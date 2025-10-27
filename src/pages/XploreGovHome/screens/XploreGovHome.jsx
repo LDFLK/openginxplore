@@ -462,7 +462,7 @@ const XploreGovHomepage = () => {
       </div>
 
       <div className="relative z-10 px-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="px-64 mx-auto">
           {/* Header */}
           {/* <div className="flex mt-8">
             <div className="z-20 flex">
@@ -543,7 +543,7 @@ const XploreGovHomepage = () => {
                   style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                 >
                   {/* Card 1 */}
-                  <div className="min-w-full px-2">
+                  <div className="min-w-full px-2 border rounded-2xl border-gray-500 bg-white/2">
                     <div className="rounded-2xl p-8 transition-all duration-300 group">
                       <div className="flex items-center space-x-3 mb-6">
                         <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
@@ -577,7 +577,7 @@ const XploreGovHomepage = () => {
                   </div>
 
                   {/* Card 2 */}
-                  <div className="min-w-full px-2">
+                  <div className="min-w-full px-2 border rounded-2xl border-gray-500 bg-white/2">
                     <div className="rounded-2xl p-8 transition-all duration-300 group">
                       <div className="flex items-center space-x-3 mb-6">
                         <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
@@ -624,13 +624,13 @@ const XploreGovHomepage = () => {
                 </div>
 
                 {/* Edge gradients */}
-                <div className="absolute inset-y-0 left-0 w-1/10 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none"></div>
-                <div className="absolute inset-y-0 right-0 w-1/10 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none"></div>
+                {/* <div className="absolute inset-y-0 left-0 w-1/10 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none"></div> */}
+                {/* <div className="absolute inset-y-0 right-0 w-1/10 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none"></div> */}
                 {/* Top gradient fade */}
-                <div className="absolute inset-x-0 top-0 h-[5%] bg-gradient-to-b from-gray-900 to-transparent pointer-events-none"></div>
+                {/* <div className="absolute inset-x-0 top-0 h-[5%] bg-gradient-to-b from-gray-900 to-transparent pointer-events-none"></div> */}
 
                 {/* Bottom gradient fade */}
-                <div className="absolute inset-x-0 bottom-0 h-[2%] bg-gradient-to-t from-gray-900 to-transparent pointer-events-none"></div>
+                {/* <div className="absolute inset-x-0 bottom-0 h-[2%] bg-gradient-to-t from-gray-900 to-transparent pointer-events-none"></div> */}
               </div>
             </div>
           </div>

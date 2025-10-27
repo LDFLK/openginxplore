@@ -344,7 +344,8 @@ const MinistryCardGrid = () => {
     <Box
       sx={{
         px: 2 ,
-        mt: -2
+        mt: -2,
+        my: 2,
 
       }}
     >

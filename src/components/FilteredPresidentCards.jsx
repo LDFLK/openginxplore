@@ -110,11 +110,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     let urlStartDate = params.get("startDate");
     let urlEndDate = params.get("endDate");
 
-    console.log("=== URL PARAMS ===");
-    console.log("selectedDate:", urlSelectedDate);
-    console.log("startDate:", urlStartDate);
-    console.log("endDate:", urlEndDate);
-
     if (urlSelectedDate) {
       const targetDate = new Date(urlSelectedDate);
       let start = urlStartDate ? new Date(urlStartDate) : null;
@@ -143,9 +138,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     if (validSelectedDate) {
       const urlRange = [new Date(urlStartDate), new Date(urlEndDate)];
 
-      console.log("Target date:", new Date(validSelectedDate));
-      console.log("Looking through all presidents...");
-
       const allPresidents = Array.isArray(presidents)
         ? presidents
         : Object.values(presidents);
@@ -173,7 +165,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       }
     }
 
-    console.log("No valid selectedDate in URL, selecting last president");
     if (filteredPresidents.length > 0) {
       const lastPresident = filteredPresidents[filteredPresidents.length - 1];
       selectPresidentAndDates(lastPresident);
@@ -194,7 +185,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
 
     if (prevStart === null && prevEnd === null) {
-      console.log("Initial dateRange set, storing reference");
       prevDateRangeRef.current = dateRange;
       return;
     }

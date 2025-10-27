@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import Navbar from "../../components/NavBar";
-import { Database, SearchIcon } from "lucide-react";
+import {
+  Binoculars,
+  ChevronLeft,
+  ChevronRight,
+  Database,
+  SearchIcon,
+  SquareLibrary,
+} from "lucide-react";
+import XploreDataTab from "../../components/xploreData/XploreDataTab";
 
 export default function OpenginXplore() {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -14,11 +22,11 @@ export default function OpenginXplore() {
           {/* <Link href="/" className="flex items-center gap-2"> */}
           <Database className="w-5 lg:w-6 h-5 lg:h-6 flex-shrink-0 text-white mr-2" />
           <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent text-md lg:text-2xl">
-            OpenginXplore
+            OpenGINXplore
           </span>
           {/* </Link> */}
         </h2>
-        <div className="w-full flex justify-end">
+        {/* <div className="w-full flex justify-end">
           <form
             // onSubmit={handleSearch}
             className="flex-1 max-w-2xl"
@@ -34,7 +42,7 @@ export default function OpenginXplore() {
               />
             </div>
           </form>
-        </div>
+        </div> */}
       </div>
 
       {/* Body */}
@@ -43,39 +51,43 @@ export default function OpenginXplore() {
         <div
           className={`${
             isExpanded ? "w-64" : "w-16"
-          } bg-gray-900 h-full transition-all duration-300 ease-in-out flex flex-col items-center py-4 border-r border-gray-700`}
+          } bg-gray-900 h-full transition-all duration-900 ease-in-out flex flex-col items-center p-2 border-r border-gray-700`}
         >
-          {/* <button
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="bg-white text-red-400 px-3 py-1 rounded-md hover:bg-red-100"
+            className=" px-3 py-1 rounded-md text-gray-200 mb-2"
           >
-            {isExpanded ? "Collapse" : "Expand"}
-          </button> */}
+            {isExpanded ? <ChevronLeft /> : <ChevronRight />}
+          </button>
 
-          <nav className="flex flex-col gap-2 text-white w-full px-2">
+          <nav className="flex flex-col text-white w-full gap-1">
             <button
-              className="hover:bg-blue-950 hover:cursor-pointer p-2 rounded-md text-left"
+              className={`${
+                selectedTab == "xploreorg" ? "bg-blue-950" : ""
+              } hover:bg-blue-950 hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out duration-700 text-left flex`}
               onClick={() => setSelectedTab("xploreorg")}
             >
-              {isExpanded ? "XploreOrg" : "D"}
+              <Binoculars className="mr-3 flex-shrink-0" size={24} />
+              {isExpanded && "XploreOrg"}
             </button>
             <button
-              className="hover:bg-blue-950 hover:cursor-pointer p-2 rounded-md text-left"
+              className={`${
+                selectedTab == "xploredata" ? "bg-blue-950" : ""
+              } hover:bg-blue-950 hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out duration-700 text-left flex`}
               onClick={() => setSelectedTab("xploredata")}
             >
-              {isExpanded ? "XploreData" : "P"}
+              <SquareLibrary className="mr-3 flex-shrink-0" size={24} />
+              {isExpanded && "XploreData"}
             </button>
           </nav>
         </div>
 
         {/* Main content */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto bg-[#000B18]">
           {selectedTab == "xploreorg" ? (
             <Navbar />
           ) : (
-            <>
-              <p>xploredata</p>
-            </>
+            selectedTab == "xploredata" && <XploreDataTab />
           )}
         </div>
       </div>
