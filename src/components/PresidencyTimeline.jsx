@@ -401,6 +401,7 @@ export default function PresidencyTimeline() {
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               alignItems: "center",
+              height: "100%",
             }}
           >
             {gazetteData?.length > 0 ? (
@@ -424,8 +425,8 @@ export default function PresidencyTimeline() {
                       <Box
                         ref={isDateSelected ? dotRef : null}
                         sx={{
-                          width: isDateSelected ? 18 : 15,
-                          height: isDateSelected ? 18 : 15,
+                          width: 15,
+                          height: 15,
                           borderRadius: "50%",
                           backgroundColor: isDateSelected
                             ? selectedPresident?.themeColorLight || colors.timelineColor
@@ -433,27 +434,37 @@ export default function PresidencyTimeline() {
                           border: `3px solid ${colors.backgroundPrimary}`,
                           zIndex: 99,
                           pointerEvents: "auto",
+                          position: "relative",
                           transition: "all 0.3s ease",
-                          // Pulse animation
-                          animation: isDateSelected
-                            ? "pulse 1.2s infinite ease-in-out"
-                            : "none",
-                          "@keyframes pulse": {
-                            "0%": {
-                              transform: "scale(1)",
-                              zIndex: 1000,
-                            },
-                            "50%": {
-                              transform: "scale(1.1)",
-                              zIndex: 1000,
-                            },
-                            "100%": {
-                              transform: "scale(1)",
-                              zIndex: 1000,
-                            },
+                          animation: isDateSelected ? "dotPulse 1.2s infinite ease-in-out" : "none", // Dot pulse
+                          "&::before": isDateSelected
+                            ? {
+                              content: '""',
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: "50%",
+                              border: `2px solid ${selectedPresident?.themeColorLight || colors.timelineColor}`,
+                              transform: "translate(-50%, -50%) scale(1)",
+                              zIndex: 0,
+                              animation: "ripple 1.2s infinite ease-out",
+                            }
+                            : {},
+                          "@keyframes ripple": {
+                            "0%": { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
+                            "70%": { transform: "translate(-50%, -50%) scale(2.5)", opacity: 0.5 },
+                            "100%": { transform: "translate(-50%, -50%) scale(3)", opacity: 0 },
+                          },
+                          "@keyframes dotPulse": {
+                            "0%": { transform: "scale(1)" },
+                            "50%": { transform: "scale(1.4)" },
+                            "100%": { transform: "scale(1)" },
                           },
                         }}
                       />
+
 
                     </Tooltip>
                     <Typography
