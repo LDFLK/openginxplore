@@ -492,7 +492,7 @@ const MinistryCardGrid = () => {
                 <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
                   Active Ministries{" "}
                   <InfoTooltip
-                    message="Number of ministry portfolios active on the selected gazette date or last date in selected range if no new gazettes published"
+                    message="Number of ministry portfolios active on the selected gazette published date or last date in selected range if no new gazettes published"
                     iconColor={colors.textPrimary}
                     iconSize={13}
                   />
@@ -684,12 +684,20 @@ const MinistryCardGrid = () => {
                       },
                     }}
                   >
-                    <MenuItem value="all">All Ministries</MenuItem>
-                    <MenuItem value="newPerson">New Ministers Appointed</MenuItem>
-                    <MenuItem value="newMinistry">New Ministries</MenuItem>
-                    <MenuItem value="presidentAsMinister">President as Minister</MenuItem>
+                    {activeMinistryList.length > 0 && <MenuItem value="all">All Ministries</MenuItem>}
+                    {activeMinistryList.filter((m) => m.newPerson).length > 0 && <MenuItem value="newPerson">New Ministers Appointed</MenuItem>}
+                    {activeMinistryList.filter((m) => m.newMin).length > 0 && <MenuItem value="newMinistry">New Ministries</MenuItem>}
+                    {activeMinistryList.filter((m) => {
+                      const headName = m.headMinisterName ? utils.extractNameFromProtobuf(m.headMinisterName) : null;
+                      const presidentName = selectedPresident?.name
+                        ? utils.extractNameFromProtobuf(selectedPresident.name).split(":")[0]
+                        : null;
+                      if (!headName && presidentName) return true;
+                      return headName && presidentName && headName.toLowerCase().trim() === presidentName.toLowerCase().trim();
+                    }).length > 0 && <MenuItem value="presidentAsMinister">President as Minister</MenuItem>}
                   </Select>
                 </FormControl>
+
               </>
             )}
 
