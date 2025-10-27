@@ -128,13 +128,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     };
   }, []);
 
-  // Initial selection of president & date
-  useEffect(() => {
-    if (gazetteDataClassic?.length > 0) {
-      setIsDateTake(true);
-    }
-  }, [presidents, gazetteDataClassic]);
-
   // Build graph function
   const buildGraph = async (parentNode = null) => {
     setGraphParent(parentNode);
@@ -384,13 +377,12 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         type: "minister",
       };
       buildGraph(ministryParent);
-    } else if (isDateTaken && selectedDate && selectedPresident) {
+    } else if (selectedDate && selectedPresident) {
       buildGraph();
     }
   }, [
     selectedDate,
     selectedPresident,
-    isDateTaken,
     activeMinistries,
     filterType,
     location.search,
