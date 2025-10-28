@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -19,6 +19,8 @@ export function ChartVisualization({ columns, rows }) {
   const [selectedYColumns, setSelectedYColumns] = useState([]);
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
+  const [detectedTicks, setDetectedTicks] = useState([]);
+  const chartRef = useRef(null);
 
   useEffect(() => {
     const stringCols = [];
@@ -54,7 +56,7 @@ export function ChartVisualization({ columns, rows }) {
     const yIndexes = selectedYColumns.map((col) => columns.indexOf(col));
 
     return rows.map((row) => {
-      const obj= {};
+      const obj = {};
       obj[xAxis] = row[xIndex];
       yIndexes.forEach((yIdx, i) => {
         obj[selectedYColumns[i]] = Number(row[yIdx]) || 0;
@@ -63,12 +65,40 @@ export function ChartVisualization({ columns, rows }) {
     });
   }, [columns, rows, xAxis, selectedYColumns]);
 
+  // Extract ticks from the actual rendered chart
+  useEffect(() => {
+    if (!chartRef.current) return;
+
+    const timer = setTimeout(() => {
+      try {
+        // Find all Y-axis tick elements in the SVG
+        const svg = chartRef.current.querySelector('svg');
+        if (!svg) return;
+
+        const yAxisTicks = svg.querySelectorAll('.recharts-yAxis .recharts-cartesian-axis-tick');
+        const ticks = Array.from(yAxisTicks).map(tick => {
+          const text = tick.querySelector('text');
+          return text ? parseFloat(text.textContent) : 0;
+        }).filter(val => !isNaN(val)).sort((a, b) => b - a);
+
+        if (ticks.length > 0) {
+          setDetectedTicks(ticks);
+        }
+      } catch (e) {
+        console.log('Could not extract ticks', e);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [chartData, selectedYColumns]);
+
   return (
     <>
       {numericColumns.length > 0 && !(numericColumns.length === 1 && numericColumns[0].toLowerCase() === "id") && (
         <div className="space-y-6 w-full">
           {/* Controls */}
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-300">Visualizations</h3>
             <h3 className="text-sm font-semibold mb-2 text-gray-400">Select Chart Data</h3>
 
             {/* X-axis selector */}
@@ -126,7 +156,7 @@ export function ChartVisualization({ columns, rows }) {
             {chartData.length > 0 ? (
               <div className="space-y-4">
                 {/* Fixed Legend */}
-                <div className="flex justify-center items-center gap-4 flex-wrap pb-2 border-b border-border">
+                <div className="flex justify-center items-center gap-4 flex-wrap pb-2 border-border" >
                   {selectedYColumns.map((col, i) => (
                     <div key={col} className="flex items-center gap-2">
                       <div
@@ -147,95 +177,144 @@ export function ChartVisualization({ columns, rows }) {
                     className="flex-shrink-0 bg-gray-800"
                     style={{
                       width: 60,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      height: 430,
+                      position: "relative",
+                      height: 425,
                       position: "sticky",
                       left: 0,
-                    //   backgroundColor: "var(--card)",
                       zIndex: 10,
                       borderRight: "1px solid var(--border)",
                       marginBottom: 60,
                     }}
                   >
-                    {Array.from({ length: 5 }).map((_, i) => {
-                      const maxVal = Math.max(
-                        ...chartData.flatMap((d) =>
-                          selectedYColumns.map((col) => d[col])
-                        )
-                      );
+                    {detectedTicks.length > 0 ? detectedTicks.map((tickVal, i) => {
+                      const totalTicks = detectedTicks.length;
+                      const percentage = (i / (totalTicks - 1)) * 100;
 
-                      const niceDomain = Math.ceil(maxVal / 5) * 5;
-                      const tickVal = Math.round((niceDomain / 4) * (4 - i));
                       return (
-                        <div key={i} className="text-xs text-right pr-1 text-gray-300">
-                          {tickVal}
+                        <div
+                          key={`${tickVal}-${i}`}
+                          className="text-xs text-right pr-1 text-gray-300"
+                          style={{
+                            position: 'absolute',
+                            top: `${percentage}%`,
+                            transform: 'translateY(-50%)',
+                            width: '100%',
+                            paddingRight: '4px',
+                          }}
+                        >
+                          {Math.round(tickVal)}
                         </div>
                       );
-                    })}
+                    }) : null}
                   </div>
 
                   {/* Scrollable chart */}
-                  <div className="overflow-x-auto flex-1">
+                  <div className="overflow-x-auto flex-1" ref={chartRef}>
                     <div
                       style={{
-                        minWidth: `${chartData.length * 80}px`,
-                        height: 480,
+                        minWidth: `${chartData.length * 100}px`,
+                        height: 455,
                         overflow: "hidden",
                       }}
                     >
-                      <BarChart
-                        data={chartData}
-                        width={chartData.length * 80}
-                        height={450}
-                        margin={{ left: 0, bottom: -10 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                        <XAxis
-                          dataKey={xAxis}
-                          stroke="var(--foreground)"
-                          tick={{ fontSize: 12, fill: "white", fillOpacity: "0.7"}}
-                          interval={0}
-                          tickFormatter={(value) =>
-                            value.length > 10 ? value.slice(0, 10) + "..." : value
-                          }
-                        />
-                        <YAxis
-                          hide
-                          domain={[0, (dataMax) => Math.ceil(dataMax / 5) * 5]}
-                          ticks={(() => {
-                            const maxVal = Math.max(
-                              ...chartData.flatMap((d) =>
-                                selectedYColumns.map((col) => d[col])
-                              )
-                            );
-                            const niceDomain = Math.ceil(maxVal / 5) * 5;
-                            return [
-                              0,
-                              niceDomain * 0.25,
-                              niceDomain * 0.5,
-                              niceDomain * 0.75,
-                              niceDomain,
-                            ];
-                          })()}
-                        />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "var(--card)",
-                            border: "1px solid var(--border)",
-                            borderRadius: "0.5rem",
+                      <div className="overflow-x-auto flex-1">
+                        <div
+                          style={{
+                            minWidth: `${chartData.length * 100}px`,
+                            width: Math.max(chartData.length * 100, 1000),
+                            height: 455,
+                            overflow: "hidden",
                           }}
-                        />
-                        {selectedYColumns.map((col, i) => (
-                          <Bar
-                            key={col}
-                            dataKey={col}
-                            fill={COLORS[i % COLORS.length]}
-                            stackId="a"
-                          />
-                        ))}
-                      </BarChart>
+                        >
+                          <BarChart
+                            data={chartData}
+                            width={Math.max(chartData.length * 100, 1000)}
+                            height={450}
+                            margin={{ left: -60, bottom: -60 }}
+                            barCategoryGap="15%"
+                          >
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
+
+                            <XAxis
+                              dataKey={xAxis}
+                              stroke="var(--foreground)"
+                              interval={0}
+                              height={86}
+                              tickLine={false}
+                              axisLine={{ stroke: "var(--border)" }}
+                              tick={({ x, y, payload }) => {
+                                const maxCharsPerLine = 15;
+                                const text = payload.value;
+                                let line1 = text;
+                                let line2 = "";
+
+                                if (text.length > maxCharsPerLine) {
+                                  const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                  if (splitIndex > 0) {
+                                    line1 = text.slice(0, splitIndex);
+                                    line2 = text.slice(splitIndex + 1);
+                                  } else {
+                                    line1 = text.slice(0, maxCharsPerLine);
+                                    line2 = text.slice(maxCharsPerLine);
+                                  }
+                                }
+
+                                return (
+                                  <g transform={`translate(${x},${y + 2.5})`}>
+                                    <text
+                                      x={0}
+                                      y={0}
+                                      textAnchor="middle"
+                                      fontSize={11.5}
+                                      fill="white"
+                                      fillOpacity={0.7}
+                                    >
+                                      {line1}
+                                    </text>
+                                    {line2 && (
+                                      <text
+                                        x={0}
+                                        y={12}
+                                        textAnchor="middle"
+                                        fontSize={11.5}
+                                        fill="white"
+                                        fillOpacity={0.7}
+                                      >
+                                        {line2}
+                                      </text>
+                                    )}
+                                  </g>
+                                );
+                              }}
+                            />
+
+                            <YAxis
+                              stroke="transparent"
+                              tickLine={false}
+                              axisLine={false}
+                              tick={{ fill: 'transparent' }}
+                            />
+
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "var(--card)",
+                                border: "1px solid var(--border)",
+                                borderRadius: "0.5rem",
+                              }}
+                              formatter={(value, name) => [value, formatText({ name: name })]}
+                            />
+
+                            {selectedYColumns.map((col, i) => (
+                              <Bar
+                                key={col}
+                                dataKey={col}
+                                fill={COLORS[i % COLORS.length]}
+                                stackId="a"
+                              />
+                            ))}
+                          </BarChart>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
