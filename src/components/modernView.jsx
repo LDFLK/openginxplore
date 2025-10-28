@@ -1,4 +1,3 @@
-import { Box } from "@mui/material";
 import PresidencyTimeline from "./PresidencyTimeline";
 import MinistryCardGrid from "./MinistryCardGrid";
 import { useSelector } from "react-redux";
@@ -26,32 +25,11 @@ const ModernView = () => {
     }
   }, [president, navigate, location.pathname]);
 
-
   return (
-    <Box
-      sx={{
-        paddingTop: "2vw",
-        // width: "100vw",
-        minHeight: "100vh",
-        backgroundColor: colors.backgroundPrimary,
-        overflowX: "hidden",
-      }}
-    >
-      (
-      <Box sx={{ display: "flex", mt: 5, justifyContent: "center" }}>
-        <PresidencyTimeline />
-      </Box>
-      )
-      {selectedPresident && (
-        <>
-          <Box
-          >
-            {/* Card Grid for Modern View */}
-            {selectedDate != null && <MinistryCardGrid />}
-          </Box>
-        </>
-      )}
-    </Box>
+    <div>
+      <PresidencyTimeline />
+      {selectedPresident && <>{selectedDate != null && <MinistryCardGrid />}</>}
+    </div>
   );
 };
 

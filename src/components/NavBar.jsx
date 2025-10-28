@@ -40,7 +40,7 @@ function Navbar() {
       }}
     >
       {/* View Buttons */}
-      <Box
+      {/* <Box
         sx={{
           width: "100%",
           backgroundColor: colors.backgroundPrimary,
@@ -85,7 +85,7 @@ function Navbar() {
             Settings
           </Button>
         </Stack>
-      </Box>
+      </Box> */}
 
       {/* Drawer for settings */}
       <Drawer

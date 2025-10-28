@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const apiUrlData = window?.configs?.apiUrlData ? window.configs.apiUrlData : "/"
-// const apiUrlData = "";
+// const apiUrlData = window?.configs?.apiUrlData ? window.configs.apiUrlData : "/"
+const apiUrlData = "https://aaf8ece1-3077-4a52-ab05-183a424f6d93-dev.e1-us-east-azure.choreoapis.dev/data-platform/gi-service/v1.0";
 
 const fetchCategoriesAndDatasets = async (parentId = "") => {
   try {
