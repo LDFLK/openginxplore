@@ -54,7 +54,7 @@ export function ChartVisualization({ columns, rows }) {
     const yIndexes = selectedYColumns.map((col) => columns.indexOf(col));
 
     return rows.map((row) => {
-      const obj= {};
+      const obj = {};
       obj[xAxis] = row[xIndex];
       yIndexes.forEach((yIdx, i) => {
         obj[selectedYColumns[i]] = Number(row[yIdx]) || 0;
@@ -153,7 +153,7 @@ export function ChartVisualization({ columns, rows }) {
                       height: 430,
                       position: "sticky",
                       left: 0,
-                    //   backgroundColor: "var(--card)",
+                      //   backgroundColor: "var(--card)",
                       zIndex: 10,
                       borderRight: "1px solid var(--border)",
                       marginBottom: 60,
@@ -180,62 +180,122 @@ export function ChartVisualization({ columns, rows }) {
                   <div className="overflow-x-auto flex-1">
                     <div
                       style={{
-                        minWidth: `${chartData.length * 80}px`,
-                        height: 480,
+                        minWidth: `${chartData.length * 100}px`,
+                        height: 455,
                         overflow: "hidden",
                       }}
                     >
-                      <BarChart
-                        data={chartData}
-                        width={chartData.length * 80}
-                        height={450}
-                        margin={{ left: 0, bottom: -10 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                        <XAxis
-                          dataKey={xAxis}
-                          stroke="var(--foreground)"
-                          tick={{ fontSize: 12, fill: "white", fillOpacity: "0.7"}}
-                          interval={0}
-                          tickFormatter={(value) =>
-                            value.length > 10 ? value.slice(0, 10) + "..." : value
-                          }
-                        />
-                        <YAxis
-                          hide
-                          domain={[0, (dataMax) => Math.ceil(dataMax / 5) * 5]}
-                          ticks={(() => {
-                            const maxVal = Math.max(
-                              ...chartData.flatMap((d) =>
-                                selectedYColumns.map((col) => d[col])
-                              )
-                            );
-                            const niceDomain = Math.ceil(maxVal / 5) * 5;
-                            return [
-                              0,
-                              niceDomain * 0.25,
-                              niceDomain * 0.5,
-                              niceDomain * 0.75,
-                              niceDomain,
-                            ];
-                          })()}
-                        />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "var(--card)",
-                            border: "1px solid var(--border)",
-                            borderRadius: "0.5rem",
+                      <div className="overflow-x-auto flex-1">
+                        <div
+                          style={{
+                            minWidth: `${chartData.length * 100}px`,
+                            width: Math.max(chartData.length * 100, 1000),
+                            height: 455,
+                            overflow: "hidden",
                           }}
-                        />
-                        {selectedYColumns.map((col, i) => (
-                          <Bar
-                            key={col}
-                            dataKey={col}
-                            fill={COLORS[i % COLORS.length]}
-                            stackId="a"
-                          />
-                        ))}
-                      </BarChart>
+                        >
+                          <BarChart
+                            data={chartData}
+                            width={Math.max(chartData.length * 100, 1000)}
+                            height={450}
+                            margin={{ left: 0, bottom: -60 }}
+                            barCategoryGap="15%"
+                          >
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
+
+                            <XAxis
+                              dataKey={xAxis}
+                              stroke="var(--foreground)"
+                              interval={0}
+                              height={80}
+                              tickLine={false}
+                              axisLine={{ stroke: "var(--border)" }}
+                              tick={({ x, y, payload }) => {
+                                const maxCharsPerLine = 15;
+                                const text = payload.value;
+                                let line1 = text;
+                                let line2 = "";
+
+                                if (text.length > maxCharsPerLine) {
+                                  const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                  if (splitIndex > 0) {
+                                    line1 = text.slice(0, splitIndex);
+                                    line2 = text.slice(splitIndex + 1);
+                                  } else {
+                                    line1 = text.slice(0, maxCharsPerLine);
+                                    line2 = text.slice(maxCharsPerLine);
+                                  }
+                                }
+
+                                return (
+                                  <g transform={`translate(${x},${y + 2.5})`}>
+                                    <text
+                                      x={0}
+                                      y={0}
+                                      textAnchor="middle"
+                                      fontSize={11.5}
+                                      fill="white"
+                                      fillOpacity={0.7}
+                                    >
+                                      {line1}
+                                    </text>
+                                    {line2 && (
+                                      <text
+                                        x={0}
+                                        y={12}
+                                        textAnchor="middle"
+                                        fontSize={11.5}
+                                        fill="white"
+                                        fillOpacity={0.7}
+                                      >
+                                        {line2}
+                                      </text>
+                                    )}
+                                  </g>
+                                );
+                              }}
+
+                            />
+
+                            <YAxis
+                              hide
+                              domain={[0, (dataMax) => Math.ceil(dataMax / 5) * 5]}
+                              ticks={(() => {
+                                const maxVal = Math.max(
+                                  ...chartData.flatMap((d) => selectedYColumns.map((col) => d[col]))
+                                );
+                                const niceDomain = Math.ceil(maxVal / 5) * 5;
+                                return [
+                                  0,
+                                  niceDomain * 0.25,
+                                  niceDomain * 0.5,
+                                  niceDomain * 0.75,
+                                  niceDomain,
+                                ];
+                              })()}
+                            />
+
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "var(--card)",
+                                border: "1px solid var(--border)",
+                                borderRadius: "0.5rem",
+                              }}
+                              formatter={(value, name) => [value, formatText({ name: name })]}
+                            />
+
+                            {selectedYColumns.map((col, i) => (
+                              <Bar
+                                key={col}
+                                dataKey={col}
+                                fill={COLORS[i % COLORS.length]}
+                                stackId="a"
+                              />
+                            ))}
+                          </BarChart>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
