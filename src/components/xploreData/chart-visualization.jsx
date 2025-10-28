@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -19,6 +19,8 @@ export function ChartVisualization({ columns, rows }) {
   const [selectedYColumns, setSelectedYColumns] = useState([]);
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
+  const [detectedTicks, setDetectedTicks] = useState([]);
+  const chartRef = useRef(null);
 
   useEffect(() => {
     const stringCols = [];
@@ -62,6 +64,33 @@ export function ChartVisualization({ columns, rows }) {
       return obj;
     });
   }, [columns, rows, xAxis, selectedYColumns]);
+
+  // Extract ticks from the actual rendered chart
+  useEffect(() => {
+    if (!chartRef.current) return;
+
+    const timer = setTimeout(() => {
+      try {
+        // Find all Y-axis tick elements in the SVG
+        const svg = chartRef.current.querySelector('svg');
+        if (!svg) return;
+
+        const yAxisTicks = svg.querySelectorAll('.recharts-yAxis .recharts-cartesian-axis-tick');
+        const ticks = Array.from(yAxisTicks).map(tick => {
+          const text = tick.querySelector('text');
+          return text ? parseFloat(text.textContent) : 0;
+        }).filter(val => !isNaN(val)).sort((a, b) => b - a);
+
+        if (ticks.length > 0) {
+          setDetectedTicks(ticks);
+        }
+      } catch (e) {
+        console.log('Could not extract ticks', e);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [chartData, selectedYColumns]);
 
   return (
     <>
@@ -127,7 +156,7 @@ export function ChartVisualization({ columns, rows }) {
             {chartData.length > 0 ? (
               <div className="space-y-4">
                 {/* Fixed Legend */}
-                <div className="flex justify-center items-center gap-4 flex-wrap pb-2 border-b border-border">
+                <div className="flex justify-center items-center gap-4 flex-wrap pb-2 border-border" >
                   {selectedYColumns.map((col, i) => (
                     <div key={col} className="flex items-center gap-2">
                       <div
@@ -148,37 +177,39 @@ export function ChartVisualization({ columns, rows }) {
                     className="flex-shrink-0 bg-gray-800"
                     style={{
                       width: 60,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
+                      position: "relative",
                       height: 425,
                       position: "sticky",
                       left: 0,
-                      //   backgroundColor: "var(--card)",
                       zIndex: 10,
                       borderRight: "1px solid var(--border)",
                       marginBottom: 60,
                     }}
                   >
-                    {Array.from({ length: 5 }).map((_, i) => {
-                      const maxVal = Math.max(
-                        ...chartData.flatMap((d) =>
-                          selectedYColumns.map((col) => d[col])
-                        )
-                      );
+                    {detectedTicks.length > 0 ? detectedTicks.map((tickVal, i) => {
+                      const totalTicks = detectedTicks.length;
+                      const percentage = (i / (totalTicks - 1)) * 100;
 
-                      const niceDomain = Math.ceil(maxVal / 5) * 5;
-                      const tickVal = Math.round((niceDomain / 4) * (4 - i));
                       return (
-                        <div key={i} className="text-xs text-right pr-1 text-gray-300">
-                          {tickVal}
+                        <div
+                          key={`${tickVal}-${i}`}
+                          className="text-xs text-right pr-1 text-gray-300"
+                          style={{
+                            position: 'absolute',
+                            top: `${percentage}%`,
+                            transform: 'translateY(-50%)',
+                            width: '100%',
+                            paddingRight: '4px',
+                          }}
+                        >
+                          {Math.round(tickVal)}
                         </div>
                       );
-                    })}
+                    }) : null}
                   </div>
 
                   {/* Scrollable chart */}
-                  <div className="overflow-x-auto flex-1">
+                  <div className="overflow-x-auto flex-1" ref={chartRef}>
                     <div
                       style={{
                         minWidth: `${chartData.length * 100}px`,
@@ -199,7 +230,7 @@ export function ChartVisualization({ columns, rows }) {
                             data={chartData}
                             width={Math.max(chartData.length * 100, 1000)}
                             height={450}
-                            margin={{ left: 0, bottom: -60 }}
+                            margin={{ left: -60, bottom: -60 }}
                             barCategoryGap="15%"
                           >
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
@@ -255,25 +286,13 @@ export function ChartVisualization({ columns, rows }) {
                                   </g>
                                 );
                               }}
-
                             />
 
                             <YAxis
-                              hide
-                              domain={[0, (dataMax) => Math.ceil(dataMax / 5) * 5]}
-                              ticks={(() => {
-                                const maxVal = Math.max(
-                                  ...chartData.flatMap((d) => selectedYColumns.map((col) => d[col]))
-                                );
-                                const niceDomain = Math.ceil(maxVal / 5) * 5;
-                                return [
-                                  0,
-                                  niceDomain * 0.25,
-                                  niceDomain * 0.5,
-                                  niceDomain * 0.75,
-                                  niceDomain,
-                                ];
-                              })()}
+                              stroke="transparent"
+                              tickLine={false}
+                              axisLine={false}
+                              tick={{ fill: 'transparent' }}
                             />
 
                             <Tooltip
@@ -296,7 +315,6 @@ export function ChartVisualization({ columns, rows }) {
                           </BarChart>
                         </div>
                       </div>
-
                     </div>
                   </div>
                 </div>
