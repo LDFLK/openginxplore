@@ -151,7 +151,7 @@ export function ChartVisualization({ columns, rows }) {
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
-                      height: 430,
+                      height: 425,
                       position: "sticky",
                       left: 0,
                       //   backgroundColor: "var(--card)",
@@ -208,7 +208,7 @@ export function ChartVisualization({ columns, rows }) {
                               dataKey={xAxis}
                               stroke="var(--foreground)"
                               interval={0}
-                              height={85}
+                              height={86}
                               tickLine={false}
                               axisLine={{ stroke: "var(--border)" }}
                               tick={({ x, y, payload }) => {
