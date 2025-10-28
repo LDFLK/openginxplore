@@ -1,7 +1,7 @@
 import utils from "../utils/utils";
 
-// const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
-const apiUrl = "";
+const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
+// const apiUrl = "";
 
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {

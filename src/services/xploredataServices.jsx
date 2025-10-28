@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const apiUrlData = window?.configs?.apiUrlData ? window.configs.apiUrlData : "/"
-const apiUrlData = "";
+const apiUrlData = window?.configs?.apiUrlData ? window.configs.apiUrlData : "/"
+// const apiUrlData = "";
 
 const fetchCategoriesAndDatasets = async (parentId = "") => {
   try {
