@@ -69,6 +69,7 @@ export function ChartVisualization({ columns, rows }) {
         <div className="space-y-6 w-full">
           {/* Controls */}
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-300">Visualizations</h3>
             <h3 className="text-sm font-semibold mb-2 text-gray-400">Select Chart Data</h3>
 
             {/* X-axis selector */}
