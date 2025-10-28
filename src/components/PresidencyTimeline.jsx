@@ -10,24 +10,21 @@ import { useThemeContext } from "../themeContext";
 import YearRangeSelector from "../components/Timeline";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { Files } from "lucide-react";
 
 export default function PresidencyTimeline() {
   const dispatch = useDispatch();
 
   //redux state
-  const presidents = useSelector((state) => state.presidency.presidentDict);
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
   );
   const selectedDate = useSelector((state) => state.presidency.selectedDate);
+
+  const { gazetteData } = useSelector((state) => state.gazettes);
   const presidentRelationDict = useSelector(
     (state) => state.presidency.presidentRelationDict
   );
-  const { gazetteData } = useSelector((state) => state.gazettes);
-  const gazetteDateClassic = useSelector(
-    (state) => state.gazettes.gazetteDataClassic
-  );
-
   //ref
   const scrollRef = useRef(null);
   const avatarRef = useRef(null);
@@ -37,11 +34,6 @@ export default function PresidencyTimeline() {
   const [lineStyle, setLineStyle] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [latestPresStartDate, setLatestPresStartDate] = useState(new Date());
-  const [userSelectedDateRange, setUserSelectedDateRange] = useState([
-    null,
-    null,
-  ]);
   const [latestPresidentId, setLatestPresidentId] = useState(null);
 
   const { colors } = useThemeContext();
@@ -111,23 +103,6 @@ export default function PresidencyTimeline() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!presidents || presidents.length === 0 || !presidentRelationDict)
-      return;
-
-    const relationEntries = Object.entries(presidentRelationDict);
-    if (relationEntries.length === 0) return;
-
-    // Last relation
-    const [lastPresId, lastRelation] =
-      relationEntries[relationEntries.length - 1];
-
-    if (lastPresId && lastRelation?.startTime) {
-      setLatestPresidentId(lastPresId);
-      setLatestPresStartDate(new Date(lastRelation.startTime.split("T")[0]));
-    }
-  }, [presidents, presidentRelationDict]);
-
   // Auto-scroll selected dot into view
   useEffect(() => {
     setTimeout(() => {
@@ -155,13 +130,6 @@ export default function PresidencyTimeline() {
     }
   }, [selectedDate]);
 
-  const handleDateRangeChange = useCallback((dateRange) => {
-    const [startDate, endDate] = dateRange;
-    setUserSelectedDateRange([startDate, endDate]);
-  }, []);
-
-  const dates = gazetteDateClassic.map((d) => `${d}T00:00:00Z`);
-
   return (
     <Box
       sx={{
@@ -170,26 +138,26 @@ export default function PresidencyTimeline() {
         alignItems: "center",
         gap: 2,
         width: "100%",
-        mt: -2
       }}
     >
-      <YearRangeSelector
-        startYear={2019}
-        dates={dates}
-        latestPresStartDate={latestPresStartDate}
-        onDateChange={handleDateRangeChange}
-      />
+      <Typography
+        sx={{
+          mt: "20px",
+          color: colors.textPrimary,
+        }}
+      >
+        Select gazette published date
+      </Typography>
       {selectedPresident && (
         <Box
           sx={{
             position: "relative",
             display: "flex",
             alignItems: "center",
-            width: "100%",
-            maxWidth: { xs: "100vw", sm: "90vw", md: "80vw", lg: "1200px" },
+            maxWidth: { xs: "100vw", sm: "90vw", md: "80vw", lg: "85vw" },
             overflow: "hidden",
-            minWidth: 0,
-            height: "130px",
+            width: "100%",
+            height: "120px",
           }}
         >
           <IconButton
@@ -242,14 +210,12 @@ export default function PresidencyTimeline() {
             <Box
               sx={{
                 position: "absolute",
-                left: { xs: 3, sm: 6 },
                 zIndex: 9,
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
                 flexShrink: 0,
                 transition: "all 0.3s ease",
-                padding: { xs: 2, sm: 4 },
                 pointerEvents: "none",
               }}
             >
@@ -267,8 +233,10 @@ export default function PresidencyTimeline() {
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                     sx={{
-                      border: `4px solid ${selectedPresident?.themeColorLight || colors.timelineColor
-                        }`,
+                      border: `4px solid ${
+                        selectedPresident?.themeColorLight ||
+                        colors.timelineColor
+                      }`,
                       backgroundColor: colors.backgroundPrimary,
                       margin: "auto",
                       borderRadius: 50,
@@ -309,29 +277,18 @@ export default function PresidencyTimeline() {
                   </Typography>
                 </Box>
               ) : (
-                <Box
-                  sx={{
-                    textAlign: "center",
-                    minWidth: { xs: 60, sm: 80 },
-                    background: `linear-gradient(to right, ${colors.backgroundPrimary} 65%, rgba(0,0,0,0) 50%)`,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      border: `4px solid ${selectedPresident?.themeColorLight || colors.timelineColor
-                        }`,
-                      backgroundColor: colors.backgroundPrimary,
-                      margin: "auto",
-                      borderRadius: "50%",
-                      display: "inline-flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Avatar
+                // <Box
+                //   sx={{
+                //     textAlign: "center",
+                //     minWidth: { xs: 60, sm: 80 },
+                //     background: `linear-gradient(to right, ${colors.backgroundPrimary} 65%, rgba(0,0,0,0) 50%)`,
+                //   }}
+                // >
+                  
+                    <Box
                       ref={avatarRef}
-                      alt={selectedPresident.name}
-                      src={selectedPresident.imageUrl}
+                      // alt={selectedPresident.name}
+                      // src={selectedPresident.imageUrl}
                       sx={{
                         width: { xs: 40, sm: 50 },
                         height: { xs: 40, sm: 50 },
@@ -339,45 +296,9 @@ export default function PresidencyTimeline() {
                         backgroundColor: colors.backgroundPrimary,
                         margin: "auto",
                       }}
-                    />
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      mt: 1,
-                      color: colors.textPrimary,
-                      fontFamily: "poppins",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {utils.extractNameFromProtobuf(selectedPresident.name)}
-                  </Typography>
+                    ><Files /></Box>
+                  // </Box>
 
-                  <Typography
-                    variant="caption"
-                    sx={{ color: colors.textMuted, fontFamily: "poppins" }}
-                  >
-                    {(() => {
-                      const relation =
-                        presidentRelationDict[selectedPresident.id];
-                      if (!relation) return "Unknown";
-
-                      return relation.startTime
-                        ? new Date(relation.startTime).getFullYear()
-                        : "Unknown";
-                    })()}{" "}
-                    -{" "}
-                    {(() => {
-                      const relation =
-                        presidentRelationDict[selectedPresident.id];
-                      if (!relation) return "Unknown";
-
-                      return relation.endTime
-                        ? new Date(relation.endTime).getFullYear()
-                        : "Present";
-                    })()}
-                  </Typography>
-                </Box>
               )}
             </Box>
           )}
@@ -421,7 +342,11 @@ export default function PresidencyTimeline() {
                       mt: { xs: -8.5, sm: -4 },
                     }}
                   >
-                    <Tooltip title="Gazette published date" placement="top" arrow>
+                    <Tooltip
+                      title="Gazette published date"
+                      placement="top"
+                      arrow
+                    >
                       <Box
                         ref={isDateSelected ? dotRef : null}
                         sx={{
@@ -429,33 +354,48 @@ export default function PresidencyTimeline() {
                           height: 15,
                           borderRadius: "50%",
                           backgroundColor: isDateSelected
-                            ? selectedPresident?.themeColorLight || colors.timelineColor
+                            ? selectedPresident?.themeColorLight ||
+                              colors.timelineColor
                             : colors.dotColorInactive,
                           border: `3px solid ${colors.backgroundPrimary}`,
                           zIndex: 99,
                           pointerEvents: "auto",
                           position: "relative",
                           transition: "all 0.3s ease",
-                          animation: isDateSelected ? "dotPulse 1.2s infinite ease-in-out" : "none", // Dot pulse
+                          animation: isDateSelected
+                            ? "dotPulse 1.2s infinite ease-in-out"
+                            : "none", // Dot pulse
                           "&::before": isDateSelected
                             ? {
-                              content: '""',
-                              position: "absolute",
-                              top: "50%",
-                              left: "50%",
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: "50%",
-                              border: `2px solid ${selectedPresident?.themeColorLight || colors.timelineColor}`,
-                              transform: "translate(-50%, -50%) scale(1)",
-                              zIndex: 0,
-                              animation: "ripple 1.2s infinite ease-out",
-                            }
+                                content: '""',
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                width: "100%",
+                                height: "100%",
+                                borderRadius: "50%",
+                                border: `2px solid ${
+                                  selectedPresident?.themeColorLight ||
+                                  colors.timelineColor
+                                }`,
+                                transform: "translate(-50%, -50%) scale(1)",
+                                zIndex: 0,
+                                animation: "ripple 1.2s infinite ease-out",
+                              }
                             : {},
                           "@keyframes ripple": {
-                            "0%": { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
-                            "70%": { transform: "translate(-50%, -50%) scale(2.5)", opacity: 0.5 },
-                            "100%": { transform: "translate(-50%, -50%) scale(3)", opacity: 0 },
+                            "0%": {
+                              transform: "translate(-50%, -50%) scale(1)",
+                              opacity: 1,
+                            },
+                            "70%": {
+                              transform: "translate(-50%, -50%) scale(2.5)",
+                              opacity: 0.5,
+                            },
+                            "100%": {
+                              transform: "translate(-50%, -50%) scale(3)",
+                              opacity: 0,
+                            },
                           },
                           "@keyframes dotPulse": {
                             "0%": { transform: "scale(1)" },
@@ -464,8 +404,6 @@ export default function PresidencyTimeline() {
                           },
                         }}
                       />
-
-
                     </Tooltip>
                     <Typography
                       variant="caption"
@@ -473,7 +411,7 @@ export default function PresidencyTimeline() {
                         mt: 0.5,
                         color: isDateSelected
                           ? selectedPresident?.themeColorLight ||
-                          colors.timelineColor
+                            colors.timelineColor
                           : colors.dotColorInactive,
                         fontSize: "0.75rem",
                         fontWeight: isDateSelected ? "bold" : "",
@@ -501,7 +439,8 @@ export default function PresidencyTimeline() {
                   mt: { xs: -7.5, sm: -2 },
                   flexShrink: 0,
                 }}
-              >z
+              >
+                z
                 <Box
                   sx={{
                     color: colors.textMuted,
