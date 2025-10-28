@@ -208,7 +208,7 @@ export function ChartVisualization({ columns, rows }) {
                               dataKey={xAxis}
                               stroke="var(--foreground)"
                               interval={0}
-                              height={80}
+                              height={85}
                               tickLine={false}
                               axisLine={{ stroke: "var(--border)" }}
                               tick={({ x, y, payload }) => {
