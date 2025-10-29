@@ -294,7 +294,7 @@ export default function PresidencyTimeline() {
                     backgroundColor: colors.backgroundPrimary,
                     margin: "auto",
                   }}
-                ><Files /></Box>
+                ><Box /></Box>
                 // </Box>
 
               )}
@@ -439,10 +439,10 @@ export default function PresidencyTimeline() {
           </IconButton>
         </Box>
       )}
-      {gazetteData?.length == 0 && (
+      {gazetteData?.length == 0 && selectedDate && (
         <Typography
           variant="caption"
-          sx={{color: colors.success || "#28a745",fontWeight: 500,textAlign: "center",fontSize: 14,}}
+          sx={{ color: colors.success || "#28a745", fontWeight: 500, textAlign: "center", fontSize: 14, }}
         >
           Information corresponds to the last date of selected range: {" "}
           {new Date(selectedDate.date).toLocaleDateString("en-GB", {
@@ -450,6 +450,19 @@ export default function PresidencyTimeline() {
             month: "short",
             year: "numeric",
           })}
+        </Typography>
+      )}
+      {selectedDate?.date && !gazetteData.some(item => item.date === selectedDate.date) && !gazetteData?.length == 0 && (
+        <Typography
+          variant="caption"
+          sx={{ color: colors.success || "#28a745", fontWeight: 500, textAlign: "center", fontSize: 14, }}
+        >
+          Information corresponds to the date: {" "}
+          {new Date(selectedDate.date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })} (not a gazette published date)
         </Typography>
       )}
     </Box>
