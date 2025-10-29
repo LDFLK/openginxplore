@@ -137,14 +137,16 @@ export default function PresidencyTimeline() {
         width: "100%",
       }}
     >
-      <Typography
-        sx={{
-          mt: "20px",
-          color: colors.textPrimary,
-        }}
-      >
-        Select gazette published date
-      </Typography>
+      {gazetteData?.length > 0 && (
+        <Typography
+          sx={{
+            mt: "30px",
+            color: colors.textPrimary,
+          }}
+        >
+          Select gazette published date
+        </Typography>
+      )}
       {selectedPresident && (
         <Box
           sx={{
@@ -392,11 +394,11 @@ export default function PresidencyTimeline() {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  mt: { xs: -7.5, sm: -2 },
                   flexShrink: 0,
+                  position: "absolute",
+                  left: 0,
                 }}
               >
-                z
                 <Box
                   sx={{
                     color: colors.textMuted,
@@ -410,9 +412,7 @@ export default function PresidencyTimeline() {
                     alignItems: "center",
                   }}
                 >
-                  <InfoOutlinedIcon
-                    sx={{ fontSize: 15, color: colors.textMuted, mr: 0.5 }}
-                  />
+                  <InfoOutlinedIcon sx={{ fontSize: 15, color: colors.textMuted }} />
                   <Typography variant="caption">
                     No new gazette publications
                   </Typography>
@@ -438,6 +438,19 @@ export default function PresidencyTimeline() {
             <ArrowForwardIosIcon />
           </IconButton>
         </Box>
+      )}
+      {gazetteData?.length == 0 && (
+        <Typography
+          variant="caption"
+          sx={{color: colors.success || "#28a745",fontWeight: 500,textAlign: "center",fontSize: 14,}}
+        >
+          Information corresponds to the last date of selected range: {" "}
+          {new Date(selectedDate.date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </Typography>
       )}
     </Box>
   );
