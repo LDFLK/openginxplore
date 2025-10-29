@@ -68,6 +68,15 @@ export default function YearRangeSelector({
     initialStartYear,
     initialEndYear,
   ]);
+  useEffect(() => {
+  if (!startDate || !endDate) return;
+  
+  const url = new URL(window.location.href);
+  url.searchParams.set("startDate", startDate.toISOString().split("T")[0]);
+  url.searchParams.set("endDate", endDate.toISOString().split("T")[0]);
+  
+  window.history.replaceState({}, "", url.toString());
+}, [startDate, endDate]);
 
   useEffect(() => {
     const selectedDateParam = searchParams.get("selectedDate");
