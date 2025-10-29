@@ -7,7 +7,6 @@ import { setSelectedDate } from "../store/presidencySlice";
 import utils from "../utils/utils";
 import StyledBadge from "../components/materialCustomAvatar";
 import { useThemeContext } from "../themeContext";
-import YearRangeSelector from "../components/Timeline";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { Files } from "lucide-react";
@@ -22,9 +21,7 @@ export default function PresidencyTimeline() {
   const selectedDate = useSelector((state) => state.presidency.selectedDate);
 
   const { gazetteData } = useSelector((state) => state.gazettes);
-  const presidentRelationDict = useSelector(
-    (state) => state.presidency.presidentRelationDict
-  );
+
   //ref
   const scrollRef = useRef(null);
   const avatarRef = useRef(null);

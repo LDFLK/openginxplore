@@ -531,6 +531,11 @@ export default function YearRangeSelector({
     setIsDragging(null);
     setIsMovingWindow(false);
   };
+  useEffect(() => {
+  if (onDateChange && startDate && endDate) {
+    onDateChange([startDate, endDate]);
+  }
+}, [startDate, endDate, onDateChange]);
 
   useEffect(() => {
     if (isDragging || isMovingWindow) {
@@ -1313,11 +1318,6 @@ export default function YearRangeSelector({
 
       <div className="text-gray-500 text-xs text-center mt-2">
         Gazettes Published by Year
-      </div>
-
-      {/* FilteredPresidentCards Component */}
-      <div className="mb-6">
-        <FilteredPresidentCards dateRange={[startDate, endDate]} />
       </div>
     </div>
   );
