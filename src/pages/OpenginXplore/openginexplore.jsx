@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Navbar from "../../components/NavBar";
 import {
   Binoculars,
   ChevronLeft,
@@ -11,6 +10,7 @@ import {
 import XploreDataTab from "../../components/xploreData/XploreDataTab";
 import YearRangeSelector from "../../components/Timeline";
 import { useSelector } from "react-redux";
+import Organization from "../../components/Organization";
 
 export default function OpenginXplore() {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -116,7 +116,9 @@ export default function OpenginXplore() {
           onDateChange={handleDateRangeChange}
         />
           {selectedTab == "xploreorg" ? (
-            <Navbar />
+             <>
+              <Organization dateRange={userSelectedDateRange} />
+            </>
           ) : (
             selectedTab == "xploredata" && <XploreDataTab />
           )}

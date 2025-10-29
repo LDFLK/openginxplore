@@ -493,7 +493,7 @@ const MinistryCardGrid = () => {
                 <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
                   Active Ministries{" "}
                   <InfoTooltip
-                    message="Number of ministry portfolios active on the selected gazette published date or last date in selected range if no new gazettes published"
+                    message="Number of ministry portfolios active on the selected date"
                     iconColor={colors.textPrimary}
                     iconSize={13}
                   />
