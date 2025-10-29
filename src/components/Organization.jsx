@@ -25,6 +25,15 @@ const Organization = ({ dateRange }) => {
     }
   }, [president, navigate, location.pathname]);
 
+  // Cleanup selectedDate from URL when leaving the organization tab
+  useEffect(() => {
+    return () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("selectedDate");
+      window.history.replaceState({}, "", url.toString());
+    };
+  }, []);
+
   return (
     <div>
       {/* FilteredPresidentCards Component */}
