@@ -230,10 +230,9 @@ export default function PresidencyTimeline() {
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                     sx={{
-                      border: `4px solid ${
-                        selectedPresident?.themeColorLight ||
+                      border: `4px solid ${selectedPresident?.themeColorLight ||
                         colors.timelineColor
-                      }`,
+                        }`,
                       backgroundColor: colors.backgroundPrimary,
                       margin: "auto",
                       borderRadius: 50,
@@ -281,20 +280,20 @@ export default function PresidencyTimeline() {
                 //     background: `linear-gradient(to right, ${colors.backgroundPrimary} 65%, rgba(0,0,0,0) 50%)`,
                 //   }}
                 // >
-                  
-                    <Box
-                      ref={avatarRef}
-                      // alt={selectedPresident.name}
-                      // src={selectedPresident.imageUrl}
-                      sx={{
-                        width: { xs: 40, sm: 50 },
-                        height: { xs: 40, sm: 50 },
-                        border: `3px solid ${colors.backgroundPrimary}`,
-                        backgroundColor: colors.backgroundPrimary,
-                        margin: "auto",
-                      }}
-                    ><Files /></Box>
-                  // </Box>
+
+                <Box
+                  ref={avatarRef}
+                  // alt={selectedPresident.name}
+                  // src={selectedPresident.imageUrl}
+                  sx={{
+                    width: { xs: 40, sm: 50 },
+                    height: { xs: 40, sm: 50 },
+                    border: `3px solid ${colors.backgroundPrimary}`,
+                    backgroundColor: colors.backgroundPrimary,
+                    margin: "auto",
+                  }}
+                ><Files /></Box>
+                // </Box>
 
               )}
             </Box>
@@ -347,58 +346,18 @@ export default function PresidencyTimeline() {
                       <Box
                         ref={isDateSelected ? dotRef : null}
                         sx={{
-                          width: 15,
-                          height: 15,
+                          width: isDateSelected ? 20 : 15,
+                          height: isDateSelected ? 20 : 15,
                           borderRadius: "50%",
                           backgroundColor: isDateSelected
                             ? selectedPresident?.themeColorLight ||
-                              colors.timelineColor
+                            colors.timelineColor
                             : colors.dotColorInactive,
                           border: `3px solid ${colors.backgroundPrimary}`,
                           zIndex: 99,
                           pointerEvents: "auto",
                           position: "relative",
                           transition: "all 0.3s ease",
-                          animation: isDateSelected
-                            ? "dotPulse 1.2s infinite ease-in-out"
-                            : "none", // Dot pulse
-                          "&::before": isDateSelected
-                            ? {
-                                content: '""',
-                                position: "absolute",
-                                top: "50%",
-                                left: "50%",
-                                width: "100%",
-                                height: "100%",
-                                borderRadius: "50%",
-                                border: `2px solid ${
-                                  selectedPresident?.themeColorLight ||
-                                  colors.timelineColor
-                                }`,
-                                transform: "translate(-50%, -50%) scale(1)",
-                                zIndex: 0,
-                                animation: "ripple 1.2s infinite ease-out",
-                              }
-                            : {},
-                          "@keyframes ripple": {
-                            "0%": {
-                              transform: "translate(-50%, -50%) scale(1)",
-                              opacity: 1,
-                            },
-                            "70%": {
-                              transform: "translate(-50%, -50%) scale(2.5)",
-                              opacity: 0.5,
-                            },
-                            "100%": {
-                              transform: "translate(-50%, -50%) scale(3)",
-                              opacity: 0,
-                            },
-                          },
-                          "@keyframes dotPulse": {
-                            "0%": { transform: "scale(1)" },
-                            "50%": { transform: "scale(1.4)" },
-                            "100%": { transform: "scale(1)" },
-                          },
                         }}
                       />
                     </Tooltip>
@@ -408,7 +367,7 @@ export default function PresidencyTimeline() {
                         mt: 0.5,
                         color: isDateSelected
                           ? selectedPresident?.themeColorLight ||
-                            colors.timelineColor
+                          colors.timelineColor
                           : colors.dotColorInactive,
                         fontSize: "0.75rem",
                         fontWeight: isDateSelected ? "bold" : "",
