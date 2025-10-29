@@ -7,7 +7,7 @@ import {
   IconButton,
   Drawer,
 } from "@mui/material";
-import ModernView from "./modernView";
+import ModernView from "./Organization";
 import CloseIcon from "@mui/icons-material/Close";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Switch, FormControlLabel } from "@mui/material";
@@ -217,7 +217,7 @@ function Navbar() {
         </Stack>
       </Drawer>
 
-      <ModernView />
+      {/* <ModernView /> */}
     </Box>
   );
 }

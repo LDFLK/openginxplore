@@ -210,18 +210,6 @@ export default function XploreDataTab() {
         />
       )}
       <div className="">
-        {breadcrumbTrail && breadcrumbTrail.length == 0 && (
-          <div className="mb-4">
-            <h2 className="text-3xl font-medium text-gray-200 mb-2">
-              Explore Open Data
-            </h2>
-            <p className=" text-gray-400">
-              Browse datasets by category to discover insights across various
-              domains.
-            </p>
-          </div>
-        )}
-
         {initialLoading ? (
           <div className="text-gray-500 text-center py-10">Loading...</div>
         ) : selectedDataset ? (

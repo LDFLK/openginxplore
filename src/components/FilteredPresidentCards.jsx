@@ -217,17 +217,8 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     if (!selectedDate?.date) return;
     const url = new URL(window.location.href);
     url.searchParams.set("selectedDate", selectedDate.date);
-
-
-    if (dateRange[0]) {
-      url.searchParams.set("startDate", dateRange[0].toISOString().split("T")[0]);
-    }
-    if (dateRange[1]) {
-      url.searchParams.set("endDate", dateRange[1].toISOString().split("T")[0]);
-    }
-
     window.history.replaceState({}, "", url.toString());
-  }, [selectedDate, dateRange]);
+  }, [selectedDate]); 
 
 
   return (
