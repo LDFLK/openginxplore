@@ -1,36 +1,78 @@
-// import { ChartVisualization } from "./chart-visualization";
 import { DataTable } from "./table-view";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import apiData from "../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
+import { useSearchParams } from "react-router-dom";
 
 export function DatasetView({ data }) {
-  const dataset = data;
+  const datasets = data;
 
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
-  const [selectDataset, setSelectedDataset] = useState(null);
+  const [selectedDataset, setSelectedDataset] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(
+    Object.keys(data).length > 0 ? Object.keys(data)[0] : ""
+  );
+  const [dataCache, setDataCache] = useState({});
+  const [years, setYears] = useState([]);
+  const [searchParams] = useSearchParams();
+
+  console.log(searchParams)
 
   useEffect(() => {
-    if (!dataset) return;
+    if (!datasets) return;
+
+    console.log(searchParams);
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    if (!startDate || !endDate) {
+      console.warn("Missing startDate or endDate in URL params");
+      return;
+    }
+    const startYear = startDate.split("-")[0];
+    const endYear = endDate.split("-")[0];
+    console.log("start year : ", startYear);
+    console.log("end year : ", endYear);
+
+    const filteredYears = Object.keys(datasets).filter(
+      (year) => year >= startYear && year <= endYear
+    );
+    console.log("filtered years : ", filteredYears);
+
+    setYears(Object.keys(datasets));
+  }, [datasets, searchParams.toString()]);
+
+  useEffect(() => {
     const fetchData = async () => {
+      if (!selectedYear || !datasets[selectedYear]) return;
       try {
-        setLoadingDatasetId(dataset.id);
-        const response = await apiData.fetchDataset(dataset);
-        setSelectedDataset(response.data);
+        if (!Object.keys(dataCache).includes(selectedYear)) {
+          setLoadingDatasetId(selectedYear);
+          const response = await apiData.fetchDataset(
+            datasets[selectedYear][0]
+          );
+          setSelectedDataset(response.data);
+          setDataCache((prev) => ({
+            ...prev,
+            [selectedYear]: response.data,
+          }));
+        } else {
+          setSelectedDataset(dataCache[selectedYear]);
+        }
       } catch (e) {
-        console.error("Failed to fetch dataset : ", e);
+        console.error("Failed to fetch dataset:", e);
       } finally {
         setLoadingDatasetId(null);
       }
     };
-    fetchData();
-  }, [dataset]);
 
-  if (!dataset) {
+    fetchData();
+  }, [selectedYear, datasets]);
+
+  if (!datasets) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full mt-4">
         <p className="text-gray-500 italic">Dataset not found</p>
       </div>
     );
@@ -41,16 +83,41 @@ export function DatasetView({ data }) {
       {/* Dataset Info */}
       <div className="space-y-2">
         <h2 className="text-xl md:text-2xl font-bold text-gray-300">
-          {selectDataset?.attributeName}
+          {datasets[selectedYear][0]?.nameExact || "Select a Dataset"}
         </h2>
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-gray-400">
           <p>
-            <span className="font-semibold">Published By :</span>{" "}
-            {dataset.source}
+            <span className="font-semibold">Published By : </span>{" "}
+            {datasets[selectedYear][0]?.source || "—"}
           </p>
         </div>
       </div>
 
+      {/* Year Selector */}
+      <div className="w-full flex justify-end">
+        <select
+          className="w-2/9 bg-gray-900 text-gray-100 border border-gray-700 rounded-lg px-3 py-2 
+                   focus:outline-none 
+                   hover:border-gray-500 transition"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+        >
+          <option value="" hidden>
+            Select Year
+          </option>
+          {years.map((year) => (
+            <option
+              key={year}
+              value={year}
+              className="bg-gray-900 text-gray-100"
+            >
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Dataset Visualization */}
       <div className="border border-gray-700 rounded-xl p-4 shadow-sm bg-gray-900">
         <div className="overflow-x-auto">
           {loadingDatasetId ? (
@@ -58,26 +125,24 @@ export function DatasetView({ data }) {
               <ClipLoader size={25} color="currentColor" />
               <p className="mt-2 text-sm">Loading...</p>
             </div>
-          ) : (
-            selectDataset && (
-              <div className=" bg-gray-900">
-                {/* <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold">Visualizations</h3>
-                  </div> */}
-                <div className="overflow-x-auto text-gray-500 text-sm italic">
-                  <ChartVisualization
-                    columns={selectDataset.columns}
-                    rows={selectDataset.rows}
-                  />
-                </div>
-
-                <DataTable
-                  columns={selectDataset?.columns}
-                  rows={selectDataset?.rows}
-                  title={selectDataset?.attributeName}
+          ) : selectedDataset ? (
+            <div className="bg-gray-900">
+              <div className="overflow-x-auto text-gray-500 text-sm italic">
+                <ChartVisualization
+                  columns={selectedDataset.columns}
+                  rows={selectedDataset.rows}
                 />
               </div>
-            )
+              <DataTable
+                columns={selectedDataset.columns}
+                rows={selectedDataset.rows}
+                title={selectedDataset.attributeName}
+              />
+            </div>
+          ) : (
+            <p className="text-gray-500 italic text-center">
+              Please select a dataset year.
+            </p>
           )}
         </div>
       </div>

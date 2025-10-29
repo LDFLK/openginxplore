@@ -19,7 +19,7 @@ export default function XploreDataTab() {
   const [categoriesByParentId, setCategoriesByParentId] = useState(new Map());
   const [datasetsByParentId, setDatasetsByParentId] = useState(new Map());
   const [breadcrumbTrail, setBreadcrumbTrail] = useState([]);
-  const [selectedDataset, setSelectedDataset] = useState(null);
+  const [selectedDatasets, setSelectedDatasets] = useState(null);
 
   const [loadingCategoryId, setLoadingCategoryId] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -71,10 +71,19 @@ export default function XploreDataTab() {
       const cachedCategories = categoriesByParentId.get(parentId);
       const cachedDatasets = datasetsByParentId.get(parentId);
 
+      const normalizedDatasets = Array.isArray(cachedDatasets)
+        ? cachedDatasets.reduce((acc, dataset) => {
+            const year = new Date(dataset.created).getFullYear();
+            if (!acc[year]) acc[year] = [];
+            acc[year].push(dataset);
+            return acc;
+          }, {})
+        : cachedDatasets || {};
+
       if (cachedCategories) {
         setData({
           categories: cachedCategories,
-          datasets: cachedDatasets ? { cached: cachedDatasets } : {},
+          datasets: normalizedDatasets,
         });
       } else {
         const { categories, datasets } = await fetchCategoriesAndDatasets(
@@ -116,9 +125,17 @@ export default function XploreDataTab() {
       const cachedDatasets = datasetsByParentId.get(categoryId);
 
       if (cachedCategories) {
+        const normalizedDatasets = Array.isArray(cachedDatasets)
+          ? cachedDatasets.reduce((acc, dataset) => {
+              const year = new Date(dataset.created).getFullYear();
+              if (!acc[year]) acc[year] = [];
+              acc[year].push(dataset);
+              return acc;
+            }, {})
+          : cachedDatasets || {};
         setData({
           categories: cachedCategories,
-          datasets: cachedDatasets ? { cached: cachedDatasets } : {},
+          datasets: normalizedDatasets,
         });
       } else {
         const { categories, datasets } = await fetchCategoriesAndDatasets(
@@ -127,38 +144,38 @@ export default function XploreDataTab() {
         setData({ categories, datasets });
       }
     } catch (error) {
-      console.error("❌ Failed to load subcategories:", error);
+      console.error("Failed to load subcategories:", error);
     } finally {
       setLoadingCategoryId(null);
     }
   };
 
-  const handleDatasetClick = (dataset) => {
-    const parentId = searchParams.get("parentId") || "";
-    const datasetName = dataset.nameExact || formatText({ name: dataset.name });
+  const handleDatasetClick = () => {
+    // const parentId = searchParams.get("parentId") || "";
+    // const datasetName = dataset.nameExact || formatText({ name: dataset.name });
 
-    setSelectedDataset(dataset);
+    setSelectedDatasets(data.datasets);
 
-    if (
-      !breadcrumbTrail.find(
-        (breadcrumbItem) => breadcrumbItem.label == datasetName
-      )
-    ) {
-      const newBreadcrumb = [
-        ...breadcrumbTrail,
-        {
-          label: datasetName,
-          path: `/datasets?datasetId=${dataset.id}&datasetName=${datasetName}&parentId=${parentId}`,
-        },
-      ];
+    // if (
+    //   !breadcrumbTrail.find(
+    //     (breadcrumbItem) => breadcrumbItem.label == datasetName
+    //   )
+    // ) {
+    //   const newBreadcrumb = [
+    //     ...breadcrumbTrail,
+    //     {
+    //       label: datasetName,
+    //       path: `/datasets?datasetId=${dataset.id}&datasetName=${datasetName}&parentId=${parentId}`,
+    //     },
+    //   ];
 
-      const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
+    //   const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
 
-      setBreadcrumbTrail(newBreadcrumb);
-      // navigate(
-      //   `/datasets?datasetId=${dataset.id}&datasetName=${datasetName}&parentId=${parentId}&breadcrumb=${encodedTrail}`
-      // );
-    }
+    //   setBreadcrumbTrail(newBreadcrumb);
+    //   // navigate(
+    //   //   `/datasets?datasetId=${dataset.id}&datasetName=${datasetName}&parentId=${parentId}&breadcrumb=${encodedTrail}`
+    //   // );
+    // }
   };
 
   const handleBreadcrumbClick = async (index, item) => {
@@ -184,10 +201,19 @@ export default function XploreDataTab() {
       const cachedCategories = categoriesByParentId.get(parentId);
       const cachedDatasets = datasetsByParentId.get(parentId);
 
+      const normalizedDatasets = Array.isArray(cachedDatasets)
+        ? cachedDatasets.reduce((acc, dataset) => {
+            const year = new Date(dataset.created).getFullYear();
+            if (!acc[year]) acc[year] = [];
+            acc[year].push(dataset);
+            return acc;
+          }, {})
+        : cachedDatasets || {};
+
       if (cachedCategories) {
         setData({
           categories: cachedCategories,
-          datasets: cachedDatasets ? { cached: cachedDatasets } : {},
+          datasets: normalizedDatasets,
         });
       } else {
         const { categories, datasets } = await fetchCategoriesAndDatasets(
@@ -200,20 +226,26 @@ export default function XploreDataTab() {
     }
   };
 
+  const firstKey = data?.datasets ? Object.keys(data.datasets)[0] : null;
+  const firstDataset =
+    firstKey && data.datasets[firstKey] && data.datasets[firstKey].length > 0
+      ? data.datasets[firstKey][0]
+      : null;
+
   return (
     <div className="p-6">
       {breadcrumbTrail && breadcrumbTrail.length > 0 && (
         <Breadcrumb
           items={breadcrumbTrail}
           onItemClick={handleBreadcrumbClick}
-          setSelectedDataset={setSelectedDataset}
+          setSelectedDatasets={setSelectedDatasets}
         />
       )}
       <div className="">
         {initialLoading ? (
           <div className="text-gray-500 text-center py-10">Loading...</div>
-        ) : selectedDataset ? (
-          <DatasetView data={selectedDataset}/>
+        ) : selectedDatasets ? (
+          <DatasetView data={selectedDatasets} />
         ) : (
           <>
             {data.categories && data.categories.length > 0 && (
@@ -249,34 +281,30 @@ export default function XploreDataTab() {
                 <h3 className="text-xl font-semibold mb-4 text-gray-100">
                   Datasets
                 </h3>
-                {Object.entries(data.datasets).map(([year, datasets]) => (
-                  <div key={year} className="mb-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {datasets.map((dataset) => (
-                        <motion.div
-                          key={dataset.id}
-                          whileHover={{ y: -2, scale: 1.01 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => handleDatasetClick(dataset)}
-                          className="cursor-pointer w-full h-[90px] border border-gray-600 rounded-xl p-4 flex items-center bg-dataset-card hover:bg-gray-800 transition"
-                        >
-                          <FileText className=" text-blue-400" />
-                          <div className="ml-3 text-left">
-                            <p className="font-medium  text-gray-100">
-                              {dataset.nameExact ||
-                                formatText({ name: dataset.name })}
-                            </p>
-                            {dataset.source && (
-                              <p className="text-sm  text-gray-400">
-                                {dataset.source}
-                              </p>
-                            )}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {firstDataset && (
+                    <motion.div
+                      key={firstDataset.id}
+                      whileHover={{ y: -2, scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleDatasetClick}
+                      className="cursor-pointer w-full h-[90px] border border-gray-600 rounded-xl p-4 flex items-center bg-dataset-card hover:bg-gray-800 transition"
+                    >
+                      <FileText className=" text-blue-400" />
+                      <div className="ml-3 text-left">
+                        <p className="font-medium  text-gray-100">
+                          {firstDataset.nameExact ||
+                            formatText({ name: firstDataset.name })}
+                        </p>
+                        {firstDataset.source && (
+                          <p className="text-sm  text-gray-400">
+                            {firstDataset.source}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
               </div>
             ) : (
               data.categories &&
