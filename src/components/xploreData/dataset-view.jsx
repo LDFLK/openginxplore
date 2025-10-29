@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import apiData from "../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
+import { useSearchParams } from "react-router-dom";
 
 export function DatasetView({ data }) {
   const datasets = data;
@@ -14,11 +15,33 @@ export function DatasetView({ data }) {
   );
   const [dataCache, setDataCache] = useState({});
   const [years, setYears] = useState([]);
+  const [searchParams] = useSearchParams();
+
+  console.log(searchParams)
 
   useEffect(() => {
     if (!datasets) return;
+
+    console.log(searchParams);
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    if (!startDate || !endDate) {
+      console.warn("Missing startDate or endDate in URL params");
+      return;
+    }
+    const startYear = startDate.split("-")[0];
+    const endYear = endDate.split("-")[0];
+    console.log("start year : ", startYear);
+    console.log("end year : ", endYear);
+
+    const filteredYears = Object.keys(datasets).filter(
+      (year) => year >= startYear && year <= endYear
+    );
+    console.log("filtered years : ", filteredYears);
+
     setYears(Object.keys(datasets));
-  }, [datasets]);
+  }, [datasets, searchParams.toString()]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,7 +102,9 @@ export function DatasetView({ data }) {
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
         >
-          <option value="" hidden>Select Year</option>
+          <option value="" hidden>
+            Select Year
+          </option>
           {years.map((year) => (
             <option
               key={year}

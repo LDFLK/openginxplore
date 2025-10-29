@@ -11,7 +11,6 @@ import {
   setSelectedPresident
 } from "../../../store/presidencySlice";
 import { useDispatch, useSelector } from "react-redux";
-import Navbar from "../../../components/NavBar";
 import { setGazetteDataClassic } from "../../../store/gazetteDate";
 import PersonProfile from "../../PersonProfilePage/screens/PersonProfile";
 import Error500 from "../../ErrorBoundaries/screens/500Error";
