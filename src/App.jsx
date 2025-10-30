@@ -7,7 +7,6 @@ import DataLoadingAnimatedComponent from "./pages/SplashPage/screens/dataLoading
 import DocsPage from "./pages/DocsPage/screens/DocsPage";
 
 const App = () => {
-
   const { isDark } = useThemeContext();
 
   return (
@@ -15,12 +14,11 @@ const App = () => {
       <Router>
         <Routes>
           <Route path="/" element={<XploreGovHomepage />} />
-          <Route path='/openginxplore' element={<DataLoadingAnimatedComponent mode="orgchart" />} />
-          <Route path="/orgchart" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
-          <Route path="*" element={<Error404 />} />
           <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
           <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
-          <Route path="/docs" element ={<DocsPage></DocsPage>}/>
+          <Route path="/docs" element={<DocsPage />} />
+          <Route path="/:tab" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
+          <Route path="*" element={<Error404 />} />
         </Routes>
       </Router>
     </div>

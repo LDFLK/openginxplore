@@ -516,7 +516,7 @@ const XploreGovHomepage = () => {
               <div className="flex mt-6">
                 <button
                   className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white px-2.5 py-2 rounded-lg font-normal text-lg hover:scale-105 transition transform inline-flex items-center hover:cursor-pointer"
-                  onClick={() => navigate("/orgchart")}
+                  onClick={() => navigate("/organization") }
                 >
                   <History className="w-6 h-6 mr-2" />
                   <span>Xplore</span>
