@@ -13,6 +13,7 @@ export default function YearRangeSelector({
   dates,
   latestPresStartDate,
   onDateChange,
+  externalRange
 }) {
   const presidentsArray = useSelector(
     (state) => state.presidency.presidentDict
@@ -71,21 +72,51 @@ export default function YearRangeSelector({
     initialEndYear,
   ]);
   useEffect(() => {
-  if (!startDate || !endDate) return;
+    if (!externalRange) return;
 
-  const params = new URLSearchParams(location.search);
-  const currentStart = params.get("startDate");
-  const currentEnd = params.get("endDate");
-  const newStart = startDate.toISOString().split("T")[0];
-  const newEnd = endDate.toISOString().split("T")[0];
+    const [extStart, extEnd] = externalRange;
 
-  if (currentStart !== newStart || currentEnd !== newEnd) {
+    // Only update if both dates are valid
+    if (extStart instanceof Date && !isNaN(extStart) && extEnd instanceof Date && !isNaN(extEnd)) {
+      if (
+        extStart.getTime() !== startDate?.getTime() ||
+        extEnd.getTime() !== endDate?.getTime()
+      ) {
+        setStartDate(extStart);
+        setEndDate(extEnd);
+        setTempStartDate(extStart);
+        setTempEndDate(extEnd);
+        setSelectedRange([extStart.getFullYear(), extEnd.getFullYear()]);
+      }
+    }
+  }, [externalRange]);
+
+  useEffect(() => {
+    if (!startDate || !endDate) return;
+
+    const path = location.pathname;
+    const params = new URLSearchParams(window.location.search);
+
+    const newStart = startDate.toISOString().split("T")[0];
+    const newEnd = endDate.toISOString().split("T")[0];
+    const currentStart = params.get("startDate");
+    const currentEnd = params.get("endDate");
+
+    //clean up org-only params in /data
+    if (path.includes("/data")) {
+      ["selectedDate", "filterByType", "viewMode", "ministry"].forEach((key) =>
+        params.delete(key)
+      );
+    }
+
+    // merge with existing URL params
     params.set("startDate", newStart);
     params.set("endDate", newEnd);
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-  }
-}, [startDate, endDate, navigate]);
 
+    if (currentStart !== newStart || currentEnd !== newEnd) {
+      window.history.replaceState({}, "", `${path}?${params.toString()}`);
+    }
+  }, [startDate, endDate, location.pathname]);
 
   useEffect(() => {
     const selectedDateParam = searchParams.get("selectedDate");
@@ -104,8 +135,7 @@ export default function YearRangeSelector({
       // SelectedDate year is within the URL range → keep URL range as-is
       if (targetDate >= urlStart && targetDate <= urlEnd) {
         console.log(
-          `SelectedDate within URL range → keeping range: ${
-            urlStart.toISOString().split("T")[0]
+          `SelectedDate within URL range → keeping range: ${urlStart.toISOString().split("T")[0]
           } → ${urlEnd.toISOString().split("T")[0]}`
         );
       }
@@ -114,8 +144,7 @@ export default function YearRangeSelector({
         urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
         urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
         console.log(
-          `SelectedDate outside URL range but within available range → overriding to full year: ${
-            urlStart.toISOString().split("T")[0]
+          `SelectedDate outside URL range but within available range → overriding to full year: ${urlStart.toISOString().split("T")[0]
           } → ${urlEnd.toISOString().split("T")[0]}`
         );
       }
@@ -124,8 +153,7 @@ export default function YearRangeSelector({
         urlStart = minDate;
         urlEnd = maxDate;
         console.log(
-          `SelectedDate out of available range → using default: ${
-            urlStart.toISOString().split("T")[0]
+          `SelectedDate out of available range → using default: ${urlStart.toISOString().split("T")[0]
           } → ${urlEnd.toISOString().split("T")[0]}`
         );
       }
@@ -139,8 +167,7 @@ export default function YearRangeSelector({
         urlStart = clampedStart;
         urlEnd = clampedEnd;
         console.log(
-          ` URL range clamped to available range: ${
-            urlStart.toISOString().split("T")[0]
+          ` URL range clamped to available range: ${urlStart.toISOString().split("T")[0]
           } → ${urlEnd.toISOString().split("T")[0]}`
         );
       }
@@ -149,8 +176,7 @@ export default function YearRangeSelector({
         urlStart = minDate;
         urlEnd = maxDate;
         console.log(
-          `URL range completely outside available range → using default: ${
-            urlStart.toISOString().split("T")[0]
+          `URL range completely outside available range → using default: ${urlStart.toISOString().split("T")[0]
           } → ${urlEnd.toISOString().split("T")[0]}`
         );
       }
@@ -464,27 +490,27 @@ export default function YearRangeSelector({
       years.indexOf(tempStartDate.getUTCFullYear()) +
       (tempStartDate.getUTCMonth() +
         (tempStartDate.getUTCDate() - 1) /
-          new Date(
-            Date.UTC(
-              tempStartDate.getUTCFullYear(),
-              tempStartDate.getUTCMonth() + 1,
-              0
-            )
-          ).getUTCDate()) /
-        12;
+        new Date(
+          Date.UTC(
+            tempStartDate.getUTCFullYear(),
+            tempStartDate.getUTCMonth() + 1,
+            0
+          )
+        ).getUTCDate()) /
+      12;
 
     const currentEndYearPos =
       years.indexOf(tempEndDate.getUTCFullYear()) +
       (tempEndDate.getUTCMonth() +
         tempEndDate.getUTCDate() /
-          new Date(
-            Date.UTC(
-              tempEndDate.getUTCFullYear(),
-              tempEndDate.getUTCMonth() + 1,
-              0
-            )
-          ).getUTCDate()) /
-        12;
+        new Date(
+          Date.UTC(
+            tempEndDate.getUTCFullYear(),
+            tempEndDate.getUTCMonth() + 1,
+            0
+          )
+        ).getUTCDate()) /
+      12;
 
     const windowSize = currentEndYearPos - currentStartYearPos;
     const newStartYearPos = currentStartYearPos + yearDelta;
@@ -516,14 +542,14 @@ export default function YearRangeSelector({
         years.indexOf(newTempEnd.getUTCFullYear()) +
         (newTempEnd.getUTCMonth() +
           newTempEnd.getUTCDate() /
-            new Date(
-              Date.UTC(
-                newTempEnd.getUTCFullYear(),
-                newTempEnd.getUTCMonth() + 1,
-                0
-              )
-            ).getUTCDate()) /
-          12;
+          new Date(
+            Date.UTC(
+              newTempEnd.getUTCFullYear(),
+              newTempEnd.getUTCMonth() + 1,
+              0
+            )
+          ).getUTCDate()) /
+        12;
       newTempStart = positionToDate(Math.max(0, endYearPos - windowSize));
     }
 
@@ -742,11 +768,10 @@ export default function YearRangeSelector({
               setActivePreset(preset.label);
               setActivePresident("");
             }}
-            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${
-              activePreset === preset.label
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-800 bg-gray-700 text-gray-300 hover:cursor-pointer"
-            }`}
+            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${activePreset === preset.label
+              ? "bg-blue-600 text-white"
+              : "hover:bg-gray-800 bg-gray-700 text-gray-300 hover:cursor-pointer"
+              }`}
           >
             {preset.label}
           </button>
@@ -756,38 +781,36 @@ export default function YearRangeSelector({
         <div className="relative w-56 text-xs">
           {/* Main button */}
           <button
-            className={`w-full px-3 py-1.5 text-left cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${
-              activePresident
-                ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300"
-            }`}
+            className={`w-full px-3 py-1.5 text-left cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${activePresident
+              ? "bg-blue-600 text-white"
+              : "bg-gray-700 text-gray-300"
+              }`}
             onClick={() => setIsDropdownOpen((o) => !o)}
           >
             <span>
               {activePresident
                 ? (() => {
-                    const pres = presidents[activePresident];
-                    if (!pres) return "By President Term";
-                    if (pres.terms.length === 1) return pres.name;
-                    const currentTerm = pres.terms.find(
-                      (t) =>
-                        startDate.getTime() === new Date(t.start).getTime() &&
-                        endDate.getTime() === new Date(t.end).getTime()
-                    );
-                    return currentTerm
-                      ? `${pres.name} (${new Date(
-                          currentTerm.start
-                        ).getUTCFullYear()} - ${new Date(
-                          currentTerm.end
-                        ).getUTCFullYear()})`
-                      : pres.name;
-                  })()
+                  const pres = presidents[activePresident];
+                  if (!pres) return "By President Term";
+                  if (pres.terms.length === 1) return pres.name;
+                  const currentTerm = pres.terms.find(
+                    (t) =>
+                      startDate.getTime() === new Date(t.start).getTime() &&
+                      endDate.getTime() === new Date(t.end).getTime()
+                  );
+                  return currentTerm
+                    ? `${pres.name} (${new Date(
+                      currentTerm.start
+                    ).getUTCFullYear()} - ${new Date(
+                      currentTerm.end
+                    ).getUTCFullYear()})`
+                    : pres.name;
+                })()
                 : "By President Term"}
             </span>
             <svg
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -808,11 +831,10 @@ export default function YearRangeSelector({
                 <div key={id} className="group relative">
                   {/* President row */}
                   <button
-                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-gray-600 ${
-                      activePresident === id
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-300"
-                    }`}
+                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-gray-600 ${activePresident === id
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-300"
+                      }`}
                     onClick={() => {
                       if (data.terms.length === 1) {
                         const term = data.terms[0];
@@ -843,14 +865,13 @@ export default function YearRangeSelector({
                       {data.terms.map((term, idx) => (
                         <button
                           key={idx}
-                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-gray-600 ${
-                            activePresident === id &&
+                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-gray-600 ${activePresident === id &&
                             startDate.getTime() ===
-                              new Date(term.start).getTime() &&
+                            new Date(term.start).getTime() &&
                             endDate.getTime() === new Date(term.end).getTime()
-                              ? "bg-blue-600 text-white"
-                              : "text-gray-300"
-                          }`}
+                            ? "bg-blue-600 text-white"
+                            : "text-gray-300"
+                            }`}
                           onClick={() => {
                             setActivePresident(id);
                             setStartDate(new Date(term.start));
@@ -890,13 +911,12 @@ export default function YearRangeSelector({
               setCalendarOpen((o) => !o);
             }}
             className={`flex items-center justify-center gap-2 w-full sm:w-auto px-2.5 py-1.5 text-xs rounded-md transition-colors cursor-pointer
-      ${
-        calendarRange &&
-        startDate.toISOString() === calendarRange.start &&
-        endDate.toISOString() === calendarRange.end
-          ? "bg-blue-600 text-white hover:bg-blue-700"
-          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-      }`}
+      ${calendarRange &&
+                startDate.toISOString() === calendarRange.start &&
+                endDate.toISOString() === calendarRange.end
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
           >
             By Date
           </button>
@@ -946,11 +966,10 @@ export default function YearRangeSelector({
                           <button
                             onClick={decreaseMonth}
                             disabled={prevMonthButtonDisabled}
-                            className={`p-1 rounded-full ${
-                              prevMonthButtonDisabled
-                                ? "text-gray-500 cursor-not-allowed"
-                                : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
-                            }`}
+                            className={`p-1 rounded-full ${prevMonthButtonDisabled
+                              ? "text-gray-500 cursor-not-allowed"
+                              : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
+                              }`}
                           >
                             <ChevronLeft size={18} />
                           </button>
@@ -986,11 +1005,10 @@ export default function YearRangeSelector({
                           <button
                             onClick={increaseMonth}
                             disabled={nextMonthButtonDisabled}
-                            className={`p-1 rounded-full ${
-                              nextMonthButtonDisabled
-                                ? "text-gray-500 cursor-not-allowed"
-                                : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
-                            }`}
+                            className={`p-1 rounded-full ${nextMonthButtonDisabled
+                              ? "text-gray-500 cursor-not-allowed"
+                              : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
+                              }`}
                           >
                             <ChevronRight size={18} />
                           </button>
@@ -1078,11 +1096,10 @@ export default function YearRangeSelector({
                           <button
                             onClick={decreaseMonth}
                             disabled={prevMonthButtonDisabled}
-                            className={`p-1 rounded-full ${
-                              prevMonthButtonDisabled
-                                ? "text-gray-500 cursor-not-allowed"
-                                : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
-                            }`}
+                            className={`p-1 rounded-full ${prevMonthButtonDisabled
+                              ? "text-gray-500 cursor-not-allowed"
+                              : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
+                              }`}
                           >
                             <ChevronLeft size={18} />
                           </button>
@@ -1118,11 +1135,10 @@ export default function YearRangeSelector({
                           <button
                             onClick={increaseMonth}
                             disabled={nextMonthButtonDisabled}
-                            className={`p-1 rounded-full ${
-                              nextMonthButtonDisabled
-                                ? "text-gray-500 cursor-not-allowed"
-                                : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
-                            }`}
+                            className={`p-1 rounded-full ${nextMonthButtonDisabled
+                              ? "text-gray-500 cursor-not-allowed"
+                              : "hover:cursor-pointer text-gray-700 hover:text-gray-800"
+                              }`}
                           >
                             <ChevronRight size={18} />
                           </button>
@@ -1146,13 +1162,13 @@ export default function YearRangeSelector({
                       if (
                         date >= start &&
                         date <=
-                          new Date(start.getFullYear(), start.getMonth() + 1, 0)
+                        new Date(start.getFullYear(), start.getMonth() + 1, 0)
                       ) {
                         return "bg-blue-500/20 rounded-none";
                       }
                       if (
                         date >=
-                          new Date(end.getFullYear(), end.getMonth(), 1) &&
+                        new Date(end.getFullYear(), end.getMonth(), 1) &&
                         date <= end
                       ) {
                         return "bg-blue-500/20 rounded-none";
@@ -1247,9 +1263,8 @@ export default function YearRangeSelector({
               return (
                 <div
                   key={year}
-                  className={`relative transition-all duration-200 hover:cursor-pointer ${
-                    isInRange ? "opacity-100" : "opacity-40"
-                  } border-l-1 border-r-1 border-gray-500`}
+                  className={`relative transition-all duration-200 hover:cursor-pointer ${isInRange ? "opacity-100" : "opacity-40"
+                    } border-l-1 border-r-1 border-gray-500`}
                   style={{ height: "40px", flex: "1 0 0" }}
                   onClick={() => {
                     setSelectedRange([year, year]);
@@ -1283,9 +1298,8 @@ export default function YearRangeSelector({
                     isInRange={isInRange}
                   />
                   <div
-                    className={`absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${
-                      isInRange ? "text-blue-400" : "text-gray-400"
-                    }`}
+                    className={`absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${isInRange ? "text-blue-400" : "text-gray-400"
+                      }`}
                   >
                     {year}
                   </div>

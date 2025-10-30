@@ -7,7 +7,7 @@ import formatText from "../../utils/common_functions";
 import apiData from "./../../services/xploredataServices";
 import { DatasetView } from "./dataset-view";
 
-export default function XploreDataTab({handleDateRangeChange}) {
+export default function XploreDataTab({setExternalDateRange }){
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -245,7 +245,7 @@ export default function XploreDataTab({handleDateRangeChange}) {
         {initialLoading ? (
           <div className="text-gray-500 text-center py-10">Loading...</div>
         ) : selectedDatasets ? (
-          <DatasetView data={selectedDatasets} handleDateRangeChange={handleDateRangeChange} />
+          <DatasetView data={selectedDatasets} setExternalDateRange={setExternalDateRange} />
         ) : (
           <>
             {data.categories && data.categories.length > 0 && (

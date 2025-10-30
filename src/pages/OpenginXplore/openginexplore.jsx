@@ -16,7 +16,7 @@ export default function OpenginXplore() {
   const [isExpanded, setIsExpanded] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { tab } = useParams(); // Get the tab from URL
+  const { tab } = useParams(); 
 
   // Determine selectedTab based on URL parameter (default to organization)
   const selectedTab = tab || "organization";
@@ -34,6 +34,8 @@ export default function OpenginXplore() {
     null,
     null,
   ]);
+  const [externalDateRange, setExternalDateRange] = useState([null, null]);
+
 
   const handleDateRangeChange = useCallback((dateRange) => {
     const [startDate, endDate] = dateRange;
@@ -118,13 +120,14 @@ export default function OpenginXplore() {
             dates={dates}
             latestPresStartDate={latestPresStartDate}
             onDateChange={handleDateRangeChange}
+            externalRange={externalDateRange}
           />
           {selectedTab === "organization" ? (
             <>
               <Organization dateRange={userSelectedDateRange} />
             </>
           ) : selectedTab === "data" ? (
-            <XploreDataTab />
+            <XploreDataTab setExternalDateRange={setExternalDateRange} />
           ) : (
             <div className="text-white p-8">Tab not found: {selectedTab}</div>
           )}
