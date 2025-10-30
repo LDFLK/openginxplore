@@ -70,8 +70,9 @@ export default function OpenginXplore() {
       <div className="flex justify-between py-6 px-4 md:px-8 lg:px-12 border-b border-gray-700 bg-gray-900">
         <h2 className="text-lg font-bold text-sidebar-foreground flex justify-start items-center">
           <Database className="w-5 lg:w-6 h-5 lg:h-6 flex-shrink-0 text-white mr-2" />
+          <span className="text-white">OpenGIN</span>
           <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent text-md">
-            OpenGINXplore
+            Xplore
           </span>
         </h2>
       </div>
