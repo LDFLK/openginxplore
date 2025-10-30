@@ -179,7 +179,6 @@ export function ChartVisualization({ columns, rows }) {
                       width: 60,
                       position: "relative",
                       height: 425,
-                      position: "sticky",
                       left: 0,
                       zIndex: 10,
                       borderRight: "1px solid var(--border)",
