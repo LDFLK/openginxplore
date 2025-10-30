@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import apiData from "../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
+import { Eye } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export function DatasetView({ data }) {
+export function DatasetView({ data, handleDateRangeChange }) {
   const datasets = data;
 
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
@@ -69,6 +71,24 @@ export function DatasetView({ data }) {
     );
   }
 
+  const navigate = useNavigate();
+  const location =  useLocation();
+  const handleAvailableDatasetView = (datasets) => {
+
+  try {
+    const params = new URLSearchParams(location.search);
+
+    let yearKeys = Object.keys(datasets).map(Number).sort((a, b) => a - b);
+
+    params.set('startDate', `${yearKeys[0]}-01-01`);
+    params.set('endDate', `${yearKeys[yearKeys.length - 1]}-12-31`);
+
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+  } catch (e) {
+    console.error("Can't update the new dates", e);
+  }
+};
+
   return (
     <div className="p-4 md:p-6 space-y-6 w-full">
       {/* Dataset Info */}
@@ -115,7 +135,7 @@ export function DatasetView({ data }) {
       )}
 
       {/* Dataset Visualization */}
-      <div className="border border-gray-700 rounded-xl p-4 shadow-sm bg-gray-900">
+      <div className="border border-gray-700 rounded-md p-4 shadow-sm bg-gray-900">
         <div className="overflow-x-auto">
           {loadingDatasetId ? (
             <div className="flex flex-col justify-center items-center h-48 text-gray-400">
@@ -139,8 +159,21 @@ export function DatasetView({ data }) {
           ) : years && years.length == 0 && Object.keys(datasets).length > 0 ? (
             <div className="block justify-center items-center">
               <p className="text-gray-500 italic text-center">
-                No data yet! But you have data for {Object.keys(datasets)}
+                No available data yet! But you have data for
               </p>
+              <div className="flex justify-center gap-2 mt-2">
+                {Object.keys(datasets).map((year) => {
+                  return <button className="text-green-400/75">{year}</button>;
+                })}
+              </div>
+              <div className="flex justify-center">
+                <button
+                  className=" flex text-blue-400 gap-2 cursor-pointer mt-2"
+                  onClick={handleAvailableDatasetView}
+                >
+                  <Eye /> <span>Show me</span>
+                </button>
+              </div>
             </div>
           ) : (
             <p className="text-gray-500 italic text-center">

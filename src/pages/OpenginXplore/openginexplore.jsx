@@ -35,22 +35,22 @@ export default function OpenginXplore() {
     setUserSelectedDateRange([startDate, endDate]);
   }, []);
 
-    useEffect(() => {
-      if (!presidents || presidents.length === 0 || !presidentRelationDict)
-        return;
-  
-      const relationEntries = Object.entries(presidentRelationDict);
-      if (relationEntries.length === 0) return;
-  
-      // Last relation
-      const [lastPresId, lastRelation] =
-        relationEntries[relationEntries.length - 1];
-  
-      if (lastPresId && lastRelation?.startTime) {
-        // setLatestPresidentId(lastPresId);
-        setLatestPresStartDate(new Date(lastRelation.startTime.split("T")[0]));
-      }
-    }, [presidents, presidentRelationDict]);
+  useEffect(() => {
+    if (!presidents || presidents.length === 0 || !presidentRelationDict)
+      return;
+
+    const relationEntries = Object.entries(presidentRelationDict);
+    if (relationEntries.length === 0) return;
+
+    // Last relation
+    const [lastPresId, lastRelation] =
+      relationEntries[relationEntries.length - 1];
+
+    if (lastPresId && lastRelation?.startTime) {
+      // setLatestPresidentId(lastPresId);
+      setLatestPresStartDate(new Date(lastRelation.startTime.split("T")[0]));
+    }
+  }, [presidents, presidentRelationDict]);
 
   const dates = gazetteDateClassic.map((d) => `${d}T00:00:00Z`);
 
@@ -61,14 +61,13 @@ export default function OpenginXplore() {
         <h2 className="text-lg font-bold text-sidebar-foreground flex justify-start items-center">
           {/* <Link href="/" className="flex items-center gap-2"> */}
           <Database className="w-5 lg:w-6 h-5 lg:h-6 flex-shrink-0 text-white mr-2" />
+          <span className="text-white">OpenGIN</span>
           <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent text-md">
-            OpenGINXplore
+            Xplore
           </span>
           {/* </Link> */}
         </h2>
-
       </div>
-        
 
       {/* Body */}
       <div className="flex flex-1">
@@ -110,13 +109,13 @@ export default function OpenginXplore() {
         {/* Main content */}
         <div className="flex-1 overflow-auto bg-[#000B18]">
           <YearRangeSelector
-          startYear={2019}
-          dates={dates}
-          latestPresStartDate={latestPresStartDate}
-          onDateChange={handleDateRangeChange}
-        />
+            startYear={2019}
+            dates={dates}
+            latestPresStartDate={latestPresStartDate}
+            onDateChange={handleDateRangeChange}
+          />
           {selectedTab == "xploreorg" ? (
-             <>
+            <>
               <Organization dateRange={userSelectedDateRange} />
             </>
           ) : (
