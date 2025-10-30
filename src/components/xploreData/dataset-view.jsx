@@ -6,7 +6,7 @@ import { ChartVisualization } from "./chart-visualization";
 import { Eye } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export function DatasetView({ data, handleDateRangeChange }) {
+export function DatasetView({ data, setExternalDateRange }) {
   const datasets = data;
 
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
@@ -72,22 +72,17 @@ export function DatasetView({ data, handleDateRangeChange }) {
   }
 
   const navigate = useNavigate();
-  const location =  useLocation();
+  const location = useLocation();
   const handleAvailableDatasetView = (datasets) => {
 
-  try {
-    const params = new URLSearchParams(location.search);
-
-    let yearKeys = Object.keys(datasets).map(Number).sort((a, b) => a - b);
-
-    params.set('startDate', `${yearKeys[0]}-01-01`);
-    params.set('endDate', `${yearKeys[yearKeys.length - 1]}-12-31`);
-
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-  } catch (e) {
-    console.error("Can't update the new dates", e);
-  }
-};
+    try {
+      const start = new Date("2021-01-01");
+      const end = new Date("2022-12-31");
+      setExternalDateRange([start, end]);
+    } catch (e) {
+      console.error("Can't update the new dates", e);
+    }
+  };
 
   return (
     <div className="p-4 md:p-6 space-y-6 w-full">
