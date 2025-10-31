@@ -65,7 +65,7 @@ export function DataTable({ columns, rows, title }) {
   return (
     <div className="space-y-4 w-full mt-6">
       {/* Search */}
-      <div className="flex justify-end  gap-2">
+      <div className="flex justify-end gap-2">
         <input
           placeholder="Search table..."
           value={searchTerm}
@@ -73,22 +73,22 @@ export function DataTable({ columns, rows, title }) {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="p-2 rounded-sm border border-gray-700 text-gray-400"
+          className="p-2 rounded-sm border border-border text-border"
         />
 
         {/* <ExportButton columns={columns} rows={rows} filename={title} /> */}
       </div>
 
       {/* Table */}
-      <div className="border border-gray-800 rounded-lg overflow-x-auto">
+      <div className="border border-border/15 rounded-lg overflow-x-auto">
         <table className="w-full min-w-max text-sm">
           <thead>
-            <tr className="bg-muted border-b border-gray-800">
+            <tr className="bg-background-dark/95 border-b border-background-dark">
               {columns && columns.map((column, index) => (
                 <th key={index} className="px-4 py-3 text-left">
                   <button
                     onClick={() => handleSort(index)}
-                    className="flex items-center gap-2 font-semibold text-sm hover:text-accent transition-colors whitespace-nowrap hover:cursor-pointer"
+                    className="flex items-center gap-2 font-semibold text-sm hover:text-accent transition-colors text-primary/75 whitespace-nowrap hover:cursor-pointer"
                   >
                     {formatText({ name: column })}
                     {sortColumn === index &&
@@ -107,10 +107,10 @@ export function DataTable({ columns, rows, title }) {
               paginatedRows.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-b border-b-gray-700 hover:bg-muted/10 transition-colors"
+                  className="border-b border-b-border/10 hover:bg-muted/10 transition-colors"
                 >
                   {row.map((cell, cellIndex) => (
-                    <td key={cellIndex} className="px-4 py-3 whitespace-nowrap text-gray-200">
+                    <td key={cellIndex} className="px-4 py-3 whitespace-nowrap text-primary/85">
                       {cell}
                     </td>
                   ))}
@@ -144,7 +144,7 @@ export function DataTable({ columns, rows, title }) {
             size="2"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="border border-blue-700/75 px-3 py-1 rounded-md text-blue-700/75 hover:cursor-pointer"
+            className="border border-accent/75 px-3 py-1 rounded-md text-accent/75 hover:cursor-pointer"
           >
             Previous
           </button>
@@ -154,7 +154,7 @@ export function DataTable({ columns, rows, title }) {
               setCurrentPage(Math.min(totalPages, currentPage + 1))
             }
             disabled={currentPage === totalPages}
-            className="border border-blue-700/75 px-3 py-1 rounded-md text-blue-700/75 hover:cursor-pointer"
+            className="border border-accent/75 px-3 py-1 rounded-md text-accent/75 hover:cursor-pointer"
           >
             Next
           </button>

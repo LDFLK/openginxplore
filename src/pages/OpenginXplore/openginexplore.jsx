@@ -90,8 +90,8 @@ export default function OpenginXplore() {
               className={`${
                 selectedTab === "organization"
                   ? "bg-accent text-background"
-                  : ""
-              } hover:bg-accent hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+                  : "hover:bg-background-dark/85"
+              }  hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
               onClick={() => handleTabChange("organization")}
             >
               <Binoculars className="mr-3 flex-shrink-0" size={24} />
@@ -99,8 +99,10 @@ export default function OpenginXplore() {
             </button>
             <button
               className={`${
-                selectedTab === "data" ? "bg-accent text-background" : ""
-              } hover:bg-accent hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+                selectedTab === "data"
+                  ? "bg-accent text-background"
+                  : "hover:bg-background-dark/85"
+              } hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
               onClick={() => handleTabChange("data")}
             >
               <SquareLibrary className="mr-3 flex-shrink-0" size={24} />
