@@ -244,14 +244,14 @@ export default function XploreDataTab({setExternalDateRange }){
       )}
       <div className="">
         {initialLoading ? (
-          <div className="text-gray-500 text-center py-10">Loading...</div>
+          <div className="text-primary/70 text-center py-10">Loading...</div>
         ) : selectedDatasets ? (
           <DatasetView data={selectedDatasets} setExternalDateRange={setExternalDateRange} />
         ) : (
           <>
             {data.categories && data.categories.length > 0 && (
               <>
-                <h3 className="text-xl font-normal mt-6 mb-3 text-gray-100">
+                <h3 className="text-xl font-semibold mt-6 mb-3 text-primary">
                   Categories
                 </h3>
                     <div
@@ -286,7 +286,7 @@ export default function XploreDataTab({setExternalDateRange }){
 
             {data.datasets && Object.keys(data.datasets).length > 0 ? (
               <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4 text-gray-100">
+                <h3 className="text-xl font-semibold mb-4 text-primary">
                   Datasets
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -296,16 +296,16 @@ export default function XploreDataTab({setExternalDateRange }){
                       whileHover={{ y: -2, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleDatasetClick}
-                      className="cursor-pointer w-full h-[90px] border border-gray-600 rounded-xl p-4 flex items-center bg-dataset-card hover:bg-gray-800 transition"
+                      className="cursor-pointer shadow-2xs w-full h-[90px] border border-border rounded-xl p-4 flex items-center bg-dataset-card bg-background transition"
                     >
-                      <FileText className=" text-blue-400" />
+                      <FileText className=" text-accent" />
                       <div className="ml-3 text-left">
-                        <p className="font-medium  text-gray-100">
+                        <p className="font-medium  text-primary">
                           {firstDataset.nameExact ||
                             formatText({ name: firstDataset.name })}
                         </p>
                         {firstDataset.source && (
-                          <p className="text-sm  text-gray-400">
+                          <p className="text-sm  text-primary/65 text-forground/10">
                             {firstDataset.source}
                           </p>
                         )}
@@ -317,7 +317,7 @@ export default function XploreDataTab({setExternalDateRange }){
             ) : (
               data.categories &&
               data.categories.length === 0 && (
-                <p className="text-gray-500 text-center mt-10">
+                <p className="text-muted text-center mt-10">
                   No categories or datasets found for this level.
                 </p>
               )

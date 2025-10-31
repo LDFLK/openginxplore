@@ -6,27 +6,21 @@ export default function MinistryViewModeToggleButton({
   viewMode,
   setViewMode,
 }) {
-  const { colors } = useThemeContext();
-  
   return (
     <div className="flex justify-end">
       <button
-        className="flex justify-center items-center py-3 px-4 cursor-pointer transition-all duration-200 ease-in-out rounded-l-sm"
-        style={{
-          color: viewMode == "Grid" ? colors.textPrimary : colors.textMuted,
-          backgroundColor: viewMode == "Grid" ? colors.backgroundPrimary : "",
-        }}
+        className={`flex justify-center items-center py-3 px-4 cursor-pointer transition-all duration-200 ease-in-out rounded-l-sm ${
+          viewMode == "Grid" ? "text-primary bg-foreground/10" : "text-primary"
+        }`}
         onClick={() => setViewMode("Grid")}
       >
         <MdGridOn className="mr-2 text-xl" />
         List
       </button>
       <button
-        className="flex justify-center items-center py-3 px-4 cursor-pointer transition-all duration-200 ease-in-out rounded-r-sm"
-        style={{
-          color: viewMode == "Graph" ? colors.textPrimary : colors.textMuted,
-          backgroundColor: viewMode == "Graph" ? colors.backgroundPrimary : "",
-        }}
+        className={`flex justify-center items-center py-3 px-4 cursor-pointer transition-all duration-200 ease-in-out rounded-r-sm ${
+          viewMode == "Graph" ? "text-primary bg-foreground/10" : "text-primary"
+        }`}
         onClick={() => setViewMode("Graph")}
       >
         <PiGraph className="mr-2 text-xl" />

@@ -3,7 +3,8 @@ const colors = {
   backgroundPrimary: '#F8FAFF',
   backgroundSecondary: '#2593B8',
   backgroundBlue: '#0a1929',
-  backgroundWhite:'#fff',
+  backgroundWhite:'#f8f8f8',
+  backgroundDark: "#e7e7e7",
   
   // Text
   textPrimary: '#181818',
@@ -33,8 +34,10 @@ const colors = {
 
   //main colors
   white: "#ffffff",
-  green: "#3DD37B",
-  purple: "#AD46FF"   
+  green: "#16a085",
+  purple: "#AD46FF",   
+
+  border: "#dbdbdb",
 };
 
 export default colors;

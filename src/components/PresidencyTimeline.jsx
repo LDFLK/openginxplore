@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Avatar, Typography, IconButton } from "@mui/material";
+import { Box, Avatar, Typography, IconButton, Divider } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,7 +9,7 @@ import StyledBadge from "../components/materialCustomAvatar";
 import { useThemeContext } from "../themeContext";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Files } from "lucide-react";
+import { Divide, Files } from "lucide-react";
 
 export default function PresidencyTimeline() {
   const dispatch = useDispatch();
@@ -135,18 +135,9 @@ export default function PresidencyTimeline() {
         alignItems: "center",
         gap: 2,
         width: "100%",
+        pt: "30px",
       }}
     >
-      {gazetteData?.length > 0 && (
-        <Typography
-          sx={{
-            mt: "30px",
-            color: colors.textPrimary,
-          }}
-        >
-          Select gazette published date
-        </Typography>
-      )}
       {selectedPresident && (
         <Box
           sx={{
@@ -232,9 +223,10 @@ export default function PresidencyTimeline() {
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                     sx={{
-                      border: `4px solid ${selectedPresident?.themeColorLight ||
+                      border: `4px solid ${
+                        selectedPresident?.themeColorLight ||
                         colors.timelineColor
-                        }`,
+                      }`,
                       backgroundColor: colors.backgroundPrimary,
                       margin: "auto",
                       borderRadius: 50,
@@ -275,28 +267,17 @@ export default function PresidencyTimeline() {
                   </Typography>
                 </Box>
               ) : (
-                // <Box
-                //   sx={{
-                //     textAlign: "center",
-                //     minWidth: { xs: 60, sm: 80 },
-                //     background: `linear-gradient(to right, ${colors.backgroundPrimary} 65%, rgba(0,0,0,0) 50%)`,
-                //   }}
-                // >
-
                 <Box
                   ref={avatarRef}
-                  // alt={selectedPresident.name}
-                  // src={selectedPresident.imageUrl}
                   sx={{
-                    width: { xs: 40, sm: 50 },
-                    height: { xs: 40, sm: 50 },
+                    display: "none",
                     border: `3px solid ${colors.backgroundPrimary}`,
                     backgroundColor: colors.backgroundPrimary,
                     margin: "auto",
                   }}
-                ><Box /></Box>
-                // </Box>
-
+                >
+                  <Box />
+                </Box>
               )}
             </Box>
           )}
@@ -353,7 +334,7 @@ export default function PresidencyTimeline() {
                           borderRadius: "50%",
                           backgroundColor: isDateSelected
                             ? selectedPresident?.themeColorLight ||
-                            colors.timelineColor
+                              colors.timelineColor
                             : colors.dotColorInactive,
                           border: `3px solid ${colors.backgroundPrimary}`,
                           zIndex: 99,
@@ -369,7 +350,7 @@ export default function PresidencyTimeline() {
                         mt: 0.5,
                         color: isDateSelected
                           ? selectedPresident?.themeColorLight ||
-                          colors.timelineColor
+                            colors.timelineColor
                           : colors.dotColorInactive,
                         fontSize: "0.75rem",
                         fontWeight: isDateSelected ? "bold" : "",
@@ -412,7 +393,9 @@ export default function PresidencyTimeline() {
                     alignItems: "center",
                   }}
                 >
-                  <InfoOutlinedIcon sx={{ fontSize: 15, color: colors.textMuted }} />
+                  <InfoOutlinedIcon
+                    sx={{ fontSize: 15, color: colors.textMuted }}
+                  />
                   <Typography variant="caption">
                     No new gazette publications
                   </Typography>
@@ -439,12 +422,29 @@ export default function PresidencyTimeline() {
           </IconButton>
         </Box>
       )}
+      {gazetteData?.length > 0 && (
+        <Typography
+          sx={{
+            mt: "-50px",
+            mb: "30px",
+            fontSize: "0.95rem",
+            color: `${colors.textPrimary}99`
+          }}
+        >
+          Gazettes published dates
+        </Typography>
+      )}
       {gazetteData?.length == 0 && selectedDate && (
         <Typography
           variant="caption"
-          sx={{ color: colors.success || "#28a745", fontWeight: 500, textAlign: "center", fontSize: 14, }}
+          sx={{
+            color: colors.success || "#28a745",
+            fontWeight: 500,
+            textAlign: "center",
+            fontSize: 14,
+          }}
         >
-          Information corresponds to the last date of selected range: {" "}
+          Information corresponds to the last date of selected range:{" "}
           {new Date(selectedDate.date).toLocaleDateString("en-GB", {
             day: "2-digit",
             month: "short",
@@ -452,19 +452,27 @@ export default function PresidencyTimeline() {
           })}
         </Typography>
       )}
-      {selectedDate?.date && !gazetteData.some(item => item.date === selectedDate.date) && !gazetteData?.length == 0 && (
-        <Typography
-          variant="caption"
-          sx={{ color: colors.success || "#28a745", fontWeight: 500, textAlign: "center", fontSize: 14, }}
-        >
-          Information corresponds to the date: {" "}
-          {new Date(selectedDate.date).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })} (not a gazette published date)
-        </Typography>
-      )}
+      {selectedDate?.date &&
+        !gazetteData.some((item) => item.date === selectedDate.date) &&
+        !gazetteData?.length == 0 && (
+          <Typography
+            variant="caption"
+            sx={{
+              color: colors.success || "#28a745",
+              fontWeight: 500,
+              textAlign: "center",
+              fontSize: 14,
+            }}
+          >
+            Information corresponds to the date:{" "}
+            {new Date(selectedDate.date).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}{" "}
+            (not a gazette published date)
+          </Typography>
+        )}
     </Box>
   );
 }

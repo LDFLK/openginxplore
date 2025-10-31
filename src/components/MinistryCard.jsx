@@ -25,14 +25,14 @@ const MinistryCard = ({ card, onClick }) => {
         cursor: "pointer",
         boxShadow: "none",
         // border: `2px solid ${colors.backgroundSecondary}50`,
-        border: `2px solid ${selectedPresident.themeColorLight}99`,
+        border: `1px solid ${selectedPresident.themeColorLight}99`,
         transition: "box-shadow 0.2s",
         "&:hover": {
           // border: `2px solid ${colors.ministryCardBorderHover}`,
-          border: `2px solid ${selectedPresident.themeColorLight}`,
+          // border: `2px solid ${selectedPresident.themeColorLight}`,
         },
 
-        backgroundColor: colors.backgroundBlue,
+        backgroundColor: colors.backgroundWhite,
         borderRadius: "10px",
         position: "relative",
         width: "100%",
@@ -50,7 +50,7 @@ const MinistryCard = ({ card, onClick }) => {
           minHeight={50}
           sx={{
             px: 1.5,
-            py: 0.5,
+            // py: 0.5,
             backgroundColor:
               mouseHover && mouseHover.id == card.id
                 ? `${selectedPresident.themeColorLight}`
@@ -67,7 +67,7 @@ const MinistryCard = ({ card, onClick }) => {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center", // vertically centers content
-              height: `calc(1.4em * 4)`, // fixed 4-line height
+              height: `calc(1.4em * 3)`, // fixed 4-line height
               overflow: "hidden",
             }}
           >
@@ -77,7 +77,7 @@ const MinistryCard = ({ card, onClick }) => {
                 color: "#ffffff",
                 fontWeight: 400,
                 display: "-webkit-box",
-                WebkitLineClamp: 4,
+                WebkitLineClamp: 3,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -92,7 +92,7 @@ const MinistryCard = ({ card, onClick }) => {
           {card.newMin && showMinistryBadge && (
             <Box
               sx={{
-                backgroundColor: selectedPresident.themeColorLight,
+                backgroundColor: colors.green,
                 color: "#fff",
                 fontSize: "0.7rem",
                 fontWeight: "semibold",
@@ -114,7 +114,7 @@ const MinistryCard = ({ card, onClick }) => {
           spacing={0.5}
           sx={{
             p: 1,
-            minHeight: 80,
+            // minHeight: '50px',
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between", // push name to bottom
@@ -180,8 +180,8 @@ const MinistryCard = ({ card, onClick }) => {
               {card.newPerson && showPersonBadge && (
                 <Box
                   sx={{
-                    border: `1px solid ${selectedPresident.themeColorLight}`,
-                    color: `${selectedPresident.themeColorLight}`,
+                    border: `1px solid ${colors.green}`,
+                    color: `${colors.green}`,
                     fontSize: "0.65rem",
                     fontWeight: "semibold",
                     borderRadius: "4px",
