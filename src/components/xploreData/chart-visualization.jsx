@@ -94,7 +94,7 @@ export function ChartVisualization({ columns, rows }) {
 
   return (
     <>
-      {numericColumns.length > 0 && !(numericColumns.length === 1 && numericColumns[0].toLowerCase() === "id") && (
+      {numericColumns.length > 0 && !(numericColumns.length === 1 && numericColumns[0].toLowerCase() === "id") && stringColumns.length !== 0 &&(
         <div className="space-y-6 w-full">
           {/* Controls */}
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
