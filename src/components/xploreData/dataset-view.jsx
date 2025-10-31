@@ -4,7 +4,6 @@ import { ClipLoader } from "react-spinners";
 import apiData from "../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
 import { Eye } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
 
 export function DatasetView({ data, setExternalDateRange }) {
   const datasets = data;
@@ -32,9 +31,20 @@ export function DatasetView({ data, setExternalDateRange }) {
     const filteredYears = Object.keys(datasets).filter(
       (year) => year >= startYear && year <= endYear
     );
-    setSelectedDataset(null);
+ 
     setYears(filteredYears);
   }, [datasets, window.location.search]);
+
+  useEffect(() => {
+    if (years.length > 0) {
+      const sortedYears = [...years].sort((a, b) => Number(a) - Number(b));
+      const latestYear = sortedYears[sortedYears.length - 1];
+      setSelectedYear(latestYear);
+    } else {
+      setSelectedYear("");
+      setSelectedDataset(null);
+    }
+  }, [years]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,13 +81,15 @@ export function DatasetView({ data, setExternalDateRange }) {
     );
   }
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const handleAvailableDatasetView = (datasets) => {
-
+  const handleAvailableDatasetView = () => {
     try {
-      const start = new Date("2021-01-01");
-      const end = new Date("2022-12-31");
+      console.log("datasets", datasets);
+
+      let yearKeys = Object.keys(datasets).map(Number).sort((a, b) => a - b);
+
+      console.log("yearKeys", yearKeys);
+      const start = new Date(`${yearKeys[0]}-01-01`);
+      const end = new Date(`${yearKeys[yearKeys.length - 1]}-12-31`);
       setExternalDateRange([start, end]);
     } catch (e) {
       console.error("Can't update the new dates", e);
@@ -158,7 +170,7 @@ export function DatasetView({ data, setExternalDateRange }) {
               </p>
               <div className="flex justify-center gap-2 mt-2">
                 {Object.keys(datasets).map((year) => {
-                  return <button className="text-green-400/75">{year}</button>;
+                  return <button key={year} className="text-green-400/75">{year}</button>;
                 })}
               </div>
               <div className="flex justify-center">

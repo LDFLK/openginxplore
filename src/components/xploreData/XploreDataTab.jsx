@@ -6,6 +6,7 @@ import { Breadcrumb } from "./breadcrumb";
 import formatText from "../../utils/common_functions";
 import apiData from "./../../services/xploredataServices";
 import { DatasetView } from "./dataset-view";
+import { ClipLoader } from "react-spinners";
 
 export default function XploreDataTab({setExternalDateRange }){
   const [searchParams] = useSearchParams();
@@ -253,26 +254,33 @@ export default function XploreDataTab({setExternalDateRange }){
                 <h3 className="text-xl font-normal mt-6 mb-3 text-gray-100">
                   Categories
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {data.categories.map((item) => (
-                    <motion.div
-                      key={item.id}
-                      whileHover={{ y: -2, scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleCategoryClick(item.id, item.name)}
-                      className={`cursor-pointer w-full h-[100px] border border-gray-600 rounded-2xl p-4 flex items-center bg-category-card transition  hover:text-gray-900 ${
-                        loadingCategoryId === item.id
-                          ? "opacity-50 pointer-events-none"
-                          : "hover:bg-gray-800"
-                      }`}
+                    <div
+                      className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 ${loadingCategoryId ? "pointer-events-none opacity-60" : ""
+                        }`}
                     >
-                      <Folder className="text-blue-400" />
-                      <p className="ml-3 text-start text-gray-200">
-                        {formatText({ name: item.name })}
-                      </p>
-                    </motion.div>
-                  ))}
-                </div>
+                      {data.categories.map((item) => (
+                        <motion.div
+                          key={item.id}
+                          whileHover={{ y: -2, scale: 1.01 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleCategoryClick(item.id, item.name)}
+                          className={`cursor-pointer relative w-full h-[100px] border border-gray-600 rounded-2xl p-4 flex items-center justify-between bg-category-card transition hover:text-gray-900 ${loadingCategoryId === item.id
+                              ? "opacity-50 pointer-events-none"
+                              : "hover:bg-gray-800"
+                            }`}
+                        >
+                          <div className="flex items-center">
+                            <Folder className="text-blue-400" />
+                            <p className="ml-3 text-start text-gray-200">
+                              {formatText({ name: item.name })}
+                            </p>
+                          </div>
+                          {loadingCategoryId === item.id && (
+                            <ClipLoader size={20} color="#60a5fa" /> // tailwind blue-400
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
               </>
             )}
 
