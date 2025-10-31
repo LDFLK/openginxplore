@@ -8,7 +8,7 @@ import { setAllPerson } from "../../../store/allPersonData";
 import {
   setPresidentRelationDict,
   setPresidentDict,
-  setSelectedPresident
+  setSelectedPresident,
 } from "../../../store/presidencySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setGazetteDataClassic } from "../../../store/gazetteDate";
@@ -190,15 +190,14 @@ export default function DataLoadingAnimatedComponent({ mode }) {
         <Error500 />
       ) : (
         <>
-          {Object.keys(presidentDict).length > 0 &&
-          mode === "orgchart" ? (
-            <OpenginXplore/>
+          {Object.keys(presidentDict).length > 0 && mode === "orgchart" ? (
+            <OpenginXplore />
           ) : Object.keys(presidentDict).length > 0 &&
             mode === "person-profile" ? (
             <PersonProfile />
           ) : (
             Object.keys(presidentDict).length > 0 &&
-            mode === "department-profile" && <DepartmentProfile/>
+            mode === "department-profile" && <DepartmentProfile />
           )}
         </>
       )}

@@ -121,10 +121,10 @@ const PersonsTab = ({ selectedDate }) => {
               }}
             >
               <Typography
-                variant="h6"
                 sx={{
                   fontFamily: "Poppins",
-                  fontWeight: 600,
+                  fontSize: '1.2rem',
+                  fontWeight: 500,
                   color: colors.textPrimary,
                   mb: 2,
                 }}
@@ -227,15 +227,15 @@ const PersonsTab = ({ selectedDate }) => {
           variant="subtitle1"
           sx={{
             mt: 2,
-            fontSize: "1.25rem",
+            fontSize: "1rem",
             color: colors.textPrimary,
-            fontWeight: 600,
+            fontWeight: 500,
             fontFamily: "poppins",
           }}
         >
           Ministers
         </Typography>
-        <Divider sx={{ py: 1 }} />
+        {/* <Divider sx={{ py: 1 }} /> */}
 
         <Stack spacing={1} sx={{ mb: 2 }}>
           {ministerListForMinistry.map((person, idx) => (
@@ -245,12 +245,12 @@ const PersonsTab = ({ selectedDate }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
+                // boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
                 padding: "12px 16px",
                 marginBottom: "12px",
                 transition: "all 0.3s ease",
                 cursor: "pointer",
-                borderBottom: `3px solid ${colors.backgroundWhite}`,
+                borderBottom: `1px solid ${colors.backgroundWhite}`,
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -332,7 +332,6 @@ const PersonsTab = ({ selectedDate }) => {
             </Box>
           ))}
         </Stack>
-        <Divider sx={{ py: 1 }} />
       </Box>
     </>
   );

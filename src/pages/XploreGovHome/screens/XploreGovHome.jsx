@@ -14,6 +14,10 @@ import {
 import ForceGraph3D from "react-force-graph-3d";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../../../components/theme-toggle";
+import Footer from "../components/footer";
+import BackgroundGradientEffect from "../components/backgroundGradientEffect";
+import AnimatedDots from "../components/animatedDots";
+import TextLogo from "../components/textLogo";
 
 // Simulate the 3D network data structure
 const genRandomTree = (N = 100) => {
@@ -35,23 +39,13 @@ const XploreGovHomepage = () => {
   const navigate = useNavigate();
   const graphData = genRandomTree();
 
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
-
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cards = [0, 1]; 
+  const cards = [0];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % cards.length);
-    }, 10000); 
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -74,37 +68,39 @@ const XploreGovHomepage = () => {
         }
       };
     }, []);
-    return (<div className="relative h-64 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/50 overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <ForceGraph3D
-          ref={graphRef}
-          graphData={graphData}
-          enableNodeDrag={false}
-          enableNavigationControls={false}
-          showNavInfo={false}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
-      </div>
-      <div className="absolute bottom-4 left-4 right-4">
-        <div className="text-xs text-gray-300 mb-2">
-          Live Government Structure
+    return (
+      <div className="relative h-64 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/50 overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ForceGraph3D
+            ref={graphRef}
+            graphData={graphData}
+            enableNodeDrag={false}
+            enableNavigationControls={false}
+            showNavInfo={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
         </div>
-        <div className="flex space-x-4 text-xs">
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-            <span className="text-gray-400">Ministries</span>
+        <div className="absolute bottom-4 left-4 right-4">
+          <div className="text-xs text-gray-300 mb-2">
+            Live Government Structure
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <span className="text-gray-400">Departments</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-            <span className="text-gray-400">Officials</span>
+          <div className="flex space-x-4 text-xs">
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+              <span className="text-gray-400">Ministries</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-gray-400">Departments</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span className="text-gray-400">Officials</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>)
+    );
   };
 
   // Mock presidential data
@@ -321,7 +317,7 @@ const XploreGovHomepage = () => {
                         />
                       </div>
                       {president.active && isActive && (
-                        <div className="absolute -bottom-0 right-1 w-3 h-3 bg-active border border-border rounded-full animate-pulse"></div>
+                        <div className="absolute -bottom-0 right-1 w-3 h-3 border border-border rounded-full animate-pulse bg-active-green"></div>
                       )}
                     </div>
 
@@ -448,41 +444,19 @@ const XploreGovHomepage = () => {
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
       {/* Background Effects */}
-      <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-background">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(128, 131, 133, 0.1)_0%,transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.1)_0%,transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_90%,rgba(168,85,247,0.25)_0%,rgba(34,211,238,0.15)_30%,transparent_60%)]"></div>
-      </div>
+      <BackgroundGradientEffect />
 
       {/* Animated particles */}
-      <div className="fixed inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-accent/75 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${i * 200}ms`,
-              animationDuration: `${3 + Math.random() * 2}s`,
-            }}
-          />
-        ))}
-      </div>
+      <AnimatedDots />
 
       <div className="relative z-10 px-2 lg:px-6">
         <div className="p-2 md:px-14 lg:px-24 xl:px-56 mx-auto">
           {/* Hero Section */}
           <div className="py-2 md:py-4 lg:py-6 justify-between flex">
             <div className="pt-2 pb-4 text-left flex items-center space-x-3">
-              {/* Heading with gradient text */}
-              <h2 className="text-normal md:text-2xl font-semibold">
-                <span className="text-accent">
-                  OpenGIN<span className="text-primary">Xplore</span>
-                </span>
-              </h2>
+            <TextLogo />
             </div>
-            <ThemeToggle isDark={isDark} onToggle={setIsDark} />
+            <ThemeToggle/>
           </div>
 
           {/* Modern Split Section */}
@@ -609,8 +583,6 @@ const XploreGovHomepage = () => {
                   </div>
                 </div>
 
-                
-
                 {/* Edge gradients */}
                 {/* <div className="absolute inset-y-0 left-0 w-1/10 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none"></div> */}
                 {/* <div className="absolute inset-y-0 right-0 w-1/10 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none"></div> */}
@@ -621,28 +593,23 @@ const XploreGovHomepage = () => {
                 {/* <div className="absolute inset-x-0 bottom-0 h-[2%] bg-gradient-to-t from-gray-900 to-transparent pointer-events-none"></div> */}
               </div>
               {/* Dots */}
-                <div className="mt-15 w-full flex justify-center space-x-2">
-                  {cards.map((_, idx) => (
-                    <span
-                      key={idx}
-                      className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
-                        currentIndex === idx ? "bg-white" : "bg-gray-500"
-                      }`}
-                      onClick={() => setCurrentIndex(idx)}
-                    ></span>
-                  ))}
-                </div>
+              <div className="mt-15 w-full flex justify-center space-x-2">
+                {cards.map((_, idx) => (
+                  <span
+                    key={idx}
+                    className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
+                      currentIndex === idx ? "bg-white" : "bg-gray-500"
+                    }`}
+                    onClick={() => setCurrentIndex(idx)}
+                  ></span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
       {/* Footer */}
-      <div className="absolute flex justify-center mt-4 lg:mt-0 lg:bottom-0 w-full">
-        <div className="inline-flex items-center px-4 py-2 rounded-full bg-background/25 border border-border text-sm text-accent mb-6 text-center">
-          <Clock className="hidden md:block w-4 h-4 mr-2" />
-          Powered by OpenGIN : Open General Information Network
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 };

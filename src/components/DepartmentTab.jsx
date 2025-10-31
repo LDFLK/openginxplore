@@ -39,7 +39,6 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
   );
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -124,17 +123,17 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                   flexDirection: "column",
                   alignItems: "flex-start",
                   width: "40%",
-                  border: `2px solid ${colors.backgroundWhite}`,
+                  border: `1px solid ${colors.backgroundWhite}`,
                   p: 2,
                   backgroundColor: colors.backgroundWhite,
                   borderRadius: "14px",
                 }}
               >
                 <Typography
-                  variant="h6"
                   sx={{
                     fontFamily: "Poppins",
-                    fontWeight: 600,
+                    fontSize: "1.2rem",
+                    fontWeight: 500,
                     color: colors.textPrimary,
                     mb: 2,
                   }}
@@ -246,10 +245,10 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
             <Typography
               variant="subtitle1"
               sx={{
-                fontSize: "1.25rem",
+                fontSize: "1rem",
                 color: colors.textPrimary,
                 fontFamily: "poppins",
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               Departments
@@ -289,7 +288,6 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
               />
             </Box>
           </Box>
-          <Divider sx={{ py: 1 }} />
 
           {/* Department List */}
           <Box
@@ -299,6 +297,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
               flexDirection: "column",
               gap: 2,
               borderRadius: 2,
+              mt: 2
             }}
           >
             <Stack spacing={1}>
@@ -312,12 +311,11 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)",
                         padding: "12px 16px",
                         marginBottom: "12px",
                         transition: "all 0.3s ease",
                         cursor: "pointer",
-                        borderBottom: `3px solid ${colors.backgroundWhite}`,
+                        borderBottom: `1px solid ${colors.backgroundWhite}`,
                       }}
                     >
                       <Box

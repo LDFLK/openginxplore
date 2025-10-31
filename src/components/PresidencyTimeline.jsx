@@ -135,9 +135,10 @@ export default function PresidencyTimeline() {
         alignItems: "center",
         gap: 2,
         width: "100%",
+        pt: '25px'
       }}
     >
-      {gazetteData?.length > 0 && (
+      {/* {gazetteData?.length > 0 && (
         <Typography
           sx={{
             mt: "30px",
@@ -146,7 +147,7 @@ export default function PresidencyTimeline() {
         >
           Select gazette published date
         </Typography>
-      )}
+      )} */}
       {selectedPresident && (
         <Box
           sx={{

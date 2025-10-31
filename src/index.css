@@ -6,7 +6,8 @@
 
 :root {
   /* Blue theme color scheme */
-  --background: oklch(0.98 0 0);
+  --background: oklch(97.913% 0.00011 271.152);
+  --background-dark: oklch(92.797% 0.00011 271.152);
   --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
@@ -28,7 +29,7 @@
   --destructive: oklch(0.577 0.245 27.325); /* red for destructive stays */
   --destructive-foreground: oklch(0.577 0.245 27.325);
 
-  --border: oklch(0.92 0 0);
+  --border: oklch(89.143% 0.0001 271.152);
   --input: oklch(0.92 0 0);
   --ring: oklch(0.65 0.2 240);
   
@@ -41,6 +42,7 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-dark: var(--background-dark);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -74,6 +76,7 @@
 .dark {
   /* Dark mode adjustments for blue theme */
   --background: oklch(21% 0.034 264.665);
+  --background-dark: oklch(18.581% 0.02264 260.445);
   --foreground: oklch(0.95 0 0);
   --card: oklch(0.15 0 0);
   --card-foreground: oklch(0.95 0 0);
@@ -89,7 +92,7 @@
   --muted: oklch(0.25 0 0);
   --muted-foreground: oklch(0.7 0 0);
 
-  --accent: oklch(0.65 0.2 240);
+  --accent: oklch(78.9% 0.154 211.53);
   --accent-foreground: oklch(0.12 0 0);
 
   --destructive: oklch(0.396 0.141 25.723);
