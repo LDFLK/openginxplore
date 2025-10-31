@@ -9,15 +9,14 @@ import XploreDataTab from "../../components/xploreData/XploreDataTab";
 import YearRangeSelector from "../../components/Timeline";
 import { useSelector } from "react-redux";
 import Organization from "../../components/Organization";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import TextLogo from "../XploreGovHome/components/textLogo";
 import ThemeToggle from "../../components/theme-toggle";
 
 export default function OpenginXplore() {
   const [isExpanded, setIsExpanded] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { tab } = useParams(); // Get the tab from URL
+  const { tab } = useParams();
 
   const selectedTab = tab || "organization";
 
