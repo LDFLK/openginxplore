@@ -31,7 +31,7 @@ export function DatasetView({ data, setExternalDateRange }) {
     const filteredYears = Object.keys(datasets).filter(
       (year) => year >= startYear && year <= endYear
     );
-    setSelectedDataset(null);
+ 
     setYears(filteredYears);
   }, [datasets, window.location.search]);
 
