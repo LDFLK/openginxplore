@@ -264,14 +264,14 @@ export default function XploreDataTab({setExternalDateRange }){
                           whileHover={{ y: -2, scale: 1.01 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleCategoryClick(item.id, item.name)}
-                          className={`cursor-pointer relative w-full h-[100px] border border-gray-600 rounded-2xl p-4 flex items-center justify-between bg-category-card transition hover:text-gray-900 ${loadingCategoryId === item.id
+                          className={`cursor-pointer bg-background shadow-2xs relative w-full h-[100px] border border-border rounded-2xl p-4 flex items-center justify-between bg-category-card transition ${loadingCategoryId === item.id
                               ? "opacity-50 pointer-events-none"
-                              : "hover:bg-gray-800"
+                              : "hover:bg-border/10"
                             }`}
                         >
                           <div className="flex items-center">
-                            <Folder className="text-blue-400" />
-                            <p className="ml-3 text-start text-gray-200">
+                            <Folder className="text-accent" />
+                            <p className="ml-3 text-start text-primary">
                               {formatText({ name: item.name })}
                             </p>
                           </div>
