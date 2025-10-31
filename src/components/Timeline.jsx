@@ -698,8 +698,7 @@ export default function YearRangeSelector({
   return (
     <div className="bg-background border-b border-border py-6 px-12 w-full mx-auto">
       {/* Presets and calendar */}
-      <div className="py-2 px-1 text-primary text-sm">
-        {" "}
+      <div className="pb-4 px-1 text-primary text-md font-semibold">
         Select a Date range
       </div>
       <div className="flex gap-2 mb-4 flex-wrap sm:justify-start justify-center">

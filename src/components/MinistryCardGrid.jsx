@@ -399,9 +399,9 @@ const MinistryCardGrid = () => {
                   <Typography
                     sx={{
                       fontSize: 12,
-                      color: colors.textPrimary,
+                      color: colors.white,
                       fontWeight: 500,
-                      backgroundColor: `${selectedPresident.themeColorLight}75`,
+                      backgroundColor: `${selectedPresident.themeColorLight}99`,
                       py: 0.25,
                       px: 1,
                       borderRadius: 1,
