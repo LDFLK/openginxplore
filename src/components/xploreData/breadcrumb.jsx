@@ -3,14 +3,14 @@ import { ChevronRightIcon, HomeIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function Breadcrumb({ items, onItemClick, setSelectedDatasets }) {
-  const navigator = useNavigate();
+  const navigate = useNavigate();
 
   const handleClick = (index, item) => {
     setSelectedDatasets(null)
     if (onItemClick) {
       onItemClick(index, item);
     } else {
-      navigator(item.path);
+      navigate(item.path);
     }
   };
 
@@ -22,7 +22,7 @@ export function Breadcrumb({ items, onItemClick, setSelectedDatasets }) {
             onClick={() => {
               setSelectedDatasets(null)
               if (onItemClick) onItemClick(-1, { label: "Home", path: "/" });
-              else navigator("/");
+              else navigate("/");
             }}
             className="flex items-center gap-1 text-forground/10 hover:text-accent transition-colors hover:cursor-pointer"
           >

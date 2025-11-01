@@ -9,20 +9,18 @@ const App = () => {
   const { isDark } = useThemeContext();
 
   return (
-    
       <div className={isDark ? "dark" : ""}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<XploreGovHomepage />} />
-          <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
-          <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
-          <Route path="/docs" element={<DocsPage />} />
-          <Route path="/:tab" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
-          <Route path="*" element={<Error404 />} />
-        </Routes>
-      </Router>
+        <Router>
+          <Routes>
+            <Route path="/" element={<XploreGovHomepage />} />
+            <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
+            <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
+            <Route path="/docs" element={<DocsPage />} />
+            <Route path="/:tab" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
+            <Route path="*" element={<Error404 />} />
+          </Routes>
+        </Router>
       </div>
-
   );
 }
 

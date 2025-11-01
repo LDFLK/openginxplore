@@ -40,7 +40,7 @@ const XploreGovHomepage = () => {
   const graphData = genRandomTree();
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cards = [0];
+  const cards = [0,1];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -446,9 +446,6 @@ const XploreGovHomepage = () => {
       {/* Background Effects */}
       <BackgroundGradientEffect />
 
-      {/* Animated particles */}
-      <AnimatedDots />
-
       <div className="relative z-10 px-2 lg:px-6">
         <div className="p-2 md:px-14 lg:px-24 xl:px-56 mx-auto">
           {/* Hero Section */}
@@ -503,7 +500,7 @@ const XploreGovHomepage = () => {
                   style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                 >
                   {/* Card 1 */}
-                  <div className="min-w-full xl:h-[66vh] px-2 border rounded-2xl border-border bg-foreground/8">
+                  <div className="min-w-full xl:h-[66vh] px-2 border rounded-2xl border-border bg-foreground/8 shadow-2xl">
                     {/* Soft light gradient overlay for frosted effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
@@ -545,7 +542,7 @@ const XploreGovHomepage = () => {
                   </div>
 
                   {/* Card 2 */}
-                  <div className="min-w-full xl:h-[66vh] px-2 border rounded-2xl border-border bg-foreground/8">
+                  <div className="min-w-full xl:h-[66vh] px-2 border rounded-2xl border-border bg-foreground/8 shadow-2xl">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
                     <div className="rounded-2xl px-1 py-2 md:p-4 lg:p-6 transition-all duration-300 group">
@@ -582,15 +579,6 @@ const XploreGovHomepage = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Edge gradients */}
-                {/* <div className="absolute inset-y-0 left-0 w-1/10 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none"></div> */}
-                {/* <div className="absolute inset-y-0 right-0 w-1/10 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none"></div> */}
-                {/* Top gradient fade */}
-                {/* <div className="absolute inset-x-0 top-0 h-[5%] bg-gradient-to-b from-gray-900 to-transparent pointer-events-none"></div> */}
-
-                {/* Bottom gradient fade */}
-                {/* <div className="absolute inset-x-0 bottom-0 h-[2%] bg-gradient-to-t from-gray-900 to-transparent pointer-events-none"></div> */}
               </div>
               {/* Dots */}
               <div className="mt-15 w-full flex justify-center space-x-2">
@@ -608,6 +596,10 @@ const XploreGovHomepage = () => {
           </div>
         </div>
       </div>
+
+      {/* Animated particles */}
+      <AnimatedDots />
+      
       {/* Footer */}
       <Footer />
     </div>
