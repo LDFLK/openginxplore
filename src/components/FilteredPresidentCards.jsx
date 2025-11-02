@@ -172,11 +172,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     }
   }, [presidents, presidentRelationDict, gazetteDateClassic, initializedFromUrl]);
 
-
-
-
-
-
   useEffect(() => {
     if (!initializedFromUrl) return;
 
@@ -226,7 +221,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       {filteredPresidents.length > 4 && (
         <input
           type="text"
-          className="border border-gray-600 bg-gray-800 text-gray-200 p-2 mb-3 w-full rounded placeholder-gray-400 focus:outline-none focus:border-blue-500 text-sm"
+          className="border border-border bg-gray-800 text-gray-200 p-2 mb-3 w-full rounded placeholder-gray-400 focus:outline-none focus:border-blue-500 text-sm"
           placeholder="Search presidents..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -251,25 +246,25 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
               <button
                 key={president.id}
                 onClick={() => selectPresidentAndDates(president)}
-                className={`flex items-center p-1 rounded-lg border transition-all duration-200 hover:cursor-pointer
+                className={`flex items-center p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
     ${isSelected
-                    ? "bg-blue-600/20 border-blue-400 shadow-md"
-                    : "bg-gray-800 border-gray-700 hover:bg-gray-700"
+                    ? "bg-accent/20 border-accent/35 shadow-md"
+                    : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
                   }`}
               >
                 <img
                   src={president.imageUrl || president.image || ""}
                   alt={nameText}
-                  className="w-10 h-10 object-cover rounded-full mr-3 border border-gray-600 flex-shrink-0"
+                  className="w-10 h-10 object-cover rounded-full mr-3 border border-border flex-shrink-0"
                 />
                 <div className="flex flex-col flex-1 text-left min-w-0">
                   <p
-                    className={`font-medium text-sm break-words whitespace-normal ${isSelected ? "text-blue-400" : "text-gray-200"
+                    className={`font-medium text-sm break-words whitespace-normal ${isSelected ? "text-accent" : "text-primary"
                       }`}
                   >
                     {nameText}
                   </p>
-                  <p className="text-xs text-gray-400 break-words whitespace-normal">
+                  <p className="text-xs text-primary/50 break-words whitespace-normal">
                     {term}
                   </p>
                 </div>

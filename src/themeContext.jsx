@@ -5,7 +5,7 @@ import darkColors from "./assets/darkColors";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
 
   const toggleTheme = () => setIsDark((prev) => !prev);
   const colors = isDark ? darkColors : lightColors;

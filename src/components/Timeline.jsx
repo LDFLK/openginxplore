@@ -722,10 +722,9 @@ export default function YearRangeSelector({
   };
 
   return (
-    <div className="bg-gray-900 border-b border-gray-700 py-6 px-12 shadow-lg w-full mx-auto">
+    <div className="bg-background border-b border-border py-6 px-12 w-full mx-auto">
       {/* Presets and calendar */}
-      <div className="py-2 px-1 text-gray-500 text-sm">
-        {" "}
+      <div className="pb-4 px-1 text-primary text-md font-semibold">
         Select a Date range
       </div>
       <div className="flex gap-2 mb-4 flex-wrap sm:justify-start justify-center">
@@ -768,10 +767,11 @@ export default function YearRangeSelector({
               setActivePreset(preset.label);
               setActivePresident("");
             }}
-            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${activePreset === preset.label
-              ? "bg-blue-600 text-white"
-              : "hover:bg-gray-800 bg-gray-700 text-gray-300 hover:cursor-pointer"
-              }`}
+            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${
+              activePreset === preset.label
+                ? "bg-accent/20 text-primary"
+                : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
+            }`}
           >
             {preset.label}
           </button>
@@ -781,10 +781,11 @@ export default function YearRangeSelector({
         <div className="relative w-56 text-xs">
           {/* Main button */}
           <button
-            className={`w-full px-3 py-1.5 text-left cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${activePresident
-              ? "bg-blue-600 text-white"
-              : "bg-gray-700 text-gray-300"
-              }`}
+            className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${
+              activePresident
+                ? "bg-accent/20 text-primary"
+                : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
+            }`}
             onClick={() => setIsDropdownOpen((o) => !o)}
           >
             <span>
@@ -826,15 +827,16 @@ export default function YearRangeSelector({
 
           {/* Dropdown menu */}
           {isDropdownOpen && (
-            <div className="absolute z-50 mt-1 w-full bg-gray-700 border border-gray-600 rounded-md shadow-lg">
+            <div className="absolute z-50 mt-1 w-full bg-background border border-border rounded-md shadow-lg">
               {Object.entries(presidents).map(([id, data]) => (
                 <div key={id} className="group relative">
                   {/* President row */}
                   <button
-                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-gray-600 ${activePresident === id
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-300"
-                      }`}
+                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-border ${
+                      activePresident === id
+                        ? "bg-accent/20 text-primary"
+                        : "text-primary"
+                    }`}
                     onClick={() => {
                       if (data.terms.length === 1) {
                         const term = data.terms[0];
@@ -855,23 +857,24 @@ export default function YearRangeSelector({
                   >
                     {data.name}
                     {data.terms.length > 1 && (
-                      <span className="ml-1 text-gray-400 text-xs">▶</span>
+                      <span className="ml-1 text-primary text-xs">▶</span>
                     )}
                   </button>
 
                   {/* Nested terms */}
                   {data.terms.length > 1 && (
-                    <div className="absolute top-0 left-full mt-0 ml-1 w-40 bg-gray-700 border border-gray-600 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-0 left-full mt-0 ml-1 w-40 bg-border border border-border rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                       {data.terms.map((term, idx) => (
                         <button
                           key={idx}
-                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-gray-600 ${activePresident === id &&
+                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-border ${
+                            activePresident === id &&
                             startDate.getTime() ===
                             new Date(term.start).getTime() &&
                             endDate.getTime() === new Date(term.end).getTime()
-                            ? "bg-blue-600 text-white"
-                            : "text-gray-300"
-                            }`}
+                              ? "bg-accent text-white"
+                              : "text-primary"
+                          }`}
                           onClick={() => {
                             setActivePresident(id);
                             setStartDate(new Date(term.start));
@@ -911,22 +914,23 @@ export default function YearRangeSelector({
               setCalendarOpen((o) => !o);
             }}
             className={`flex items-center justify-center gap-2 w-full sm:w-auto px-2.5 py-1.5 text-xs rounded-md transition-colors cursor-pointer
-      ${calendarRange &&
-                startDate.toISOString() === calendarRange.start &&
-                endDate.toISOString() === calendarRange.end
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              }`}
+      ${
+        calendarRange &&
+        startDate.toISOString() === calendarRange.start &&
+        endDate.toISOString() === calendarRange.end
+          ? "bg-accent text-white hover:bg-accent"
+          : "bg-foreground/10 text-primary font-medium hover:bg-border"
+      }`}
           >
             By Date
           </button>
 
           {calendarOpen && (
-            <div className="absolute left-1/2 -translate-x-1/2 mt-1.5 z-50 w-full sm:w-auto bg-gray-800 p-3 rounded-md shadow-lg flex flex-col">
+            <div className="absolute left-1/2 -translate-x-1/2 mt-1.5 z-50 w-full sm:w-auto bg-background p-3 rounded-md shadow-lg flex flex-col">
               <div className="flex flex-col sm:flex-row gap-3">
                 {/* From date */}
                 <div className="flex-1 flex flex-col">
-                  <p className="text-[11px] text-gray-300 mb-1">From</p>
+                  <p className="text-[11px] text-primary font-medium mb-1">From</p>
                   <DatePicker
                     selected={calendarStart}
                     onChange={setCalendarStart}
@@ -1056,7 +1060,7 @@ export default function YearRangeSelector({
 
                 {/* To date */}
                 <div className="flex-1 flex flex-col">
-                  <p className="text-[11px] text-gray-300 mb-1">To</p>
+                  <p className="text-[11px] text-primary font-medium mb-1">To</p>
                   <DatePicker
                     selected={calendarEnd}
                     onChange={setCalendarEnd}
@@ -1183,7 +1187,7 @@ export default function YearRangeSelector({
               <div className="flex flex-col sm:flex-row justify-end gap-1.5 mt-3">
                 <button
                   onClick={() => setCalendarOpen(false)}
-                  className="px-3 py-1.5 bg-gray-600 text-gray-300 rounded-md hover:bg-gray-500 text-xs"
+                  className="px-3 py-1.5 bg-border text-primary rounded-md hover:bg-border cursor-pointer text-xs"
                 >
                   Cancel
                 </button>
@@ -1212,7 +1216,7 @@ export default function YearRangeSelector({
                       });
                     }
                   }}
-                  className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs"
+                  className="px-3 py-1.5 bg-accent text-primary cursor-pointer rounded-md hover:bg-accent text-xs"
                 >
                   Apply
                 </button>
@@ -1223,7 +1227,7 @@ export default function YearRangeSelector({
 
         {/* Selected range display */}
         <div className="flex items-center gap-1.5 w-full sm:w-auto ml-auto">
-          <div className="px-2.5 py-1 text-xs rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 font-medium">
+          <div className="px-2.5 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
             {new Date(
               tempStartDate.toISOString().split("T")[0]
             ).toLocaleDateString("en-GB", {
@@ -1232,8 +1236,8 @@ export default function YearRangeSelector({
               year: "numeric",
             })}
           </div>
-          <span className="text-blue-300 font-medium text-xs">→</span>
-          <div className="px-2.5 py-1 text-xs rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 font-medium">
+          <span className="text-primary font-medium text-xs">→</span>
+          <div className="px-2.5 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
             {new Date(
               tempEndDate.toISOString().split("T")[0]
             ).toLocaleDateString("en-GB", {
@@ -1253,7 +1257,7 @@ export default function YearRangeSelector({
       >
         <div
           ref={containerRef}
-          className="relative bg-gray-700 mb-3"
+          className="relative bg-foreground/10 mb-3"
           style={{ height: "27.5px", minWidth: `${years.length * 80}px` }}
         >
           <div className="flex h-full items-end">
@@ -1263,8 +1267,9 @@ export default function YearRangeSelector({
               return (
                 <div
                   key={year}
-                  className={`relative transition-all duration-200 hover:cursor-pointer ${isInRange ? "opacity-100" : "opacity-40"
-                    } border-l-1 border-r-1 border-gray-500`}
+                  className={`relative transition-all duration-200 hover:cursor-pointer ${
+                    isInRange ? "opacity-100" : "opacity-40"
+                  } border-l-1 border-r-1 border-foreground/50`}
                   style={{ height: "40px", flex: "1 0 0" }}
                   onClick={() => {
                     setSelectedRange([year, year]);
@@ -1298,8 +1303,9 @@ export default function YearRangeSelector({
                     isInRange={isInRange}
                   />
                   <div
-                    className={`absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${isInRange ? "text-blue-400" : "text-gray-400"
-                      }`}
+                    className={`absolute -bottom- left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${
+                      isInRange ? "text-accent" : "text-primary"
+                    }`}
                   >
                     {year}
                   </div>
@@ -1310,7 +1316,7 @@ export default function YearRangeSelector({
 
           {/* Overlay */}
           <div
-            className="absolute top-0 bg-blue-500/40 border-t-2 border-blue-500 transition-all duration-200"
+            className="absolute top-0 bg-accent/40 border-t-2 border-accent transition-all duration-200"
             style={{
               left: overlayMetrics.left,
               width: overlayMetrics.width,
@@ -1336,7 +1342,7 @@ export default function YearRangeSelector({
 
           {/* Drag handles */}
           <div
-            className="absolute top-0 bottom-0 w-2 bg-blue-600 cursor-ew-resize hover:bg-blue-500 transition-colors z-10"
+            className="absolute top-0 bottom-0 w-2 bg-accent cursor-ew-resize hover:bg-accent transition-colors z-10"
             style={{
               left: handlePositions.startLeft,
               transform: "translateX(-50%)",
@@ -1344,7 +1350,7 @@ export default function YearRangeSelector({
             onMouseDown={(e) => handleMouseDown(e, "start")}
           />
           <div
-            className="absolute top-0 bottom-0 w-2 bg-blue-600 cursor-ew-resize hover:bg-blue-500 transition-colors z-10"
+            className="absolute top-0 bottom-0 w-2 bg-accent cursor-ew-resize hover:bg-accent transition-colors z-10"
             style={{
               left: handlePositions.endLeft,
               transform: "translateX(-50%)",
@@ -1354,7 +1360,7 @@ export default function YearRangeSelector({
         </div>
       </div>
 
-      <div className="text-gray-500 text-xs text-center mt-2">
+      <div className="text-primary/75 font-medium text-xs text-center mt-4">
         Gazettes Published by Year
       </div>
     </div>
