@@ -14,7 +14,7 @@ const COLORS = [
   "#66b2ff", "#99ccff", "#cce5ff",
 ];
 
-export function ChartVisualization({ columns, rows }) {
+export function ChartVisualization({ columns, rows, yearlyData }) {
   const [xAxis, setXAxis] = useState("district");
   const [selectedYColumns, setSelectedYColumns] = useState([]);
   const [numericColumns, setNumericColumns] = useState([]);
@@ -22,18 +22,36 @@ export function ChartVisualization({ columns, rows }) {
   const [detectedTicks, setDetectedTicks] = useState([]);
   const chartRef = useRef(null);
 
+  // Normalize yearlyData format - convert single year to yearlyData format
+  const normalizedYearlyData = useMemo(() => {
+    console.log('Columns:', columns);
+    console.log('Rows:', rows);
+    console.log('Yearly Data:', yearlyData);
+    if (yearlyData?.length > 0) {
+      return yearlyData;
+    } else if (rows?.length > 0) {
+      // Convert single year format to yearlyData format
+      return [{ year: 'single', rows: rows }];
+    }
+    return [];
+  }, [yearlyData, rows]);
+
+  // Detect columns
   useEffect(() => {
     const stringCols = [];
     const numericCols = [];
 
-    if (!rows || rows.length === 0 || !columns.length) {
+    const sampleRows =
+      normalizedYearlyData.length > 0 ? normalizedYearlyData[0].rows : [];
+
+    if (!sampleRows || sampleRows.length === 0 || !columns.length) {
       setNumericColumns([]);
       setStringColumns([]);
       return;
     }
 
     columns.forEach((col, idx) => {
-      const isNumeric = rows.some((row) => {
+      const isNumeric = sampleRows.some((row) => {
         const val = row[idx];
         return (
           typeof val === "number" ||
@@ -47,285 +65,410 @@ export function ChartVisualization({ columns, rows }) {
 
     setNumericColumns(numericCols);
     setStringColumns(stringCols);
-    setSelectedYColumns([]);
-  }, [columns, rows]);
 
+
+    setSelectedYColumns((prev) =>
+      prev.filter((col) => numericCols.includes(col))
+    );
+  }, [columns, normalizedYearlyData]);
+
+
+  // Helper function to normalize strings for comparison
+  const normalizeString = (str) => {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s]/g, '')
+      .replace(/\s+/g, '');
+  };
+
+  // Prepare chart data - unified logic for single and multi-year
   const chartData = useMemo(() => {
-    if (!xAxis || selectedYColumns.length === 0) return [];
-    const xIndex = columns.indexOf(xAxis);
-    const yIndexes = selectedYColumns.map((col) => columns.indexOf(col));
+    if (normalizedYearlyData.length === 0 || selectedYColumns.length === 0) {
+      return [];
+    }
 
-    return rows.map((row) => {
-      const obj = {};
-      obj[xAxis] = row[xIndex];
-      yIndexes.forEach((yIdx, i) => {
-        obj[selectedYColumns[i]] = Number(row[yIdx]) || 0;
+    console.log('=== CHART PREPARATION ===');
+    console.log('Columns:', columns);
+    console.log('X-axis:', xAxis);
+    console.log('Selected Y columns:', selectedYColumns);
+    console.log('Number of years:', normalizedYearlyData.length);
+
+    const dataMap = new Map();
+
+    // Process each year's data
+    normalizedYearlyData.forEach((dataset) => {
+      console.log(`\nProcessing year ${dataset.year}`);
+
+      let yearXIndex = -1;
+
+      // Find X-axis by looking for the string column
+      if (dataset.rows.length > 0) {
+        const firstRow = dataset.rows[0];
+        firstRow.forEach((val, idx) => {
+          if (typeof val === 'string' && val.length > 2) {
+            yearXIndex = idx;
+          }
+        });
+        console.log(`X-axis found at index: ${yearXIndex}`);
+      }
+
+      if (yearXIndex === -1) {
+        console.error(`Could not find X-axis column for year ${dataset.year}`);
+        return;
+      }
+
+      const globalXIndex = columns.indexOf(xAxis);
+
+      // Process rows for this year
+      dataset.rows.forEach((row, rowIdx) => {
+        const rawXVal = row[yearXIndex];
+        const normalizedXVal = normalizeString(rawXVal);
+
+        if (!normalizedXVal) return;
+
+        // Get or create data point for this X value
+        if (!dataMap.has(normalizedXVal)) {
+          dataMap.set(normalizedXVal, {
+            [xAxis]: rawXVal,
+          });
+        }
+
+        const dataPoint = dataMap.get(normalizedXVal);
+
+        // Add Y values
+        selectedYColumns.forEach((col) => {
+          const globalYIndex = columns.indexOf(col);
+          const offset = yearXIndex - globalXIndex;
+          const actualYIndex = globalYIndex + offset;
+
+          const value = row[actualYIndex];
+          const key = `${dataset.year}_${col}`;
+          const numValue = Number(value) || 0;
+
+          dataPoint[key] = (dataPoint[key] || 0) + numValue;
+
+          if (rowIdx < 2) {
+            console.log(`  ${rawXVal}: ${col} -> value ${value}`);
+          }
+        });
       });
-      return obj;
     });
-  }, [columns, rows, xAxis, selectedYColumns]);
 
-  // Extract ticks from the actual rendered chart
+    const result = Array.from(dataMap.values());
+
+    // Fill missing year-column combinations with 0
+    result.forEach((dataPoint) => {
+      normalizedYearlyData.forEach((dataset) => {
+        selectedYColumns.forEach((col) => {
+          const key = `${dataset.year}_${col}`;
+          if (dataPoint[key] === undefined) {
+            dataPoint[key] = 0;
+          }
+        });
+      });
+    });
+
+    console.log('Final data (first 3):', result.slice(0, 3));
+    return result;
+  }, [columns, xAxis, selectedYColumns, normalizedYearlyData]);
+
+  // Extract Y-axis ticks
   useEffect(() => {
     if (!chartRef.current) return;
 
     const timer = setTimeout(() => {
       try {
-        // Find all Y-axis tick elements in the SVG
-        const svg = chartRef.current.querySelector('svg');
+        const svg = chartRef.current.querySelector("svg");
         if (!svg) return;
 
-        const yAxisTicks = svg.querySelectorAll('.recharts-yAxis .recharts-cartesian-axis-tick');
-        const ticks = Array.from(yAxisTicks).map(tick => {
-          const text = tick.querySelector('text');
-          return text ? parseFloat(text.textContent) : 0;
-        }).filter(val => !isNaN(val)).sort((a, b) => b - a);
+        const yAxisTicks = svg.querySelectorAll(
+          ".recharts-yAxis .recharts-cartesian-axis-tick"
+        );
+        const ticks = Array.from(yAxisTicks)
+          .map((tick) => {
+            const text = tick.querySelector("text");
+            return text ? parseFloat(text.textContent) : 0;
+          })
+          .filter((val) => !isNaN(val))
+          .sort((a, b) => b - a);
 
-        if (ticks.length > 0) {
-          setDetectedTicks(ticks);
-        }
+        if (ticks.length > 0) setDetectedTicks(ticks);
       } catch (e) {
-        console.log('Could not extract ticks', e);
+        console.log("Could not extract ticks", e);
       }
     }, 100);
 
     return () => clearTimeout(timer);
   }, [chartData, selectedYColumns]);
 
+  const isMultiYear = normalizedYearlyData.length > 1;
+
   return (
     <>
-      {numericColumns.length > 0 && !(numericColumns.length === 1 && numericColumns[0].toLowerCase() === "id") && stringColumns.length !== 0 &&(
-        <div className="space-y-6 w-full">
-          {/* Controls */}
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
-            <h3 className="text-lg font-semibold text-gray-300">Visualizations</h3>
-            <h3 className="text-sm font-semibold mb-2 text-gray-400">Select Chart Data</h3>
+      {numericColumns.length > 0 &&
+        !(numericColumns.length === 1 && numericColumns[0].toLowerCase() === "id") &&
+        stringColumns.length !== 0 && (
+          <div className="space-y-6 w-full">
+            {/* Controls */}
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-300">
+                Visualizations
+              </h3>
+              <h3 className="text-sm font-semibold mb-2 text-gray-400">
+                Select Chart Data
+              </h3>
 
-            {/* X-axis selector */}
-            <div>
-              <label className="text-sm font-medium text-gray-400">X-Axis (Category):</label>
-              <select
-                value={xAxis}
-                onChange={(e) => setXAxis(e.target.value)}
-                className="mt-1 block w-full border text-gray-400 border-gray-700 rounded-md p-2 text-sm bg-gray-800"
-              >
-                <option value="">Select column</option>
-                {stringColumns.map((col) => (
-                  <option key={col} value={col}>
-                    {col}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Y-axis (multiple) */}
-            <div className="bg-gray-800 ">
-              <label className="text-sm font-medium text-gray-400">Y-Axis (Values):</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2 bg-gray-800">
-                {numericColumns
-                  .filter((col) => col !== "id" && col !== "total")
-                  .map((col) => (
-                    <label
-                      key={col}
-                      className="flex items-start space-x-2 text-sm break-words "
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedYColumns.includes(col)}
-                        onChange={(e) => {
-                          setSelectedYColumns((prev) =>
-                            e.target.checked
-                              ? [...prev, col]
-                              : prev.filter((c) => c !== col)
-                          );
-                        }}
-                      />
-                      <span className="break-words max-w-[220px] text-gray-400">
-                        {formatText({ name: col })}
-                      </span>
-                    </label>
+              {/* X-axis selector */}
+              <div>
+                <label className="text-sm font-medium text-gray-400">
+                  X-Axis (Category):
+                </label>
+                <select
+                  value={xAxis}
+                  onChange={(e) => setXAxis(e.target.value)}
+                  className="mt-1 block w-full border text-gray-400 border-gray-700 rounded-md p-2 text-sm bg-gray-800"
+                >
+                  <option value="">Select column</option>
+                  {stringColumns.map((col) => (
+                    <option key={col} value={col}>
+                      {col}
+                    </option>
                   ))}
+                </select>
+              </div>
+
+              {/* Y-axis (multiple) */}
+              <div className="bg-gray-800">
+                <label className="text-sm font-medium text-gray-400">
+                  Y-Axis (Values):
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2 bg-gray-800">
+                  {numericColumns
+                    .filter((col) => col !== "id" && col !== "total")
+                    .map((col) => (
+                      <label
+                        key={col}
+                        className="flex items-start space-x-2 text-sm break-words"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedYColumns.includes(col)}
+                          onChange={(e) => {
+                            setSelectedYColumns((prev) =>
+                              e.target.checked
+                                ? [...prev, col]
+                                : prev.filter((c) => c !== col)
+                            );
+                          }}
+                        />
+                        <span className="break-words max-w-[220px] text-gray-400">
+                          {formatText({ name: col })}
+                        </span>
+                      </label>
+                    ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Chart */}
-          <div className="bg-gray-800  border border-gray-700 rounded-lg p-4">
-            <h3 className="text-sm font-semibold mb-4 text-gray-400">Bar Chart</h3>
+            {/* Chart */}
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+              <h3 className="text-sm font-semibold mb-4 text-gray-400">
+                Bar Chart
+              </h3>
 
-            {chartData.length > 0 ? (
-              <div className="space-y-4">
-                {/* Fixed Legend */}
-                <div className="flex justify-center items-center gap-4 flex-wrap pb-2 border-border" >
-                  {selectedYColumns.map((col, i) => (
-                    <div key={col} className="flex items-center gap-2">
-                      <div
-                        style={{
-                          width: 12,
-                          height: 12,
-                          backgroundColor: COLORS[i % COLORS.length],
-                        }}
-                      />
-                      <span className="text-sm">{col}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex">
-                  {/* Y-axis sticky labels */}
-                  <div
-                    className="flex-shrink-0 bg-gray-800"
-                    style={{
-                      width: 60,
-                      position: "relative",
-                      height: 425,
-                      left: 0,
-                      zIndex: 10,
-                      borderRight: "1px solid var(--border)",
-                      marginBottom: 60,
-                    }}
-                  >
-                    {detectedTicks.length > 0 ? detectedTicks.map((tickVal, i) => {
-                      const totalTicks = detectedTicks.length;
-                      const percentage = (i / (totalTicks - 1)) * 100;
-
-                      return (
-                        <div
-                          key={`${tickVal}-${i}`}
-                          className="text-xs text-right pr-1 text-gray-300"
-                          style={{
-                            position: 'absolute',
-                            top: `${percentage}%`,
-                            transform: 'translateY(-50%)',
-                            width: '100%',
-                            paddingRight: '4px',
-                          }}
-                        >
-                          {Math.round(tickVal)}
+              {chartData.length > 0 ? (
+                <div className="space-y-4">
+                  {/* Legend */}
+                  <div className="flex justify-center items-center gap-4 flex-wrap pb-2 border-border">
+                    {isMultiYear
+                      ? normalizedYearlyData.map((d, yearIdx) => (
+                        <div key={d.year} className="flex items-center gap-2">
+                          <div
+                            style={{
+                              width: 12,
+                              height: 12,
+                              backgroundColor: COLORS[yearIdx % COLORS.length],
+                            }}
+                          />
+                          <span className="text-sm text-gray-300">{d.year}</span>
                         </div>
-                      );
-                    }) : null}
+                      ))
+                      : selectedYColumns.map((col, i) => (
+                        <div key={col} className="flex items-center gap-2">
+                          <div
+                            style={{
+                              width: 12,
+                              height: 12,
+                              backgroundColor: COLORS[i % COLORS.length],
+                            }}
+                          />
+                          <span className="text-sm text-gray-300">{formatText({ name: col })}</span>
+                        </div>
+                      ))}
                   </div>
 
-                  {/* Scrollable chart */}
-                  <div className="overflow-x-auto flex-1" ref={chartRef}>
+                  <div className="flex">
+                    {/* Y-axis sticky labels */}
                     <div
+                      className="flex-shrink-0 bg-gray-800"
                       style={{
-                        minWidth: `${chartData.length * 100}px`,
-                        height: 455,
-                        overflow: "hidden",
+                        width: 60,
+                        position: "relative",
+                        height: 425,
+                        left: 0,
+                        zIndex: 10,
+                        borderRight: "1px solid #374151",
+                        marginBottom: 60,
                       }}
                     >
-                      <div className="overflow-x-auto flex-1">
-                        <div
-                          style={{
-                            minWidth: `${chartData.length * 100}px`,
-                            width: Math.max(chartData.length * 100, 1000),
-                            height: 455,
-                            overflow: "hidden",
-                          }}
+                      {detectedTicks.length > 0
+                        ? detectedTicks.map((tickVal, i) => {
+                          const totalTicks = detectedTicks.length;
+                          const percentage = (i / (totalTicks - 1)) * 100;
+
+                          return (
+                            <div
+                              key={`${tickVal}-${i}`}
+                              className="text-xs text-right pr-1 text-gray-300"
+                              style={{
+                                position: "absolute",
+                                top: `${percentage}%`,
+                                transform: "translateY(-50%)",
+                                width: "100%",
+                                paddingRight: "4px",
+                              }}
+                            >
+                              {Math.round(tickVal)}
+                            </div>
+                          );
+                        })
+                        : null}
+                    </div>
+
+                    {/* Scrollable chart */}
+                    <div className="overflow-x-auto flex-1" ref={chartRef}>
+                      <div
+                        style={{
+                          minWidth: `${chartData.length * 120}px`,
+                          height: 455,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <BarChart
+                          data={chartData}
+                          width={Math.max(chartData.length * 120, 1000)}
+                          height={450}
+                          margin={{ left: -60, bottom: -60 }}
+                          barCategoryGap="20%"
                         >
-                          <BarChart
-                            data={chartData}
-                            width={Math.max(chartData.length * 100, 1000)}
-                            height={450}
-                            margin={{ left: -60, bottom: -60 }}
-                            barCategoryGap="15%"
-                          >
-                            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="#374151"
+                            strokeOpacity={0.5}
+                          />
 
-                            <XAxis
-                              dataKey={xAxis}
-                              stroke="var(--foreground)"
-                              interval={0}
-                              height={86}
-                              tickLine={false}
-                              axisLine={{ stroke: "var(--border)" }}
-                              tick={({ x, y, payload }) => {
-                                const maxCharsPerLine = 15;
-                                const text = payload.value;
-                                let line1 = text;
-                                let line2 = "";
+                          <XAxis
+                            dataKey={xAxis}
+                            stroke="white"
+                            interval={0}
+                            height={86}
+                            tickLine={false}
+                            axisLine={{ stroke: "#374151" }}
+                            tick={({ x, y, payload }) => {
+                              const maxCharsPerLine = 15;
+                              const text = payload.value;
+                              let line1 = text;
+                              let line2 = "";
 
-                                if (text.length > maxCharsPerLine) {
-                                  const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
-                                  if (splitIndex > 0) {
-                                    line1 = text.slice(0, splitIndex);
-                                    line2 = text.slice(splitIndex + 1);
-                                  } else {
-                                    line1 = text.slice(0, maxCharsPerLine);
-                                    line2 = text.slice(maxCharsPerLine);
-                                  }
+                              if (text.length > maxCharsPerLine) {
+                                const splitIndex =
+                                  text.lastIndexOf(" ", maxCharsPerLine);
+                                if (splitIndex > 0) {
+                                  line1 = text.slice(0, splitIndex);
+                                  line2 = text.slice(splitIndex + 1);
+                                } else {
+                                  line1 = text.slice(0, maxCharsPerLine);
+                                  line2 = text.slice(maxCharsPerLine);
                                 }
+                              }
 
-                                return (
-                                  <g transform={`translate(${x},${y + 2.5})`}>
+                              return (
+                                <g transform={`translate(${x},${y + 2.5})`}>
+                                  <text
+                                    x={0}
+                                    y={0}
+                                    textAnchor="middle"
+                                    fontSize={11.5}
+                                    fill="white"
+                                    fillOpacity={0.7}
+                                  >
+                                    {line1}
+                                  </text>
+                                  {line2 && (
                                     <text
                                       x={0}
-                                      y={0}
+                                      y={12}
                                       textAnchor="middle"
                                       fontSize={11.5}
                                       fill="white"
                                       fillOpacity={0.7}
                                     >
-                                      {line1}
+                                      {line2}
                                     </text>
-                                    {line2 && (
-                                      <text
-                                        x={0}
-                                        y={12}
-                                        textAnchor="middle"
-                                        fontSize={11.5}
-                                        fill="white"
-                                        fillOpacity={0.7}
-                                      >
-                                        {line2}
-                                      </text>
-                                    )}
-                                  </g>
-                                );
-                              }}
-                            />
+                                  )}
+                                </g>
+                              );
+                            }}
+                          />
 
-                            <YAxis
-                              stroke="transparent"
-                              tickLine={false}
-                              axisLine={false}
-                              tick={{ fill: 'transparent' }}
-                            />
+                          <YAxis
+                            stroke="transparent"
+                            tickLine={false}
+                            axisLine={false}
+                            tick={{ fill: "transparent" }}
+                          />
 
-                            <Tooltip
-                              contentStyle={{
-                                backgroundColor: "var(--card)",
-                                border: "1px solid var(--border)",
-                                borderRadius: "0.5rem",
-                              }}
-                              formatter={(value, name) => [value, formatText({ name: name })]}
-                            />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "#1f2937",
+                              border: "1px solid #374151",
+                              borderRadius: "0.5rem",
+                            }}
+                            formatter={(value, name) => [
+                              value,
+                              formatText({ name: name }),
+                            ]}
+                          />
 
-                            {selectedYColumns.map((col, i) => (
+                          {normalizedYearlyData.map((d, yearIdx) =>
+                            selectedYColumns.map((col) => (
                               <Bar
-                                key={col}
-                                dataKey={col}
-                                fill={COLORS[i % COLORS.length]}
-                                stackId="a"
+                                key={`${d.year}_${col}`}
+                                dataKey={`${d.year}_${col}`}
+                                fill={
+                                  isMultiYear
+                                    ? COLORS[yearIdx % COLORS.length]
+                                    : COLORS[selectedYColumns.indexOf(col) % COLORS.length]
+                                }
+                                stackId={`stack-${d.year}`}
                               />
-                            ))}
-                          </BarChart>
-                        </div>
+                            ))
+                          )}
+                        </BarChart>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <p className="text-center text-gray-400 text-sm">
-                Select X and Y columns to generate the chart.
-              </p>
-            )}
+              ) : (
+                <p className="text-center text-gray-400 text-sm">
+                  Select X and Y columns to generate the chart.
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 }
