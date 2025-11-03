@@ -233,7 +233,7 @@ const PersonsTab = ({ selectedDate }) => {
             fontFamily: "poppins",
           }}
         >
-          Ministers
+          Minister
         </Typography>
         {/* <Divider sx={{ py: 1 }} /> */}
 

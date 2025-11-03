@@ -1,24 +1,14 @@
 import { useState } from "react";
-import {
-  Typography,
-  Avatar,
-  Box,
-  Button,
-  ButtonBase,
-} from "@mui/material";
 import { useSelector } from "react-redux";
 import { useThemeContext } from "../../../themeContext";
 import utils from "../../../utils/utils";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import PersonIcon from "@mui/icons-material/Person";
 import personDetails from "../../../assets/personImages.json";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { FaAngleLeft } from "react-icons/fa6";
 import PersonHistoryTimeline from "../components/PersonHistoryTimeline";
 import ShareLinkButton from "../../../components/ShareLinkButton";
+import { ChevronLeft, Landmark, UserRound } from "lucide-react";
 
 const PersonProfile = () => {
-  const { colors } = useThemeContext();
   const { personId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,250 +41,91 @@ const PersonProfile = () => {
   const tabOptions = ["history"];
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: colors.backgroundPrimary,
-        width: "100%",
-        minHeight: { xs: "100vh", sm: "100vh" },
-        px: { xs: 6, sm: 14, md: 36 },
-        py: { xs: 4, sm: 6 },
-      }}
-    >
+    <div className="px-3 py-6 md:px-12 md:py-8 lg:px-18 xl:px-24 2xl:px-36 w-full bg-background-dark min-h-screen">
       {state.mode === "back" ? (
-        <ButtonBase
+        <button
           onClick={() => navigate(-1)}
-          sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            mb: 2,
-            width: 100,
-            color: colors.textPrimary,
-          }}
+          className="flex justify-start items-center mb-2 text-primary cursor-pointer"
         >
-          <FaAngleLeft />
-          <Typography
-            variant="h8"
-            sx={{
-              fontFamily: "Poppins",
-              color: colors.textPrimary,
-              textTransform: "none",
-              ml: 1,
-            }}
-          >
-            Back
-          </Typography>
-        </ButtonBase>
+          <ChevronLeft />
+          <p className="text-primary">Back</p>
+        </button>
       ) : (
-        <ButtonBase
-          onClick={() => navigate('/')}
-          sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            mb: 2,
-            width: 200,
-            color: colors.textPrimary,
-          }}
+        <button
+          onClick={() => navigate("/")}
+          className="flex justify-start items-center mb-2 text-primary cursor-pointer"
         >
-          <FaAngleLeft />
-          <Typography
-            variant="h8"
-            sx={{
-              fontFamily: "Poppins",
-              color: colors.textPrimary,
-              textTransform: "none",
-            }}
-          >
-            Go to XploreGov
-          </Typography>
-        </ButtonBase>
+          <ChevronLeft />
+          <p className="text-primary">Go to XploreGov</p>
+        </button>
       )}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          my: 2,
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            fontFamily: "Poppins",
-            fontWeight: 600,
-            color: colors.textPrimary,
-          }}
-        >
-          Person profile
-        </Typography>
-
+      <div className="flex justify-end items-center my-2">
         <ShareLinkButton />
-      </Box>
+      </div>
 
       {/* --- Person Card --- */}
-      <Box
-        sx={{
-          width: { xs: "100%", sm: "fit-content", md: "fit-content" },
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "flex-start", sm: "center" },
-          justifyContent: "space-between",
-          p: { xs: 2, sm: 3 },
-          borderRadius: 2,
-          backgroundColor: colors.backgroundWhite,
-          boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-          gap: { xs: 2, sm: 3 },
-          my: 3,
-        }}
-      >
-        {/* Avatar */}
-        <Avatar
-          src={imageUrl}
-          alt={selectedPerson?.name}
-          sx={{
-            width: { xs: 70, sm: 90, md: 100 },
-            height: { xs: 70, sm: 90, md: 100 },
-            bgcolor: colors.textMuted2,
-            fontSize: { xs: 18, sm: 22, md: 24 },
-            flexShrink: 0,
-          }}
-        >
-          {personName.charAt(0).toUpperCase() || "?"}
-        </Avatar>
+      <div className="w-1/2 flex items-center gap-4 justify-center rounded-md border border-border bg-background my-6 p-5">
+        <div className="flex-shrink-0">
+          <img
+            className="rounded-full w-24 h-24 md:w-28 md:h-28 object-cover mb-2 shadow-md"
+            src={imageUrl}
+            alt={selectedPerson?.name}
+            style={{ aspectRatio: "1 / 1" }}
+          />
+        </div>
 
-        {/* Info */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 1.5,
-            flex: 1,
-            width: "100%",
-          }}
-        >
-          <Typography
-            sx={{
-              fontFamily: "Poppins",
-              fontWeight: 600,
-              color: colors.textPrimary,
-              fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
-              wordBreak: "break-word",
-            }}
-          >
+        <div className="flex flex-col gap-1 w-full text-center md:text-left">
+          <p className="font-semibold text-primary text-xl mb-3 mt-3 md:mt-5">
             {utils.extractNameFromProtobuf(selectedPerson?.name || "Unknown")}
-          </Typography>
+          </p>
 
-          {/* Info Fields */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              width: "100%",
-            }}
-          >
-            {[
-              {
-                icon: <AccountBalanceIcon sx={{ fontSize: 18, color: colors.textMuted }} />,
-                label: "Ministries Worked At",
-                value: workedMinistries,
-              },
-              {
-                icon: <PersonIcon sx={{ fontSize: 18, color: colors.textMuted }} />,
-                label: "Worked as President",
-                value: workedAsPresident,
-              },
-            ].map((item, idx) => (
-              <Box
-                key={idx}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: { xs: 2, sm: 3, lg: 20, md: 3 },
-                  width: "100%",
-                  maxWidth: { xs: "100%", sm: "400px" },
-                }}
-              >
-                <Typography
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    flexShrink: 0,
-                  }}
-                >
-                  {item.icon}
-                  {item.label}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                    textAlign: "right",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {item.value}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      </Box>
+          {[
+            {
+              icon: <Landmark className="text-primary/50" />,
+              label: "Ministries Worked At",
+              value: workedMinistries,
+            },
+            {
+              icon: <UserRound className="text-primary/50" />,
+              label: "Worked as President",
+              value: workedAsPresident,
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="flex justify-between flex-wrap gap-2 mb-3 w-full text-sm sm:text-base"
+            >
+              <p className="flex items-center gap-2 font-normal text-primary/75">
+                {item.icon}
+                {item.label}
+              </p>
+              <p className="text-primary/75">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
-
-      {/* --- Tabs (Elliptical Buttons) --- */}
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
-          mb: 2,
-          justifyContent: { xs: "center", sm: "flex-start" },
-        }}
-      >
+      <div className="flex gap-2 mb-2 justify-center md:justify-start flex-wrap">
         {tabOptions.map((tab) => {
           const label = tab.charAt(0).toUpperCase() + tab.slice(1);
           const isActive = activeTab === tab;
 
           return (
-            <Button
+            <button
               key={tab}
-              variant={isActive ? "contained" : "outlined"}
+              className={`rounded-full ${
+                isActive
+                  ? "bg-accent/95 hover:bg-accent text-primary-foreground"
+                  : "bg-background border border-border"
+              } cursor-pointer px-6 py-3 mb-2`}
               onClick={() => setActiveTab(tab)}
-              sx={{
-                textTransform: "none",
-                borderRadius: "50px",
-                px: { xs: 2, sm: 3 },
-                py: 0.8,
-                fontFamily: "poppins",
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                color: isActive ? colors.backgroundPrimary : colors.textPrimary,
-                backgroundColor: isActive ? colors.textPrimary : "transparent",
-                borderColor: colors.textPrimary,
-                "&:hover": {
-                  backgroundColor: isActive
-                    ? colors.textPrimary
-                    : `${colors.primary}10`,
-                },
-              }}
             >
               {label}
-            </Button>
+            </button>
           );
         })}
-      </Box>
+      </div>
 
-      {/* --- Tab Panels --- */}
       {activeTab === "history" && (
         <PersonHistoryTimeline
           selectedPerson={selectedPerson}
@@ -302,7 +133,7 @@ const PersonProfile = () => {
           presidentRelationDict={presidentRelationDict}
         />
       )}
-    </Box>
+    </div>
   );
 };
 
