@@ -1,13 +1,20 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useMemo, useEffect, useRef } from "react";
 import utils from "../utils/utils";
-import { setSelectedPresident, setSelectedDate } from "../store/presidencySlice";
+import {
+  setSelectedPresident,
+  setSelectedDate,
+} from "../store/presidencySlice";
 import { setGazetteData } from "../store/gazetteDate";
+import { Link, useLocation } from "react-router-dom";
+import { EyeIcon } from "lucide-react";
 
 export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const dispatch = useDispatch();
   const presidents = useSelector((s) => s.presidency.presidentDict);
-  const presidentRelationDict = useSelector((s) => s.presidency.presidentRelationDict);
+  const presidentRelationDict = useSelector(
+    (s) => s.presidency.presidentRelationDict
+  );
   const gazetteDateClassic = useSelector((s) => s.gazettes.gazetteDataClassic);
   const selectedPresident = useSelector((s) => s.presidency.selectedPresident);
   const selectedDate = useSelector((s) => s.presidency.selectedDate);
@@ -17,10 +24,13 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const [urlInitComplete, setUrlInitComplete] = useState(false);
   const prevDateRangeRef = useRef([null, null]);
 
+  const location = useLocation()
 
   const filteredPresidents = useMemo(() => {
     if (!presidents) return [];
-    const arr = Array.isArray(presidents) ? presidents : Object.values(presidents);
+    const arr = Array.isArray(presidents)
+      ? presidents
+      : Object.values(presidents);
     const [rangeStart, rangeEnd] = dateRange;
 
     return arr
@@ -29,7 +39,9 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         if (!rel) return false;
         if (!rangeStart || !rangeEnd) return true;
         const presStart = new Date(rel.startTime.split("T")[0]);
-        const presEnd = rel.endTime ? new Date(rel.endTime.split("T")[0]) : new Date();
+        const presEnd = rel.endTime
+          ? new Date(rel.endTime.split("T")[0])
+          : new Date();
         return presStart < rangeEnd && presEnd > rangeStart;
       })
       .filter((p) => {
@@ -37,15 +49,22 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         const nameText = utils.extractNameFromProtobuf(p.name);
         const rel = presidentRelationDict[p.id];
         const startYear = rel?.startTime ? rel.startTime.split("-")[0] : "";
-        const endYear = rel?.endTime ? new Date(rel.endTime).getFullYear() : "Present";
+        const endYear = rel?.endTime
+          ? new Date(rel.endTime).getFullYear()
+          : "Present";
         const term = startYear ? `${startYear} - ${endYear}` : "";
         const q = searchTerm.toLowerCase();
-        return nameText.toLowerCase().includes(q) || term.toLowerCase().includes(q);
+        return (
+          nameText.toLowerCase().includes(q) || term.toLowerCase().includes(q)
+        );
       });
   }, [presidents, presidentRelationDict, dateRange, searchTerm]);
 
-
-  const selectPresidentAndDates = (president, urlDateRange = null, urlSelectedDate = null) => {
+  const selectPresidentAndDates = (
+    president,
+    urlDateRange = null,
+    urlSelectedDate = null
+  ) => {
     if (!president) {
       dispatch(setSelectedPresident(null));
       dispatch(setGazetteData([]));
@@ -57,14 +76,16 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
     const rel = presidentRelationDict[president.id];
     const presStart = new Date(rel.startTime.split("T")[0]);
-    const presEnd = rel?.endTime ? new Date(rel.endTime.split("T")[0]) : new Date();
-
+    const presEnd = rel?.endTime
+      ? new Date(rel.endTime.split("T")[0])
+      : new Date();
 
     const [rangeStart, rangeEnd] = urlDateRange || dateRange;
 
-    const finalStart = rangeStart ? new Date(Math.max(presStart, rangeStart)) : presStart;
+    const finalStart = rangeStart
+      ? new Date(Math.max(presStart, rangeStart))
+      : presStart;
     const finalEnd = rangeEnd ? new Date(Math.min(presEnd, rangeEnd)) : presEnd;
-
 
     const filteredDates = gazetteDateClassic
       .filter((d) => {
@@ -75,21 +96,17 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
     dispatch(setGazetteData(filteredDates));
 
-
     let selectedDateValue;
     if (urlSelectedDate) {
       selectedDateValue = { date: urlSelectedDate };
     } else if (filteredDates.length > 0) {
-
       selectedDateValue = filteredDates[filteredDates.length - 1];
     } else {
-
       selectedDateValue = { date: finalEnd.toISOString().split("T")[0] };
     }
 
     dispatch(setSelectedDate(selectedDateValue));
   };
-
 
   useEffect(() => {
     if (initializedFromUrl) return;
@@ -101,7 +118,10 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         : Object.keys(presidents).length === 0)
     )
       return;
-    if (!presidentRelationDict || Object.keys(presidentRelationDict).length === 0)
+    if (
+      !presidentRelationDict ||
+      Object.keys(presidentRelationDict).length === 0
+    )
       return;
     if (!gazetteDateClassic || gazetteDateClassic.length === 0) return;
 
@@ -114,7 +134,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       const targetDate = new Date(urlSelectedDate);
       let start = urlStartDate ? new Date(urlStartDate) : null;
       let end = urlEndDate ? new Date(urlEndDate) : null;
-
 
       if (!start || !end || targetDate < start || targetDate > end) {
         const year = targetDate.getFullYear();
@@ -132,7 +151,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       }
     }
 
-
     const validSelectedDate = urlSelectedDate;
 
     if (validSelectedDate) {
@@ -147,18 +165,18 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         if (!rel || !rel.startTime) return false;
 
         const start = new Date(rel.startTime.split("T")[0]);
-        const end = rel.endTime ? new Date(rel.endTime.split("T")[0]) : new Date();
+        const end = rel.endTime
+          ? new Date(rel.endTime.split("T")[0])
+          : new Date();
 
-        const matches = new Date(validSelectedDate) >= start && new Date(validSelectedDate) <= end;
+        const matches =
+          new Date(validSelectedDate) >= start &&
+          new Date(validSelectedDate) <= end;
         return matches;
       });
 
       if (presidentForDate) {
-        selectPresidentAndDates(
-          presidentForDate,
-          urlRange,
-          validSelectedDate
-        );
+        selectPresidentAndDates(presidentForDate, urlRange, validSelectedDate);
         setInitializedFromUrl(true);
         setUrlInitComplete(true);
         return;
@@ -170,7 +188,12 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       selectPresidentAndDates(lastPresident);
       setInitializedFromUrl(true);
     }
-  }, [presidents, presidentRelationDict, gazetteDateClassic, initializedFromUrl]);
+  }, [
+    presidents,
+    presidentRelationDict,
+    gazetteDateClassic,
+    initializedFromUrl,
+  ]);
 
   useEffect(() => {
     if (!initializedFromUrl) return;
@@ -178,15 +201,12 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const [prevStart, prevEnd] = prevDateRangeRef.current;
     const [currStart, currEnd] = dateRange;
 
-
     if (prevStart === null && prevEnd === null) {
       prevDateRangeRef.current = dateRange;
       return;
     }
 
-
     if (prevStart === currStart && prevEnd === currEnd) return;
-
 
     if (urlInitComplete) {
       console.log("Skipping first dateRange trigger after URL init");
@@ -207,14 +227,12 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     prevDateRangeRef.current = dateRange;
   }, [dateRange, filteredPresidents, initializedFromUrl, urlInitComplete]);
 
-
   useEffect(() => {
     if (!selectedDate?.date) return;
     const url = new URL(window.location.href);
     url.searchParams.set("selectedDate", selectedDate.date);
     window.history.replaceState({}, "", url.toString());
-  }, [selectedDate]); 
-
+  }, [selectedDate]);
 
   return (
     <div className="rounded-lg w-full mt-2 -mb-6">
@@ -239,7 +257,9 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
             const nameText = utils.extractNameFromProtobuf(president.name);
             const rel = presidentRelationDict[president.id];
             const startYear = rel?.startTime ? rel.startTime.split("-")[0] : "";
-            const endYear = rel?.endTime ? new Date(rel.endTime).getFullYear() : "Present";
+            const endYear = rel?.endTime
+              ? new Date(rel.endTime).getFullYear()
+              : "Present";
             const term = startYear ? `${startYear} - ${endYear}` : "";
 
             return (
@@ -247,10 +267,11 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                 key={president.id}
                 onClick={() => selectPresidentAndDates(president)}
                 className={`flex items-center p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
-    ${isSelected
-                    ? "bg-accent/20 border-accent/35 shadow-md"
-                    : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
-                  }`}
+    ${
+      isSelected
+        ? "bg-accent/20 border-accent/35 shadow-md"
+        : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
+    }`}
               >
                 <img
                   src={president.imageUrl || president.image || ""}
@@ -259,22 +280,29 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                 />
                 <div className="flex flex-col flex-1 text-left min-w-0">
                   <p
-                    className={`font-medium text-sm break-words whitespace-normal ${isSelected ? "text-accent" : "text-primary"
-                      }`}
+                    className={`font-medium text-sm break-words whitespace-normal ${
+                      isSelected ? "text-accent" : "text-primary"
+                    }`}
                   >
                     {nameText}
                   </p>
                   <p className="text-xs text-primary/50 break-words whitespace-normal">
                     {term}
                   </p>
+                  <Link
+                    to={`/person-profile/${president?.id}`}
+                    state={{ mode: "back", from: location.pathname + location.search  }}
+                    className="text-primary/75 text-xs hover:text-accent transition-all animation duration-200 mt-1 flex"
+                  >
+                    <EyeIcon size={16} className="mr-1" />
+                    <p>View Profile</p>
+                  </Link>
                 </div>
               </button>
-
             );
           })}
         </div>
       )}
     </div>
   );
-
 }

@@ -6,8 +6,8 @@ import utils from "../../../utils/utils";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import InfoTooltip from "../../../components/InfoToolTip";
-import { FaAngleLeft } from "react-icons/fa6";
 import ShareLinkButton from "../../../components/ShareLinkButton";
+import { ChevronLeft } from "lucide-react";
 
 export default function DepartmentProfile() {
   const { departmentId } = useParams();
@@ -24,133 +24,55 @@ export default function DepartmentProfile() {
     }
   }, [departmentId, allDepartmentData]);
 
+  useEffect(() => {
+    console.log("state : ");
+    console.log(state);
+  }, [state]);
+
   const { colors } = useThemeContext();
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: colors.backgroundPrimary,
-        width: "100%",
-        minHeight: { xs: "auto", sm: "100vh" },
-        px: { xs: 6, sm: 14, md: 36 },
-        py: { xs: 4, sm: 6 },
-      }}
-    >
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <Box
-          sx={{
-            //position: 'sticky',
-            top: 0,
-            zIndex: 10,
-            mb: 2,
-            backgroundColor: colors.backgroundPrimary,
-          }}
+    <div className="px-3 py-6 md:px-12 md:py-8 lg:px-18 xl:px-24 2xl:px-36 w-full bg-background-dark min-h-screen">
+      <div className="w-full flex justify-between items-center">
+        {state.from !== "" ? (
+        <button
+          onClick={() => navigate(state.from)}
+          className="flex items-centertext-primary cursor-pointer"
         >
-          {state.mode === "back" ? (
-            <ButtonBase
-              onClick={() => navigate(-1)}
-              sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "center",
-                mb: 2,
-                width: 100,
-                color: colors.textPrimary,
-              }}
-            >
-              <FaAngleLeft />
-              <Typography
-                variant="h8"
-                sx={{
-                  fontFamily: "Poppins",
-                  color: colors.textPrimary,
-                  textTransform: "none",
-                  ml: 1,
-                }}
-              >
-                Back
-              </Typography>
-            </ButtonBase>
-          ) : (
-            <ButtonBase
-              onClick={() => navigate('/')}
-              sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "center",
-                mb: 2,
-                width: 200,
-                color: colors.textPrimary,
-              }}
-            >
-              <FaAngleLeft />
-              <Typography
-                variant="h8"
-                sx={{
-                  fontFamily: "Poppins",
-                  color: colors.textPrimary,
-                  textTransform: "none",
-                }}
-              >
-                Go to XploreGov
-              </Typography>
-            </ButtonBase>
-          )}
+          <ChevronLeft className="text-primary" />
+          <p className="text-primary">Back</p>
+        </button>
+      ) : (
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center mb-2 text-primary cursor-pointer"
+        >
+          <ChevronLeft className="text-primary" />
+          <p className="text-primary">Go to XploreGov</p>
+        </button>
+      )}
+          <ShareLinkButton />
+      </div>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              mb: 3,
-            }}
-          >
-            <Typography
-              variant="h6"
-              gutterBottom
-              sx={{
-                fontWeight: "bold",
-                color: colors.textPrimary,
-                fontFamily: "Poppins",
-              }}
-            >
-              {selectedDepartment &&
-                utils.extractNameFromProtobuf(selectedDepartment.name)}
-            </Typography>
+      <div className="flex items-center justify-center w-full mt-6 text-primary">
+        <p className="text-xl font-semibold">
+          {selectedDepartment &&
+            utils.extractNameFromProtobuf(selectedDepartment.name)}
+        </p>
 
-            <ShareLinkButton />
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 3,
-            }}
-          >
-            <Typography
-              gutterBottom
-              sx={{
-                mt: -2,
-                color: colors.textPrimary,
-                fontFamily: "poppins",
-              }}
-            >
-              Department History Timeline{" "}
-              <InfoTooltip
-                message="Ministers the department was under throughout the history"
-                iconColor={colors.textPrimary}
-                iconSize={14}
-              />
-            </Typography>
-          </Box>
-        </Box>
+      </div>
+      <div className="flex justify-center">
+        <p className="border border-border text-accent font-semibold px-4 py-3 bg-background mt-4 rounded-full">
+          Department History Timeline{" "}
+          <InfoTooltip
+            message="Ministers the department was under throughout the history"
+            iconColor={colors.textPrimary}
+            iconSize={14}
+          />
+        </p>
+      </div>
 
-        {/* Timeline */}
-        <DepartmentHistoryTimeline selectedDepartment={selectedDepartment} />
-      </Box>
-    </Box>
+      {/* Timeline */}
+      <DepartmentHistoryTimeline selectedDepartment={selectedDepartment} />
+    </div>
   );
 }

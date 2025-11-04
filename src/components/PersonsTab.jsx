@@ -7,7 +7,7 @@ import utils from "../utils/utils";
 import api from "../services/services";
 import { useThemeContext } from "../themeContext";
 import InfoTooltip from "../components/InfoToolTip";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
 const PersonsTab = ({ selectedDate }) => {
@@ -16,6 +16,7 @@ const PersonsTab = ({ selectedDate }) => {
   const { selectedPresident } = useSelector((state) => state.presidency);
   const [ministerListForMinistry, setministerListForMinistry] = useState([]);
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -310,7 +311,7 @@ const PersonsTab = ({ selectedDate }) => {
 
               <Link
                 to={`/person-profile/${person.id}`}
-                state={{ mode: "back" }}
+                state={{ mode: "back", from: location.pathname + location.search  }}
                 style={{
                   textDecoration: "none",
                   color: selectedPresident.themeColorLight,

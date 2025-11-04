@@ -4,7 +4,7 @@ import { useThemeContext } from "../themeContext";
 import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import { Building, History, UserRound, Building2, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import utils from "../utils/utils";
 
 export default function Drawer({
@@ -23,6 +23,8 @@ export default function Drawer({
   const BATCH_SIZE = 20;
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
   const [selectedTab, setSelectedTab] = useState("departments");
+
+  const location = useLocation();
 
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
@@ -165,7 +167,7 @@ export default function Drawer({
                     selectedNode.type == "person" && (
                       <Link
                         to={`/person-profile/${selectedNode.id}`}
-                        state={{ mode: "back" }}
+                        state={{ mode: "back", from: location.pathname + location.search }}
                         className="mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-background bg-accent rounded-sm hover:bg-accent/90"
                       >
                         <History className="w-5 h-5 mr-2" />

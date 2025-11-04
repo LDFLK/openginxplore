@@ -85,8 +85,6 @@ const PersonHistoryTimeline = ({
     });
   };
 
-  console.log(timelineData);
-
   return (
     <div className=" rounded-md p-6 bg-background-dark">
       <VerticalTimeline
