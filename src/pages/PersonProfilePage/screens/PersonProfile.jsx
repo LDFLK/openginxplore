@@ -208,7 +208,9 @@ const PersonProfile = () => {
                 label: "Worked as President",
                 value: workedAsPresident,
               },
-            ].map((item, idx) => (
+            ]
+            .filter((item) => !(item.label === "Worked as President" && (!item.value || item.value === 0)))
+            .map((item, idx) => (
               <Box
                 key={idx}
                 sx={{
