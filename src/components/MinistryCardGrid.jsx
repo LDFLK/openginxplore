@@ -381,15 +381,14 @@ const MinistryCardGrid = () => {
             justifyContent: "center",
             backgroundColor: colors.backgroundWhite,
             overflow: "hidden",
-            p: 1.5,
-            pr: { lg: 6 },
+            py: 1.5,
             borderRight: { lg: `1px solid ${colors.timelineColor}` },
             borderBottom: { xs: `1px solid ${colors.timelineColor}`, lg: "none" },
           }}
         >
           <Box sx={{ mt: -0.5 }}>
             {primeMinister.person && primeMinister.relation && selectedPresident ? (
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", paddingLeft: 3 }}>
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start"}}>
                 <Avatar
                   src={primeMinister.person.imageUrl}
                   alt={primeMinister.person.name}
@@ -431,7 +430,7 @@ const MinistryCardGrid = () => {
                   <Button
                     component={Link}
                     to={`/person-profile/${primeMinister.person?.id}`}
-                    state={{ mode: "back" }}
+                    state={{ mode: "back", from: location.pathname + location.search  }}
                     disableRipple
                     disableElevation
                     sx={{

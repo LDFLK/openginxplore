@@ -3,11 +3,12 @@ import { useEffect, useState, useMemo } from "react";
 import { ClipLoader } from "react-spinners";
 import apiData from "../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
-import { Eye } from "lucide-react";
+import { Eye, EyeIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function DatasetView({ data, setExternalDateRange }) {
   const datasets = data;
-
+  console.log(datasets);
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
   const [dataCache, setDataCache] = useState({});
   const [years, setYears] = useState([]);
@@ -178,18 +179,48 @@ export function DatasetView({ data, setExternalDateRange }) {
   return (
     <div className="p-4 md:p-6 space-y-6 w-full">
       {/* Dataset Info */}
-      {years && years.length > 0 && firstSelectedYear && (
-        <div className="space-y-2">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-300">
-            {datasets[firstSelectedYear]
-              ? datasets[firstSelectedYear][0]?.nameExact
+      {years && years.length > 0 && (
+        <div className="space-y-1 mt-2">
+          <h2 className="text-xl md:text-2xl font-bold text-primary/85">
+            {datasets[selectedYear]
+              ? datasets[selectedYear][0]?.nameExact
               : "Select a Dataset"}
           </h2>
-          <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-gray-400">
-            <p>
-              <span className="font-semibold">Published By : </span>{" "}
-              {datasets[firstSelectedYear] ? datasets[firstSelectedYear][0]?.source : "—"}
-            </p>
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-primary/75">
+            {datasets[selectedYear] &&
+            datasets[selectedYear][0].sourceType === "department" ? (
+              <div className="flex items-center">
+                <Link
+                  to={`/department-profile/${datasets[selectedYear][0]?.sourceId}`}
+                >
+                  <span className="font-semibold">Published By : </span>{" "}
+                  {datasets[selectedYear]
+                    ? datasets[selectedYear][0]?.source
+                    : "—"}
+                </Link>
+                <Link
+                to={`/department-profile/${datasets[selectedYear][0]?.sourceId}`}
+                state={{mode: "back"}}
+                  class="ml-5 inline-flex items-center px-2 py-2 gap-2 text-sm rounded-lg bg-background text-active-green"
+                  role="alert"
+                >
+                  <div>
+                    <EyeIcon />
+                  </div>
+                  <span class="sr-only">Info</span>
+                  <div>
+                    <span class="font-medium">Explore History</span>
+                  </div>
+                </Link>
+              </div>
+            ) : (
+              <p>
+                <span className="font-semibold">Published By : </span>{" "}
+                {datasets[selectedYear]
+                  ? datasets[selectedYear][0]?.source
+                  : "—"}
+              </p>
+            )}
           </div>
         </div>
       )}

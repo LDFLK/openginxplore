@@ -1,25 +1,16 @@
 import { useState, useEffect } from "react";
-import {
-  Typography,
-  Paper,
-  Avatar,
-  Box,
-} from "@mui/material";
 import { useSelector } from "react-redux";
-import {
-  Timeline,
-  TimelineItem,
-  TimelineOppositeContent,
-  TimelineSeparator,
-  TimelineDot,
-  TimelineConnector,
-  TimelineContent,
-} from "@mui/lab";
+import "./../../../assets/verticalTimeLineCSS.css";
 import { useThemeContext } from "../../../themeContext";
 import { ClipLoader } from "react-spinners";
 import utils from "../../../utils/utils";
 import api from "../../../services/services";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import {
+  VerticalTimeline,
+  VerticalTimelineElement,
+} from "react-vertical-timeline-component";
+import "react-vertical-timeline-component/style.min.css";
+import { Landmark } from "lucide-react";
 
 const PersonHistoryTimeline = ({
   selectedPerson,
@@ -31,7 +22,7 @@ const PersonHistoryTimeline = ({
   const allMinistryData = useSelector(
     (state) => state.allMinistryData.allMinistryData
   );
-  const { colors } = useThemeContext();
+  const { colors, isDark } = useThemeContext();
 
   useEffect(() => {
     const fetchPersonHistory = async () => {
@@ -42,7 +33,7 @@ const PersonHistoryTimeline = ({
         const data = await res.json();
 
         const enriched = data
-          .filter(d => d.startTime !== d.endTime)
+          .filter((d) => d.startTime !== d.endTime)
           .map((d) => {
             const ministry = allMinistryData[d.relatedEntityId];
             return {
@@ -76,27 +67,15 @@ const PersonHistoryTimeline = ({
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "20vh",
-        }}
-      >
+      <div className="flex justify-center items-center h-20">
         <ClipLoader color={colors.primary} loading={loading} size={25} />
-      </Box>
+      </div>
     );
   }
 
   if (!timelineData.length) {
     return (
-      <Typography
-        variant="body2"
-        sx={{ mt: 2, fontFamily: "poppins", color: colors.textPrimary }}
-      >
-        No timeline history available.
-      </Typography>
+      <h4 className="mt-2 text-primary">No timeline history available.</h4>
     );
   }
   const isPresidentDuring = (ministryStart, ministryEnd) => {
@@ -108,24 +87,17 @@ const PersonHistoryTimeline = ({
       const mStart = new Date(ministryStart);
       const mEnd = ministryEnd ? new Date(ministryEnd) : null;
 
-      // overlap condition
       return (!presEnd || mStart <= presEnd) && (!mEnd || mEnd >= presStart);
     });
   };
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        alignItems: "center",
-        p: { xs: 2, sm: 4 },
-        borderRadius: 2,
-        backgroundColor: colors.backgroundWhite,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-        gap: 2,
-      }}
-    >
-      <Timeline position="alternate" sx={{ py: 0 }}>
+    <div className=" rounded-md p-6 bg-background-dark">
+      <VerticalTimeline
+        animate={true}
+        layout="2-columns"
+        lineColor={isDark ? "#364153" : "#dbdbdb"}
+      >
         {timelineData.map((entry, idx, arr) => {
           const wasPresident = isPresidentDuring(
             entry.startTime,
@@ -133,127 +105,53 @@ const PersonHistoryTimeline = ({
           );
 
           return (
-            <TimelineItem key={idx} sx={{ py: 0 }}>
-              <TimelineOppositeContent
-                sx={{
-                  m: "auto 0",
-                  color: colors.textMuted,
-                  fontWeight: "600",
-                  fontSize: 12,
-                  minWidth: 70,
-                  pr: 1,
-                  fontFamily: "poppins",
-                }}
-                align="right"
-                variant="body2"
-              >
-                {entry.startTime
+            <VerticalTimelineElement
+              icon={<Landmark />}
+              iconStyle={{
+                background: isDark ? "#101828" : "#f8f8f8",
+                color: isDark ? "#f8f8f8" : "#0b0b0b",
+                boxShadow: "none",
+                border: `1px solid  ${isDark ? "#364153" : "#dbdbdb"}`,
+              }}
+              className={idx}
+              contentStyle={{
+                background: isDark ? "#101828" : "#f8f8f8",
+                color: isDark ? "#f8f8f8" : "#0b0b0b",
+                border: `1px solid  ${isDark ? "#364153" : "#dbdbdb"}`,
+                boxShadow: "none",
+                padding: "10px",
+                marginBottom: "25px",
+                marginTop: "25px",
+              }}
+              contentArrowStyle={{
+                borderRight: `7px solid  ${isDark ? "#364153" : "#dbdbdb"}`,
+              }}
+              date={
+                entry.startTime
                   ? `${new Date(entry.startTime)
-                    .toISOString()
-                    .slice(0, 10)} - ${entry.endTime
-                      ? new Date(entry.endTime).toISOString().slice(0, 10)
-                      : "Present"
-                  }`
-                  : "Unknown"}
-              </TimelineOppositeContent>
-
-              <TimelineSeparator>
-                <TimelineDot
-                  color="primary"
-                  sx={{
-                    width: 2,
-                    height: 2,
-                    boxShadow: `0 0 6px ${colors.textPrimary}`,
-                    animation: "pulse 2.5s infinite",
-                    backgroundColor: colors.textPrimary,
-                  }}
-                />
-                {idx < arr.length && (
-                  <TimelineConnector
-                    sx={{ bgcolor: colors.textMuted, height: 2 }}
-                  />
-                )}
-              </TimelineSeparator>
-
-              <TimelineContent sx={{ py: 0.5, px: 1 }}>
-                <Paper
-                  elevation={3}
-                  sx={{
-                    p: 1,
-                    borderRadius: 2,
-                    backgroundColor: colors.backgroundBlue,
-                    boxShadow: "0 1px 5px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
-                  >
-                    {/* Avatar */}
-                    <Avatar
-                      sx={{
-                        bgcolor: colors.textPrimary,
-                        width: 25,
-                        height: 25,
-                        fontSize: 14,
-                      }}
-                    >
-                      <AccountBalanceIcon style={{ color: colors.backgroundBlue, width: 15, height: 15 }} />
-                    </Avatar>
-
-                    {/* Text + President badge */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start",
-                        flexGrow: 1,
-                        alignSelf: "flex-start",
-                      }}
-                    >
-                      {/* Ministry Name */}
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          fontWeight: "600",
-                          fontSize: { xs: 12, sm: 15 }, // responsive font
-                          fontFamily: "poppins",
-                          wordBreak: "break-word",
-                          width: "100%",
-                          textAlign: "left",
-                          color: colors.textPrimary
-                        }}
-                      >
-                        {entry.ministryName.split(":")[0]}
-                      </Typography>
-
-                      {/* President Badge */}
-                      {wasPresident && (
-                        <Box
-                          sx={{
-                            mt: 0.5,
-                            px: 1,
-                            py: 0.2,
-                            borderRadius: 1,
-                            bgcolor: colors.textMuted,
-                            color: colors.backgroundBlue,
-                            fontSize: { xs: 8, sm: 10 }, // responsive font
-                            fontWeight: 500,
-                            fontFamily: "poppins",
-                            alignSelf: "flex-start",
-                          }}
-                        >
-                          President
-                        </Box>
-                      )}
-                    </Box>
-                  </Box>
-                </Paper>
-              </TimelineContent>
-            </TimelineItem>
+                      .toISOString()
+                      .slice(0, 10)} - ${
+                      entry.endTime
+                        ? new Date(entry.endTime).toISOString().slice(0, 10)
+                        : "Present"
+                    }`
+                  : ""
+              }
+              dateClassName={"text-primary/65"}
+            >
+              {wasPresident && (
+                <div className="-mt-4">
+                  <p className="bg-active-green/15 text-center rounded-md px-2 py-1 inline-block mt-0">
+                    President
+                  </p>
+                </div>
+              )}
+              <h3 className="mt-1">{entry.ministryName.split(":")[0]}</h3>
+            </VerticalTimelineElement>
           );
         })}
-      </Timeline>
-    </Box>
+      </VerticalTimeline>
+    </div>
   );
 };
 

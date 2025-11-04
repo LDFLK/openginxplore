@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { useThemeContext } from "../themeContext";
 import { useBadgeContext } from "./badgeContext";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MinistryCard = ({ card, onClick }) => {
   const { selectedPresident } = useSelector((state) => state.presidency);
@@ -12,10 +12,11 @@ const MinistryCard = ({ card, onClick }) => {
   const { showMinistryBadge, showPersonBadge } = useBadgeContext();
   const [mouseHover, setMouseHover] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleOpenProfile = (id) => {
     navigate(`/person-profile/${id}`, {
-      state: { mode: "back" },
+      state:{ mode: "back", from: location.pathname + location.search  }
     })
   }
 

@@ -203,8 +203,8 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 4px;              
-  height: 4px;           
+  width: 7px;              
+  height: 5px;           
 }
 
 ::-webkit-scrollbar-track {
@@ -219,6 +219,8 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #06359c; /* darker on hover */
 }
+
+
 
 
 
