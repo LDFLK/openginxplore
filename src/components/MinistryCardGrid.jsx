@@ -366,7 +366,9 @@ const MinistryCardGrid = () => {
           py: 2,
           px: 3,
           backgroundColor: colors.backgroundWhite,
-          borderRadius: 2
+          borderRadius: 2,
+          border: "1px solid",
+          borderColor: colors.border
         }}
       >
         {/* Highlights Box*/}
@@ -397,9 +399,9 @@ const MinistryCardGrid = () => {
                   <Typography
                     sx={{
                       fontSize: 12,
-                      color: colors.textMuted,
+                      color: colors.white,
                       fontWeight: 500,
-                      backgroundColor: `${selectedPresident.themeColorLight}75`,
+                      backgroundColor: `${selectedPresident.themeColorLight}99`,
                       py: 0.25,
                       px: 1,
                       borderRadius: 1,
@@ -586,8 +588,9 @@ const MinistryCardGrid = () => {
           gap: 2,
           py: 2,
           borderRadius: 2,
-          //backgroundColor: colors.backgroundColor,
           backgroundColor: colors.backgroundWhite,
+          border: "1px solid",
+          borderColor: colors.border
         }}
       >
         {/* Top Bar with Title + Search + Filter + ViewMode Toggle */}
@@ -918,7 +921,7 @@ const MinistryCardGrid = () => {
                                   flexDirection: "column",
                                   overflowY: "auto",
                                   scrollbarWidth: "none",
-                                  backgroundColor: colors.backgroundBlue,
+                                  backgroundColor: colors.backgroundDark,
                                   "&::-webkit-scrollbar": { display: "none" },
                                 }}
                               >
@@ -956,7 +959,7 @@ const MinistryCardGrid = () => {
                                           borderColor:
                                             selectedPresident.themeColorLight,
                                           color: isActive
-                                            ? colors.textPrimary
+                                            ? colors.white
                                             : selectedPresident.themeColorLight,
                                           fontFamily: "poppins",
                                           fontSize: {

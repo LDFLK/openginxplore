@@ -2,7 +2,8 @@ const colors = {
   backgroundPrimary: '#000B18',          
   backgroundSecondary: '#1E2A38',     
   backgroundBlue: '#0a1929',    
-  backgroundWhite: '#1E2A38',
+  backgroundWhite: '#101828',
+  backgroundDark: "#0d131d",
 
   // Text
   textPrimary: '#EBF2F5',               
@@ -32,8 +33,10 @@ const colors = {
 
   // Main colors
   white: '#ffffff',                    
-  green: '#1FCE68',
-  purple: "#AD46FF"       
+  green: '#16a085',
+  purple: "#AD46FF",
+  
+  border: "#364153",
 
 
 };

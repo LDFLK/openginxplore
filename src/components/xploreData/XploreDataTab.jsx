@@ -8,7 +8,7 @@ import apiData from "./../../services/xploredataServices";
 import { DatasetView } from "./dataset-view";
 import { ClipLoader } from "react-spinners";
 
-export default function XploreDataTab({setExternalDateRange }){
+export default function XploreDataTab({ setExternalDateRange }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -117,9 +117,13 @@ export default function XploreDataTab({setExternalDateRange }){
         ];
 
         const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
-
-        // navigate(`/datasets?parentId=${categoryId}&breadcrumb=${encodedTrail}`);
         setBreadcrumbTrail(newBreadcrumb);
+
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set("parentId", categoryId);
+        searchParams.set("breadcrumb", encodedTrail);
+
+        navigate(`${location.pathname}?${searchParams.toString()}`);
       }
 
       const cachedCategories = categoriesByParentId.get(categoryId);
@@ -151,53 +155,72 @@ export default function XploreDataTab({setExternalDateRange }){
     }
   };
 
-  const handleDatasetClick = () => {
-    // const parentId = searchParams.get("parentId") || "";
-    // const datasetName = dataset.nameExact || formatText({ name: dataset.name });
+  const handleDatasetClick = (dataset) => {
+    const parentId = searchParams.get("parentId") || "";
+    const datasetName = dataset.nameExact || formatText({ name: dataset.name });
 
     setSelectedDatasets(data.datasets);
 
-    // if (
-    //   !breadcrumbTrail.find(
-    //     (breadcrumbItem) => breadcrumbItem.label == datasetName
-    //   )
-    // ) {
-    //   const newBreadcrumb = [
-    //     ...breadcrumbTrail,
-    //     {
-    //       label: datasetName,
-    //       path: `/datasets?datasetId=${dataset.id}&datasetName=${datasetName}&parentId=${parentId}`,
-    //     },
-    //   ];
+    if (
+      !breadcrumbTrail.find(
+        (breadcrumbItem) => breadcrumbItem.label == datasetName
+      )
+    ) {
+      const newBreadcrumb = [
+        ...breadcrumbTrail,
+        {
+          label: datasetName,
+          path: `/datasets?datasetId=${dataset.id}&datasetName=${datasetName}&parentId=${parentId}`,
+        },
+      ];
 
-    //   const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
+      const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
+      setBreadcrumbTrail(newBreadcrumb);
 
-    //   setBreadcrumbTrail(newBreadcrumb);
-    //   // navigate(
-    //   //   `/datasets?datasetId=${dataset.id}&datasetName=${datasetName}&parentId=${parentId}&breadcrumb=${encodedTrail}`
-    //   // );
-    // }
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set("datasetId", dataset.id);
+      searchParams.set("datasetName", datasetName);
+      searchParams.set("parentId", parentId);
+      searchParams.set("breadcrumb", encodedTrail);
+
+      navigate(`${location.pathname}?${searchParams.toString()}`);
+    }
   };
 
   const handleBreadcrumbClick = async (index, item) => {
     try {
+      const url = new URL(item.path, window.location.origin);
+      const searchParams = new URLSearchParams(location.search);
+
+      if (index == -1) {
+        searchParams.delete("breadcrumb");
+        searchParams.delete("datasetId");
+        searchParams.delete("datasetName");
+        searchParams.delete("parentId");
+      }
       const newTrail = breadcrumbTrail.slice(0, index + 1);
       const encodedTrail = encodeURIComponent(JSON.stringify(newTrail));
 
       setBreadcrumbTrail(newTrail);
 
-      const url = new URL(item.path, window.location.origin);
       const parentId = url.searchParams.get("parentId") || "";
       const datasetId = url.searchParams.get("datasetId");
 
-      const newUrl =
-        datasetId && parentId
-          ? `/datasets?datasetId=${datasetId}&parentId=${parentId}&breadcrumb=${encodedTrail}`
-          : parentId
-          ? `/datasets?parentId=${parentId}&breadcrumb=${encodedTrail}`
-          : `/datasets?breadcrumb=${encodedTrail}`;
+      if (datasetId) {
+        searchParams.set("datasetId", datasetId);
+        searchParams.set("breadcrumb", encodedTrail);
+      } else {
+        searchParams.delete("datasetId");
+      }
 
-      // navigate(newUrl);
+      if (parentId) {
+        searchParams.set("parentId", parentId);
+        searchParams.set("breadcrumb", encodedTrail);
+      } else {
+        searchParams.delete("parentId");
+      }
+
+      navigate(`${location.pathname}?${searchParams.toString()}`);
 
       const cachedCategories = categoriesByParentId.get(parentId);
       const cachedDatasets = datasetsByParentId.get(parentId);
@@ -244,49 +267,54 @@ export default function XploreDataTab({setExternalDateRange }){
       )}
       <div className="">
         {initialLoading ? (
-          <div className="text-gray-500 text-center py-10">Loading...</div>
+          <div className="text-primary/70 text-center py-10">Loading...</div>
         ) : selectedDatasets ? (
-          <DatasetView data={selectedDatasets} setExternalDateRange={setExternalDateRange} />
+          <DatasetView
+            data={selectedDatasets}
+            setExternalDateRange={setExternalDateRange}
+          />
         ) : (
           <>
             {data.categories && data.categories.length > 0 && (
               <>
-                <h3 className="text-xl font-normal mt-6 mb-3 text-gray-100">
+                <h3 className="text-xl font-semibold mt-6 mb-3 text-primary">
                   Categories
                 </h3>
-                    <div
-                      className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 ${loadingCategoryId ? "pointer-events-none opacity-60" : ""
-                        }`}
+                <div
+                  className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 ${
+                    loadingCategoryId ? "pointer-events-none opacity-60" : ""
+                  }`}
+                >
+                  {data.categories.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      whileHover={{ y: -2, scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleCategoryClick(item.id, item.name)}
+                      className={`cursor-pointer bg-background shadow-2xs relative w-full h-[100px] border border-border rounded-2xl p-4 flex items-center justify-between bg-category-card transition ${
+                        loadingCategoryId === item.id
+                          ? "opacity-50 pointer-events-none"
+                          : "hover:bg-border/10"
+                      }`}
                     >
-                      {data.categories.map((item) => (
-                        <motion.div
-                          key={item.id}
-                          whileHover={{ y: -2, scale: 1.01 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => handleCategoryClick(item.id, item.name)}
-                          className={`cursor-pointer relative w-full h-[100px] border border-gray-600 rounded-2xl p-4 flex items-center justify-between bg-category-card transition hover:text-gray-900 ${loadingCategoryId === item.id
-                              ? "opacity-50 pointer-events-none"
-                              : "hover:bg-gray-800"
-                            }`}
-                        >
-                          <div className="flex items-center">
-                            <Folder className="text-blue-400" />
-                            <p className="ml-3 text-start text-gray-200">
-                              {formatText({ name: item.name })}
-                            </p>
-                          </div>
-                          {loadingCategoryId === item.id && (
-                            <ClipLoader size={20} color="#60a5fa" /> // tailwind blue-400
-                          )}
-                        </motion.div>
-                      ))}
-                    </div>
+                      <div className="flex items-center">
+                        <Folder className="text-accent" />
+                        <p className="ml-3 text-start text-primary">
+                          {formatText({ name: item.name })}
+                        </p>
+                      </div>
+                      {loadingCategoryId === item.id && (
+                        <ClipLoader size={20} color="#0099ee" />
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
               </>
             )}
 
             {data.datasets && Object.keys(data.datasets).length > 0 ? (
               <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4 text-gray-100">
+                <h3 className="text-xl font-semibold mb-4 text-primary">
                   Datasets
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -295,17 +323,17 @@ export default function XploreDataTab({setExternalDateRange }){
                       key={firstDataset.id}
                       whileHover={{ y: -2, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={handleDatasetClick}
-                      className="cursor-pointer w-full h-[90px] border border-gray-600 rounded-xl p-4 flex items-center bg-dataset-card hover:bg-gray-800 transition"
+                      onClick={() => handleDatasetClick(firstDataset)}
+                      className="cursor-pointer shadow-2xs w-full h-[90px] border border-border rounded-xl p-4 flex items-center bg-dataset-card bg-background transition"
                     >
-                      <FileText className=" text-blue-400" />
+                      <FileText className=" text-accent" />
                       <div className="ml-3 text-left">
-                        <p className="font-medium  text-gray-100">
+                        <p className="font-medium  text-primary">
                           {firstDataset.nameExact ||
                             formatText({ name: firstDataset.name })}
                         </p>
                         {firstDataset.source && (
-                          <p className="text-sm  text-gray-400">
+                          <p className="text-sm  text-primary/65 text-forground/10">
                             {firstDataset.source}
                           </p>
                         )}
@@ -317,7 +345,7 @@ export default function XploreDataTab({setExternalDateRange }){
             ) : (
               data.categories &&
               data.categories.length === 0 && (
-                <p className="text-gray-500 text-center mt-10">
+                <p className="text-muted text-center mt-10">
                   No categories or datasets found for this level.
                 </p>
               )

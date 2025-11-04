@@ -92,10 +92,8 @@ export default function Drawer({
   return (
     <div
       className={`${expandDrawer ? "w-1/3" : "w-0"
-        } z-[1000] transition-all duration-300 ease-in-out h-full shadow-xl p-4 flex-shrink-0`}
+        } z-[1000] transition-all duration-300 ease-in-out h-full shadow-xl p-4 flex-shrink-0 bg-background-dark`}
       style={{
-        backgroundColor: colors.backgroundPrimary,
-        color: colors.textPrimary,
         overflow: expandDrawer ? "visible" : "hidden",
       }}
     >
@@ -103,7 +101,7 @@ export default function Drawer({
       {!expandDrawer && (
         <button
           className={`${!expandDrawer
-            ? "rounded-l-full bg-[#305cde] text-gray-300 text-5xl p-1 absolute right-12 cursor-pointer shadow-xl"
+            ? "rounded-l-full bg-accent text-background text-5xl p-1 absolute right-4 cursor-pointer shadow-xl"
             : ""
             }`}
           onClick={() => setExpandDrawer(true)}
@@ -121,7 +119,7 @@ export default function Drawer({
           >
             <CiCircleChevLeft />
           </button>
-          <p className="text-xl">Xplore more...</p>
+          <p className="text-xl text-primary">Xplore more...</p>
         </div>
       )}
 
@@ -132,18 +130,18 @@ export default function Drawer({
             <>
               {/* Case 1: Show selected node info */}
               {selectedNode && (
-                <div className="w-full mb-2 p-4 bg-white/90 border border-gray-500 rounded-sm shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div className="w-full mb-2 p-4 bg-background border border-border rounded-sm shadow-sm dark:bg-gray-800 dark:border-gray-700">
                   <a>
                     {selectedNode.type == "minister" ? (
-                      <div className="flex items-center gap-2 mb-1 text-gray-600">
+                      <div className="flex items-center gap-2 mb-1 text-primary/50">
                         <Building2 className="w-5 h-5" /> <span>Ministry</span>
                       </div>
                     ) : selectedNode.type == "department" ? (
-                      <div className="flex items-center gap-2 mb-1 text-gray-600">
+                      <div className="flex items-center gap-2 mb-1 text-primary/50">
                         <Building2 className="w-5 h-5" /> <span>Department</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 mb-1 text-gray-600">
+                      <div className="flex items-center gap-2 mb-1 text-primary/50">
                         <User className="w-5 h-5" /> <span>Person</span>
                       </div>
                     )}
@@ -157,7 +155,7 @@ export default function Drawer({
                     <Link
                       to={`/department-profile/${selectedNode.id}`}
                       state={{ mode: "back" }}
-                      className="mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-300 bg-blue-700 rounded-sm hover:bg-blue-800"
+                      className="mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-background bg-accent rounded-sm hover:bg-accent/90"
                     >
                       <History className="w-5 h-5 mr-2" />
                       View History
@@ -168,7 +166,7 @@ export default function Drawer({
                       <Link
                         to={`/person-profile/${selectedNode.id}`}
                         state={{ mode: "back" }}
-                        className="mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-gray-300 bg-blue-700 rounded-sm hover:bg-blue-800"
+                        className="mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-background bg-accent rounded-sm hover:bg-accent/90"
                       >
                         <History className="w-5 h-5 mr-2" />
                         View Profile
@@ -180,12 +178,12 @@ export default function Drawer({
 
               {/* Case 2: Show ministry from URL when no selected node */}
               {!selectedNode && urlMinistry && (
-                <div className="w-full mb-2 p-4 bg-white/90 border border-gray-500 rounded-sm shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                  <div className="flex items-center gap-2 mb-1 text-gray-600">
+                <div className="w-full mb-2 p-4 bg-background/90 border border-border rounded-md">
+                  <div className="flex items-center gap-2 mb-1 text-primary/50">
                     <Building2 className="w-5 h-5" />
                     <span>Ministry</span>
                   </div>
-                  <p className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-300">
+                  <p className="text-lg font-normal tracking-tight text-primary">
                     {urlMinistry.name}
                   </p>
                 </div>
@@ -193,12 +191,12 @@ export default function Drawer({
 
               {/* Tabs for ministers */}
               {parentNode && parentNode.type === "minister" && (
-                <div className="flex justify-center mt-4 border border-white/20 p-1 rounded-sm bg-[#0F172A]">
+                <div className="flex justify-center mt-4 border border-border p-1 rounded-sm bg-background">
                   <button
                     className={`hover:cursor-pointer w-1/2 py-3 font-normal text-lg transition-colors duration-300 transform rounded-l-xs inline-flex items-center justify-center space-x-2
                       ${selectedTab === "departments"
-                        ? "text-cyan-300 bg-[#1E2A38]"
-                        : "text-white bg-transparent hover:text-cyan-400"
+                        ? "text-primary bg-accent/25"
+                        : "text-primary bg-transparent"
                       }`}
                     onClick={() => setSelectedTab("departments")}
                   >
@@ -209,8 +207,8 @@ export default function Drawer({
                   <button
                     className={`hover:cursor-pointer w-1/2 py-3 font-normal text-lg transition-colors duration-300 transform rounded-r-xs inline-flex items-center justify-center space-x-2 border-l border-white/20
                       ${selectedTab === "persons"
-                        ? "text-cyan-300 bg-[#1E2A38]"
-                        : "text-white bg-transparent hover:text-cyan-400"
+                        ? "text-primary bg-accent/25"
+                        : "text-primary bg-transparent"
                       }`}
                     onClick={() => setSelectedTab("persons")}
                   >
@@ -222,11 +220,11 @@ export default function Drawer({
 
               {/* Header */}
               {loading ? (
-                <h2 className="text-md font-normal text-gray-300 mt-4 mb-2 shrink-0">
+                <h2 className="text-md font-normal text-primary mt-4 mb-2 shrink-0">
                   Loading...
                 </h2>
               ) : (
-                <h2 className="text-md font-normal text-gray-300 mt-4 mb-2 shrink-0">
+                <h2 className="text-md font-normal text-primary mt-4 mb-2 shrink-0">
                   {Object.keys(drawerContentList).length} Active
                   {`${parentNode &&
                     parentNode.type === "minister" &&
@@ -257,18 +255,13 @@ export default function Drawer({
                     .map(([key, item], index) => {
                       const isSelected =
                         selectedNode && selectedNode.id === item.id;
+
                       const baseClasses =
                         "my-2 p-2 rounded-sm cursor-pointer font-normal text-sm transition-colors duration-200";
-                      const themeClasses = isDark
-                        ? "text-gray-300"
-                        : "text-gray-700";
-                      const selectedClasses = isSelected
-                        ? isDark
-                          ? "bg-cyan-800/60 border-l-4 border-cyan-400 text-cyan-100"
-                          : "bg-cyan-100 border-l-4 border-cyan-500 text-cyan-800"
-                        : isDark
-                          ? "bg-[#1E2A38]/50 hover:bg-[#1E2A38] text-gray-300"
-                          : "bg-gray-200 hover:bg-gray-300 text-gray-700";
+                      
+                        const themeClasses = isDark
+                        ? "text-primary/75"
+                        : "text-primary/75";
 
                       return (
                         <div
@@ -282,7 +275,7 @@ export default function Drawer({
                               onMinistryClick(item);
                             }
                           }}
-                          className={`${baseClasses} ${themeClasses} ${selectedClasses}`}
+                          className={`${baseClasses} ${themeClasses} bg-background/85`}
                           onClick={() => onMinistryClick(item)}
                         >
                           <div className="flex">
@@ -301,7 +294,7 @@ export default function Drawer({
                   {drawerContentList &&
                     Object.keys(drawerContentList).length > visibleCount && (
                       <button
-                        className="mt-2 px-4 text-sm py-2 bg-blue-500 text-gray-300 rounded hover:bg-blue-600 hover:cursor-pointer"
+                        className="mt-2 px-4 text-sm py-2 bg-accent text-background/90 rounded hover:accent/10 hover:cursor-pointer"
                         onClick={() =>
                           setVisibleCount((prev) => prev + BATCH_SIZE)
                         }
