@@ -101,7 +101,7 @@ const PersonProfile = () => {
             ]
             .filter((item) => !(item.label === "Worked as President" && (!item.value || item.value === 0)))
             .map((item, idx) => (
-              <Box
+              <div
                 key={idx}
                 className="flex justify-between flex-wrap gap-2 mb-3 w-full text-sm sm:text-base"
               >

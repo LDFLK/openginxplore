@@ -182,24 +182,24 @@ export function DatasetView({ data, setExternalDateRange }) {
       {years && years.length > 0 && (
         <div className="space-y-1 mt-2">
           <h2 className="text-xl md:text-2xl font-bold text-primary/85">
-            {datasets[selectedYear]
-              ? datasets[selectedYear][0]?.nameExact
+            {datasets[firstSelectedYear]
+              ? datasets[firstSelectedYear][0]?.nameExact
               : "Select a Dataset"}
           </h2>
           <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-primary/75">
-            {datasets[selectedYear] &&
-            datasets[selectedYear][0].sourceType === "department" ? (
+            {datasets[firstSelectedYear] &&
+            datasets[firstSelectedYear][0].sourceType === "department" ? (
               <div className="flex items-center">
                 <Link
-                  to={`/department-profile/${datasets[selectedYear][0]?.sourceId}`}
+                  to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
                 >
                   <span className="font-semibold">Published By : </span>{" "}
-                  {datasets[selectedYear]
-                    ? datasets[selectedYear][0]?.source
+                  {datasets[firstSelectedYear]
+                    ? datasets[firstSelectedYear][0]?.source
                     : "—"}
                 </Link>
                 <Link
-                to={`/department-profile/${datasets[selectedYear][0]?.sourceId}`}
+                to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
                 state={{mode: "back"}}
                   class="ml-5 inline-flex items-center px-2 py-2 gap-2 text-sm rounded-lg bg-background text-active-green"
                   role="alert"
@@ -216,8 +216,8 @@ export function DatasetView({ data, setExternalDateRange }) {
             ) : (
               <p>
                 <span className="font-semibold">Published By : </span>{" "}
-                {datasets[selectedYear]
-                  ? datasets[selectedYear][0]?.source
+                {datasets[firstSelectedYear]
+                  ? datasets[firstSelectedYear][0]?.source
                   : "—"}
               </p>
             )}

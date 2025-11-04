@@ -101,14 +101,7 @@ export default function YearRangeSelector({
     const newEnd = endDate.toISOString().split("T")[0];
     const currentStart = params.get("startDate");
     const currentEnd = params.get("endDate");
-
-    //clean up org-only params in /data
-    if (path.includes("/data")) {
-      ["selectedDate", "filterByType", "viewMode", "ministry"].forEach((key) =>
-        params.delete(key)
-      );
-    }
-
+    
     // merge with existing URL params
     params.set("startDate", newStart);
     params.set("endDate", newEnd);

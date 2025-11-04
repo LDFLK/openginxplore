@@ -74,7 +74,12 @@ export default function OpenginXplore() {
       params.delete("datasetName");
       params.delete("breadcrumb");
     }
-
+    if (tabName === "data") {
+      params.delete("selectedDate");
+      params.delete("filterByType");
+      params.delete("viewMode");
+      params.delete("ministry");
+    }
     navigate({
       pathname: `/${tabName}`,
       search: params.toString() ? `?${params.toString()}` : "",
