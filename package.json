@@ -47,6 +47,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.2",
     "react-spinners": "^0.17.0",
+    "react-vertical-timeline-component": "^3.5.3",
     "recharts": "^3.3.0",
     "remark-gfm": "^4.0.1",
     "shadcn-ui": "^0.9.5",

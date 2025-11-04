@@ -359,7 +359,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
 
                       <Link
                         to={`/department-profile/${dep.id}`}
-                        state={{ mode: "back" }}
+                        state={{ mode: "back", from: location.pathname + location.search  }}
                         style={{
                           textDecoration: "none",
                           color: selectedPresident.themeColorLight,

@@ -9,7 +9,12 @@ import XploreDataTab from "../../components/xploreData/XploreDataTab";
 import YearRangeSelector from "../../components/Timeline";
 import { useSelector } from "react-redux";
 import Organization from "../../components/Organization";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import TextLogo from "../XploreGovHome/components/textLogo";
 import ThemeToggle from "../../components/theme-toggle";
 
@@ -17,7 +22,8 @@ export default function OpenginXplore() {
   const [isExpanded, setIsExpanded] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { tab } = useParams(); 
+  const { tab } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const selectedTab = tab || "organization";
 
@@ -35,7 +41,6 @@ export default function OpenginXplore() {
     null,
   ]);
   const [externalDateRange, setExternalDateRange] = useState([null, null]);
-
 
   const handleDateRangeChange = useCallback((dateRange) => {
     const [startDate, endDate] = dateRange;
@@ -61,8 +66,19 @@ export default function OpenginXplore() {
   const dates = gazetteDateClassic.map((d) => `${d}T00:00:00Z`);
 
   const handleTabChange = (tabName) => {
-    const currentParams = window.location.search;
-    navigate(`/${tabName}${currentParams}`);
+    const params = new URLSearchParams(location.search);
+
+    if (tabName === "organization") {
+      params.delete("parentId");
+      params.delete("datasetId");
+      params.delete("datasetName");
+      params.delete("breadcrumb");
+    }
+
+    navigate({
+      pathname: `/${tabName}`,
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
   };
 
   return (

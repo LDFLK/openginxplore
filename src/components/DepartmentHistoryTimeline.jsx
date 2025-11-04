@@ -1,31 +1,19 @@
 import { useState, useEffect } from "react";
-import {
-  Typography,
-  Paper,
-  Avatar,
-  Box,
-  Dialog,
-  IconButton,
-} from "@mui/material";
 import { useSelector } from "react-redux";
 import utils from "../utils/utils";
 import api from "../services/services";
-import {
-  Timeline,
-  TimelineItem,
-  TimelineOppositeContent,
-  TimelineSeparator,
-  TimelineDot,
-  TimelineConnector,
-  TimelineContent,
-} from "@mui/lab";
 import { useThemeContext } from "../themeContext";
 import { ClipLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
-import colors from "../assets/colors";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  VerticalTimeline,
+  VerticalTimelineElement,
+} from "react-vertical-timeline-component";
+import { Landmark } from "lucide-react";
+
+import "./../assets/verticalTimeLineCSS.css";
 
 const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
-  const [selectedIndex, setSelectedIndex] = useState(null);
   const allMinistryData = useSelector(
     (state) => state.allMinistryData.allMinistryData
   );
@@ -34,10 +22,11 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
     (state) => state.presidency.presidentRelationDict
   );
   const [enrichedMinistries, setEnrichedMinistries] = useState([]);
-  const allPersonDict = useSelector((state) => state.allPerson.allPerson);;
+  const allPersonDict = useSelector((state) => state.allPerson.allPerson);
   const [loading, setLoading] = useState(false);
-  const { colors } = useThemeContext();
+  const { colors, isDark } = useThemeContext();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const enrichWithMinisters = async () => {
@@ -304,212 +293,116 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
     }
   }, [selectedDepartment]);
 
-  const handleOpenProfile = (minister) => {
-    navigate(`/person-profile/${minister.id}`, {
-      state: { mode: "back" },
-    });
-    // setSelectedMinister(minister);
-    // setProfileOpen(true);
-  };
-
   return (
     <>
       {!loading ? (
-        <Box sx={{backgroundColor: colors.backgroundWhite, py: 2}}>
+        <>
           {enrichedMinistries && enrichedMinistries.length > 0 ? (
-            <Timeline position="alternate" sx={{ py: 0 }}>
-              {enrichedMinistries
-                .sort((b, a) => new Date(a.startTime) - new Date(b.startTime))
-                .map((entry, idx, arr) => (
-                  <TimelineItem key={idx} sx={{ cursor: "pointer", py: 0.5 }}>
-                    <TimelineOppositeContent
-                      sx={{
-                        m: "auto 0",
-                        color: colors.textMuted,
-                        fontWeight: "600",
-                        fontSize: 12,
-                        minWidth: 70,
-                        pr: 1,
-                        fontFamily: "poppins",
-                      }}
-                      align="right"
-                      variant="body2"
-                    >
-                      {entry.startTime
-                        ? `${new Date(entry.startTime)
-                            .toISOString()
-                            .slice(0, 10)} - ${
-                            entry.endTime
-                              ? new Date(entry.endTime)
-                                  .toISOString()
-                                  .slice(0, 10)
-                              : "Present"
-                          }`
-                        : "Unknown"}
-                    </TimelineOppositeContent>
-
-                    <TimelineSeparator>
-                      <TimelineDot
-                        color="primary"
-                        sx={{
-                          width: 2,
-                          height: 2,
-                          boxShadow: `0 0 6px ${colors.textPrimary}`,
-                          animation: "pulse 2.5s infinite",
-                          backgroundColor: colors.textPrimary,
+            <div className=" rounded-md p-6 bg-background-dark">
+              <VerticalTimeline
+                animate={true}
+                layout="2-columns"
+                lineColor={isDark ? "#364153" : "#dbdbdb"}
+              >
+                {enrichedMinistries
+                  .sort((b, a) => new Date(a.startTime) - new Date(b.startTime))
+                  .map((entry, idx, arr) => {
+                    return (
+                      <VerticalTimelineElement
+                        icon={<Landmark />}
+                        iconStyle={{
+                          background: isDark ? "#101828" : "#f8f8f8",
+                          color: isDark ? "#f8f8f8" : "#0b0b0b",
+                          boxShadow: "none",
+                          border: `1px solid  ${
+                            isDark ? "#364153" : "#dbdbdb"
+                          }`,
                         }}
-                      />
-                      {idx < arr.length && (
-                        <TimelineConnector
-                          sx={{
-                            bgcolor: colors.textMuted,
-                            height: 2,
-                          }}
-                        />
-                      )}
-                    </TimelineSeparator>
-
-                    <TimelineContent sx={{ py: 0.5, px: 1 }}>
-                      <Paper
-                        elevation={3}
-                        sx={{
-                          p: 1,
-                          borderRadius: 2,
-                          backgroundColor: colors.backgroundBlue,
-                          boxShadow:
-                            selectedIndex === idx
-                              ? `0 0 10px ${colors.textMuted}`
-                              : "0 1px 5px rgba(0,0,0,0.1)",
-                          transform:
-                            selectedIndex === idx ? "scale(1.01)" : "scale(1)",
-                          transition: "all 0.2s ease-in-out",
+                        className={idx}
+                        contentStyle={{
+                          background: isDark ? "#101828" : "#f8f8f8",
+                          color: isDark ? "#f8f8f8" : "#0b0b0b",
+                          border: `1px solid  ${
+                            isDark ? "#364153" : "#dbdbdb"
+                          }`,
+                          boxShadow: "none",
+                          padding: "10px",
+                          paddingTop: "0px",
+                          marginBottom: "25px",
+                          marginTop: "15px",
                         }}
-                        onClick={() =>
-                          setSelectedIndex(selectedIndex === idx ? null : idx)
+                        contentArrowStyle={{
+                          borderRight: `7px solid  ${
+                            isDark ? "#364153" : "#dbdbdb"
+                          }`,
+                        }}
+                        date={
+                          entry.startTime
+                            ? `${new Date(entry.startTime)
+                                .toISOString()
+                                .slice(0, 10)} - ${
+                                entry.endTime
+                                  ? new Date(entry.endTime)
+                                      .toISOString()
+                                      .slice(0, 10)
+                                  : "Present"
+                              }`
+                            : ""
                         }
+                        dateClassName={"text-primary/65"}
                       >
-                        <Box
-                          sx={{
-                            width: "100%",
-                            textAlign: "left",
-                            display: "flex",
-                            borderRadius: 2,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "flex-start",
-                              gap: 1,
-                              width: "100%",
-                            }}
+                        <div>
+                          <p
+                            className="text-primary"
+                            style={{ fontSize: "1rem" }}
                           >
-                            {/* Avatar */}
-                            <Avatar
-                              sx={{
-                                bgcolor: colors.textPrimary,
-                                width: 30,
-                                height: 30,
-                                fontSize: 14,
-                                fontWeight: 500,
-                                flexShrink: 0,
-                                color: colors.backgroundBlue
-                              }}
-                            >
-                              {entry.minister
-                                ? utils
-                                    .extractNameFromProtobuf(
+                            {
+                              utils
+                                .extractNameFromProtobuf(entry.name)
+                                .split(":")[0]
+                            }
+                          </p>
+                          <div className="flex items-center mt-1 space-x-3">
+                            <div className="flex items-center justify-between">
+                              {entry.minister ? (
+                                <>
+                                  {/* Minister Name */}
+                                  <Link
+                                    to={`/person-profile/${entry.minister.id}`}
+                                    state={{
+                                      mode: "back",
+                                      from: location.pathname + location.search,
+                                      callback: true,
+                                      callbackLink: location.state?.from,
+                                    }}
+                                    className="text-accent text-normal font-medium hover:text-accent/80 transition-colors"
+                                  >
+                                    {utils.extractNameFromProtobuf(
                                       entry.minister.name
-                                    )
-                                    .charAt(0)
-                                    .toUpperCase()
-                                : "?"}
-                            </Avatar>
-
-                            {/* Text stacked vertically */}
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                flexGrow: 1,
-                                justifyContent: "flex-start",
-                              }}
-                            >
-                              <Typography
-                                variant="subtitle2"
-                                color={colors.textPrimary}
-                                sx={{
-                                  fontWeight: "700",
-                                  fontSize: 15,
-                                  fontFamily: "poppins",
-                                }}
-                              >
-                                {
-                                  utils
-                                    .extractNameFromProtobuf(entry.name)
-                                    .split(":")[0]
-                                }
-                              </Typography>
-
-                              <Typography
-                                variant="caption"
-                                color={colors.textPrimary}
-                                sx={{
-                                  fontSize: 14,
-                                  fontFamily: "poppins",
-                                  cursor: entry.minister
-                                    ? "pointer"
-                                    : "default",
-                                  textDecoration: "none",
-                                  "&:hover": {
-                                    textDecoration: entry.minister
-                                      ? "underline"
-                                      : "none",
-                                  },
-                                }}
-                                onClick={() =>
-                                  entry.minister &&
-                                  handleOpenProfile(entry.minister)
-                                }
-                              >
-                                {entry.minister
-                                  ? utils.extractNameFromProtobuf(
-                                      entry.minister.name
-                                    )
-                                  : "No Minister Assigned"}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Box>
-                      </Paper>
-                    </TimelineContent>
-                  </TimelineItem>
-                ))}
-            </Timeline>
+                                    )}
+                                  </Link>
+                                </>
+                              ) : (
+                                <span className="text-primary/25 italic">
+                                  No Minister Assigned
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </VerticalTimelineElement>
+                    );
+                  })}
+              </VerticalTimeline>
+            </div>
           ) : (
-            <Typography
-              variant="body2"
-              sx={{ mt: 2, fontFamily: "poppins", color: colors.textPrimary }}
-            >
-              No timeline history available.
-            </Typography>
+            <p className="text-primary mt-5">No timeline history available.</p>
           )}
-        </Box>
+        </>
       ) : (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "20vh",
-          }}
-        >
-          <ClipLoader
-            color={colors.textPrimary}
-            loading={loading}
-            size={25}
-          />
-        </Box>
+        <div className="flex justify-center items-center h-20">
+          <ClipLoader color={colors.textPrimary} loading={loading} size={25} />
+        </div>
       )}
     </>
   );
