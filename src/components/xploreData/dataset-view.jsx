@@ -1,5 +1,5 @@
 import { DataTable } from "./table-view";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ClipLoader } from "react-spinners";
 import apiData from "../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
@@ -88,8 +88,60 @@ export function DatasetView({ data, setExternalDateRange }) {
     fetchData();
   }, [selectedYears, datasets]);
 
+  // Stabilize columns reference - only change if actual columns change
+  const stableColumns = useMemo(() => {
+    if (fetchedDatasets.length === 0) return [];
+    return fetchedDatasets[0].data.columns;
+  }, [fetchedDatasets.length > 0 ? fetchedDatasets[0].data.columns.join(',') : '']);
+
+  // Stabilize yearlyData reference
+  const stableYearlyData = useMemo(() => {
+    return fetchedDatasets.map((d) => ({
+      year: d.year,
+      rows: d.data.rows,
+    }));
+  }, [fetchedDatasets]);
+
+  // Check if dataset is plottable (has numeric columns and string columns)
+  const isPlottable = useMemo(() => {
+    if (fetchedDatasets.length === 0) return false;
+    
+    const cols = fetchedDatasets[0].data.columns;
+    const sampleRows = fetchedDatasets[0].data.rows;
+    
+    if (!sampleRows || sampleRows.length === 0 || !cols.length) return false;
+    
+    let hasNumeric = false;
+    let hasString = false;
+    
+    cols.forEach((col, idx) => {
+      const isNumeric = sampleRows.some((row) => {
+        const val = row[idx];
+        return (
+          typeof val === "number" ||
+          (!isNaN(Number(val)) && val !== null && val !== "")
+        );
+      });
+      
+      if (isNumeric && col !== "id") {
+        hasNumeric = true;
+      } else if (!isNumeric) {
+        hasString = true;
+      }
+    });
+    
+    return hasNumeric && hasString;
+  }, [fetchedDatasets]);
+
   // Checkbox handler
   const handleYearToggle = (year) => {
+    // Prevent multi-year selection for unplottable datasets
+    if (!isPlottable && !selectedYears.includes(year)) {
+      // If trying to add a year to unplottable dataset, switch to that year only
+      setSelectedYears([year]);
+      return;
+    }
+    
     if (selectedYears.includes(year)) {
       // Prevent unchecking if it's the only one
       if (selectedYears.length === 1) return;
@@ -144,24 +196,35 @@ export function DatasetView({ data, setExternalDateRange }) {
 
       {/* Year selector - checkboxes for multi-year, chip for single year */}
       {multiYearMode ? (
-        <div className="w-full flex justify-end flex-wrap gap-2">
-          {years.map((year) => (
-            <label
-              key={year}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer 
-              ${selectedYears.includes(year)
-                  ? "bg-blue-900 border-blue-500"
-                  : "bg-gray-900 border-gray-700 hover:border-gray-500"
-                }`}
-            >
-              <input
-                type="checkbox"
-                checked={selectedYears.includes(year)}
-                onChange={() => handleYearToggle(year)}
-              />
-              <span className="text-gray-100">{year}</span>
-            </label>
-          ))}
+        <div className="w-full space-y-2">
+          {!isPlottable && fetchedDatasets.length > 0 && (
+            <p className="text-xs text-yellow-400/80 text-right">
+              This dataset cannot be visualized. Showing table view only for one year.
+            </p>
+          )}
+          <div className="flex justify-end flex-wrap gap-2">
+            {years.map((year) => (
+              <label
+                key={year}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer 
+                ${selectedYears.includes(year)
+                    ? "bg-blue-900 border-blue-500"
+                    : "bg-gray-900 border-gray-700 hover:border-gray-500"
+                  }
+                ${!isPlottable && !selectedYears.includes(year) ? "opacity-50" : ""}`}
+                title={!isPlottable && !selectedYears.includes(year) 
+                  ? "Only one year can be viewed at a time for this dataset" 
+                  : ""}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedYears.includes(year)}
+                  onChange={() => handleYearToggle(year)}
+                />
+                <span className="text-gray-100">{year}</span>
+              </label>
+            ))}
+          </div>
         </div>
       ) : (
         years &&
@@ -175,22 +238,22 @@ export function DatasetView({ data, setExternalDateRange }) {
       )}
 
       {/* Dataset Visualization */}
-      <div className="border border-gray-700 rounded-md p-4 shadow-sm bg-gray-900">
+      <div className="border border-gray-700 rounded-md p-4 shadow-sm bg-gray-900 relative">
+        {/* Loading overlay - doesn't unmount the chart */}
+        {loadingDatasetId && (
+          <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-sm flex flex-col justify-center items-center z-50 rounded-md">
+            <ClipLoader size={25} color="currentColor" />
+            <p className="mt-2 text-sm text-gray-400">Loading {loadingDatasetId} data...</p>
+          </div>
+        )}
+        
         <div className="overflow-x-auto">
-          {loadingDatasetId ? (
-            <div className="flex flex-col justify-center items-center h-48 text-gray-400">
-              <ClipLoader size={25} color="currentColor" />
-              <p className="mt-2 text-sm">Loading...</p>
-            </div>
-          ) : fetchedDatasets.length > 0 ? (
+          {fetchedDatasets.length > 0 ? (
             <>
               {/* Unified chart for both single and multi-year */}
               <ChartVisualization
-                columns={fetchedDatasets[0].data.columns}
-                yearlyData={fetchedDatasets.map((d) => ({
-                  year: d.year,
-                  rows: d.data.rows,
-                }))}
+                columns={stableColumns}
+                yearlyData={stableYearlyData}
               />
 
               {/* Show table only if one year selected */}
