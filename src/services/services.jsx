@@ -1,7 +1,7 @@
 import utils from "../utils/utils";
 
-// const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
-const apiUrl = "https://aaf8ece1-3077-4a52-ab05-183a424f6d93-prod.e1-us-east-azure.choreoapis.dev/data-platform/query-api/v1.1";
+const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
+// const apiUrl = "";
 
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {

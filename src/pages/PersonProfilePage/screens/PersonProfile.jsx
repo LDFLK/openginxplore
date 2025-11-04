@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useThemeContext } from "../../../themeContext";
 import utils from "../../../utils/utils";
 import personDetails from "../../../assets/personImages.json";
 import { useLocation, useNavigate, useParams } from "react-router-dom";

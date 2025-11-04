@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import DepartmentHistoryTimeline from "../../../components/DepartmentHistoryTimeline";
-import { Box, Typography, ButtonBase } from "@mui/material";
 import { useThemeContext } from "../../../themeContext";
 import utils from "../../../utils/utils";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
