@@ -54,7 +54,13 @@ const PersonHistoryTimeline = ({
               endTime: d.endTime,
             };
           })
-          .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+          .sort((a, b) => {
+            if (!a.endTime && !b.endTime) return 0;
+            if (!a.endTime) return -1;
+            if (!b.endTime) return 1;
+            return new Date(b.endTime) - new Date(a.endTime);
+          });
+
 
         setTimelineData(enriched);
         onTimelineUpdate?.(enriched);
