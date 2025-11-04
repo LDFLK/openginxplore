@@ -21,10 +21,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
   const [detectedTicks, setDetectedTicks] = useState([]);
-  const [chartType, setChartType] = useState("bar"); 
+  const [chartType, setChartType] = useState("bar");
   const chartRef = useRef(null);
 
-  // Normalize yearlyData format - convert single year to yearlyData format
   const normalizedYearlyData = useMemo(() => {
     if (yearlyData?.length > 0) {
       return yearlyData;
@@ -77,7 +76,6 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       .replace(/\s+/g, "");
   };
 
-  // Prepare chart data
   const chartData = useMemo(() => {
     if (normalizedYearlyData.length === 0 || selectedYColumns.length === 0) {
       return [];
@@ -91,7 +89,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       if (dataset.rows.length > 0) {
         const firstRow = dataset.rows[0];
         firstRow.forEach((val, idx) => {
-          if (typeof val === "string" && val.length > 2) {
+          if (typeof val === "string" && val.length > 2 &&
+            isNaN(parseFloat(val))
+          ) {
             yearXIndex = idx;
           }
         });
@@ -121,7 +121,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
           const key = `${dataset.year}_${col}`;
           const numValue = Number(value) || 0;
 
-          dataPoint[key] = (dataPoint[key] || 0) + numValue;
+          dataPoint[key] = numValue;
         });
       });
     });
@@ -136,7 +136,24 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       });
     });
 
+    // Sort for highest total
+    result.sort((a, b) => {
+      const sumA = selectedYColumns.reduce((acc, col) => {
+        return acc + normalizedYearlyData.reduce((yearAcc, d) => {
+          return yearAcc + (a[`${d.year}_${col}`] || 0);
+        }, 0);
+      }, 0);
+
+      const sumB = selectedYColumns.reduce((acc, col) => {
+        return acc + normalizedYearlyData.reduce((yearAcc, d) => {
+          return yearAcc + (b[`${d.year}_${col}`] || 0);
+        }, 0);
+      }, 0);
+
+      return sumB - sumA; // Highest first
+    });
     return result;
+
   }, [columns, xAxis, selectedYColumns, normalizedYearlyData]);
 
   // Extract Y-axis ticks
@@ -169,6 +186,16 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   }, [chartData, selectedYColumns]);
 
   const isMultiYear = normalizedYearlyData.length > 1;
+
+  const barsPerCategory = normalizedYearlyData.length * selectedYColumns.length;
+
+  const barWidth = 40;
+  const barGap = -20;
+  const categoryGap = 60;
+
+  const widthPerCategory = (barsPerCategory * (barWidth + barGap)) + categoryGap;
+
+  const totalChartWidth = Math.max(chartData.length * widthPerCategory, 1200);
 
   return (
     <>
@@ -214,7 +241,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   {numericColumns
                     .filter((col) => {
                       const lower = col.toLowerCase();
-                      return lower !== "id" && lower !== "total";
+                      return lower !== "id";
                     })
                     .map((col) => (
                       <label
@@ -339,7 +366,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                     <div className="overflow-x-auto flex-1" ref={chartRef}>
                       <div
                         style={{
-                          minWidth: `${chartData.length * 120}px`,
+                          minWidth: `${totalChartWidth}px`,
                           height: 455,
                           overflow: "hidden",
                         }}
@@ -347,10 +374,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                         {chartType === "bar" ? (
                           <BarChart
                             data={chartData}
-                            width={Math.max(chartData.length * 120, 1000)}
+                            width={totalChartWidth}
                             height={450}
                             margin={{ left: -60, bottom: -60 }}
-                            barCategoryGap="20%"
                           >
                             <CartesianGrid
                               strokeDasharray="3 3"
@@ -365,7 +391,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                               tickLine={false}
                               axisLine={{ stroke: "#374151" }}
                               tick={({ x, y, payload }) => {
-                                const maxCharsPerLine = 15;
+                                const maxCharsPerLine = 13;
                                 const text = payload.value;
                                 let line1 = text;
                                 let line2 = "";
@@ -420,29 +446,29 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 borderRadius: "0.5rem",
                               }}
                               formatter={(value, name) => [value, formatText({ name: name })]}
+                              shared={false}
                             />
-                            {normalizedYearlyData.map((d, yearIdx) =>
-                              selectedYColumns.map((col) => (
+                            {selectedYColumns.map((col, colIdx) =>
+                              normalizedYearlyData.map((d, yearIdx) => (
                                 <Bar
                                   key={`${d.year}_${col}`}
                                   dataKey={`${d.year}_${col}`}
                                   fill={
                                     isMultiYear
                                       ? COLORS[yearIdx % COLORS.length]
-                                      : COLORS[selectedYColumns.indexOf(col) % COLORS.length]
+                                      : COLORS[colIdx % COLORS.length]
                                   }
-                                  stackId={`stack-${d.year}`}
+                                  maxBarSize={barWidth}
                                 />
                               ))
                             )}
                           </BarChart>
                         ) : (
-                          
                           <LineChart
                             data={chartData}
-                            width={Math.max(chartData.length * 120, 1000)}
+                            width={totalChartWidth}
                             height={450}
-                            margin={{ left: -30, bottom: -60 }}
+                            margin={{ left: -25, bottom: -60, right: 50 }}
                           >
                             <CartesianGrid
                               strokeDasharray="3 3"
@@ -457,7 +483,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                               tickLine={false}
                               axisLine={{ stroke: "#374151" }}
                               tick={({ x, y, payload }) => {
-                                const maxCharsPerLine = 15;
+                                const maxCharsPerLine = 13;
                                 const text = payload.value;
                                 let line1 = text;
                                 let line2 = "";
@@ -512,9 +538,10 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 borderRadius: "0.5rem",
                               }}
                               formatter={(value, name) => [value, formatText({ name: name })]}
+                              shared={false}
                             />
-                            {normalizedYearlyData.map((d, yearIdx) =>
-                              selectedYColumns.map((col) => (
+                            {selectedYColumns.map((col, colIdx) =>
+                              normalizedYearlyData.map((d, yearIdx) => (
                                 <Line
                                   key={`${d.year}_${col}`}
                                   type="monotone"
@@ -522,7 +549,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                   stroke={
                                     isMultiYear
                                       ? COLORS[yearIdx % COLORS.length]
-                                      : COLORS[selectedYColumns.indexOf(col) % COLORS.length]
+                                      : COLORS[colIdx % COLORS.length]
                                   }
                                   strokeWidth={2}
                                   dot={{ r: 2 }}
