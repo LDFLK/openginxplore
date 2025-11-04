@@ -98,8 +98,10 @@ const PersonProfile = () => {
                 label: "Worked as President",
                 value: workedAsPresident,
               },
-            ].map((item, idx) => (
-              <div
+            ]
+            .filter((item) => !(item.label === "Worked as President" && (!item.value || item.value === 0)))
+            .map((item, idx) => (
+              <Box
                 key={idx}
                 className="flex justify-between flex-wrap gap-2 mb-3 w-full text-sm sm:text-base"
               >
