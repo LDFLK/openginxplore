@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -10,8 +12,7 @@ import {
 import formatText from "../../utils/common_functions";
 
 const COLORS = [
-  "#004c99", "#0066cc", "#007bff", "#3399ff",
-  "#66b2ff", "#99ccff", "#cce5ff",
+  "#00bcd4", "#8bc34a", "#ffc107", "#ff9800", "#e91e63", "#9c27b0",
 ];
 
 export function ChartVisualization({ columns, rows, yearlyData }) {
@@ -20,18 +21,15 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
   const [detectedTicks, setDetectedTicks] = useState([]);
+  const [chartType, setChartType] = useState("bar"); 
   const chartRef = useRef(null);
 
   // Normalize yearlyData format - convert single year to yearlyData format
   const normalizedYearlyData = useMemo(() => {
-    console.log('Columns:', columns);
-    console.log('Rows:', rows);
-    console.log('Yearly Data:', yearlyData);
     if (yearlyData?.length > 0) {
       return yearlyData;
     } else if (rows?.length > 0) {
-      // Convert single year format to yearlyData format
-      return [{ year: 'single', rows: rows }];
+      return [{ year: "single", rows: rows }];
     }
     return [];
   }, [yearlyData, rows]);
@@ -40,7 +38,6 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   useEffect(() => {
     const stringCols = [];
     const numericCols = [];
-
     const sampleRows =
       normalizedYearlyData.length > 0 ? normalizedYearlyData[0].rows : [];
 
@@ -66,78 +63,55 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     setNumericColumns(numericCols);
     setStringColumns(stringCols);
 
-
     setSelectedYColumns((prev) =>
       prev.filter((col) => numericCols.includes(col))
     );
   }, [columns, normalizedYearlyData]);
 
-
-  // Helper function to normalize strings for comparison
   const normalizeString = (str) => {
-    if (str === null || str === undefined) return '';
+    if (str === null || str === undefined) return "";
     return String(str)
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s]/g, '')
-      .replace(/\s+/g, '');
+      .replace(/[^\w\s]/g, "")
+      .replace(/\s+/g, "");
   };
 
-  // Prepare chart data - unified logic for single and multi-year
+  // Prepare chart data
   const chartData = useMemo(() => {
     if (normalizedYearlyData.length === 0 || selectedYColumns.length === 0) {
       return [];
     }
 
-    console.log('=== CHART PREPARATION ===');
-    console.log('Columns:', columns);
-    console.log('X-axis:', xAxis);
-    console.log('Selected Y columns:', selectedYColumns);
-    console.log('Number of years:', normalizedYearlyData.length);
-
     const dataMap = new Map();
 
-    // Process each year's data
     normalizedYearlyData.forEach((dataset) => {
-      console.log(`\nProcessing year ${dataset.year}`);
-
       let yearXIndex = -1;
 
-      // Find X-axis by looking for the string column
       if (dataset.rows.length > 0) {
         const firstRow = dataset.rows[0];
         firstRow.forEach((val, idx) => {
-          if (typeof val === 'string' && val.length > 2) {
+          if (typeof val === "string" && val.length > 2) {
             yearXIndex = idx;
           }
         });
-        console.log(`X-axis found at index: ${yearXIndex}`);
       }
 
-      if (yearXIndex === -1) {
-        console.error(`Could not find X-axis column for year ${dataset.year}`);
-        return;
-      }
+      if (yearXIndex === -1) return;
 
       const globalXIndex = columns.indexOf(xAxis);
 
-      // Process rows for this year
-      dataset.rows.forEach((row, rowIdx) => {
+      dataset.rows.forEach((row) => {
         const rawXVal = row[yearXIndex];
         const normalizedXVal = normalizeString(rawXVal);
-
         if (!normalizedXVal) return;
 
-        // Get or create data point for this X value
         if (!dataMap.has(normalizedXVal)) {
-          dataMap.set(normalizedXVal, {
-            [xAxis]: rawXVal,
-          });
+          dataMap.set(normalizedXVal, { [xAxis]: rawXVal });
         }
 
         const dataPoint = dataMap.get(normalizedXVal);
 
-        // Add Y values
         selectedYColumns.forEach((col) => {
           const globalYIndex = columns.indexOf(col);
           const offset = yearXIndex - globalXIndex;
@@ -148,29 +122,20 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
           const numValue = Number(value) || 0;
 
           dataPoint[key] = (dataPoint[key] || 0) + numValue;
-
-          if (rowIdx < 2) {
-            console.log(`  ${rawXVal}: ${col} -> value ${value}`);
-          }
         });
       });
     });
 
     const result = Array.from(dataMap.values());
-
-    // Fill missing year-column combinations with 0
     result.forEach((dataPoint) => {
       normalizedYearlyData.forEach((dataset) => {
         selectedYColumns.forEach((col) => {
           const key = `${dataset.year}_${col}`;
-          if (dataPoint[key] === undefined) {
-            dataPoint[key] = 0;
-          }
+          if (dataPoint[key] === undefined) dataPoint[key] = 0;
         });
       });
     });
 
-    console.log('Final data (first 3):', result.slice(0, 3));
     return result;
   }, [columns, xAxis, selectedYColumns, normalizedYearlyData]);
 
@@ -216,6 +181,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
               <h3 className="text-lg font-semibold text-gray-300">
                 Visualizations
               </h3>
+
               <h3 className="text-sm font-semibold mb-2 text-gray-400">
                 Select Chart Data
               </h3>
@@ -239,14 +205,17 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                 </select>
               </div>
 
-              {/* Y-axis (multiple) */}
+              {/* Y-axis checkboxes */}
               <div className="bg-gray-800">
                 <label className="text-sm font-medium text-gray-400">
                   Y-Axis (Values):
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2 bg-gray-800">
                   {numericColumns
-                    .filter((col) => col !== "id" && col !== "total")
+                    .filter((col) => {
+                      const lower = col.toLowerCase();
+                      return lower !== "id" && lower !== "total";
+                    })
                     .map((col) => (
                       <label
                         key={col}
@@ -270,12 +239,27 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                     ))}
                 </div>
               </div>
+
+              {/* Chart type selector */}
+              <div className="flex items-center gap-3 mt-3">
+                <label className="text-sm font-medium text-gray-400">
+                  Chart Type:
+                </label>
+                <select
+                  value={chartType}
+                  onChange={(e) => setChartType(e.target.value)}
+                  className="border text-gray-400 border-gray-700 rounded-md p-1.5 text-sm bg-gray-800"
+                >
+                  <option value="bar">Bar Chart</option>
+                  <option value="line">Line Chart</option>
+                </select>
+              </div>
             </div>
 
             {/* Chart */}
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
               <h3 className="text-sm font-semibold mb-4 text-gray-400">
-                Bar Chart
+                {chartType === "bar" ? "Bar Chart" : "Line Chart"}
               </h3>
 
               {chartData.length > 0 ? (
@@ -289,10 +273,13 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             style={{
                               width: 12,
                               height: 12,
-                              backgroundColor: COLORS[yearIdx % COLORS.length],
+                              backgroundColor:
+                                COLORS[yearIdx % COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-gray-300">{d.year}</span>
+                          <span className="text-sm text-gray-300">
+                            {d.year}
+                          </span>
                         </div>
                       ))
                       : selectedYColumns.map((col, i) => (
@@ -301,16 +288,19 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             style={{
                               width: 12,
                               height: 12,
-                              backgroundColor: COLORS[i % COLORS.length],
+                              backgroundColor:
+                                COLORS[i % COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-gray-300">{formatText({ name: col })}</span>
+                          <span className="text-sm text-gray-300">
+                            {formatText({ name: col })}
+                          </span>
                         </div>
                       ))}
                   </div>
 
                   <div className="flex">
-                    {/* Y-axis sticky labels */}
+                    {/* Sticky Y-axis */}
                     <div
                       className="flex-shrink-0 bg-gray-800"
                       style={{
@@ -323,11 +313,10 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                         marginBottom: 60,
                       }}
                     >
-                      {detectedTicks.length > 0
-                        ? detectedTicks.map((tickVal, i) => {
+                      {detectedTicks.length > 0 &&
+                        detectedTicks.map((tickVal, i) => {
                           const totalTicks = detectedTicks.length;
                           const percentage = (i / (totalTicks - 1)) * 100;
-
                           return (
                             <div
                               key={`${tickVal}-${i}`}
@@ -343,11 +332,10 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                               {Math.round(tickVal)}
                             </div>
                           );
-                        })
-                        : null}
+                        })}
                     </div>
 
-                    {/* Scrollable chart */}
+                    {/* Scrollable chart area */}
                     <div className="overflow-x-auto flex-1" ref={chartRef}>
                       <div
                         style={{
@@ -356,107 +344,194 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                           overflow: "hidden",
                         }}
                       >
-                        <BarChart
-                          data={chartData}
-                          width={Math.max(chartData.length * 120, 1000)}
-                          height={450}
-                          margin={{ left: -60, bottom: -60 }}
-                          barCategoryGap="20%"
-                        >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="#374151"
-                            strokeOpacity={0.5}
-                          />
-
-                          <XAxis
-                            dataKey={xAxis}
-                            stroke="white"
-                            interval={0}
-                            height={86}
-                            tickLine={false}
-                            axisLine={{ stroke: "#374151" }}
-                            tick={({ x, y, payload }) => {
-                              const maxCharsPerLine = 15;
-                              const text = payload.value;
-                              let line1 = text;
-                              let line2 = "";
-
-                              if (text.length > maxCharsPerLine) {
-                                const splitIndex =
-                                  text.lastIndexOf(" ", maxCharsPerLine);
-                                if (splitIndex > 0) {
-                                  line1 = text.slice(0, splitIndex);
-                                  line2 = text.slice(splitIndex + 1);
-                                } else {
-                                  line1 = text.slice(0, maxCharsPerLine);
-                                  line2 = text.slice(maxCharsPerLine);
+                        {chartType === "bar" ? (
+                          <BarChart
+                            data={chartData}
+                            width={Math.max(chartData.length * 120, 1000)}
+                            height={450}
+                            margin={{ left: -60, bottom: -60 }}
+                            barCategoryGap="20%"
+                          >
+                            <CartesianGrid
+                              strokeDasharray="3 3"
+                              stroke="#374151"
+                              strokeOpacity={0.5}
+                            />
+                            <XAxis
+                              dataKey={xAxis}
+                              stroke="white"
+                              interval={0}
+                              height={86}
+                              tickLine={false}
+                              axisLine={{ stroke: "#374151" }}
+                              tick={({ x, y, payload }) => {
+                                const maxCharsPerLine = 15;
+                                const text = payload.value;
+                                let line1 = text;
+                                let line2 = "";
+                                if (text.length > maxCharsPerLine) {
+                                  const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                  if (splitIndex > 0) {
+                                    line1 = text.slice(0, splitIndex);
+                                    line2 = text.slice(splitIndex + 1);
+                                  } else {
+                                    line1 = text.slice(0, maxCharsPerLine);
+                                    line2 = text.slice(maxCharsPerLine);
+                                  }
                                 }
-                              }
-
-                              return (
-                                <g transform={`translate(${x},${y + 2.5})`}>
-                                  <text
-                                    x={0}
-                                    y={0}
-                                    textAnchor="middle"
-                                    fontSize={11.5}
-                                    fill="white"
-                                    fillOpacity={0.7}
-                                  >
-                                    {line1}
-                                  </text>
-                                  {line2 && (
+                                return (
+                                  <g transform={`translate(${x},${y + 2.5})`}>
                                     <text
                                       x={0}
-                                      y={12}
+                                      y={0}
                                       textAnchor="middle"
                                       fontSize={11.5}
                                       fill="white"
                                       fillOpacity={0.7}
                                     >
-                                      {line2}
+                                      {line1}
                                     </text>
-                                  )}
-                                </g>
-                              );
-                            }}
-                          />
-
-                          <YAxis
-                            stroke="transparent"
-                            tickLine={false}
-                            axisLine={false}
-                            tick={{ fill: "transparent" }}
-                          />
-
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "#1f2937",
-                              border: "1px solid #374151",
-                              borderRadius: "0.5rem",
-                            }}
-                            formatter={(value, name) => [
-                              value,
-                              formatText({ name: name }),
-                            ]}
-                          />
-
-                          {normalizedYearlyData.map((d, yearIdx) =>
-                            selectedYColumns.map((col) => (
-                              <Bar
-                                key={`${d.year}_${col}`}
-                                dataKey={`${d.year}_${col}`}
-                                fill={
-                                  isMultiYear
-                                    ? COLORS[yearIdx % COLORS.length]
-                                    : COLORS[selectedYColumns.indexOf(col) % COLORS.length]
+                                    {line2 && (
+                                      <text
+                                        x={0}
+                                        y={12}
+                                        textAnchor="middle"
+                                        fontSize={11.5}
+                                        fill="white"
+                                        fillOpacity={0.7}
+                                      >
+                                        {line2}
+                                      </text>
+                                    )}
+                                  </g>
+                                );
+                              }}
+                            />
+                            <YAxis
+                              stroke="transparent"
+                              tickLine={false}
+                              axisLine={false}
+                              tick={{ fill: "transparent" }}
+                            />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "#1f2937",
+                                border: "1px solid #374151",
+                                borderRadius: "0.5rem",
+                              }}
+                              formatter={(value, name) => [value, formatText({ name: name })]}
+                            />
+                            {normalizedYearlyData.map((d, yearIdx) =>
+                              selectedYColumns.map((col) => (
+                                <Bar
+                                  key={`${d.year}_${col}`}
+                                  dataKey={`${d.year}_${col}`}
+                                  fill={
+                                    isMultiYear
+                                      ? COLORS[yearIdx % COLORS.length]
+                                      : COLORS[selectedYColumns.indexOf(col) % COLORS.length]
+                                  }
+                                  stackId={`stack-${d.year}`}
+                                />
+                              ))
+                            )}
+                          </BarChart>
+                        ) : (
+                          
+                          <LineChart
+                            data={chartData}
+                            width={Math.max(chartData.length * 120, 1000)}
+                            height={450}
+                            margin={{ left: -30, bottom: -60 }}
+                          >
+                            <CartesianGrid
+                              strokeDasharray="3 3"
+                              stroke="#374151"
+                              strokeOpacity={0.5}
+                            />
+                            <XAxis
+                              dataKey={xAxis}
+                              stroke="white"
+                              interval={0}
+                              height={86}
+                              tickLine={false}
+                              axisLine={{ stroke: "#374151" }}
+                              tick={({ x, y, payload }) => {
+                                const maxCharsPerLine = 15;
+                                const text = payload.value;
+                                let line1 = text;
+                                let line2 = "";
+                                if (text.length > maxCharsPerLine) {
+                                  const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                  if (splitIndex > 0) {
+                                    line1 = text.slice(0, splitIndex);
+                                    line2 = text.slice(splitIndex + 1);
+                                  } else {
+                                    line1 = text.slice(0, maxCharsPerLine);
+                                    line2 = text.slice(maxCharsPerLine);
+                                  }
                                 }
-                                stackId={`stack-${d.year}`}
-                              />
-                            ))
-                          )}
-                        </BarChart>
+                                return (
+                                  <g transform={`translate(${x},${y + 2.5})`}>
+                                    <text
+                                      x={0}
+                                      y={0}
+                                      textAnchor="middle"
+                                      fontSize={11.5}
+                                      fill="white"
+                                      fillOpacity={0.7}
+                                    >
+                                      {line1}
+                                    </text>
+                                    {line2 && (
+                                      <text
+                                        x={0}
+                                        y={12}
+                                        textAnchor="middle"
+                                        fontSize={11.5}
+                                        fill="white"
+                                        fillOpacity={0.7}
+                                      >
+                                        {line2}
+                                      </text>
+                                    )}
+                                  </g>
+                                );
+                              }}
+                            />
+                            <YAxis
+                              stroke="transparent"
+                              tickLine={false}
+                              axisLine={false}
+                              tick={{ fill: "transparent" }}
+                            />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "#1f2937",
+                                border: "1px solid #374151",
+                                borderRadius: "0.5rem",
+                              }}
+                              formatter={(value, name) => [value, formatText({ name: name })]}
+                            />
+                            {normalizedYearlyData.map((d, yearIdx) =>
+                              selectedYColumns.map((col) => (
+                                <Line
+                                  key={`${d.year}_${col}`}
+                                  type="monotone"
+                                  dataKey={`${d.year}_${col}`}
+                                  stroke={
+                                    isMultiYear
+                                      ? COLORS[yearIdx % COLORS.length]
+                                      : COLORS[selectedYColumns.indexOf(col) % COLORS.length]
+                                  }
+                                  strokeWidth={2}
+                                  dot={{ r: 2 }}
+                                  activeDot={{ r: 4 }}
+                                />
+                              ))
+                            )}
+                          </LineChart>
+                        )}
                       </div>
                     </div>
                   </div>
