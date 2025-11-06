@@ -1,13 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useThemeContext } from "../../../themeContext";
 
-export default function TextLogo() {
+export default function TextLogo({ isExpanded }) {
+  const { isDark } = useThemeContext();
+
   return (
     <Link to={"/"}>
-      <h2 className="text-normal md:text-2xl font-semibold">
-        <span className="text-accent">
-          OpenGIN<span className="text-primary">Xplore</span>
-        </span>
+      <h2 className="text-normal md:text-2xl py-6 font-semibold">
+        {isExpanded ? (
+          <span className="text-accent">
+            OpenGIN<span className="text-primary">Xplore</span>
+          </span>
+        ) : isDark ? (
+          <img src={"/openginexplore.ico"} />
+        ) : (
+          <img src={"/openginexplorelight.ico"} />
+        )}
       </h2>
     </Link>
   );

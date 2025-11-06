@@ -251,7 +251,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
           No president information found for the selected date range.
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {filteredPresidents.map((president) => {
             const isSelected = selectedPresident?.id === president.id;
             const nameText = utils.extractNameFromProtobuf(president.name);

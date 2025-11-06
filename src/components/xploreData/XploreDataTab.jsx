@@ -345,7 +345,7 @@ export default function XploreDataTab({ setExternalDateRange }) {
             ) : (
               data.categories &&
               data.categories.length === 0 && (
-                <p className="text-muted text-center mt-10">
+                <p className="text-primary/75 text-center mt-10">
                   No categories or datasets found for this level.
                 </p>
               )
