@@ -695,7 +695,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
                       height={graphHeight}
                       width={graphWidth}
                       graphData={graphData}
-                      backgroundColor={isDark ? "#222" : "#fff"}
+                      backgroundColor={isDark ? "#0d131d" : "#e7e7e7"}
                       linkWidth={3}
                       linkColor={colors.timelineLineActive}
                       nodeRelSize={15}
