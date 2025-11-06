@@ -2,15 +2,20 @@ import { Moon, Sun } from "lucide-react";
 import { useThemeContext } from "../themeContext";
 
 export default function ThemeToggle() {
-  
-    const {isDark, toggleTheme} = useThemeContext();
+  const { isDark, toggleTheme } = useThemeContext();
 
   return (
     <button
-      onClick={() => { toggleTheme() }}
-      className="rounded-full relative top-0 hover:cursor-pointer"
+      onClick={() => {
+        toggleTheme();
+      }}
+      className="rounded-full relative top-0 cursor-pointer"
     >
-      {isDark ? <Sun className="w-6 h-6 text-foreground/75" /> : <Moon className="w-6 h-6 text-primary/75" />}
+      {isDark ? (
+        <Sun className="w-6 h-6 text-foreground/75 hover:text-primary/95" />
+      ) : (
+        <Moon className="w-6 h-6 text-primary/75 hover:text-primary/95" />
+      )}
     </button>
   );
 }

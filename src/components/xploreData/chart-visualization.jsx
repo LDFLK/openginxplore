@@ -415,7 +415,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                       y={0}
                                       textAnchor="middle"
                                       fontSize={11.5}
-                                      fill="white"
+                                      fill= {isDark ? "white" : "dark"}
                                       fillOpacity={0.7}
                                     >
                                       {line1}
@@ -426,7 +426,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                         y={12}
                                         textAnchor="middle"
                                         fontSize={11.5}
-                                        fill="white"
+                                        fill= {isDark ? "white" : "dark"}
                                         fillOpacity={0.7}
                                       >
                                         {line2}
