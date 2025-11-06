@@ -9,7 +9,7 @@ export default function ThemeToggle() {
       onClick={() => {
         toggleTheme();
       }}
-      className="rounded-full relative top-0 cursor-pointer"
+      className="rounded-full relative top-0 cursor-pointer mx-2"
     >
       {isDark ? (
         <Sun className="w-6 h-6 text-foreground/75 hover:text-primary/95" />
