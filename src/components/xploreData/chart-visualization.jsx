@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "recharts";
 import formatText from "../../utils/common_functions";
+import { useThemeContext } from "../../themeContext";
 
 const COLORS = [
   "#00bcd4", "#8bc34a", "#ffc107", "#ff9800", "#e91e63", "#9c27b0",
@@ -23,6 +24,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [detectedTicks, setDetectedTicks] = useState([]);
   const [chartType, setChartType] = useState("bar");
   const chartRef = useRef(null);
+
+  const {isDark} = useThemeContext()
 
   const normalizedYearlyData = useMemo(() => {
     if (yearlyData?.length > 0) {
@@ -204,24 +207,24 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
         stringColumns.length !== 0 && (
           <div className="space-y-6 w-full">
             {/* Controls */}
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
-              <h3 className="text-lg font-semibold text-gray-300">
+            <div className="bg-background-dark border border-border rounded-lg p-4 space-y-4">
+              <h3 className="text-lg font-semibold text-accent/75">
                 Visualizations
               </h3>
 
-              <h3 className="text-sm font-semibold mb-2 text-gray-400">
+              <h3 className="text-sm font-semibold mb-2 text-primary/60">
                 Select Chart Data
               </h3>
 
               {/* X-axis selector */}
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-primary/50">
                   X-Axis (Category):
                 </label>
                 <select
                   value={xAxis}
                   onChange={(e) => setXAxis(e.target.value)}
-                  className="mt-1 block w-full border text-gray-400 border-gray-700 rounded-md p-2 text-sm bg-gray-800"
+                  className="mt-1 block w-full border text-primary/75 border-border rounded-md p-2 text-sm bg-background focus:border-none"
                 >
                   <option value="">Select column</option>
                   {stringColumns.map((col) => (
@@ -233,11 +236,11 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
               </div>
 
               {/* Y-axis checkboxes */}
-              <div className="bg-gray-800">
-                <label className="text-sm font-medium text-gray-400">
+              <div className="">
+                <label className="text-sm font-medium text-primary/60">
                   Y-Axis (Values):
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2 bg-gray-800">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
                   {numericColumns
                     .filter((col) => {
                       const lower = col.toLowerCase();
@@ -246,7 +249,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                     .map((col) => (
                       <label
                         key={col}
-                        className="flex items-start space-x-2 text-sm break-words"
+                        className="flex justify-start items-center space-x-2 text-sm break-words"
                       >
                         <input
                           type="checkbox"
@@ -259,7 +262,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             );
                           }}
                         />
-                        <span className="break-words max-w-[220px] text-gray-400">
+                        <span className="break-words max-w-[220px] text-primary">
                           {formatText({ name: col })}
                         </span>
                       </label>
@@ -269,13 +272,13 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
               {/* Chart type selector */}
               <div className="flex items-center gap-3 mt-3">
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-primary/75">
                   Chart Type:
                 </label>
                 <select
                   value={chartType}
                   onChange={(e) => setChartType(e.target.value)}
-                  className="border text-gray-400 border-gray-700 rounded-md p-1.5 text-sm bg-gray-800"
+                  className="border text-primary bg-background border-border rounded-md p-1.5 text-sm"
                 >
                   <option value="bar">Bar Chart</option>
                   <option value="line">Line Chart</option>
@@ -284,8 +287,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
             </div>
 
             {/* Chart */}
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-              <h3 className="text-sm font-semibold mb-4 text-gray-400">
+            <div className="bg-background-dark border border-border rounded-lg p-4">
+              <h3 className="text-sm font-semibold mb-4 text-primary/80">
                 {chartType === "bar" ? "Bar Chart" : "Line Chart"}
               </h3>
 
@@ -304,7 +307,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 COLORS[yearIdx % COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-gray-300">
+                          <span className="text-sm text-primary/75">
                             {d.year}
                           </span>
                         </div>
@@ -319,7 +322,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 COLORS[i % COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-gray-300">
+                          <span className="text-sm text-primary/75">
                             {formatText({ name: col })}
                           </span>
                         </div>
@@ -329,7 +332,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   <div className="flex">
                     {/* Sticky Y-axis */}
                     <div
-                      className="flex-shrink-0 bg-gray-800"
+                      className="flex-shrink-0 bg-background-dark"
                       style={{
                         width: 60,
                         position: "relative",
@@ -347,7 +350,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                           return (
                             <div
                               key={`${tickVal}-${i}`}
-                              className="text-xs text-right pr-1 text-gray-300"
+                              className="text-xs text-right pr-1 text-primary/75"
                               style={{
                                 position: "absolute",
                                 top: `${percentage}%`,
@@ -441,9 +444,11 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             />
                             <Tooltip
                               contentStyle={{
-                                backgroundColor: "#1f2937",
-                                border: "1px solid #374151",
+                                backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+                                color: isDark ? "#dbdbdb" : "#1f2937",
+                                border: "1px solid #dbdbdb",
                                 borderRadius: "0.5rem",
+
                               }}
                               formatter={(value, name) => [value, formatText({ name: name })]}
                               shared={false}
@@ -504,7 +509,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                       y={0}
                                       textAnchor="middle"
                                       fontSize={11.5}
-                                      fill="white"
+                                      fill= {isDark ? "white" : "dark"}
                                       fillOpacity={0.7}
                                     >
                                       {line1}
@@ -515,7 +520,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                         y={12}
                                         textAnchor="middle"
                                         fontSize={11.5}
-                                        fill="white"
+                                        fill= {isDark ? "white" : "dark"}
                                         fillOpacity={0.7}
                                       >
                                         {line2}
@@ -533,8 +538,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             />
                             <Tooltip
                               contentStyle={{
-                                backgroundColor: "#1f2937",
-                                border: "1px solid #374151",
+                                backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+                                color: isDark ? "#dbdbdb" : "#1f2937",
+                                border: "1px solid #dbdbdb",
                                 borderRadius: "0.5rem",
                               }}
                               formatter={(value, name) => [value, formatText({ name: name })]}
@@ -564,7 +570,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   </div>
                 </div>
               ) : (
-                <p className="text-center text-gray-400 text-sm">
+                <p className="text-center text-primary text-sm">
                   Select X and Y columns to generate the chart.
                 </p>
               )}

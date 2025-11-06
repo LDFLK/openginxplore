@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChevronUp, ChevronDown, Search } from "lucide-react";
+import { ChevronUp, ChevronDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import formatText from "../../utils/common_functions";
 
 export function DataTable({ columns, rows, title }) {
@@ -73,7 +73,7 @@ export function DataTable({ columns, rows, title }) {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="p-2 rounded-sm border border-border text-border"
+          className="p-2 rounded-sm border border-border text-primary"
         />
 
         {/* <ExportButton columns={columns} rows={rows} filename={title} /> */}
@@ -107,7 +107,7 @@ export function DataTable({ columns, rows, title }) {
               paginatedRows.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-b border-b-border/10 hover:bg-muted/10 transition-colors"
+                  className="border-b border-b-border/75 hover:bg-muted/10 transition-colors"
                 >
                   {row.map((cell, cellIndex) => (
                     <td key={cellIndex} className="px-4 py-3 whitespace-nowrap text-primary/85">
@@ -144,9 +144,10 @@ export function DataTable({ columns, rows, title }) {
             size="2"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="border border-accent/75 px-3 py-1 rounded-md text-accent/75 hover:cursor-pointer"
+            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer"
           >
-            Previous
+            <ChevronLeft/>
+            <span>Previous</span>
           </button>
           <button
             size="2"
@@ -154,9 +155,10 @@ export function DataTable({ columns, rows, title }) {
               setCurrentPage(Math.min(totalPages, currentPage + 1))
             }
             disabled={currentPage === totalPages}
-            className="border border-accent/75 px-3 py-1 rounded-md text-accent/75 hover:cursor-pointer"
+            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer"
           >
-            Next
+            <span>Next</span>
+            <ChevronRight/>
           </button>
         </div>
       </div>
