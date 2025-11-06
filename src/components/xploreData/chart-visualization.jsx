@@ -25,7 +25,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [chartType, setChartType] = useState("bar");
   const chartRef = useRef(null);
 
-  const {isDark} = useThemeContext()
+  const { isDark } = useThemeContext()
 
   const normalizedYearlyData = useMemo(() => {
     if (yearlyData?.length > 0) {
@@ -303,13 +303,10 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             style={{
                               width: 12,
                               height: 12,
-                              backgroundColor:
-                                COLORS[yearIdx % COLORS.length],
+                              backgroundColor: COLORS[yearIdx % COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-primary/75">
-                            {d.year}
-                          </span>
+                          <span className="text-sm text-primary/75">{d.year}</span>
                         </div>
                       ))
                       : selectedYColumns.map((col, i) => (
@@ -318,8 +315,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             style={{
                               width: 12,
                               height: 12,
-                              backgroundColor:
-                                COLORS[i % COLORS.length],
+                              backgroundColor: COLORS[i % COLORS.length],
                             }}
                           />
                           <span className="text-sm text-primary/75">
@@ -329,243 +325,275 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       ))}
                   </div>
 
-                  <div className="flex">
-                    {/* Sticky Y-axis */}
-                    <div
-                      className="flex-shrink-0 bg-background-dark"
-                      style={{
-                        width: 60,
-                        position: "relative",
-                        height: 425,
-                        left: 0,
-                        zIndex: 10,
-                        borderRight: "1px solid #374151",
-                        marginBottom: 60,
-                      }}
-                    >
-                      {detectedTicks.length > 0 &&
-                        detectedTicks.map((tickVal, i) => {
-                          const totalTicks = detectedTicks.length;
-                          const percentage = (i / (totalTicks - 1)) * 100;
-                          return (
-                            <div
-                              key={`${tickVal}-${i}`}
-                              className="text-xs text-right pr-1 text-primary/75"
-                              style={{
-                                position: "absolute",
-                                top: `${percentage}%`,
-                                transform: "translateY(-50%)",
-                                width: "100%",
-                                paddingRight: "4px",
-                              }}
-                            >
-                              {Math.round(tickVal)}
-                            </div>
-                          );
-                        })}
-                    </div>
-
-                    {/* Scrollable chart area */}
-                    <div className="overflow-x-auto flex-1" ref={chartRef}>
+                  {/* Chart */}
+                  <div className="flex flex-col">
+                    <div className="flex">
+                      {/* --- Y-Axis Section --- */}
                       <div
+                        className="flex-shrink-0 bg-background-dark flex"
                         style={{
-                          minWidth: `${totalChartWidth}px`,
-                          height: 455,
-                          overflow: "hidden",
+                          position: "relative",
+                          height: 425,
+                          left: 0,
+                          zIndex: 10,
+                          borderRight: "1px solid #374151",
+                          marginBottom: 0,
                         }}
                       >
-                        {chartType === "bar" ? (
-                          <BarChart
-                            data={chartData}
-                            width={totalChartWidth}
-                            height={450}
-                            margin={{ left: -60, bottom: -60 }}
-                          >
-                            <CartesianGrid
-                              strokeDasharray="3 3"
-                              stroke="#374151"
-                              strokeOpacity={0.5}
-                            />
-                            <XAxis
-                              dataKey={xAxis}
-                              stroke="white"
-                              interval={0}
-                              height={86}
-                              tickLine={false}
-                              axisLine={{ stroke: "#374151" }}
-                              tick={({ x, y, payload }) => {
-                                const maxCharsPerLine = 13;
-                                const text = payload.value;
-                                let line1 = text;
-                                let line2 = "";
-                                if (text.length > maxCharsPerLine) {
-                                  const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
-                                  if (splitIndex > 0) {
-                                    line1 = text.slice(0, splitIndex);
-                                    line2 = text.slice(splitIndex + 1);
-                                  } else {
-                                    line1 = text.slice(0, maxCharsPerLine);
-                                    line2 = text.slice(maxCharsPerLine);
-                                  }
-                                }
-                                return (
-                                  <g transform={`translate(${x},${y + 2.5})`}>
-                                    <text
-                                      x={0}
-                                      y={0}
-                                      textAnchor="middle"
-                                      fontSize={11.5}
-                                      fill= {isDark ? "white" : "dark"}
-                                      fillOpacity={0.7}
-                                    >
-                                      {line1}
-                                    </text>
-                                    {line2 && (
-                                      <text
-                                        x={0}
-                                        y={12}
-                                        textAnchor="middle"
-                                        fontSize={11.5}
-                                        fill= {isDark ? "white" : "dark"}
-                                        fillOpacity={0.7}
-                                      >
-                                        {line2}
-                                      </text>
-                                    )}
-                                  </g>
-                                );
-                              }}
-                            />
-                            <YAxis
-                              stroke="transparent"
-                              tickLine={false}
-                              axisLine={false}
-                              tick={{ fill: "transparent" }}
-                            />
-                            <Tooltip
-                              contentStyle={{
-                                backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                color: isDark ? "#dbdbdb" : "#1f2937",
-                                border: "1px solid #dbdbdb",
-                                borderRadius: "0.5rem",
+                        {/* Y-axis title */}
+                        <div
+                          className="flex items-center justify-center text-center text-primary/80"
+                          style={{
+                            width: 20,
+                            writingMode: "vertical-rl",
+                            transform: "rotate(180deg)",
+                            fontSize: "0.85rem",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {selectedYColumns.length >= 1 &&
+                            "Value"}
+                        </div>
 
-                              }}
-                              formatter={(value, name) => [value, formatText({ name: name })]}
-                              shared={false}
-                            />
-                            {selectedYColumns.map((col, colIdx) =>
-                              normalizedYearlyData.map((d, yearIdx) => (
-                                <Bar
-                                  key={`${d.year}_${col}`}
-                                  dataKey={`${d.year}_${col}`}
-                                  fill={
-                                    isMultiYear
-                                      ? COLORS[yearIdx % COLORS.length]
-                                      : COLORS[colIdx % COLORS.length]
+                        {/* Y-axis tick labels */}
+                        <div
+                          style={{
+                            width: 60,
+                            position: "relative",
+                            height: "100%",
+                          }}
+                        >
+                          {detectedTicks.length > 0 &&
+                            detectedTicks.map((tickVal, i) => {
+                              const totalTicks = detectedTicks.length;
+                              const percentage = (i / (totalTicks - 1)) * 100;
+                              return (
+                                <div
+                                  key={`${tickVal}-${i}`}
+                                  className="text-xs text-right pr-1 text-primary/75"
+                                  style={{
+                                    position: "absolute",
+                                    top: `${percentage}%`,
+                                    transform: "translateY(-50%)",
+                                    width: "100%",
+                                    paddingRight: "4px",
+                                  }}
+                                >
+                                  {Math.round(tickVal)}
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </div>
+
+                      {/* --- Scrollable Chart Area --- */}
+                      <div className="overflow-x-auto flex-1 no-scrollbar" ref={chartRef}>
+                        <div
+                          style={{
+                            minWidth: `${totalChartWidth}px`,
+                            height: 455,
+                            overflow: "hidden",
+                          }}
+                        >
+                          {chartType === "bar" ? (
+                            <BarChart
+                              data={chartData}
+                              width={totalChartWidth}
+                              height={450}
+                              margin={{ left: -60, bottom: -60 }}
+                            >
+                              <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#374151"
+                                strokeOpacity={0.5}
+                              />
+                              <XAxis
+                                dataKey={xAxis}
+                                stroke="white"
+                                interval={0}
+                                height={86}
+                                tickLine={false}
+                                axisLine={{ stroke: "#374151" }}
+                                tick={({ x, y, payload }) => {
+                                  const maxCharsPerLine = 13;
+                                  const text = payload.value;
+                                  let line1 = text;
+                                  let line2 = "";
+                                  if (text.length > maxCharsPerLine) {
+                                    const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                    if (splitIndex > 0) {
+                                      line1 = text.slice(0, splitIndex);
+                                      line2 = text.slice(splitIndex + 1);
+                                    } else {
+                                      line1 = text.slice(0, maxCharsPerLine);
+                                      line2 = text.slice(maxCharsPerLine);
+                                    }
                                   }
-                                  maxBarSize={barWidth}
-                                />
-                              ))
-                            )}
-                          </BarChart>
-                        ) : (
-                          <LineChart
-                            data={chartData}
-                            width={totalChartWidth}
-                            height={450}
-                            margin={{ left: -25, bottom: -60, right: 50 }}
-                          >
-                            <CartesianGrid
-                              strokeDasharray="3 3"
-                              stroke="#374151"
-                              strokeOpacity={0.5}
-                            />
-                            <XAxis
-                              dataKey={xAxis}
-                              stroke="white"
-                              interval={0}
-                              height={86}
-                              tickLine={false}
-                              axisLine={{ stroke: "#374151" }}
-                              tick={({ x, y, payload }) => {
-                                const maxCharsPerLine = 13;
-                                const text = payload.value;
-                                let line1 = text;
-                                let line2 = "";
-                                if (text.length > maxCharsPerLine) {
-                                  const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
-                                  if (splitIndex > 0) {
-                                    line1 = text.slice(0, splitIndex);
-                                    line2 = text.slice(splitIndex + 1);
-                                  } else {
-                                    line1 = text.slice(0, maxCharsPerLine);
-                                    line2 = text.slice(maxCharsPerLine);
-                                  }
-                                }
-                                return (
-                                  <g transform={`translate(${x},${y + 2.5})`}>
-                                    <text
-                                      x={0}
-                                      y={0}
-                                      textAnchor="middle"
-                                      fontSize={11.5}
-                                      fill= {isDark ? "white" : "dark"}
-                                      fillOpacity={0.7}
-                                    >
-                                      {line1}
-                                    </text>
-                                    {line2 && (
+                                  return (
+                                    <g transform={`translate(${x},${y + 2.5})`}>
                                       <text
                                         x={0}
-                                        y={12}
+                                        y={0}
                                         textAnchor="middle"
                                         fontSize={11.5}
-                                        fill= {isDark ? "white" : "dark"}
+                                        fill={isDark ? "white" : "dark"}
                                         fillOpacity={0.7}
                                       >
-                                        {line2}
+                                        {line1}
                                       </text>
-                                    )}
-                                  </g>
-                                );
-                              }}
-                            />
-                            <YAxis
-                              stroke="transparent"
-                              tickLine={false}
-                              axisLine={false}
-                              tick={{ fill: "transparent" }}
-                            />
-                            <Tooltip
-                              contentStyle={{
-                                backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                color: isDark ? "#dbdbdb" : "#1f2937",
-                                border: "1px solid #dbdbdb",
-                                borderRadius: "0.5rem",
-                              }}
-                              formatter={(value, name) => [value, formatText({ name: name })]}
-                              shared={false}
-                            />
-                            {selectedYColumns.map((col, colIdx) =>
-                              normalizedYearlyData.map((d, yearIdx) => (
-                                <Line
-                                  key={`${d.year}_${col}`}
-                                  type="monotone"
-                                  dataKey={`${d.year}_${col}`}
-                                  stroke={
-                                    isMultiYear
-                                      ? COLORS[yearIdx % COLORS.length]
-                                      : COLORS[colIdx % COLORS.length]
+                                      {line2 && (
+                                        <text
+                                          x={0}
+                                          y={12}
+                                          textAnchor="middle"
+                                          fontSize={11.5}
+                                          fill={isDark ? "white" : "dark"}
+                                          fillOpacity={0.7}
+                                        >
+                                          {line2}
+                                        </text>
+                                      )}
+                                    </g>
+                                  );
+                                }}
+                              />
+                              <YAxis
+                                stroke="transparent"
+                                tickLine={false}
+                                axisLine={false}
+                                tick={{ fill: "transparent" }}
+                              />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+                                  color: isDark ? "#dbdbdb" : "#1f2937",
+                                  border: "1px solid #dbdbdb",
+                                  borderRadius: "0.5rem",
+                                }}
+                                formatter={(value, name) => [value, formatText({ name })]}
+                                shared={false}
+                              />
+                              {selectedYColumns.map((col, colIdx) =>
+                                normalizedYearlyData.map((d, yearIdx) => (
+                                  <Bar
+                                    key={`${d.year}_${col}`}
+                                    dataKey={`${d.year}_${col}`}
+                                    fill={
+                                      isMultiYear
+                                        ? COLORS[yearIdx % COLORS.length]
+                                        : COLORS[colIdx % COLORS.length]
+                                    }
+                                    maxBarSize={barWidth}
+                                  />
+                                ))
+                              )}
+                            </BarChart>
+                          ) : (
+                            <LineChart
+                              data={chartData}
+                              width={totalChartWidth}
+                              height={450}
+                              margin={{ left: -25, bottom: -60, right: 50 }}
+                            >
+                              <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#374151"
+                                strokeOpacity={0.5}
+                              />
+                              <XAxis
+                                dataKey={xAxis}
+                                stroke="white"
+                                interval={0}
+                                height={86}
+                                tickLine={false}
+                                axisLine={{ stroke: "#374151" }}
+                                tick={({ x, y, payload }) => {
+                                  const maxCharsPerLine = 13;
+                                  const text = payload.value;
+                                  let line1 = text;
+                                  let line2 = "";
+                                  if (text.length > maxCharsPerLine) {
+                                    const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                    if (splitIndex > 0) {
+                                      line1 = text.slice(0, splitIndex);
+                                      line2 = text.slice(splitIndex + 1);
+                                    } else {
+                                      line1 = text.slice(0, maxCharsPerLine);
+                                      line2 = text.slice(maxCharsPerLine);
+                                    }
                                   }
-                                  strokeWidth={2}
-                                  dot={{ r: 2 }}
-                                  activeDot={{ r: 4 }}
-                                />
-                              ))
-                            )}
-                          </LineChart>
-                        )}
+                                  return (
+                                    <g transform={`translate(${x},${y + 2.5})`}>
+                                      <text
+                                        x={0}
+                                        y={0}
+                                        textAnchor="middle"
+                                        fontSize={11.5}
+                                        fill={isDark ? "white" : "dark"}
+                                        fillOpacity={0.7}
+                                      >
+                                        {line1}
+                                      </text>
+                                      {line2 && (
+                                        <text
+                                          x={0}
+                                          y={12}
+                                          textAnchor="middle"
+                                          fontSize={11.5}
+                                          fill={isDark ? "white" : "dark"}
+                                          fillOpacity={0.7}
+                                        >
+                                          {line2}
+                                        </text>
+                                      )}
+                                    </g>
+                                  );
+                                }}
+                              />
+                              <YAxis
+                                stroke="transparent"
+                                tickLine={false}
+                                axisLine={false}
+                                tick={{ fill: "transparent" }}
+                              />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+                                  color: isDark ? "#dbdbdb" : "#1f2937",
+                                  border: "1px solid #dbdbdb",
+                                  borderRadius: "0.5rem",
+                                }}
+                                formatter={(value, name) => [value, formatText({ name })]}
+                                shared={false}
+                              />
+                              {selectedYColumns.map((col, colIdx) =>
+                                normalizedYearlyData.map((d, yearIdx) => (
+                                  <Line
+                                    key={`${d.year}_${col}`}
+                                    type="monotone"
+                                    dataKey={`${d.year}_${col}`}
+                                    stroke={
+                                      isMultiYear
+                                        ? COLORS[yearIdx % COLORS.length]
+                                        : COLORS[colIdx % COLORS.length]
+                                    }
+                                    strokeWidth={2}
+                                    dot={{ r: 2 }}
+                                    activeDot={{ r: 4 }}
+                                  />
+                                ))
+                              )}
+                            </LineChart>
+                          )}
+                        </div>
                       </div>
+                    </div>
+
+                    {/* --- X-axis Title --- */}
+                    <div className="text-center mt-1">
+                      <span className="text-sm text-primary/80 font-medium">
+                        {formatText({ name: xAxis })}
+                      </span>
                     </div>
                   </div>
                 </div>

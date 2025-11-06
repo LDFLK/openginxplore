@@ -245,7 +245,7 @@ export function DatasetView({ data, setExternalDateRange }) {
       {multiYearMode ? (
         <div className="w-full space-y-2">
           {!isPlottable && fetchedDatasets.length > 0 && (
-            <p className="text-xs text-yellow-400/80 text-right">
+            <p className="text-xs text-yellow-600 dark:text-yellow-400/80 text-right">
               This dataset cannot be visualized. Showing table view only for one
               year.
             </p>
