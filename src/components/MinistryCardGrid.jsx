@@ -388,13 +388,13 @@ const MinistryCardGrid = () => {
         >
           <Box sx={{ mt: -0.5 }}>
             {primeMinister.person && primeMinister.relation && selectedPresident ? (
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start"}}>
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", ml: 1.5}}>
                 <Avatar
                   src={primeMinister.person.imageUrl}
                   alt={primeMinister.person.name}
                   sx={{ width: 55, height: 55, backgroundColor: colors.backgroundPrimary }}
                 />
-                <Box sx={{ display: "block", ml: 1.2 }}>
+                <Box sx={{ display: "block", ml: 1. }}>
                   <Typography
                     sx={{
                       fontSize: 12,

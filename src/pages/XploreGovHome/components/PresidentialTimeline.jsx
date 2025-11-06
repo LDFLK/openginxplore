@@ -74,14 +74,14 @@ export default function PresidentialTimeline() {
 
                 {/* Light mode image */}
                 <img
-                    src="public/tl-light.PNG"
+                    src="/tl-light.PNG"
                     alt="Range Selector Light"
                     className="block dark:hidden w-full"
                 />
 
                 {/* Dark mode image */}
                 <img
-                    src="public/tl-dark.PNG"
+                    src="/tl-dark.PNG"
                     alt="Range Selector Dark"
                     className="hidden dark:block w-full"
                 />

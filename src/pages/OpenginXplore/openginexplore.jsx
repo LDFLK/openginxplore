@@ -14,9 +14,8 @@ import Organization from "../../components/Organization";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import TextLogo from "../XploreGovHome/components/textLogo";
 import ThemeToggle from "../../components/theme-toggle";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import ShareLinkButton from "../../components/ShareLinkButton";
+import { toast, ToastContainer } from "react-toastify";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
   ? window.configs.feedbackFormUrl
@@ -200,7 +199,7 @@ export default function OpenginXplore() {
 
       {/* Main content */}
       <div
-        className={`flex-1 overflow-auto bg-background-dark duration-500 transition-all animation ${
+        className={`flex-1 overflow-auto bg-background-dark transition-all ease-in-out animation ${
           isExpanded ? "ml-64" : "ml-16"
         } h-screen`}
       >
