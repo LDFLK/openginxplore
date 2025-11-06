@@ -13,9 +13,9 @@ export default function TextLogo({ isExpanded }) {
             OpenGIN<span className="text-primary">Xplore</span>
           </span>
         ) : isDark ? (
-          <img src={"/openginexplore.ico"} />
+          <img width={35} height={35} src={"/openginexplore.ico"} />
         ) : (
-          <img src={"/openginexplorelight.ico"} />
+          <img width={35} height={35} src={"/openginexplorelight.ico"} />
         )}
       </h2>
     </Link>

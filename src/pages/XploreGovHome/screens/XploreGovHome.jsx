@@ -462,7 +462,7 @@ const XploreGovHomepage = () => {
           <div className="py-2 md:py-4 lg:py-6 justify-between flex">
             <div className="pt-2 pb-4 text-left flex items-center space-x-3">
               <Link to={"/"}>
-                <h2 className="text-normal md:text-2xl py-6 font-semibold">
+                <h2 className="text-normal md:text-2xl font-semibold">
                   <span className="text-accent">
                     OpenGIN<span className="text-primary">Xplore</span>
                   </span>
