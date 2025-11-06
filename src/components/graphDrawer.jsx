@@ -116,7 +116,7 @@ export default function Drawer({
       {expandDrawer && (
         <div className="flex item-center font-semibold">
           <button
-            className={`mr-2 text-3xl rotate-180 cursor-pointer mb-2`}
+            className={`mr-2 text-3xl rotate-180 cursor-pointer mb-2 text-foreground dark:text-white`}
             onClick={() => setExpandDrawer(false)}
           >
             <CiCircleChevLeft />
@@ -190,7 +190,8 @@ export default function Drawer({
                   </p>
                 </div>
               )}
-
+              {!(selectedNode && (selectedNode.type === "department" || selectedNode.type === "person")) && (
+                <>
               {/* Tabs for ministers */}
               {parentNode && parentNode.type === "minister" && (
                 <div className="flex justify-center mt-4 border border-border p-1 rounded-sm bg-background">
@@ -306,6 +307,8 @@ export default function Drawer({
                     )}
                 </div>
               </div>
+              </>
+              )}
             </>
           )}
         </div>
