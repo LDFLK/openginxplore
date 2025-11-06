@@ -156,7 +156,7 @@ export default function Drawer({
                   {selectedNode && selectedNode.type == "department" ? (
                     <Link
                       to={`/department-profile/${selectedNode.id}`}
-                      state={{ mode: "back" }}
+                      state={{ mode: "back", from: location.pathname + location.search  }}
                       className="mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-background bg-accent rounded-sm hover:bg-accent/90"
                     >
                       <History className="w-5 h-5 mr-2" />

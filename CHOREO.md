@@ -85,7 +85,7 @@ window.configs = {
 You **MUST** import the config file in your `index.html`:
 
 ```html
-<script src="./public/config.js"></script>
+<script src=".config.js"></script>
 ```
 
 🚨 **Important**: If this script tag is missing, configurations won't work! Always check this first if you encounter errors.
