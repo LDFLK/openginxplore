@@ -12,14 +12,14 @@ import {
   BookOpenText,
 } from "lucide-react";
 import ForceGraph3D from "react-force-graph-3d";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../../../components/theme-toggle";
 import Footer from "../components/footer";
 import BackgroundGradientEffect from "../components/backgroundGradientEffect";
 import AnimatedDots from "../components/animatedDots";
 import TextLogo from "../components/textLogo";
 import PresidentialTimeline from "../components/PresidentialTimeline";
-import { useThemeContext } from '../../../themeContext';
+import { useThemeContext } from "../../../themeContext";
 
 // Simulate the 3D network data structure
 const genRandomTree = (N = 100) => {
@@ -43,11 +43,11 @@ const XploreGovHomepage = () => {
   const { colors, isDark } = useThemeContext();
 
   const COLORS = isDark
-  ? ["#22d3ee", "#3b82f6", "#a855f7"] // cyan, blue, purple for dark mode
-  : ["#06b6d4", "#60a5fa", "#c084fc"]; // lighter versions for light mode
+    ? ["#22d3ee", "#3b82f6", "#a855f7"] // cyan, blue, purple for dark mode
+    : ["#06b6d4", "#60a5fa", "#c084fc"]; // lighter versions for light mode
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cards = [0,1];
+  const cards = [0, 1];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -82,7 +82,7 @@ const XploreGovHomepage = () => {
             ref={graphRef}
             graphData={graphData}
             backgroundColor={isDark ? colors.backgroundBlue : "#fff"}
-            linkColor={() => (isDark ? "#e4dcdcff" : "#1c1a1aff")} 
+            linkColor={() => (isDark ? "#e4dcdcff" : "#1c1a1aff")}
             nodeColor={() => COLORS[Math.floor(Math.random() * COLORS.length)]}
             enableNodeDrag={false}
             enableNavigationControls={false}
@@ -461,9 +461,15 @@ const XploreGovHomepage = () => {
           {/* Hero Section */}
           <div className="py-2 md:py-4 lg:py-6 justify-between flex">
             <div className="pt-2 pb-4 text-left flex items-center space-x-3">
-            <TextLogo />
+              <Link to={"/"}>
+                <h2 className="text-normal md:text-2xl py-6 font-semibold">
+                  <span className="text-accent">
+                    OpenGIN<span className="text-primary">Xplore</span>
+                  </span>
+                </h2>
+              </Link>
             </div>
-            <ThemeToggle/>
+            <ThemeToggle />
           </div>
 
           {/* Modern Split Section */}
@@ -609,7 +615,7 @@ const XploreGovHomepage = () => {
 
       {/* Animated particles */}
       <AnimatedDots />
-      
+
       {/* Footer */}
       <Footer />
     </div>
