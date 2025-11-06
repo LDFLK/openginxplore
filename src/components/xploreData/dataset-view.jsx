@@ -4,11 +4,12 @@ import { ClipLoader } from "react-spinners";
 import apiData from "../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
 import { Eye, EyeIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useThemeContext } from "../../themeContext";
 
 export function DatasetView({ data, setExternalDateRange }) {
   const datasets = data;
-  console.log(datasets);
+
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
   const [dataCache, setDataCache] = useState({});
   const [years, setYears] = useState([]);
@@ -17,6 +18,10 @@ export function DatasetView({ data, setExternalDateRange }) {
   const [multiYearMode, setMultiYearMode] = useState(false);
   const [selectedYears, setSelectedYears] = useState([]);
   const [fetchedDatasets, setFetchedDatasets] = useState([]);
+
+  const location = useLocation();
+
+  const { isDark } = useThemeContext();
 
   useEffect(() => {
     if (!datasets) return;
@@ -93,7 +98,9 @@ export function DatasetView({ data, setExternalDateRange }) {
   const stableColumns = useMemo(() => {
     if (fetchedDatasets.length === 0) return [];
     return fetchedDatasets[0].data.columns;
-  }, [fetchedDatasets.length > 0 ? fetchedDatasets[0].data.columns.join(',') : '']);
+  }, [
+    fetchedDatasets.length > 0 ? fetchedDatasets[0].data.columns.join(",") : "",
+  ]);
 
   // Stabilize yearlyData reference
   const stableYearlyData = useMemo(() => {
@@ -106,15 +113,15 @@ export function DatasetView({ data, setExternalDateRange }) {
   // Check if dataset is plottable (has numeric columns and string columns)
   const isPlottable = useMemo(() => {
     if (fetchedDatasets.length === 0) return false;
-    
+
     const cols = fetchedDatasets[0].data.columns;
     const sampleRows = fetchedDatasets[0].data.rows;
-    
+
     if (!sampleRows || sampleRows.length === 0 || !cols.length) return false;
-    
+
     let hasNumeric = false;
     let hasString = false;
-    
+
     cols.forEach((col, idx) => {
       const isNumeric = sampleRows.some((row) => {
         const val = row[idx];
@@ -123,14 +130,14 @@ export function DatasetView({ data, setExternalDateRange }) {
           (!isNaN(Number(val)) && val !== null && val !== "")
         );
       });
-      
+
       if (isNumeric && col !== "id") {
         hasNumeric = true;
       } else if (!isNumeric) {
         hasString = true;
       }
     });
-    
+
     return hasNumeric && hasString;
   }, [fetchedDatasets]);
 
@@ -142,7 +149,7 @@ export function DatasetView({ data, setExternalDateRange }) {
       setSelectedYears([year]);
       return;
     }
-    
+
     if (selectedYears.includes(year)) {
       // Prevent unchecking if it's the only one
       if (selectedYears.length === 1) return;
@@ -154,9 +161,9 @@ export function DatasetView({ data, setExternalDateRange }) {
 
   const handleAvailableDatasetView = () => {
     try {
-      console.log("datasets", datasets);
-      let yearKeys = Object.keys(datasets).map(Number).sort((a, b) => a - b);
-      console.log("yearKeys", yearKeys);
+      let yearKeys = Object.keys(datasets)
+        .map(Number)
+        .sort((a, b) => a - b);
       const start = new Date(`${yearKeys[0]}-01-01`);
       const end = new Date(`${yearKeys[yearKeys.length - 1]}-12-31`);
       setExternalDateRange([start, end]);
@@ -168,7 +175,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   if (!datasets) {
     return (
       <div className="flex items-center justify-center h-full mt-4">
-        <p className="text-gray-500 italic">Dataset not found</p>
+        <p className="text-primary/85 italic">Dataset not found</p>
       </div>
     );
   }
@@ -192,16 +199,25 @@ export function DatasetView({ data, setExternalDateRange }) {
               <div className="flex items-center">
                 <Link
                   to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
+                  state={{
+                    mode: "back",
+                    from: location.pathname + location.search,
+                  }}
                 >
-                  <span className="font-semibold">Published By : </span>{" "}
+                  <span className="font-semibold text-primary/75">
+                    Published By :{" "}
+                  </span>{" "}
                   {datasets[firstSelectedYear]
                     ? datasets[firstSelectedYear][0]?.source
                     : "—"}
                 </Link>
                 <Link
-                to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
-                state={{mode: "back"}}
-                  class="ml-5 inline-flex items-center px-2 py-2 gap-2 text-sm rounded-lg bg-background text-active-green"
+                  to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
+                  state={{
+                    mode: "back",
+                    from: location.pathname + location.search,
+                  }}
+                  className="ml-5 inline-flex items-center px-2 py-2 gap-2 text-sm rounded-lg bg-background text-active-green"
                   role="alert"
                 >
                   <div>
@@ -230,7 +246,8 @@ export function DatasetView({ data, setExternalDateRange }) {
         <div className="w-full space-y-2">
           {!isPlottable && fetchedDatasets.length > 0 && (
             <p className="text-xs text-yellow-400/80 text-right">
-              This dataset cannot be visualized. Showing table view only for one year.
+              This dataset cannot be visualized. Showing table view only for one
+              year.
             </p>
           )}
           <div className="flex justify-end flex-wrap gap-2">
@@ -238,21 +255,28 @@ export function DatasetView({ data, setExternalDateRange }) {
               <label
                 key={year}
                 className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer 
-                ${selectedYears.includes(year)
-                    ? "bg-blue-900 border-blue-500"
-                    : "bg-gray-900 border-gray-700 hover:border-gray-500"
-                  }
-                ${!isPlottable && !selectedYears.includes(year) ? "opacity-50" : ""}`}
-                title={!isPlottable && !selectedYears.includes(year) 
-                  ? "Only one year can be viewed at a time for this dataset" 
-                  : ""}
+                ${
+                  selectedYears.includes(year)
+                    ? "bg-background border-blue-500"
+                    : "bg-background border-border hover:border-gray-500"
+                }
+                ${
+                  !isPlottable && !selectedYears.includes(year)
+                    ? "opacity-50"
+                    : ""
+                }`}
+                title={
+                  !isPlottable && !selectedYears.includes(year)
+                    ? "Only one year can be viewed at a time for this dataset"
+                    : ""
+                }
               >
                 <input
                   type="checkbox"
                   checked={selectedYears.includes(year)}
                   onChange={() => handleYearToggle(year)}
                 />
-                <span className="text-gray-100">{year}</span>
+                <span className="text-primary/75">{year}</span>
               </label>
             ))}
           </div>
@@ -261,7 +285,7 @@ export function DatasetView({ data, setExternalDateRange }) {
         years &&
         years.length === 1 && (
           <div className="w-full flex justify-end">
-            <div className="px-4 py-2 bg-gray-900 border border-gray-700 rounded-md text-gray-100">
+            <div className="px-4 py-2 bg-background border border-border rounded-md text-primary/75">
               {years[0]}
             </div>
           </div>
@@ -269,15 +293,17 @@ export function DatasetView({ data, setExternalDateRange }) {
       )}
 
       {/* Dataset Visualization */}
-      <div className="border border-gray-700 rounded-md p-4 shadow-sm bg-gray-900 relative">
+      <div className="border border-border rounded-md p-4 shadow-sm bg-background relative">
         {/* Loading overlay - doesn't unmount the chart */}
         {loadingDatasetId && (
-          <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-sm flex flex-col justify-center items-center z-50 rounded-md">
-            <ClipLoader size={25} color="currentColor" />
-            <p className="mt-2 text-sm text-gray-400">Loading {loadingDatasetId} data...</p>
+          <div className="flex flex-col justify-center items-center z-50 rounded-md w-full">
+            <ClipLoader size={25} color={isDark ? "white" : "black"} />
+            <p className="mt-2 text-sm text-primary/75">
+              Loading {loadingDatasetId} data...
+            </p>
           </div>
         )}
-        
+
         <div className="overflow-x-auto">
           {fetchedDatasets.length > 0 ? (
             <>
@@ -296,31 +322,31 @@ export function DatasetView({ data, setExternalDateRange }) {
                 />
               )}
             </>
-          ) : years && years.length === 0 && Object.keys(datasets).length > 0 ? (
-            <div className="block justify-center items-center">
-              <p className="text-gray-500 italic text-center">
-                No available data yet! But you have data for
-              </p>
-              <div className="flex justify-center gap-2 mt-2">
-                {Object.keys(datasets).map((year) => (
-                  <button key={year} className="text-green-400/75">
-                    {year}
-                  </button>
-                ))}
-              </div>
-              <div className="flex justify-center">
-                <button
-                  className="flex text-blue-400 gap-2 cursor-pointer mt-2"
-                  onClick={handleAvailableDatasetView}
-                >
-                  <Eye /> <span>Show me</span>
-                </button>
-              </div>
-            </div>
           ) : (
-            <p className="text-gray-500 italic text-center">
-              Select a year to view the dataset
-            </p>
+            years &&
+            years.length === 0 &&
+            Object.keys(datasets).length > 0 && (
+              <div className="block justify-center items-center">
+                <p className="text-primary/75 italic text-center">
+                  No available data yet! But you have data for
+                </p>
+                <div className="flex justify-center gap-2 mt-2">
+                  {Object.keys(datasets).map((year) => (
+                    <button key={year} className="text-green-400/75">
+                      {year}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-center">
+                  <button
+                    className="flex text-accent/90 gap-2 cursor-pointer mt-2"
+                    onClick={handleAvailableDatasetView}
+                  >
+                    <Eye /> <span>Show me</span>
+                  </button>
+                </div>
+              </div>
+            )
           )}
         </div>
       </div>

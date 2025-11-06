@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Binoculars,
+  BookOpenText,
   ChevronLeft,
   ChevronRight,
   SquareLibrary,
@@ -10,6 +11,7 @@ import YearRangeSelector from "../../components/Timeline";
 import { useSelector } from "react-redux";
 import Organization from "../../components/Organization";
 import {
+  Link,
   useLocation,
   useNavigate,
   useParams,
@@ -23,7 +25,6 @@ export default function OpenginXplore() {
   const navigate = useNavigate();
   const location = useLocation();
   const { tab } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const selectedTab = tab || "organization";
 
@@ -91,7 +92,15 @@ export default function OpenginXplore() {
       {/* Header */}
       <div className="flex justify-between py-6 px-4 md:px-8 lg:px-12 border-b border-border bg-background">
         <TextLogo />
-        <ThemeToggle />
+        <div className="flex items-center gap-6">
+          <Link to="/docs?file=information-pane" target="_blank" rel="noopener noreferrer">
+            <div className="flex gap-2 justify-center items-center px-3 py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border">
+              <BookOpenText size={22}/>
+              <span>Learn</span>
+            </div>
+          </Link>
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Body */}
