@@ -77,7 +77,15 @@ export default function OpenginXplore() {
               <span className="font-semibold">
                 📢 Welcome to OpenGIN Xplore!
               </span>{" "}
-              This project is open source and evolving fast. Your feedback helps
+              This project is <Link
+                to={"https://"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="text-accent">
+                  <p>Open Source</p>
+                </div>
+              </Link> and evolving fast. Your feedback helps
               us make it better for everyone.
             </p>
             <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>

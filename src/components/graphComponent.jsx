@@ -692,6 +692,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
                     )}
 
                     <ForceGraph3D
+                      showNavInfo={false}
                       height={graphHeight}
                       width={graphWidth}
                       graphData={graphData}
