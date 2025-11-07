@@ -41,6 +41,8 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
 
+  const {isDark} = useThemeContext();
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const selectedMinistry = params.get("ministry");
@@ -358,6 +360,9 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                           </Typography>
                         )}
                       </Box>
+                      <Box sx={{
+                        display: "flex",
+                      }}>
 
                       <Link
                         to={`/department-profile/${dep.id}`}
@@ -380,6 +385,29 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                       >
                         View History
                       </Link>
+                      <Box sx={{width: "1px", height: "18px", borderRight: `1px solid ${ isDark ? "white" : "black"}`, mx: '15px'}}></Box>
+                      <Link
+                        to={`/data?parentId=${dep.id}`}
+                        // state={{ mode: "back", from: location.pathname + location.search  }}
+                        style={{
+                          textDecoration: "none",
+                          color: selectedPresident.themeColorLight,
+                          fontFamily: "Poppins, sans-serif",
+                          fontWeight: 500,
+                          fontSize: "0.9rem",
+                          borderRadius: "8px",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.textDecoration = "underline";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.textDecoration = "none";
+                        }}
+                      >
+                        Data
+                      </Link>
+                      </Box>
                     </Box>
                   );
                 })

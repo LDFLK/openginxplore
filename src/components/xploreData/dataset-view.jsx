@@ -223,9 +223,9 @@ export function DatasetView({ data, setExternalDateRange }) {
                   <div>
                     <EyeIcon />
                   </div>
-                  <span class="sr-only">Info</span>
+                  <span className="sr-only">Info</span>
                   <div>
-                    <span class="font-medium">Explore History</span>
+                    <span className="font-medium">Explore History</span>
                   </div>
                 </Link>
               </div>
