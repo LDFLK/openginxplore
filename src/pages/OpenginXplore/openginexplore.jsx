@@ -222,7 +222,7 @@ export default function OpenginXplore() {
         </div>
         <YearRangeSelector
           startYear={2019}
-          dates={dates}
+          dates={selectedTab === "organization" ? dates : []}
           latestPresStartDate={latestPresStartDate}
           onDateChange={handleDateRangeChange}
           externalRange={externalDateRange}
