@@ -225,7 +225,7 @@ export function DatasetView({ data, setExternalDateRange }) {
                   </div>
                   <span className="sr-only">Info</span>
                   <div>
-                    <span className="font-medium">Explore History</span>
+                    <span className="font-medium">Explore</span>
                   </div>
                 </Link>
               </div>

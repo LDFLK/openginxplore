@@ -1352,10 +1352,6 @@ export default function YearRangeSelector({
           />
         </div>
       </div>
-
-      <div className="text-primary/75 font-medium text-xs text-center mt-4">
-        Gazettes Published by Year
-      </div>
     </div>
   );
 }
