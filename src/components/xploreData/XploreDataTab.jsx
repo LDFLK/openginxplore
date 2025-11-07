@@ -90,6 +90,30 @@ export default function XploreDataTab({ setExternalDateRange }) {
         const { categories, datasets } = await fetchCategoriesAndDatasets(
           parentId
         );
+
+        if (parentId && !breadcrumbParam && Object.keys(categories).length > 0) {
+
+          const newBreadcrumb = [
+          ...breadcrumbTrail,
+          {
+            label: formatText({ name: Object.entries(categories)[0][1].source }) || "Category",
+            path: `/datasets?parentId=${parentId}`,
+          },
+        ];
+          const encodedTrail = encodeURIComponent(
+            JSON.stringify(newBreadcrumb)
+          );
+          setBreadcrumbTrail(newBreadcrumb);
+
+          const searchParams = new URLSearchParams(location.search);
+          searchParams.set("parentId", parentId);
+
+          if (encodedTrail) {
+            searchParams.set("breadcrumb", encodedTrail);
+          }
+
+          navigate(`${location.pathname}?${searchParams.toString()}`);
+        }
         setData({ categories, datasets });
       }
 
@@ -291,9 +315,9 @@ export default function XploreDataTab({ setExternalDateRange }) {
                       whileHover={{ y: -2, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleCategoryClick(item.id, item.name)}
-                      className={`cursor-pointer bg-background shadow-2xs relative w-full h-[100px] border border-border rounded-2xl p-4 flex items-center justify-between bg-category-card transition ${
+                      className={`cursor-pointer bg-background hover:bg-background shadow-2xs relative w-full h-[100px] border border-border rounded-2xl p-4 flex items-center justify-between bg-category-card transition ${
                         loadingCategoryId === item.id
-                          ? "opacity-50 pointer-events-none"
+                          ? "opacity-90 pointer-events-none"
                           : "hover:bg-border/10"
                       }`}
                     >
