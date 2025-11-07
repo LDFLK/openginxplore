@@ -30,7 +30,6 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
 
   useEffect(() => {
     const enrichWithMinisters = async () => {
-      const startTime = new Date().getTime();
       setLoading(true);
       try {
         const departmentIds = new Set([selectedDepartment.id]);
@@ -57,6 +56,13 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
           allDepartmentRelations.push(...ministryRelations);
         }
 
+        // After fetching allDepartmentRelations, filter out same-day entries
+        allDepartmentRelations = allDepartmentRelations.filter(relation => {
+          if (!relation.endTime) return true;
+          const start = new Date(relation.startTime).toISOString().split('T')[0];
+          const end = new Date(relation.endTime).toISOString().split('T')[0];
+          return start !== end;
+        });
         const enriched = [];
 
         for (const relation of allDepartmentRelations) {
@@ -156,7 +162,6 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
             });
           }
         }
-
         // Find gaps by grouping by ministry
         const gapsToFill = [];
         const byMinistry = {};
@@ -240,13 +245,14 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
         // Add identified gaps to enriched array
         enriched.push(...gapsToFill);
 
-        // fill gaps with presidents
+        // In the president filling loop:
         for (const entry of enriched) {
           if (!entry.minister) {
             const entryStart = new Date(entry.startTime);
             const entryEnd = entry.endTime ? new Date(entry.endTime) : null;
 
             const presRelKeys = Object.keys(presidentRelationDict);
+
             let matchingPresidentRelation = null;
 
             for (const key of presRelKeys) {
@@ -264,7 +270,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
 
               const hasOverlap =
                 (!entryEnd && !presEnd) ||
-                (overlapEnd && overlapStart < overlapEnd);
+                (overlapEnd && overlapStart <= overlapEnd);
 
               if (hasOverlap) {
                 matchingPresidentRelation = presRel;
@@ -277,10 +283,20 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                 (p) => p.id === matchingPresidentRelation.id
               );
               if (pres) {
+                // Calculate overlap times
+                const presStart = new Date(matchingPresidentRelation.startTime);
+                const presEnd = matchingPresidentRelation.endTime ? new Date(matchingPresidentRelation.endTime) : null;
+
+                const overlapStart = entryStart > presStart ? entryStart : presStart;
+                const overlapEnd = entryEnd && presEnd ? (entryEnd < presEnd ? entryEnd : presEnd) : (entryEnd || presEnd);
+
                 entry.minister = {
                   id: pres.id,
                   name: pres.name,
                 };
+
+                entry.startTime = overlapStart.toISOString();
+                entry.endTime = overlapEnd ? overlapEnd.toISOString() : null;
               }
             }
           }
@@ -292,13 +308,6 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
           (a, b) => new Date(a.startTime) - new Date(b.startTime)
         )) {
           const last = collapsed[collapsed.length - 1];
-
-          const entryMinName = entry.minister
-            ? utils.extractNameFromProtobuf(entry.minister.name)
-            : null;
-          const lastMinName = last?.minister
-            ? utils.extractNameFromProtobuf(last.minister.name)
-            : null;
           const entryName = utils.extractNameFromProtobuf(entry.name);
           const lastName = last ? utils.extractNameFromProtobuf(last.name) : null;
 
@@ -359,17 +368,15 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                           background: isDark ? "#101828" : "#f8f8f8",
                           color: isDark ? "#f8f8f8" : "#0b0b0b",
                           boxShadow: "none",
-                          border: `1px solid  ${
-                            isDark ? "#364153" : "#dbdbdb"
-                          }`,
+                          border: `1px solid  ${isDark ? "#364153" : "#dbdbdb"
+                            }`,
                         }}
                         className={idx}
                         contentStyle={{
                           background: isDark ? "#101828" : "#f8f8f8",
                           color: isDark ? "#f8f8f8" : "#0b0b0b",
-                          border: `1px solid  ${
-                            isDark ? "#364153" : "#dbdbdb"
-                          }`,
+                          border: `1px solid  ${isDark ? "#364153" : "#dbdbdb"
+                            }`,
                           boxShadow: "none",
                           padding: "10px",
                           paddingTop: "0px",
@@ -377,21 +384,19 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                           marginTop: "15px",
                         }}
                         contentArrowStyle={{
-                          borderRight: `7px solid  ${
-                            isDark ? "#364153" : "#dbdbdb"
-                          }`,
+                          borderRight: `7px solid  ${isDark ? "#364153" : "#dbdbdb"
+                            }`,
                         }}
                         date={
                           entry.startTime
                             ? `${new Date(entry.startTime)
-                                .toISOString()
-                                .slice(0, 10)} - ${
-                                entry.endTime
-                                  ? new Date(entry.endTime)
-                                      .toISOString()
-                                      .slice(0, 10)
-                                  : "Present"
-                              }`
+                              .toISOString()
+                              .slice(0, 10)} - ${entry.endTime
+                                ? new Date(entry.endTime)
+                                  .toISOString()
+                                  .slice(0, 10)
+                                : "Present"
+                            }`
                             : ""
                         }
                         dateClassName={"text-primary/65"}
