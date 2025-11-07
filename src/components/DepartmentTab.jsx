@@ -173,6 +173,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                             message="Total of departments under the minister on this date"
                             iconColor={colors.textPrimary}
                             iconSize={14}
+                            placement="right"
                           />
                         </Typography>
                       </Box>
@@ -213,6 +214,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                             message="Total of newly added departments to this minister on this date"
                             iconColor={colors.textPrimary}
                             iconSize={14}
+                            placement="right"
                           />
                         </Typography>
                       </Box>

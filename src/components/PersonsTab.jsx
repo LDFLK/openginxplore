@@ -165,6 +165,7 @@ const PersonsTab = ({ selectedDate }) => {
                           message="Total people under the minister on this date"
                           iconColor={colors.textPrimary}
                           iconSize={14}
+                          placement="right"
                         />
                       </Typography>
                     </Box>
@@ -205,6 +206,7 @@ const PersonsTab = ({ selectedDate }) => {
                           message="New people assigned to this ministry on this date"
                           iconColor={colors.textPrimary}
                           iconSize={14}
+                          placement="right"
                         />
                       </Typography>
                     </Box>

@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import PersonHistoryTimeline from "../components/PersonHistoryTimeline";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import { ChevronLeft, ImageOff, Landmark, UserRound } from "lucide-react";
+import InfoTooltip from "../../../components/InfoToolTip";
 
 const PersonProfile = () => {
   const { personId } = useParams();
@@ -92,6 +93,8 @@ const PersonProfile = () => {
                 icon: <Landmark className="text-primary/50" />,
                 label: "Ministries Worked At",
                 value: workedMinistries,
+                showTooltip: workedAsPresident > 0, 
+                tooltipMessage: "also includes ministries inherited from previous presidency before releasing own cabinet",
               },
               {
                 icon: <UserRound className="text-primary/50" />,
@@ -99,19 +102,30 @@ const PersonProfile = () => {
                 value: workedAsPresident,
               },
             ]
-            .filter((item) => !(item.label === "Worked as President" && (!item.value || item.value === 0)))
-            .map((item, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between flex-wrap gap-2 mb-3 w-full text-sm sm:text-base"
-              >
-                <p className="flex items-center gap-2 font-normal text-primary/75">
-                  {item.icon}
-                  {item.label}
-                </p>
-                <p className="text-primary/75">{item.value}</p>
-              </div>
-            ))}
+              .filter(
+                (item) =>
+                  !(item.label === "Worked as President" && (!item.value || item.value === 0))
+              )
+              .map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex justify-between flex-wrap gap-1 mb-3 w-full text-sm sm:text-base"
+                >
+                  <p className="flex items-center gap-2 font-normal text-primary/75">
+                    {item.icon}
+                    {item.label}
+                    {item.showTooltip && item.tooltipMessage && (
+                      <InfoTooltip
+                        message={item.tooltipMessage}
+                        placement="right"
+                        iconColor="#888"
+                        iconSize={14}
+                      />
+                    )}
+                  </p>
+                  <p className="text-primary/75">{item.value}</p>
+                </div>
+              ))}
           </div>
         </div>
       </div>
