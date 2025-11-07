@@ -66,6 +66,7 @@ export default function DepartmentProfile() {
             message="Ministers the department was under throughout the history"
             iconColor={colors.textPrimary}
             iconSize={14}
+            placement="right"
           />
         </p>
       </div>

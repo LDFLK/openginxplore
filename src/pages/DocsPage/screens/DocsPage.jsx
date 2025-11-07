@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { CopyButton } from "../components/CopyButton";
 
 const GITHUB_USERNAME = "ldflk";
-const REPO_NAME = "orgchart";
+const REPO_NAME = "openginxplore";
 const DOCS_BRANCH = "main";
 
 export default function DocsPage() {
@@ -409,10 +409,10 @@ export default function DocsPage() {
                             const isGlossaryLink = href?.includes("file=glossary") || href?.startsWith("#");
                             const isInternal = href?.startsWith("/");
 
-                            const showArrow = isExternal || isGlossaryLink || isInternal;
+                            const showArrow = isExternal || isInternal;
 
-                            const linkClass = isExternal
-                                ? "text-blue-600 underline hover:text-blue-800 font-medium"
+                            const linkClass = isExternal || isGlossaryLink || isInternal
+                                ? "text-blue-600 hover:text-blue-800 font-medium"
                                 : "font-medium text-gray-800 hover:text-gray-900";
 
                             // Always open in new tab

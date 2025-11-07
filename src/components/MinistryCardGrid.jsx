@@ -497,6 +497,7 @@ const MinistryCardGrid = () => {
                     message="Number of ministry portfolios active on the selected date"
                     iconColor={colors.textPrimary}
                     iconSize={13}
+                    placement="right"
                   />
                 </Typography>
                 <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
@@ -515,6 +516,7 @@ const MinistryCardGrid = () => {
                     message="New ministry portfolios created on selected date"
                     iconColor={colors.textPrimary}
                     iconSize={13}
+                    placement="right"
                   />
                 </Typography>
                 <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
@@ -533,6 +535,7 @@ const MinistryCardGrid = () => {
                     message="New ministers assigned to portfolios on selected date"
                     iconColor={colors.textPrimary}
                     iconSize={13}
+                    placement="right"
                   />
                 </Typography>
                 <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
@@ -555,9 +558,10 @@ const MinistryCardGrid = () => {
                   <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
                     Ministries under president{" "}
                     <InfoTooltip
-                      message="Ministry portfolios under the president on selected date"
+                      message="Ministry portfolios under the president on selected date (may include ministries inherited from previous presidency before releasing own cabinet)"
                       iconColor={colors.textPrimary}
                       iconSize={13}
+                      placement="right"
                     />
                   </Typography>
                   <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
