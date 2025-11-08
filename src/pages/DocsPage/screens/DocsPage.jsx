@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "../components/CopyButton";
+import { TextWithCitations } from "../components/TextWithCitation";
 
 const GITHUB_USERNAME = "ldflk";
 const REPO_NAME = "openginxplore";
@@ -494,7 +495,11 @@ export default function DocsPage() {
                             );
                         },
 
-                        p: ({ node, ...props }) => <p className="mb-5 leading-relaxed text-gray-700" {...props} />,
+                        p: ({ node, children, ...props }) => (
+                            <p className="mb-5 leading-relaxed text-gray-700" {...props}>
+                                <TextWithCitations>{children}</TextWithCitations>
+                            </p>
+                        ),
                         a: ({ href, children, ...props }) => {
                             const isExternal = href?.startsWith("http://") || href?.startsWith("https://");
                             const isGlossaryLink = href?.includes("file=glossary") || href?.startsWith("#");
@@ -550,7 +555,9 @@ export default function DocsPage() {
                             <ol className="list-decimal pl-6 mb-5 space-y-1 text-gray-700" {...props} />
                         ),
                         li: ({ node, ...props }) => (
-                            <li className="ml-2 leading-relaxed" {...props} />
+                            <li className="ml-2 leading-relaxed">
+                                <TextWithCitations>{props.children}</TextWithCitations>
+                            </li>
                         ),
                     }}
                 >
