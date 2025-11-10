@@ -322,7 +322,28 @@ export default function PresidencyTimeline() {
                     }}
                   >
                     <Tooltip
-                      title="Gazette published date"
+                      title={
+                        <Box>
+                          <p className="text-md">Gazette Sources</p>
+                          <ul style={{ margin: 0, paddingLeft: "1.2em" }}>
+                            {item.gazetteId &&
+                              item.gazetteId.map((id, index) => (
+                                <li key={id}>
+                                  <a
+                                    href={`https://archives.opendata.lk/?search=id%3A${id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:text-accent text-md"
+                                  >
+                                    {`${index+1})
+                                    ${id}`}
+                                  </a>
+                                </li>
+                              ))}
+                          </ul>
+                        </Box>
+                      }
+                      children={"hellow hello"}
                       placement="top"
                       arrow
                     >
@@ -428,7 +449,7 @@ export default function PresidencyTimeline() {
             mt: "-50px",
             mb: "30px",
             fontSize: "0.95rem",
-            color: `${colors.textPrimary}99`
+            color: `${colors.textPrimary}99`,
           }}
         >
           Gazettes published dates

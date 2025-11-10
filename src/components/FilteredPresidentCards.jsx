@@ -89,10 +89,10 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
     const filteredDates = gazetteDateClassic
       .filter((d) => {
-        const dd = new Date(d);
+        const dd = new Date(d.date);
         return dd >= finalStart && dd < finalEnd;
       })
-      .map((date) => ({ date }));
+      .map((date) => (date));
 
     dispatch(setGazetteData(filteredDates));
 

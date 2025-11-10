@@ -267,7 +267,7 @@ const XploreGovHomepage = () => {
                   <span
                     key={idx}
                     className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
-                      currentIndex === idx ? "bg-white" : "bg-gray-500"
+                      currentIndex === idx ? "bg-accent" : "bg-accent/25"
                     }`}
                     onClick={() => setCurrentIndex(idx)}
                   ></span>

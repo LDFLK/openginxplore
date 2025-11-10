@@ -6,7 +6,7 @@ export default function InfoTooltip({
     message,
     placement = "top",
     iconColor = colors.textSearch,
-    iconSize = 16 // px
+    iconSize = 16 
 }) {
     return (
         <Tooltip title={message} placement={placement} arrow>

@@ -40,13 +40,9 @@ const PersonProfile = () => {
 
   const tabOptions = ["History"];
 
-  useEffect(() => {
-    console.log(state.from == "");
-  }, [state]);
-
   return (
     <div className="px-3 py-6 md:px-12 md:py-8 lg:px-18 xl:px-24 2xl:px-36 w-full bg-background-dark min-h-screen">
-      {state.from !== "" ? (
+      {state.from && state.from !== "" ? (
         <button
           onClick={() => navigate(state.from,{ state: {from: state.callback == true && state.callbackLink} })}
           className="flex items-center mb-2 text-primary cursor-pointer"
@@ -60,7 +56,7 @@ const PersonProfile = () => {
           className="flex items-center mb-2 text-primary cursor-pointer"
         >
           <ChevronLeft className="text-primary"/>
-          <p className="text-primary">Go to XploreGov</p>
+          <p className="text-primary">Go to OpenGINXplore</p>
         </button>
       )}
       <div className="flex justify-end items-center my-2">
@@ -94,7 +90,7 @@ const PersonProfile = () => {
                 label: "Ministries Worked At",
                 value: workedMinistries,
                 showTooltip: workedAsPresident > 0, 
-                tooltipMessage: "also includes ministries inherited from previous presidency before releasing own cabinet",
+                tooltipMessage: "This may include ministers inherited from the previous administration before the president released their own cabinet.",
               },
               {
                 icon: <UserRound className="text-primary/50" />,

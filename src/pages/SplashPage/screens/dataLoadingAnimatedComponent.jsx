@@ -175,7 +175,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
     try {
       // console.log("fetching all gazette data");
       const response = await api.fetchInitialGazetteData();
-      dispatch(setGazetteDataClassic(response.dates));
+      dispatch(setGazetteDataClassic(response));
     } catch (e) {
       setShowServerError(true);
       console.log(`Error fetching gazette dates : ${e.message}`);

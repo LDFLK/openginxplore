@@ -14,7 +14,7 @@ export default function Footer() {
             rel="noopener noreferrer"
           >
             <p className="text-primary/75 text-sm">
-              <span className="hover:text-white">Open Data</span> ©{" "}
+              <span className="hover:text-accent">Open Data</span> ©{" "}
               {new Date().getFullYear()}. All rights reserved.
             </p>
           </a>
@@ -25,7 +25,7 @@ export default function Footer() {
               href="https://discord.gg/wYKFyVEY"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-gray-400 hover:text-white transition-all duration-200 hover:scale-110"
+              className="p-2 text-primary/75 hover:text-accent transition-all duration-200 hover:scale-110"
             >
               <MessageSquare className="w-5 h-5" />
             </a>
@@ -33,7 +33,7 @@ export default function Footer() {
               href="https://www.linkedin.com/company/lankadata/"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-gray-400 hover:text-white transition-all hover:scale-110"
+              className="p-2 text-primary/75 hover:text-accent transition-all hover:scale-110"
             >
               <Linkedin className="w-5 h-5" />
             </a>
@@ -41,7 +41,7 @@ export default function Footer() {
               href="https://github.com/LDFLK"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-gray-400 hover:text-white transition-all duration-200 hover:scale-110"
+              className="p-2 text-primary/75 hover:text-accent transition-all duration-200 hover:scale-110"
             >
               <Github className="w-5 h-5" />
             </a>
