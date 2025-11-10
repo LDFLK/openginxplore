@@ -3,7 +3,7 @@ import { Github, Linkedin, MessageSquare } from "lucide-react";
 export default function Footer() {
   return (
     <footer
-      className={`relative z-100 border-t border-border px-2 lg:px-6`}
+      className={`absolute bottom-0 z-100 border-t border-border px-2 lg:px-6 w-full`}
     >
       <div className="py-6 p-2 md:px-14 lg:px-24 xl:px-56 mx-auto">
         <div className="flex items-center justify-between">
@@ -14,8 +14,8 @@ export default function Footer() {
             rel="noopener noreferrer"
           >
             <p className="text-primary/75 text-sm">
-              <span className="hover:text-white">Open Data</span> @
-              {new Date().getFullYear()}. // All rights reserved.
+              <span className="hover:text-white">Open Data</span> ©{" "}
+              {new Date().getFullYear()}. All rights reserved.
             </p>
           </a>
 

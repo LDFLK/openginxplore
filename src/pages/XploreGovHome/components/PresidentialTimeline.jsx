@@ -59,13 +59,6 @@ export default function PresidentialTimeline() {
             ref={timelineRef}
             className="relative rounded-xl p-1 mt-6 overflow-hidden transition-colors duration-300"
         >
-            {/* --- Title Section --- */}
-            <div className="mb-3">
-                <div className="text-sm text-primary font-accent">Official Gazette Timeline</div>
-                <div className="text-xs text-primary/70">
-                    timeline with key gazette publication dates
-                </div>
-            </div>
 
             {/* --- Image Section--- */}
             <div className="relative w-full">

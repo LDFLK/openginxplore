@@ -90,20 +90,20 @@ const XploreGovHomepage = () => {
         </div>
         <div className="absolute bottom-4 left-4 right-4">
           <div className="text-xs text-gray-300 mb-2">
-            Live Government Structure
+            Live Organizational Structure
           </div>
           <div className="flex space-x-4 text-xs">
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-              <span className="text-gray-400">Ministries</span>
+              <span className="text-gray-400">Personal</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-gray-400">Departments</span>
+              <span className="text-gray-400">Organization</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span className="text-gray-400">Officials</span>
+              <span className="text-gray-400">Geo-Location</span>
             </div>
           </div>
         </div>
@@ -137,13 +137,15 @@ const XploreGovHomepage = () => {
             {/* Left Text Section */}
             <div className="flex-1 justify-center text-center lg:text-left mt-10 xl:mt-22">
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-primary leading-tight">
-                Explore Sri Lanka’s <br />
-                <span className="text-accent">Government Structure</span>
+                Explore and Ignite <br />
+                <span className="text-accent"> Insights from Data</span>
               </h2>
               <div className="w-full flex justify-center lg:justify-start">
                 <p className="text-muted-foreground text-sm text-center lg:text-left md:text-md xl:text-lg max-w-lg mt-2 flex justify-center">
-                  Gain deep insights into how ministries, departments, and
-                  officials are connected and how they evolve through time.
+                  OpenGINXplore is your entry point into the OpenGIN ecosystem -
+                  an open environment for exploring, connecting, and
+                  understanding data through interactive applications that turn
+                  information into insights.
                 </p>
               </div>
               <div className="flex mt-6 justify-center lg:justify-start">
@@ -152,7 +154,9 @@ const XploreGovHomepage = () => {
                   onClick={() => navigate("/organization")}
                 >
                   <History className="w-6 h-6 mr-2" />
-                  <span className="text-sm md:text-normal">Xplore</span>
+                  <span className="text-sm md:text-normal">
+                    Quick Application
+                  </span>
                   <ChevronRight className="w-6 h-6" />
                 </button>
                 <Link
@@ -176,7 +180,7 @@ const XploreGovHomepage = () => {
                   style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                 >
                   {/* Card 1 */}
-                  <div className="min-w-full xl:h-[66vh] px-2 border rounded-2xl border-border bg-foreground/8 shadow-2xl">
+                  <div className="min-w-full xl:h-[56vh] px-2 border rounded-2xl border-border bg-foreground/8 shadow-2xl">
                     {/* Soft light gradient overlay for frosted effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
@@ -188,10 +192,11 @@ const XploreGovHomepage = () => {
                         </div>
                         <div>
                           <h3 className="text-normal md:text-xl font-semibold text-primary/80">
-                            Organization Structure Visualization
+                            Data Evolution Tracking
                           </h3>
                           <p className="text-sm md:text-sm text-primary/60">
-                            Track changes across leadership and time
+                            Track how entities and their connections evolve over
+                            time
                           </p>
                         </div>
                       </div>
@@ -204,13 +209,13 @@ const XploreGovHomepage = () => {
                         <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-500/10 border-l-4 border-blue-400/80 backdrop-blur-sm">
                           <Calendar className="w-4 h-4 text-blue-400" />
                           <span className="text-sm text-primary/75">
-                            Presidential term transitions
+                            Role Transitions
                           </span>
                         </div>
                         <div className="flex items-center space-x-3 p-3 rounded-lg bg-purple-500/10 border-l-4 border-purple-400/80 backdrop-blur-sm">
                           <GitBranch className="w-4 h-4 text-purple-400" />
                           <span className="text-sm text-primary/75">
-                            Ministry restructuring events
+                            Organizational Restructuring
                           </span>
                         </div>
                       </div>
@@ -218,7 +223,7 @@ const XploreGovHomepage = () => {
                   </div>
 
                   {/* Card 2 */}
-                  <div className="min-w-full xl:h-[66vh] px-2 border rounded-2xl border-border bg-foreground/8 shadow-2xl">
+                  <div className="min-w-full xl:h-[56vh] px-2 border rounded-2xl border-border bg-foreground/8 shadow-2xl">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
                     <div className="rounded-2xl px-1 py-2 md:p-4 lg:p-6 transition-all duration-300 group">
@@ -242,13 +247,13 @@ const XploreGovHomepage = () => {
                         <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-500/10 border-l-4 border-blue-400/80 backdrop-blur-sm">
                           <Building2 className="w-4 h-4 text-blue-400" />
                           <span className="text-sm text-primary/75">
-                            Ministry-Department relationships
+                            Relationships Between Elements
                           </span>
                         </div>
                         <div className="flex items-center space-x-3 p-3 rounded-lg bg-purple-500/10 border-l-4 border-purple-400/80 backdrop-blur-sm">
                           <Users className="w-4 h-4 text-purple-400" />
                           <span className="text-sm text-primary/75">
-                            Official role connections
+                            Role and Connection Mapping
                           </span>
                         </div>
                       </div>
