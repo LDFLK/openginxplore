@@ -64,7 +64,7 @@ export default function OpenginXplore() {
     }
   }, [presidents, presidentRelationDict]);
 
-  const dates = gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
+  const dates = gazetteDateClassic && gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
 
   useEffect(() => {
     const isVisited = localStorage.getItem("OpenGINXploreVisit");
