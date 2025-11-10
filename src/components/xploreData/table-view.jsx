@@ -1,8 +1,7 @@
-"use client";
-
 import { useState, useMemo } from "react";
-import { ChevronUp, ChevronDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import formatText from "../../utils/common_functions";
+import { ExportButton } from "./export-button";
 
 export function DataTable({ columns, rows, title }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,7 +75,7 @@ export function DataTable({ columns, rows, title }) {
           className="p-2 rounded-sm border border-border text-primary"
         />
 
-        {/* <ExportButton columns={columns} rows={rows} filename={title} /> */}
+        <ExportButton columns={columns} rows={rows} filename={title} />
       </div>
 
       {/* Table */}

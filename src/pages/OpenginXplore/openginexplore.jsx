@@ -64,7 +64,6 @@ export default function OpenginXplore() {
     }
   }, [presidents, presidentRelationDict]);
 
-  console.log(gazetteDateClassic)
   const dates = gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
 
   useEffect(() => {
