@@ -23,16 +23,11 @@ export default function DepartmentProfile() {
     }
   }, [departmentId, allDepartmentData]);
 
-  useEffect(() => {
-    console.log("state : ");
-    console.log(state);
-  }, [state]);
-
   const { colors } = useThemeContext();
   return (
     <div className="px-3 py-6 md:px-12 md:py-8 lg:px-18 xl:px-24 2xl:px-36 w-full bg-background-dark min-h-screen">
       <div className="w-full flex justify-between items-center">
-        {state.from !== "" ? (
+        {state.from && state.from !== "" ? (
         <button
           onClick={() => navigate(state.from)}
           className="flex items-centertext-primary cursor-pointer"
@@ -46,7 +41,7 @@ export default function DepartmentProfile() {
           className="flex items-center mb-2 text-primary cursor-pointer"
         >
           <ChevronLeft className="text-primary" />
-          <p className="text-primary">Go to XploreGov</p>
+          <p className="text-primary">Go to OpenGINXplore</p>
         </button>
       )}
           <ShareLinkButton />

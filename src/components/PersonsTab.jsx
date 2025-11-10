@@ -281,7 +281,7 @@ const PersonsTab = ({ selectedDate }) => {
                       borderRadius: "5px",
                       // backgroundColor: selectedPresident.themeColorLight,
                       // color: colors.white,
-                      backgroundColor: colors.backgroundBlue,
+                      // backgroundColor: colors.backgroundBlue,
                       color: selectedPresident.themeColorLight,
                       border: `1px solid ${selectedPresident.themeColorLight}`,
                       fontFamily: "poppins",

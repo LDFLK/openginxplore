@@ -558,7 +558,7 @@ const MinistryCardGrid = () => {
                   <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
                     Ministries under president{" "}
                     <InfoTooltip
-                      message="Ministry portfolios under the president on selected date (may include ministries inherited from previous presidency before releasing own cabinet)"
+                      message="The number of minister portfolios assigned to the president - if the president is newly elected and has not released a cabinet yet, all ministers from the prior cabinet are temporarily assigned to them."
                       iconColor={colors.textPrimary}
                       iconSize={13}
                       placement="right"
