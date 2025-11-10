@@ -1,7 +1,7 @@
 import utils from "../utils/utils";
 
 const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
-// const apiUrl = "";
+// const apiUrl = // "";
 
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
@@ -43,15 +43,38 @@ const fetchInitialGazetteData = async () => {
     const result = await response.json();
     const resultForPerson = await responseForPerson.json();
 
-    const datesList1 = result.body.map((item) => item.created?.split("T")[0]);
-    const datesList2 = resultForPerson.body.map(
-      (item) => item.created?.split("T")[0]
-    );
+    const datesList1 = result.body.map((item) => {
+      return {
+        date: item.created?.split("T")[0],
+        gazetteId: [utils.extractNameFromProtobuf(item.name)],
+      };
+    });
+    const datesList2 = resultForPerson.body.map((item) => {
+      return {
+        date: item.created?.split("T")[0],
+        gazetteId: [utils.extractNameFromProtobuf(item.name)],
+      };
+    });
 
     const mergedDateList1 = datesList1.concat(datesList2).sort();
-    const dates = Array.from(new Set(mergedDateList1));
+    // const dates = Array.from(new Set(mergedDateList1));
 
-    return { dates, allMinistryData: result.body };
+    const merged = Object.values(
+      mergedDateList1.reduce((acc, { date, gazetteId }) => {
+        if (!acc[date]) {
+          acc[date] = { date, gazetteId: [...gazetteId] };
+        } else {
+          acc[date].gazetteId.push(...gazetteId);
+        }
+        return acc;
+      }, {})
+    ).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    console.log(Object.keys(mergedDateList1).length)
+
+    console.log('merged ', merged)
+
+    return merged;
   } catch (error) {
     console.error("Error fetching initial gazette data from API:", error);
     return {
@@ -89,7 +112,6 @@ const fetchActiveMinistries = async (
   selectedPresident
 ) => {
   try {
-
     const response = await fetch(
       `${apiUrl}/v1/entities/${selectedPresident.id}/relations`,
       {
@@ -268,22 +290,33 @@ const fetchAllMinistries = async () => {
   return response;
 };
 
-const fetchAllRelationsForMinistry = async ({ministryId,relatedEntityId="",startTime="",endTime="",id="",name="",activeAt=""}) => {
+const fetchAllRelationsForMinistry = async ({
+  ministryId,
+  relatedEntityId = "",
+  startTime = "",
+  endTime = "",
+  id = "",
+  name = "",
+  activeAt = "",
+}) => {
   try {
-    const response = await fetch(`${apiUrl}/v1/entities/${ministryId}/relations`, {
-      method: "POST",
-      body: JSON.stringify({
-        relatedEntityId: relatedEntityId,
-        startTime: startTime,
-        endTime:endTime,
-        id: id,
-        name: name,
-        activeAt: activeAt,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${apiUrl}/v1/entities/${ministryId}/relations`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          relatedEntityId: relatedEntityId,
+          startTime: startTime,
+          endTime: endTime,
+          id: id,
+          name: name,
+          activeAt: activeAt,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`API error: ${response.statusText}`);
@@ -437,5 +470,5 @@ export default {
   fetchPresidentsData,
   chatbotApiCall,
   getDepartmentRenamedInfo,
-  getMinistriesByPerson
+  getMinistriesByPerson,
 };
