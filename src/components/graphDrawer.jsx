@@ -87,14 +87,10 @@ export default function Drawer({
     setVisibleCount(BATCH_SIZE);
   }, [parentNode, selectedTab, ministryDic, departmentDic, personDic]);
 
-  useEffect(() => {
-    console.log("loading ", loading);
-  }, [loading]);
-
   return (
     <div
-      className={`${expandDrawer ? "w-1/3" : "w-0"
-        } z-[1000] transition-all duration-300 ease-in-out h-full shadow-xl p-4 flex-shrink-0 bg-background-dark`}
+      className={`overflow-hidden ${expandDrawer ? "w-1/3 p-4" : "w-0"
+        } transition-all duration-300 ease-in-out border-border border-l h-full flex-shrink-0 bg-background-dark`}
       style={{
         overflow: expandDrawer ? "visible" : "hidden",
       }}
@@ -103,7 +99,7 @@ export default function Drawer({
       {!expandDrawer && (
         <button
           className={`${!expandDrawer
-            ? "rounded-l-full bg-accent text-background text-5xl p-1 absolute right-4 cursor-pointer shadow-xl"
+            ? "rounded-l-full bg-accent text-background text-5xl p-1 absolute top-2 right-0 cursor-pointer shadow-xl"
             : ""
             }`}
           onClick={() => setExpandDrawer(true)}

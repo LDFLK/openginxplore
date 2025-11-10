@@ -644,7 +644,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
 
   return (
     <>
-      <div className="flex h-screen w-full">
+      <div className="flex h-screen w-full relative">
         <div
           className={`${
             expandDrawer ? "w-2/3" : "w-full"
@@ -662,7 +662,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
             >
               {webgl &&
                 (graphData.nodes.length > 0 && graphData.links.length > 0 ? (
-                  <div className="relative">
+                  <div className="relative overflow-hidden">
                     {graphParent && (
                       <button
                         onClick={handleBackClick}
