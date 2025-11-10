@@ -209,27 +209,24 @@ export default function YearRangeSelector({
   }, [presidentsArray, presidentRelationDict]);
 
   // Preprocess dates into a lookup: year -> month -> count
-  const dateCounts = dates.reduce((acc, d) => {
-    const dt = new Date(d);
-    const year = dt.getUTCFullYear();
-    const month = dt.getUTCMonth(); // 0 = Jan, 11 = Dec
-    if (!acc[year]) acc[year] = Array(12).fill(0);
-    acc[year][month] += 1;
-    return acc;
-  }, {});
-
-  // Generate mini chart data
-  const yearData = useRef(
-    years.reduce((acc, year) => {
-      if (dateCounts[year]) {
-        acc[year] = dateCounts[year];
-      } else {
-        // fallback: zero for months with no data
-        acc[year] = Array.from({ length: 12 }, () => 0);
-      }
+  const dateCounts = useMemo(() => {
+    if (!Array.isArray(dates) || dates.length === 0) return {};
+    return dates.reduce((acc, d) => {
+      const dt = new Date(d);
+      const year = dt.getUTCFullYear();
+      const month = dt.getUTCMonth();
+      if (!acc[year]) acc[year] = Array(12).fill(0);
+      acc[year][month] += 1;
       return acc;
-    }, {})
-  ).current;
+    }, {});
+  }, [dates]);
+
+  const yearData = useMemo(() => {
+    return years.reduce((acc, year) => {
+      acc[year] = dateCounts[year] || Array(12).fill(0);
+      return acc;
+    }, {});
+  }, [years, dateCounts]);
 
   // Update yearData when years array changes
   useEffect(() => {

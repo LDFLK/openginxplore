@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "../components/CopyButton";
+import { TextWithCitations } from "../components/TextWithCitation";
 
 const GITHUB_USERNAME = "ldflk";
-const REPO_NAME = "orgchart";
+const REPO_NAME = "openginxplore";
 const DOCS_BRANCH = "main";
 
 export default function DocsPage() {
@@ -15,6 +16,7 @@ export default function DocsPage() {
     const [currentHash, setCurrentHash] = useState(
         window.location.hash?.replace("#", "") || ""
     );
+    const [collapsedSections, setCollapsedSections] = useState(new Set());
 
     const contentRef = useRef(null);
     const pendingFileRef = useRef(null);
@@ -200,11 +202,27 @@ export default function DocsPage() {
             const newUrl = `?file=${fileSlug}#${h.hash}`;
             window.history.replaceState(null, "", newUrl);
             setCurrentHash(h.hash);
+            
+            // Auto-expand parent section if clicking a child heading
+            if (h.level === 3) {
+                const parentHeading = headings.find(
+                    (parent) => parent.level === 2 && h.hash.startsWith(parent.hash + "-")
+                );
+                if (parentHeading) {
+                    setCollapsedSections((prev) => {
+                        const next = new Set(prev);
+                        next.delete(parentHeading.hash);
+                        return next;
+                    });
+                }
+            }
+            
             setTimeout(() => {
                 isManualScrollRef.current = false;
             }, 1000);
         }
     };
+
     // Track active heading based on scroll position
     useEffect(() => {
         if (!activeFile || !headings.length || !contentRef.current) return;
@@ -265,6 +283,20 @@ export default function DocsPage() {
                 const fileSlug = activeFile.slug || activeFile.file.replace(".md", "");
                 const newUrl = `?file=${fileSlug}#${activeHeading.hash}`;
                 window.history.replaceState(null, "", newUrl);
+                
+                // Auto-expand parent section when scrolling into a child heading
+                if (activeHeading.level === 3) {
+                    const parentHeading = headings.find(
+                        (parent) => parent.level === 2 && activeHeading.hash.startsWith(parent.hash + "-")
+                    );
+                    if (parentHeading) {
+                        setCollapsedSections((prev) => {
+                            const next = new Set(prev);
+                            next.delete(parentHeading.hash);
+                            return next;
+                        });
+                    }
+                }
             }
         };
 
@@ -276,6 +308,7 @@ export default function DocsPage() {
             container.removeEventListener("scroll", handleScroll);
         };
     }, [activeFile, headings, currentHash]);
+
     return (
         <div className="flex h-screen bg-gray-50 text-gray-800">
             <nav className="w-90 bg-white border-r border-gray-200 shadow-xs p-4 overflow-y-auto">
@@ -310,22 +343,81 @@ export default function DocsPage() {
                                     }
                                 }}
                             >
-                                {"> "}{f.name.replace(/\b\w/g, (c) => c.toUpperCase())}
+                                {f.name.replace(/\b\w/g, (c) => c.toUpperCase())}
                             </div>
 
                             {activeFile?.file === f.file && (
                                 <ul className="mt-2 ml-3 border-l border-gray-200 pl-3 space-y-1">
                                     {headings.map((h) => {
                                         const isSelected = currentHash === h.hash;
+                                        const hasChildren = h.level === 2 && headings.some(
+                                            (child) => child.level === 3 && child.hash.startsWith(h.hash + "-")
+                                        );
+                                        const isCollapsed = collapsedSections.has(h.hash);
+                                        
+                                        // Only show level 2 headings and level 3 headings whose parent is not collapsed
+                                        const shouldShow = h.level === 2 || (h.level === 3 && (() => {
+                                            const parentHeading = headings.find(
+                                                (parent) => parent.level === 2 && h.hash.startsWith(parent.hash + "-")
+                                            );
+                                            return parentHeading && !collapsedSections.has(parentHeading.hash);
+                                        })());
+                                        
+                                        if (!shouldShow) return null;
+                                        
                                         return (
                                             <li
                                                 key={h.id}
-                                                className={`p-1 cursor-pointer text-sm transition-colors duration-150 ${h.level === 2 ? "font-medium" : ""
-                                                    } ${isSelected ? "text-blue-600" : h.level === 2 ? "text-gray-700" : "text-gray-600"} hover:text-blue-600`}
+                                                className={`p-1 cursor-pointer text-sm transition-colors duration-150 flex items-center gap-1 ${
+                                                    h.level === 2 ? "font-medium" : ""
+                                                } ${
+                                                    isSelected ? "text-blue-600" : h.level === 2 ? "text-gray-700" : "text-gray-600"
+                                                } hover:text-blue-600`}
                                                 style={{ paddingLeft: `${(h.level - 2) * 12}px` }}
-                                                onClick={() => handleHeadingClick(h)}
+                                                onClick={() => {
+                                                    if (hasChildren) {
+                                                        setCollapsedSections((prev) => {
+                                                            const next = new Set(prev);
+                                                            if (next.has(h.hash)) {
+                                                                next.delete(h.hash);
+                                                            } else {
+                                                                next.add(h.hash);
+                                                            }
+                                                            return next;
+                                                        });
+                                                    } else {
+                                                        handleHeadingClick(h);
+                                                    }
+                                                }}
                                             >
-                                                {h.text}
+                                                {hasChildren && (
+                                                    <button
+                                                        className="flex-shrink-0 hover:bg-gray-200 rounded p-0.5 transition-transform duration-200"
+                                                        style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+                                                    >
+                                                        <svg
+                                                            width="12"
+                                                            height="12"
+                                                            viewBox="0 0 12 12"
+                                                            fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                d="M3 4.5L6 7.5L9 4.5"
+                                                                stroke="currentColor"
+                                                                strokeWidth="1.5"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                            />
+                                                        </svg>
+                                                    </button>
+                                                )}
+                                                <span
+                                                    className="flex-1"
+                                                    style={{ marginLeft: hasChildren ? '0' : '20px' }}
+                                                >
+                                                    {h.text}
+                                                </span>
                                             </li>
                                         );
                                     })}
@@ -403,16 +495,20 @@ export default function DocsPage() {
                             );
                         },
 
-                        p: ({ node, ...props }) => <p className="mb-5 leading-relaxed text-gray-700" {...props} />,
+                        p: ({ node, children, ...props }) => (
+                            <p className="mb-5 leading-relaxed text-gray-700" {...props}>
+                                <TextWithCitations>{children}</TextWithCitations>
+                            </p>
+                        ),
                         a: ({ href, children, ...props }) => {
                             const isExternal = href?.startsWith("http://") || href?.startsWith("https://");
                             const isGlossaryLink = href?.includes("file=glossary") || href?.startsWith("#");
                             const isInternal = href?.startsWith("/");
 
-                            const showArrow = isExternal || isGlossaryLink || isInternal;
+                            const showArrow = isExternal || isInternal;
 
-                            const linkClass = isExternal
-                                ? "text-blue-600 underline hover:text-blue-800 font-medium"
+                            const linkClass = isExternal || isGlossaryLink || isInternal
+                                ? "text-blue-600 hover:text-blue-800 font-medium"
                                 : "font-medium text-gray-800 hover:text-gray-900";
 
                             // Always open in new tab
@@ -459,7 +555,9 @@ export default function DocsPage() {
                             <ol className="list-decimal pl-6 mb-5 space-y-1 text-gray-700" {...props} />
                         ),
                         li: ({ node, ...props }) => (
-                            <li className="ml-2 leading-relaxed" {...props} />
+                            <li className="ml-2 leading-relaxed">
+                                <TextWithCitations>{props.children}</TextWithCitations>
+                            </li>
                         ),
                     }}
                 >
