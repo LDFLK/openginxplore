@@ -160,9 +160,8 @@ export default function OpenginXplore() {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 z-20 h-screen ${
-          isExpanded ? "w-64" : "w-16"
-        } bg-background h-full transition-all ease-in-out flex flex-col items-center p-2 border-r border-border`}
+        className={`fixed top-0 left-0 z-20 h-screen ${isExpanded ? "w-64" : "w-16"
+          } bg-background h-full transition-all ease-in-out flex flex-col items-center p-2 border-r border-border`}
       >
         <TextLogo isExpanded={isExpanded} />
 
@@ -175,22 +174,20 @@ export default function OpenginXplore() {
 
         <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen">
           <button
-            className={`${
-              selectedTab === "organization"
-                ? "bg-accent text-primary-foreground font-semibold"
-                : "hover:bg-background-dark/85"
-            }  hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+            className={`${selectedTab === "organization"
+              ? "bg-accent text-primary-foreground font-semibold"
+              : "hover:bg-background-dark/85"
+              }  hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
             onClick={() => handleTabChange("organization")}
           >
             <Binoculars className="mr-3 flex-shrink-0" size={24} />
             {isExpanded && "Organization"}
           </button>
           <button
-            className={`${
-              selectedTab === "data"
-                ? "bg-accent text-primary-foreground font-semibold"
-                : "hover:bg-background-dark/85"
-            } hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+            className={`${selectedTab === "data"
+              ? "bg-accent text-primary-foreground font-semibold"
+              : "hover:bg-background-dark/85"
+              } hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
             onClick={() => handleTabChange("data")}
           >
             <SquareLibrary className="mr-3 flex-shrink-0" size={24} />
@@ -207,15 +204,16 @@ export default function OpenginXplore() {
 
       {/* Main content */}
       <div
-        className={`flex-1 overflow-auto bg-background-dark transition-all ease-in-out animation ${
-          isExpanded ? "ml-64" : "ml-16"
-        } h-screen`}
+        className={`flex-1 overflow-auto bg-background-dark transition-all ease-in-out animation ${isExpanded ? "ml-64" : "ml-16"
+          } h-screen`}
       >
         {/* Header */}
         <div className="flex justify-between items-center py-2 px-4 md:px-8 lg:px-12 border-b border-border bg-background">
-          <div className="flex gap-2">
-            <img src={SlFlag} width={50} />
-            <h1 className="text-md xl:text-xl font-semibold text-primary">
+          <div className="flex gap-2 flex justify-center items-center">
+            <div className="w-[40px]">
+              <img src={SlFlag} />
+            </div>
+            <h1 className="text-md xl:text-md font-semibold text-primary">
               Sri Lanka
             </h1>
           </div>
