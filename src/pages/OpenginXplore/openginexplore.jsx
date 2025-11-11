@@ -75,19 +75,16 @@ export default function OpenginXplore() {
       setTimeout(() => {
         const toastContent = (
           <div className="w-full">
-            <p className="text-primary">
-              <span className="font-semibold">
-                📢 Welcome to OpenGIN Xplore!
-              </span>{" "}
-              This project is{" "}
-              <Link to={"https://"} target="_blank" rel="noopener noreferrer">
-                <div className="text-accent">
-                  <p>Open Source</p>
-                </div>
-              </Link>{" "}
-              and evolving fast. Your feedback helps us make it better for
-              everyone.
-            </p>
+            <div className="text-primary max-w-prose">
+              <p className="font-semibold">📢 Welcome to OpenGIN Xplore!</p>
+              <p>
+                This project is{" "}
+                <Link to="https://github.com/LDFLK" target="_blank" rel="noopener noreferrer" className="text-accent">
+                  Open Source
+                </Link>{" "}
+                and evolving fast. Your feedback helps us make it better for everyone.
+              </p>
+            </div>
             <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
               <Link
                 to={feedbackFormUrl}
