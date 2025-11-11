@@ -88,7 +88,6 @@ export function DatasetView({ data, setExternalDateRange }) {
         }
       }
       setFetchedDatasets(all);
-      console.log("fetchedDatasets", all);
     };
 
     fetchData();
