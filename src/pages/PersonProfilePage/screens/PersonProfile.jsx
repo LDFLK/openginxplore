@@ -139,7 +139,7 @@ const PersonProfile = () => {
                   ? "border-2 border-border hover:bg-accent"
                   : "bg-background border border-border"
               } cursor-pointer px-6 py-3 bg-background font-semibold text-accent`}
-              onClick={() => setActiveTab(tab)}
+              // onClick={() => setActiveTab(tab)}
             >
               {label}
             </button>
