@@ -136,7 +136,7 @@ const XploreGovHomepage = () => {
           <div className="flex flex-col lg:flex-row justify-between gap-2 mt-0 lg:mt-6">
             {/* Left Text Section */}
             <div className="flex-1 justify-center text-center lg:text-left mt-8 lg:mt-12">
-              <h2 className="text-3xl md:text-4xl lg:text-4xl xl:text-4xl font-bold text-primary leading-tight">
+              <h2 className="text-3xl md:text-4xl lg:text-4xl xl:text-4xl 2xl:text-5xl font-bold text-primary leading-tight">
                 Explore and Ignite <br />
                 <span className="text-accent"> Insights from Data</span>
               </h2>
@@ -173,7 +173,7 @@ const XploreGovHomepage = () => {
 
             {/* Right Cards Section (Auto Slideshow) */}
             <div className="flex-1 w-full lg:w-1/2 mt-8">
-              <div className="relative overflow-hidden rounded-xl">
+              <div className="relative overflow-hidden rounded-xl mb-14 md:mb-8 lg:mb-0">
                 {/* Carousel container */}
                 <div
                   className="flex transition-transform duration-700 ease-in-out"
