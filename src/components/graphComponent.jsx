@@ -402,7 +402,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
       };
 
       const handleContextRestored = () => {
-        console.log("WebGL context restored - checking availability again");
         // Re-check WebGL availability
         const webglAvailable = isWebGLAvailable();
         setWebgl(webglAvailable);

@@ -145,9 +145,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         url.searchParams.set("endDate", urlEndDate);
         window.history.replaceState({}, "", url.toString());
 
-        console.log(
-          ` SelectedDate outside range → overriding to full year: ${urlStartDate} → ${urlEndDate}`
-        );
       }
     }
 
@@ -209,13 +206,10 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     if (prevStart === currStart && prevEnd === currEnd) return;
 
     if (urlInitComplete) {
-      console.log("Skipping first dateRange trigger after URL init");
       setUrlInitComplete(false);
       prevDateRangeRef.current = dateRange;
       return;
     }
-
-    console.log("Date range changed by user, selecting last president");
 
     if (filteredPresidents.length > 0) {
       const lastPresident = filteredPresidents[filteredPresidents.length - 1];

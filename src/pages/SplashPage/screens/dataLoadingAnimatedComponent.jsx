@@ -72,11 +72,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   const fetchPersonData = async () => {
     try {
-      console.log("fetching person data");
-      const startTime = new Date().getTime();
       const personResponse = await api.fetchAllPersons();
-      const endTime = new Date().getTime();
-      console.log(`Time taken to fetch person data: ${endTime - startTime} ms`);
       const personList = await personResponse.json();
       //dispatch(setAllPerson(personList.body));
       const personDict = listToDict(personList.body);
@@ -135,15 +131,8 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   const fetchAllDepartmentData = async () => {
     try {
-      //console.log("fetching all department data");
-      const startTime = new Date().getTime();
       const response = await api.fetchAllDepartments();
-      const endTime = new Date().getTime();
-      console.log(
-        `Time taken to fetch department data: ${endTime - startTime} ms`
-      );
       const departmentList = await response.json();
-      // dispatch(setAllDepartmentData(departmentList.body));
       const departmentDict = listToDict(departmentList.body);
       dispatch(setAllDepartmentData(departmentDict));
     } catch (e) {
@@ -154,15 +143,8 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   const fetchAllMinistryData = async () => {
     try {
-      //console.log("fetching all ministry data");
-      const startTime = new Date().getTime();
       const response = await api.fetchAllMinistries();
-      const endTime = new Date().getTime();
-      console.log(
-        `Time taken to fetch ministry data: ${endTime - startTime} ms`
-      );
       const ministryList = await response.json();
-      // dispatch(setAllMinistryData(ministryList.body));
       const ministryDict = listToDict(ministryList.body);
       dispatch(setAllMinistryData(ministryDict));
     } catch (e) {
@@ -173,7 +155,6 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   const fetchAllGazetteDate = async () => {
     try {
-      // console.log("fetching all gazette data");
       const response = await api.fetchInitialGazetteData();
       dispatch(setGazetteDataClassic(response));
     } catch (e) {

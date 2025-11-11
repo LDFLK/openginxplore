@@ -1,5 +1,19 @@
 import {
-  Box, Grid, Typography, Alert, AlertTitle, Chip, TextField, Select, MenuItem, FormControl, InputLabel, Button, Card, DialogContent, Avatar
+  Box,
+  Grid,
+  Typography,
+  Alert,
+  AlertTitle,
+  Chip,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Card,
+  DialogContent,
+  Avatar,
 } from "@mui/material";
 import MinistryCard from "./MinistryCard";
 import { useSelector, useDispatch } from "react-redux";
@@ -47,7 +61,7 @@ const MinistryCardGrid = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [activeTab, setActiveTab] = useState("departments");
   const [selectedCard, setSelectedCard] = useState(null);
-  const [ministryLoading, setMinistryLoading] = useState(false)
+  const [ministryLoading, setMinistryLoading] = useState(false);
   const { colors } = useThemeContext();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -146,7 +160,9 @@ const MinistryCardGrid = () => {
     delayDebounceFunction = setTimeout(() => {
       let result = activeMinistryList;
 
-      if (filterType === "newPerson") {
+      if (filterType == "all") {
+        result = activeMinistryList;
+      } else if (filterType === "newPerson") {
         result = result.filter((m) => m.newPerson);
       } else if (filterType === "newMinistry") {
         result = result.filter((m) => m.newMin);
@@ -155,15 +171,15 @@ const MinistryCardGrid = () => {
           const headName = m.headMinisterName
             ? utils.extractNameFromProtobuf(m.headMinisterName)
             : selectedPresident?.name
-              ? utils
+            ? utils
                 .extractNameFromProtobuf(selectedPresident.name)
                 .split(":")[0]
-              : null;
+            : null;
 
           const presidentName = selectedPresident?.name
             ? utils
-              .extractNameFromProtobuf(selectedPresident.name)
-              .split(":")[0]
+                .extractNameFromProtobuf(selectedPresident.name)
+                .split(":")[0]
             : null;
 
           return (
@@ -206,11 +222,20 @@ const MinistryCardGrid = () => {
   };
 
   const fetchActiveMinistryList = async () => {
-    if (!selectedDate || !allMinistryData || Object.keys(allMinistryData).length === 0) return;
+    if (
+      !selectedDate ||
+      !allMinistryData ||
+      Object.keys(allMinistryData).length === 0
+    )
+      return;
 
     try {
       setMinistryLoading(true);
-      const activeMinistry = await api.fetchActiveMinistries(selectedDate, allMinistryData, selectedPresident);
+      const activeMinistry = await api.fetchActiveMinistries(
+        selectedDate,
+        allMinistryData,
+        selectedPresident
+      );
 
       const enrichedMinistries = await Promise.all(
         activeMinistry.children.map(async (ministry) => {
@@ -223,7 +248,8 @@ const MinistryCardGrid = () => {
 
           const startTimeMap = new Map();
           res.forEach((relation) => {
-            if (relation.relatedEntityId) startTimeMap.set(relation.relatedEntityId, relation.startTime);
+            if (relation.relatedEntityId)
+              startTimeMap.set(relation.relatedEntityId, relation.startTime);
           });
 
           const personListInDetail = Array.from(startTimeMap.keys())
@@ -235,14 +261,16 @@ const MinistryCardGrid = () => {
             .filter(Boolean);
 
           const headMinisterName = personListInDetail[0]?.name || null;
-          const headMinisterStartTime = personListInDetail[0]?.startTime || null;
+          const headMinisterStartTime =
+            personListInDetail[0]?.startTime || null;
           const headMinisterId = personListInDetail[0]?.id || null;
 
           return {
             ...ministry,
             headMinisterId,
             headMinisterName,
-            newPerson: headMinisterStartTime?.startsWith(selectedDate.date) || false,
+            newPerson:
+              headMinisterStartTime?.startsWith(selectedDate.date) || false,
             newMin: ministry.startTime?.startsWith(selectedDate.date) || false,
           };
         })
@@ -256,7 +284,6 @@ const MinistryCardGrid = () => {
       setMinistryLoading(false);
     }
   };
-
 
   const steps = [
     {
@@ -343,10 +370,9 @@ const MinistryCardGrid = () => {
   return (
     <Box
       sx={{
-        px: 2 ,
+        px: 2,
         mt: -2,
         my: 2,
-
       }}
     >
       <Box
@@ -368,13 +394,18 @@ const MinistryCardGrid = () => {
           backgroundColor: colors.backgroundWhite,
           borderRadius: 2,
           border: "1px solid",
-          borderColor: colors.border
+          borderColor: colors.border,
         }}
       >
         {/* Highlights Box*/}
         <Box
           sx={{
-            gridColumn: { xs: "1 / -1", sm: "1 / -1", md: "1 / -1", lg: "1 / 2" },
+            gridColumn: {
+              xs: "1 / -1",
+              sm: "1 / -1",
+              md: "1 / -1",
+              lg: "1 / 2",
+            },
             display: "flex",
             flexDirection: "column",
             alignItems: "left",
@@ -383,18 +414,34 @@ const MinistryCardGrid = () => {
             overflow: "hidden",
             py: 1.5,
             borderRight: { lg: `1px solid ${colors.timelineColor}` },
-            borderBottom: { xs: `1px solid ${colors.timelineColor}`, lg: "none" },
+            borderBottom: {
+              xs: `1px solid ${colors.timelineColor}`,
+              lg: "none",
+            },
           }}
         >
           <Box sx={{ mt: -0.5 }}>
-            {primeMinister.person && primeMinister.relation && selectedPresident ? (
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", ml: 1.5}}>
+            {primeMinister.person &&
+            primeMinister.relation &&
+            selectedPresident ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                  ml: 1.5,
+                }}
+              >
                 <Avatar
                   src={primeMinister.person.imageUrl}
                   alt={primeMinister.person.name}
-                  sx={{ width: 55, height: 55, backgroundColor: colors.backgroundPrimary }}
+                  sx={{
+                    width: 55,
+                    height: 55,
+                    backgroundColor: colors.backgroundPrimary,
+                  }}
                 />
-                <Box sx={{ display: "block", ml: 1. }}>
+                <Box sx={{ display: "block", ml: 1 }}>
                   <Typography
                     sx={{
                       fontSize: 12,
@@ -405,7 +452,7 @@ const MinistryCardGrid = () => {
                       px: 1,
                       borderRadius: 1,
                       width: "102px",
-                      mb: 0.5
+                      mb: 0.5,
                     }}
                   >
                     Prime Minister
@@ -424,13 +471,22 @@ const MinistryCardGrid = () => {
                   </Typography>
                   <Typography sx={{ fontSize: 14, color: colors.textMuted }}>
                     {primeMinister.relation.endTime
-                      ? `${primeMinister.relation.startTime.split("-")[0]} - ${new Date(primeMinister.relation.endTime).getFullYear()}`
-                      : `${primeMinister.relation.startTime.split("-")[0]} - Present`}
+                      ? `${
+                          primeMinister.relation.startTime.split("-")[0]
+                        } - ${new Date(
+                          primeMinister.relation.endTime
+                        ).getFullYear()}`
+                      : `${
+                          primeMinister.relation.startTime.split("-")[0]
+                        } - Present`}
                   </Typography>
                   <Button
                     component={Link}
                     to={`/person-profile/${primeMinister.person?.id}`}
-                    state={{ mode: "back", from: location.pathname + location.search  }}
+                    state={{
+                      mode: "back",
+                      from: location.pathname + location.search,
+                    }}
                     disableRipple
                     disableElevation
                     sx={{
@@ -460,13 +516,27 @@ const MinistryCardGrid = () => {
                   </Button>
                 </Box>
               </Box>
-            ) : primeMinister.person == null && primeMinister.relation == null && !pmloading ? (
-              <Typography sx={{ fontStyle: "italic", color: colors.textMuted, textAlign: "left" }}>
+            ) : primeMinister.person == null &&
+              primeMinister.relation == null &&
+              !pmloading ? (
+              <Typography
+                sx={{
+                  fontStyle: "italic",
+                  color: colors.textMuted,
+                  textAlign: "left",
+                }}
+              >
                 No Prime Minister appointed on this date.
               </Typography>
             ) : (
               pmloading && (
-                <Typography sx={{ fontStyle: "italic", color: colors.textMuted, textAlign: "left" }}>
+                <Typography
+                  sx={{
+                    fontStyle: "italic",
+                    color: colors.textMuted,
+                    textAlign: "left",
+                  }}
+                >
                   Loading Prime Minister data...
                 </Typography>
               )
@@ -476,22 +546,45 @@ const MinistryCardGrid = () => {
 
         <Card
           sx={{
-            gridColumn: { xs: "1 / -1", sm: "1 / -1", md: "1 / -1", lg: "2 / 3" },
+            gridColumn: {
+              xs: "1 / -1",
+              sm: "1 / -1",
+              md: "1 / -1",
+              lg: "2 / 3",
+            },
             backgroundColor: colors.backgroundWhite,
             boxShadow: "none",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             mb: { xs: 2, md: 0 },
-            borderRadius: 2
+            borderRadius: 2,
           }}
         >
-          <Box sx={{ width: "90%", px: 1, display: "flex", flexDirection: "column", gap: 0.4 }}>
+          <Box
+            sx={{
+              width: "90%",
+              px: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.4,
+            }}
+          >
             {/* Active Ministries */}
             {activeMinistryList.length > 0 && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <AccountBalanceIcon sx={{ color: colors.textMuted, fontSize: 18 }} />
-                <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
+                <AccountBalanceIcon
+                  sx={{ color: colors.textMuted, fontSize: 18 }}
+                />
+                <Typography
+                  sx={{
+                    flex: 1,
+                    fontFamily: "Poppins",
+                    fontWeight: 500,
+                    color: colors.textMuted,
+                    fontSize: 15,
+                  }}
+                >
                   Active Ministries{" "}
                   <InfoTooltip
                     message="Number of ministry portfolios active on the selected date"
@@ -500,7 +593,14 @@ const MinistryCardGrid = () => {
                     placement="right"
                   />
                 </Typography>
-                <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: 17,
+                    fontWeight: 500,
+                    color: colors.textPrimary,
+                  }}
+                >
                   {activeMinistryList.length}
                 </Typography>
               </Box>
@@ -509,8 +609,18 @@ const MinistryCardGrid = () => {
             {/* New Ministries */}
             {activeMinistryList.filter((m) => m.newMin).length > 0 && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <AccountBalanceIcon sx={{ color: colors.textMuted, fontSize: 18 }} />
-                <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
+                <AccountBalanceIcon
+                  sx={{ color: colors.textMuted, fontSize: 18 }}
+                />
+                <Typography
+                  sx={{
+                    flex: 1,
+                    fontFamily: "Poppins",
+                    fontWeight: 500,
+                    color: colors.textMuted,
+                    fontSize: 15,
+                  }}
+                >
                   New Ministries{" "}
                   <InfoTooltip
                     message="New ministry portfolios created on selected date"
@@ -519,7 +629,14 @@ const MinistryCardGrid = () => {
                     placement="right"
                   />
                 </Typography>
-                <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: 17,
+                    fontWeight: 500,
+                    color: colors.textPrimary,
+                  }}
+                >
                   {activeMinistryList.filter((m) => m.newMin).length}
                 </Typography>
               </Box>
@@ -528,8 +645,18 @@ const MinistryCardGrid = () => {
             {/* New Ministers */}
             {activeMinistryList.filter((m) => m.newPerson).length > 0 && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <PersonAddAlt1Icon sx={{ color: colors.textMuted, fontSize: 18 }} />
-                <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
+                <PersonAddAlt1Icon
+                  sx={{ color: colors.textMuted, fontSize: 18 }}
+                />
+                <Typography
+                  sx={{
+                    flex: 1,
+                    fontFamily: "Poppins",
+                    fontWeight: 500,
+                    color: colors.textMuted,
+                    fontSize: 15,
+                  }}
+                >
                   New Ministers{" "}
                   <InfoTooltip
                     message="New ministers assigned to portfolios on selected date"
@@ -538,7 +665,14 @@ const MinistryCardGrid = () => {
                     placement="right"
                   />
                 </Typography>
-                <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: 17,
+                    fontWeight: 500,
+                    color: colors.textPrimary,
+                  }}
+                >
                   {activeMinistryList.filter((m) => m.newPerson).length}
                 </Typography>
               </Box>
@@ -546,41 +680,76 @@ const MinistryCardGrid = () => {
 
             {/* Ministries under president */}
             {activeMinistryList.filter((m) => {
-              const headName = m.headMinisterName ? utils.extractNameFromProtobuf(m.headMinisterName) : null;
+              const headName = m.headMinisterName
+                ? utils.extractNameFromProtobuf(m.headMinisterName)
+                : null;
               const presidentName = selectedPresident?.name
-                ? utils.extractNameFromProtobuf(selectedPresident.name).split(":")[0]
+                ? utils
+                    .extractNameFromProtobuf(selectedPresident.name)
+                    .split(":")[0]
                 : null;
               if (!headName && presidentName) return true;
-              return headName && presidentName && headName.toLowerCase().trim() === presidentName.toLowerCase().trim();
+              return (
+                headName &&
+                presidentName &&
+                headName.toLowerCase().trim() ===
+                  presidentName.toLowerCase().trim()
+              );
             }).length > 0 && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <WorkspacePremiumIcon sx={{ color: colors.textMuted, fontSize: 18 }} />
-                  <Typography sx={{ flex: 1, fontFamily: "Poppins", fontWeight: 500, color: colors.textMuted, fontSize: 15 }}>
-                    Ministries under president{" "}
-                    <InfoTooltip
-                      message="The number of minister portfolios assigned to the president - if the president is newly elected and has not released a cabinet yet, all ministers from the prior cabinet are temporarily assigned to them."
-                      iconColor={colors.textPrimary}
-                      iconSize={13}
-                      placement="right"
-                    />
-                  </Typography>
-                  <Typography sx={{ fontFamily: "Poppins", fontSize: 17, fontWeight: 500, color: colors.textPrimary }}>
-                    {activeMinistryList.filter((m) => {
-                      const headName = m.headMinisterName ? utils.extractNameFromProtobuf(m.headMinisterName) : null;
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <WorkspacePremiumIcon
+                  sx={{ color: colors.textMuted, fontSize: 18 }}
+                />
+                <Typography
+                  sx={{
+                    flex: 1,
+                    fontFamily: "Poppins",
+                    fontWeight: 500,
+                    color: colors.textMuted,
+                    fontSize: 15,
+                  }}
+                >
+                  Ministries under president{" "}
+                  <InfoTooltip
+                    message="The number of minister portfolios assigned to the president - if the president is newly elected and has not released a cabinet yet, all ministers from the prior cabinet are temporarily assigned to them."
+                    iconColor={colors.textPrimary}
+                    iconSize={13}
+                    placement="right"
+                  />
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: 17,
+                    fontWeight: 500,
+                    color: colors.textPrimary,
+                  }}
+                >
+                  {
+                    activeMinistryList.filter((m) => {
+                      const headName = m.headMinisterName
+                        ? utils.extractNameFromProtobuf(m.headMinisterName)
+                        : null;
                       const presidentName = selectedPresident?.name
-                        ? utils.extractNameFromProtobuf(selectedPresident.name).split(":")[0]
+                        ? utils
+                            .extractNameFromProtobuf(selectedPresident.name)
+                            .split(":")[0]
                         : null;
                       if (!headName && presidentName) return true;
-                      return headName && presidentName && headName.toLowerCase().trim() === presidentName.toLowerCase().trim();
-                    }).length}
-                  </Typography>
-                </Box>
-              )}
+                      return (
+                        headName &&
+                        presidentName &&
+                        headName.toLowerCase().trim() ===
+                          presidentName.toLowerCase().trim()
+                      );
+                    }).length
+                  }
+                </Typography>
+              </Box>
+            )}
           </Box>
-
         </Card>
       </Box>
-
 
       {/* Container for Active Ministries Section */}
       <Box
@@ -593,7 +762,7 @@ const MinistryCardGrid = () => {
           borderRadius: 2,
           backgroundColor: colors.backgroundWhite,
           border: "1px solid",
-          borderColor: colors.border
+          borderColor: colors.border,
         }}
       >
         {/* Top Bar with Title + Search + Filter + ViewMode Toggle */}
@@ -624,7 +793,13 @@ const MinistryCardGrid = () => {
             {steps[activeStep]?.label !== "Departments & People" && (
               <>
                 {/* Search Bar */}
-                <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: 250 }, maxWidth: { sm: 400 } }}>
+                <Box
+                  sx={{
+                    flex: 1,
+                    minWidth: { xs: "100%", sm: 250 },
+                    maxWidth: { sm: 400 },
+                  }}
+                >
                   <TextField
                     fullWidth
                     label="Search ministries"
@@ -646,35 +821,54 @@ const MinistryCardGrid = () => {
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": { borderColor: colors.textMuted },
                         "&:hover fieldset": { borderColor: colors.textMuted },
-                        "&.Mui-focused fieldset": { borderColor: colors.textMuted },
+                        "&.Mui-focused fieldset": {
+                          borderColor: colors.textMuted,
+                        },
                         "& input:-webkit-autofill": {
                           WebkitBoxShadow: `0 0 0 1000px ${colors.backgroundColor} inset`,
                           WebkitTextFillColor: colors.textMuted,
                           transition: "background-color 5000s ease-in-out 0s",
                         },
                       },
-                      "& .MuiInputLabel-root.Mui-focused": { color: colors.textMuted },
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: colors.textMuted,
+                      },
                       "& .MuiInputBase-input": { color: colors.textMuted },
                     }}
                   />
                 </Box>
 
                 {/* Dropdown Filter */}
-                <FormControl sx={{ minWidth: { xs: "100%", sm: 150 }, flexShrink: 0 }}>
-                  <InputLabel sx={{ color: colors.textMuted, "&.Mui-focused": { color: colors.textMuted } }}>
+                <FormControl
+                  sx={{ minWidth: { xs: "100%", sm: 150 }, flexShrink: 0 }}
+                >
+                  <InputLabel
+                    sx={{
+                      color: colors.textMuted,
+                      "&.Mui-focused": { color: colors.textMuted },
+                    }}
+                  >
                     Filter
                   </InputLabel>
                   <Select
-                    value={filterType}
+                    value={filterType || ""}
                     label="Filter"
                     onChange={(e) => setFilterType(e.target.value)}
                     sx={{
                       backgroundColor: colors.backgroundColor,
                       color: colors.textMuted,
-                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
-                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
-                      "&.MuiOutlinedInput-root:hover": { backgroundColor: colors.backgroundColor },
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.textMuted,
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.textMuted,
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: colors.textMuted,
+                      },
+                      "&.MuiOutlinedInput-root:hover": {
+                        backgroundColor: colors.backgroundColor,
+                      },
                       "& .MuiSvgIcon-root": { color: colors.textMuted },
                     }}
                     MenuProps={{
@@ -686,33 +880,36 @@ const MinistryCardGrid = () => {
                             color: colors.textMuted,
                             backgroundColor: `${colors.backgroundColor} !important`,
                           },
-                          "& .MuiMenuItem-root:hover": { backgroundColor: `${colors.textMuted}10 !important` },
+                          "& .MuiMenuItem-root:hover": {
+                            backgroundColor: `${colors.textMuted}10 !important`,
+                          },
                         },
                       },
                     }}
                   >
-                    {activeMinistryList.length > 0 && <MenuItem value="all">All Ministries</MenuItem>}
-                    {activeMinistryList.filter((m) => m.newPerson).length > 0 && <MenuItem value="newPerson">New Ministers Appointed</MenuItem>}
-                    {activeMinistryList.filter((m) => m.newMin).length > 0 && <MenuItem value="newMinistry">New Ministries</MenuItem>}
-                    {activeMinistryList.filter((m) => {
-                      const headName = m.headMinisterName ? utils.extractNameFromProtobuf(m.headMinisterName) : null;
-                      const presidentName = selectedPresident?.name
-                        ? utils.extractNameFromProtobuf(selectedPresident.name).split(":")[0]
-                        : null;
-                      if (!headName && presidentName) return true;
-                      return headName && presidentName && headName.toLowerCase().trim() === presidentName.toLowerCase().trim();
-                    }).length > 0 && <MenuItem value="presidentAsMinister">President as Minister</MenuItem>}
+                    <MenuItem value="all">All Ministries</MenuItem>
+
+                    <MenuItem value="newPerson">
+                      New Ministers Appointed
+                    </MenuItem>
+
+                    <MenuItem value="newMinistry">New Ministries</MenuItem>
+
+                    <MenuItem value="presidentAsMinister">
+                      President as Minister
+                    </MenuItem>
                   </Select>
                 </FormControl>
-
               </>
             )}
 
             {/* View Mode Toggle */}
-            <MinistryViewModeToggleButton viewMode={viewMode} setViewMode={setViewMode} />
+            <MinistryViewModeToggleButton
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+            />
           </Box>
         </Box>
-
 
         {pmloading || ministryLoading ? (
           <Box
@@ -763,13 +960,15 @@ const MinistryCardGrid = () => {
                     return (
                       <Step key={step.label}>
                         <StepLabel
-                          StepIconComponent={() => <StepIcon label={step.label} />}
+                          StepIconComponent={() => (
+                            <StepIcon label={step.label} />
+                          )}
                           onClick={
                             (activeStep != 0 &&
                               step.label == "Ministries" &&
                               selectedCard) ||
-                              (activeStep == 1 &&
-                                step.label == "Departments & People")
+                            (activeStep == 1 &&
+                              step.label == "Departments & People")
                               ? handleBack
                               : null
                           }
@@ -801,8 +1000,8 @@ const MinistryCardGrid = () => {
                             }}
                           >
                             {selectedCard &&
-                              step.label == "Ministries" &&
-                              activeStep !== 0
+                            step.label == "Ministries" &&
+                            activeStep !== 0
                               ? selectedCard.name
                               : step.label}
                           </Typography>
@@ -819,7 +1018,7 @@ const MinistryCardGrid = () => {
                                 sx={{ width: "100%" }}
                               >
                                 {filteredMinistryList &&
-                                  filteredMinistryList.length > 0 ? (
+                                filteredMinistryList.length > 0 ? (
                                   filteredMinistryList.map((card) => (
                                     <Grid
                                       key={card.id}
@@ -942,7 +1141,8 @@ const MinistryCardGrid = () => {
                                 >
                                   {["departments", "people"].map((tab) => {
                                     const label =
-                                      tab.charAt(0).toUpperCase() + tab.slice(1);
+                                      tab.charAt(0).toUpperCase() +
+                                      tab.slice(1);
                                     const isActive = tab == activeTab;
                                     return (
                                       <Button
