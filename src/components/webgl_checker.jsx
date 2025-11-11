@@ -47,7 +47,6 @@ export default function WebGLChecker() {
 
   useEffect(() => {
     const supported = isWebGLAvailable();
-    console.log("webgl output : ", supported);
     setWebGLSupported(supported);
   }, []);
 

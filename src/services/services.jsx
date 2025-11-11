@@ -1,7 +1,7 @@
 import utils from "../utils/utils";
 
 const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
-// const apiUrl = // "";
+// const apiUrl = "";
 
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
@@ -69,10 +69,6 @@ const fetchInitialGazetteData = async () => {
         return acc;
       }, {})
     ).sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    console.log(Object.keys(mergedDateList1).length)
-
-    console.log('merged ', merged)
 
     return merged;
   } catch (error) {

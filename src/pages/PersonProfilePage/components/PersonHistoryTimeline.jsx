@@ -106,6 +106,7 @@ const PersonHistoryTimeline = ({
 
           return (
             <VerticalTimelineElement
+            key={idx}
               icon={<Landmark />}
               iconStyle={{
                 background: isDark ? "#101828" : "#f8f8f8",
