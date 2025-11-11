@@ -262,7 +262,7 @@ const XploreGovHomepage = () => {
                 </div>
               </div>
               {/* Dots */}
-              <div className="mt-15 w-full flex justify-center space-x-2">
+              <div className="mt-0 md:mt-6 xl:mt-8 w-full flex justify-center space-x-2">
                 {cards.map((_, idx) => (
                   <span
                     key={idx}
