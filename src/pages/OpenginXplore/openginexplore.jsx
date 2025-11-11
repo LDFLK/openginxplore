@@ -16,6 +16,7 @@ import TextLogo from "../XploreGovHome/components/textLogo";
 import ThemeToggle from "../../components/theme-toggle";
 import ShareLinkButton from "../../components/ShareLinkButton";
 import { toast, ToastContainer } from "react-toastify";
+import SlFlag from "/sl_flag.png";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
   ? window.configs.feedbackFormUrl
@@ -64,7 +65,8 @@ export default function OpenginXplore() {
     }
   }, [presidents, presidentRelationDict]);
 
-  const dates = gazetteDateClassic && gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
+  const dates =
+    gazetteDateClassic && gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
 
   useEffect(() => {
     const isVisited = localStorage.getItem("OpenGINXploreVisit");
@@ -77,16 +79,14 @@ export default function OpenginXplore() {
               <span className="font-semibold">
                 📢 Welcome to OpenGIN Xplore!
               </span>{" "}
-              This project is <Link
-                to={"https://"}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              This project is{" "}
+              <Link to={"https://"} target="_blank" rel="noopener noreferrer">
                 <div className="text-accent">
                   <p>Open Source</p>
                 </div>
-              </Link> and evolving fast. Your feedback helps
-              us make it better for everyone.
+              </Link>{" "}
+              and evolving fast. Your feedback helps us make it better for
+              everyone.
             </p>
             <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
               <Link
@@ -212,7 +212,13 @@ export default function OpenginXplore() {
         } h-screen`}
       >
         {/* Header */}
-        <div className="flex justify-end py-2 px-4 md:px-8 lg:px-12 border-b border-border bg-background">
+        <div className="flex justify-between items-center py-2 px-4 md:px-8 lg:px-12 border-b border-border bg-background">
+          <div className="flex gap-2">
+            <img src={SlFlag} width={50} />
+            <h1 className="text-md xl:text-xl font-semibold text-primary">
+              Sri Lanka
+            </h1>
+          </div>
           <div className="flex items-center gap-2">
             <Link
               to="/docs?file=information-pane"
