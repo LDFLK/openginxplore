@@ -11,6 +11,9 @@ import {
 } from "recharts";
 import formatText from "../../utils/common_functions";
 import { useThemeContext } from "../../themeContext";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 
 const COLORS = [
   "#00bcd4", "#8bc34a", "#ffc107", "#ff9800", "#e91e63", "#9c27b0",
@@ -24,6 +27,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [detectedTicks, setDetectedTicks] = useState([]);
   const [chartType, setChartType] = useState("bar");
   const chartRef = useRef(null);
+  const chartContainerRef = useRef(null);
+
 
   const { isDark } = useThemeContext()
 
@@ -69,6 +74,109 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       prev.filter((col) => numericCols.includes(col))
     );
   }, [columns, normalizedYearlyData]);
+const forceRGBColors = () => {
+    const style = document.createElement("style");
+    style.id = "force-rgb-style";
+    style.innerHTML = `
+    * {
+      --background: #ffffff !important;
+      --foreground: #1f2937 !important;
+      --muted: #9ca3af !important;
+      --muted-foreground: #e5e7eb !important;
+      --border: #d1d5db !important;
+      --input: #d1d5db !important;
+      --ring: #2563eb !important;
+      --primary: #2563eb !important;
+      --primary-foreground: #ffffff !important;
+      --secondary: #6b7280 !important;
+      --secondary-foreground: #f9fafb !important;
+      --accent: #4b5563 !important;
+      --accent-foreground: #ffffff !important;
+      --destructive: #ef4444 !important;
+      --destructive-foreground: #ffffff !important;
+      color-scheme: light !important;
+    }
+
+    /* Target only non-legend items */
+    :not(.legend-color-box) {
+      background: rgb(255,255,255) !important;
+      color: rgb(31,41,55) !important;
+      border-color: rgb(209,213,219) !important;
+      box-shadow: none !important;
+    }
+    
+    /* Fix legend box alignment */
+    .legend-color-box {
+      display: inline-block !important;
+      vertical-align: middle !important;
+    }
+    
+    /* Fix Y-axis label rotation for html2canvas */
+    .y-axis-label-export {
+      writing-mode: horizontal-tb !important;
+      transform: rotate(-90deg) !important;
+      transform-origin: center center !important;
+    }
+  `;
+    document.head.appendChild(style);
+  };
+
+  const removeForcedRGB = () => {
+    const style = document.getElementById("force-rgb-style");
+    if (style) style.remove();
+  };
+
+
+  const handleDownloadImage = async () => {
+    if (!chartContainerRef.current) return;
+    forceRGBColors();
+
+    try {
+      const canvas = await html2canvas(chartContainerRef.current, {
+        scale: 2,
+        backgroundColor: isDark ? "#1f2937" : "#ffffff",
+        useCORS: true,
+        logging: false,
+      });
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = "chart.png";
+      link.click();
+    } catch (err) {
+      console.error("html2canvas failed:", err);
+    } finally {
+      removeForcedRGB();
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!chartContainerRef.current) return;
+    forceRGBColors();
+
+    try {
+      const canvas = await html2canvas(chartContainerRef.current, {
+        scale: 2,
+        backgroundColor: isDark ? "#1f2937" : "#ffffff",
+        useCORS: true,
+        logging: false,
+      });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: [canvas.width, canvas.height],
+      });
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+      pdf.save("chart.pdf");
+    } catch (err) {
+      console.error("PDF export failed:", err);
+    } finally {
+      removeForcedRGB();
+    }
+  };
+
+
 
   const normalizeString = (str) => {
     if (str === null || str === undefined) return "";
@@ -285,9 +393,26 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                 </select>
               </div>
             </div>
+            <div className="flex justify-end gap-2 mb-4">
+              <button
+                onClick={handleDownloadImage}
+                className="px-3 py-1 text-sm bg-accent/70 hover:bg-accent text-white rounded-md"
+              >
+                Download PNG
+              </button>
+              <button
+                onClick={handleDownloadPDF}
+                className="px-3 py-1 text-sm bg-primary/70 hover:bg-primary text-white rounded-md"
+              >
+                Download PDF
+              </button>
+            </div>
 
             {/* Chart */}
-            <div className="bg-background-dark border border-border rounded-lg p-4">
+            <div
+              className="bg-background-dark border border-border rounded-lg p-4"
+              ref={chartContainerRef}
+            >
               <h3 className="text-sm font-semibold mb-4 text-primary/80">
                 {chartType === "bar" ? "Bar Chart" : "Line Chart"}
               </h3>
@@ -300,6 +425,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       ? normalizedYearlyData.map((d, yearIdx) => (
                         <div key={d.year} className="flex items-center gap-2">
                           <div
+                            className="legend-color-box"
                             style={{
                               width: 12,
                               height: 12,
@@ -308,10 +434,12 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                           />
                           <span className="text-sm text-primary/75">{d.year}</span>
                         </div>
+
                       ))
                       : selectedYColumns.map((col, i) => (
                         <div key={col} className="flex items-center gap-2">
                           <div
+                            className="legend-color-box"
                             style={{
                               width: 12,
                               height: 12,
