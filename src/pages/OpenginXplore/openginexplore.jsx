@@ -139,7 +139,7 @@ export default function OpenginXplore() {
 
   return (
     <div className="flex">
-      <ToastContainer
+      {/* <ToastContainer
         position="top-center"
         autoClose={5000}
         hideProgressBar={false}
@@ -153,7 +153,7 @@ export default function OpenginXplore() {
         }
         bodyClassName={() => "text-sm"}
         progressClassName="bg-primary"
-      />
+      /> */}
 
       {/* Sidebar */}
       <div
