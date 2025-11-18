@@ -918,7 +918,7 @@ const MinistryCardGrid = () => {
               sx={{
                 width: "100%",
                 display: "flex",
-                pl: viewMode == "Grid" ? 6 : 0,
+                pl: viewMode == "Grid" ? 6.5 : 0,
               }}
             >
               {viewMode == "Grid" ? (
