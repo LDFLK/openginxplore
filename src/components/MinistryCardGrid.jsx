@@ -222,21 +222,16 @@ const MinistryCardGrid = () => {
   };
 
   const fetchActiveMinistryList = async () => {
-    if (
-      !selectedDate ||
-      !allMinistryData ||
-      Object.keys(allMinistryData).length === 0
-    )
-      return;
+    if (!selectedDate || !allMinistryData || Object.keys(allMinistryData).length === 0) return;
 
     try {
       setMinistryLoading(true);
+
       const activeMinistry = await api.fetchActiveMinistries(
         selectedDate,
         allMinistryData,
         selectedPresident
       );
-
       const enrichedMinistries = await Promise.all(
         activeMinistry.children.map(async (ministry) => {
           const response = await api.fetchActiveRelationsForMinistry(
@@ -244,33 +239,22 @@ const MinistryCardGrid = () => {
             ministry.id,
             "AS_APPOINTED"
           );
-          const res = await response.json();
 
-          const startTimeMap = new Map();
-          res.forEach((relation) => {
-            if (relation.relatedEntityId)
-              startTimeMap.set(relation.relatedEntityId, relation.startTime);
-          });
+          const relations = await response.json();
 
-          const personListInDetail = Array.from(startTimeMap.keys())
-            .map((id) => {
-              const person = allPersonDict[id];
-              if (!person) return null;
-              return { ...person, startTime: startTimeMap.get(id) || null, id };
-            })
-            .filter(Boolean);
+          const rel = relations[0] || null;
 
-          const headMinisterName = personListInDetail[0]?.name || null;
-          const headMinisterStartTime =
-            personListInDetail[0]?.startTime || null;
-          const headMinisterId = personListInDetail[0]?.id || null;
+          const person = rel ? allPersonDict[rel.relatedEntityId] : null;
+
+          const headMinisterId = rel?.relatedEntityId || null;
+          const headMinisterName = person?.name || null;
+          const headMinisterStartTime = rel?.startTime || null;
 
           return {
             ...ministry,
             headMinisterId,
             headMinisterName,
-            newPerson:
-              headMinisterStartTime?.startsWith(selectedDate.date) || false,
+            newPerson: headMinisterStartTime?.startsWith(selectedDate.date) || false,
             newMin: ministry.startTime?.startsWith(selectedDate.date) || false,
           };
         })
@@ -429,7 +413,7 @@ const MinistryCardGrid = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
-                  ml: 1.5,
+                  ml: 2,
                 }}
               >
                 <Avatar
@@ -934,7 +918,7 @@ const MinistryCardGrid = () => {
               sx={{
                 width: "100%",
                 display: "flex",
-                pl: viewMode == "Grid" ? 8 : 0,
+                pl: viewMode == "Grid" ? 6 : 0,
               }}
             >
               {viewMode == "Grid" ? (
