@@ -117,7 +117,7 @@ export default function Drawer({
           >
             <CiCircleChevLeft />
           </button>
-          <p className="text-xl text-primary">Xplore more...</p>
+          {/* <p className="text-xl text-primary">Xplore more...</p> */}
         </div>
       )}
 
