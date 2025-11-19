@@ -164,7 +164,7 @@ export default function OpenginXplore() {
 
       
 
-        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen">
+        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen mt-4">
           <button
             className={`${selectedTab === "organization"
               ? "bg-accent text-primary-foreground font-semibold"
