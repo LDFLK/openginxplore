@@ -224,7 +224,7 @@ export default function Drawer({
                 </h2>
               ) : (
                 <h2 className="text-md font-normal text-primary mt-4 mb-2 shrink-0">
-                  {Object.keys(drawerContentList).length} Active
+                  {Object.keys(drawerContentList).length}
                   {`${parentNode &&
                     parentNode.type === "minister" &&
                     selectedTab === "departments"
