@@ -259,7 +259,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
             </Typography>
             <Box sx={{ width: 250 }}>
               <TextField
-                fullWidth
+                size="small"
                 label="Search departments"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -383,7 +383,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                           e.target.style.textDecoration = "none";
                         }}
                       >
-                        View History
+                        History
                       </Link>
                       <Box sx={{width: "1px", height: "18px", borderRight: `1px solid ${ isDark ? "white" : "black"}`, mx: '15px'}}></Box>
                       <Link

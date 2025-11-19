@@ -155,7 +155,7 @@ const XploreGovHomepage = () => {
                 >
                   <History className="w-6 h-6 mr-2" />
                   <span className="text-sm md:text-normal">
-                    Quick Application
+                    Explore
                   </span>
                   <ChevronRight className="w-6 h-6" />
                 </button>
