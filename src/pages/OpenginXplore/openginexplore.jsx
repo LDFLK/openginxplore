@@ -169,20 +169,20 @@ export default function OpenginXplore() {
             className={`${selectedTab === "organization"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
-              }  hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+              }  hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("organization")}
           >
-            <Binoculars className="mr-3 flex-shrink-0" size={24} />
+            <Binoculars className={`${isExpanded ? "mr-3" : "mx-auto"}`}  />
             {isExpanded && "Organization"}
           </button>
           <button
             className={`${selectedTab === "data"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
-              } hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+              } hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("data")}
           >
-            <SquareLibrary className="mr-3 flex-shrink-0" size={24} />
+            <SquareLibrary className={`${isExpanded ? "mr-3" : "mx-auto"}`}  />
             {isExpanded && "Data"}
           </button>
 
