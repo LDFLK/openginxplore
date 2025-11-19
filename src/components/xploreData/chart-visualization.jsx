@@ -393,7 +393,7 @@ const forceRGBColors = () => {
                 </select>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mb-4">
+            {/* <div className="flex justify-end gap-2 mb-4">
               <button
                 onClick={handleDownloadImage}
                 className="px-3 py-1 text-sm bg-accent/70 hover:bg-accent text-white rounded-md"
@@ -406,7 +406,7 @@ const forceRGBColors = () => {
               >
                 Download PDF
               </button>
-            </div>
+            </div> */}
 
             {/* Chart */}
             <div
