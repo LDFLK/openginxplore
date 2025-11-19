@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Stack,
-  Button,
-  Divider,
   Alert,
   AlertTitle,
   TextField,
@@ -13,17 +10,13 @@ import {
 import { Link, useLocation } from "react-router-dom";
 
 import ApartmentIcon from "@mui/icons-material/Apartment";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SearchIcon from "@mui/icons-material/Search";
 import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
-import DepartmentHistoryTimeline from "./DepartmentHistoryTimeline";
 import DomainAddIcon from "@mui/icons-material/DomainAdd";
 import utils from "../utils/utils";
 import api from "../services/services";
 import { useThemeContext } from "../themeContext";
-import enumMode from "../enums/mode";
-import { useNavigate } from "react-router-dom";
 import InfoTooltip from "./InfoToolTip";
 
 const DepartmentTab = ({ selectedDate, ministryId }) => {
@@ -40,8 +33,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
-
-  const {isDark} = useThemeContext();
+  const [hoveredDeptId, setHoveredDeptId] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -294,145 +286,87 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
           </Box>
 
           {/* Department List */}
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              borderRadius: 2,
-              mt: 2
-            }}
-          >
-            <Stack spacing={1}>
-              {filteredDepartments.length > 0 ? (
-                filteredDepartments.map((dep, idx) => {
-                  const depName = utils.extractNameFromProtobuf(dep.name);
-                  return (
-                    <Box
-                      key={idx}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: "12px 16px",
-                        marginBottom: "12px",
-                        transition: "all 0.3s ease",
-                        cursor: "pointer",
-                        borderBottom: `1px solid ${colors.backgroundWhite}`,
+
+          {filteredDepartments.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+              {filteredDepartments.map((dep) => {
+                const depName = utils.extractNameFromProtobuf(dep.name);
+
+                return (
+                  <div
+                    key={dep.id}
+                    onMouseEnter={() => setHoveredDeptId(dep.id)}
+                    onMouseLeave={() => setHoveredDeptId(null)}
+                    className={`flex flex-col rounded-lg  cursor-pointer transition-shadow border 
+                      ${hoveredDeptId === dep.id ? "shadow-md" : "shadow-sm"}`}
+                    style={{ borderColor: selectedPresident.themeColorLight + "99" }}
+                  >
+                    {/* Header */}
+                    <div
+                      className="flex items-center gap-2 px-4 py-2 rounded-t-[7px]"
+                      style={{
+                        backgroundColor:
+                          hoveredDeptId === dep.id
+                            ? selectedPresident.themeColorLight
+                            : selectedPresident.themeColorLight + "99",
+                        minHeight: "70px",
+                        maxHeight: "70px",
                       }}
                     >
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                      >
-                        <AccountBalanceIcon
-                          fontSize="small"
-                          sx={{ color: selectedPresident.themeColorLight }}
-                        />
-                        <Typography
-                          sx={{
-                            fontFamily: "Poppins, sans-serif",
-                            color: colors.textMuted,
-                            fontWeight: 500,
-                            fontSize: "0.95rem",
+                      <div className="flex flex-col justify-center flex-1 overflow-hidden">
+                        <span
+                          className=" text-white  font-normal  text-[14px] leading-[1.4] font-poppins overflow-hidden text-ellipsis line-clamp-3">
+                          {depName}
+                        </span>
+                      </div>
+
+                      {dep.isNew && (
+                        <div
+                          className="ml-2 px-2 py-[2px] text-xs font-semibold rounded"
+                          style={{
+                            backgroundColor: colors.green,
+                            color: "#fff",
                           }}
                         >
-                          {depName}
-                        </Typography>
+                          NEW
+                        </div>
+                      )}
+                    </div>
 
-                        {dep.isNew && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              ml: 1,
-                              px: 1,
-                              py: 0.2,
-                              borderRadius: "6px",
-                              backgroundColor:
-                                selectedPresident.themeColorLight,
-                              color: colors.white,
-                              fontFamily: "Poppins, sans-serif",
-                              fontWeight: 600,
-                              letterSpacing: "0.3px",
-                            }}
-                          >
-                            New
-                          </Typography>
-                        )}
-                      </Box>
-                      <Box sx={{
-                        display: "flex",
-                      }}>
-
+                    {/* Footer Links */}
+                    <div className="flex items-center justify-between px-4 py-2 mt-auto">
                       <Link
                         to={`/department-profile/${dep.id}`}
-                        state={{ mode: "back", from: location.pathname + location.search  }}
-                        style={{
-                          textDecoration: "none",
-                          color: selectedPresident.themeColorLight,
-                          fontFamily: "Poppins, sans-serif",
-                          fontWeight: 500,
-                          fontSize: "0.9rem",
-                          borderRadius: "8px",
-                          transition: "all 0.3s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.textDecoration = "underline";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.textDecoration = "none";
-                        }}
+                        state={{ mode: "back", from: location.pathname + location.search }}
+                        className="text-sm font-small hover:underline"
+                        style={{ color: selectedPresident.themeColorLight }}
                       >
                         History
                       </Link>
-                      <Box sx={{width: "1px", height: "18px", borderRight: `1px solid ${ isDark ? "white" : "black"}`, mx: '15px'}}></Box>
+
                       <Link
                         to={`/data?parentId=${dep.id}`}
-                        // state={{ mode: "back", from: location.pathname + location.search  }}
-                        style={{
-                          textDecoration: "none",
-                          color: selectedPresident.themeColorLight,
-                          fontFamily: "Poppins, sans-serif",
-                          fontWeight: 500,
-                          fontSize: "0.9rem",
-                          borderRadius: "8px",
-                          transition: "all 0.3s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.textDecoration = "underline";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.textDecoration = "none";
-                        }}
+                        className="text-sm font-small hover:underline"
+                        style={{ color: selectedPresident.themeColorLight }}
                       >
                         Data
                       </Link>
-                      </Box>
-                    </Box>
-                  );
-                })
-              ) : (
-                <Box
-                  sx={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Alert
-                    severity="info"
-                    sx={{ backgroundColor: "transparent" }}
-                  >
-                    <AlertTitle
-                      sx={{ fontFamily: "poppins", color: colors.textPrimary }}
-                    >
-                      Info: No departments found.
-                    </AlertTitle>
-                  </Alert>
-                </Box>
-              )}
-            </Stack>
-          </Box>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+            : (
+              <Box sx={{ width: "100%", mt: 4, display: "flex", justifyContent: "center" }}>
+                <Alert severity="info" sx={{ backgroundColor: "transparent", width: "100%", maxWidth: 600 }}>
+                  <AlertTitle sx={{ fontFamily: "poppins", color: colors.textPrimary }}>
+                    Info: No departments found.
+                  </AlertTitle>
+                </Alert>
+              </Box>
+            )}
+
         </>
       )}
     </Box>
