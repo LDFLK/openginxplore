@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Binoculars,
   BookOpenText,
-  ChevronsLeft,
-  ChevronsRight,
+  ChevronLeft,
+  ChevronRight,
   MessageSquareHeart,
   SquareLibrary,
 } from "lucide-react";
@@ -139,7 +139,7 @@ export default function OpenginXplore() {
 
   return (
     <div className="flex">
-      <ToastContainer
+      {/* <ToastContainer
         position="top-center"
         autoClose={5000}
         hideProgressBar={false}
@@ -153,7 +153,7 @@ export default function OpenginXplore() {
         }
         bodyClassName={() => "text-sm"}
         progressClassName="bg-primary"
-      />
+      /> */}
 
       {/* Sidebar */}
       <div
@@ -162,34 +162,38 @@ export default function OpenginXplore() {
       >
         <TextLogo isExpanded={isExpanded} />
 
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className=" px-3 py-1 rounded-md text-primary/80 hover:text-primary mb-2 cursor-pointer"
-        >
-          {isExpanded ? <ChevronsLeft /> : <ChevronsRight />}
-        </button>
+      
 
-        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen">
+        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen mt-4">
           <button
             className={`${selectedTab === "organization"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
-              }  hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+              }  hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("organization")}
           >
-            <Binoculars className="mr-3 flex-shrink-0" size={24} />
+            <Binoculars className={`${isExpanded ? "mr-3" : "mx-auto"}`}  />
             {isExpanded && "Organization"}
           </button>
           <button
             className={`${selectedTab === "data"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
-              } hover:cursor-pointer px-4 py-3 rounded-md transition-all ease-in-out text-left flex`}
+              } hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("data")}
           >
-            <SquareLibrary className="mr-3 flex-shrink-0" size={24} />
+            <SquareLibrary className={`${isExpanded ? "mr-3" : "mx-auto"}`}  />
             {isExpanded && "Data"}
           </button>
+
+            <button
+          onClick={() => setIsExpanded(!isExpanded)}
+            className="px-3 py-1 absolute bottom-12 left-1/2 -translate-x-1/2 
+             flex items-center rounded-md text-primary/80 hover:text-primary 
+             cursor-pointer"
+          >
+          {isExpanded ? <ChevronLeft /> : <ChevronRight />}
+        </button>
           <Link to={feedbackFormUrl} target="_blank" rel="noopener noreferrer">
             <div className="flex absolute bottom-0 w-full gap-2 justify-center items-center px-3 py-2 rounded-md text-active-green/100 hover:text-active-green bg-active-green/10 hover:bg-active-green/15 border-active-green/15 hover:border-active-green/15 cursor-pointer border duration-1000 transition-all animation">
               <MessageSquareHeart size={22} />

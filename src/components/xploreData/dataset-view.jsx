@@ -317,7 +317,7 @@ export function DatasetView({ data, setExternalDateRange }) {
                 <DataTable
                   columns={fetchedDatasets[0].data.columns}
                   rows={fetchedDatasets[0].data.rows}
-                  title={fetchedDatasets[0].data.attributeName}
+                  title={fetchedDatasets[0].data.attributeName +" "+ selectedYears[0]}
                 />
               )}
             </>
