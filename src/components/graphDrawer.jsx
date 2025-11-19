@@ -138,9 +138,12 @@ export default function Drawer({
                       <div className="flex items-center gap-2 mb-1 text-primary/50">
                         <Building2 className="w-5 h-5" /> <span>Department</span>
                       </div>
-                    ) : (
+                    ) : selectedNode.type == "persons" ? (
                       <div className="flex items-center gap-2 mb-1 text-primary/50">
                         <User className="w-5 h-5" /> <span>Person</span>
+                      </div>
+                    ): (
+                      <div className="flex items-center gap-2 mb-1 text-primary/50">
                       </div>
                     )}
                     <p className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-300">
