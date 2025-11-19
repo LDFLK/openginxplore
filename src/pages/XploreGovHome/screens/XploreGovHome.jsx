@@ -95,7 +95,7 @@ const XploreGovHomepage = () => {
           <div className="flex space-x-4 text-xs">
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-              <span className="text-gray-400">Personal</span>
+              <span className="text-gray-400">Personnel</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
