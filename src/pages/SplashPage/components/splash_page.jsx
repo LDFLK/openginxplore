@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import BackgroundGradientEffect from "../../XploreGovHome/components/backgroundGradientEffect";
 import AnimatedDots from "../../XploreGovHome/components/animatedDots";
+import { Link } from "react-router-dom";
 
 const SplashPage = ({ progress, setProgress }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -45,6 +46,15 @@ const SplashPage = ({ progress, setProgress }) => {
     <div className="min-h-screen bg-background relative overflow-hidden">
       <BackgroundGradientEffect/>
       <AnimatedDots/>
+      <div className="absolute z-20 p-10 left-20">
+        <Link to={"/"}>
+          <h2 className="text-normal md:text-2xl font-semibold">
+            <span className="text-accent">
+              OpenGIN<span className="text-primary">Xplore</span>
+            </span>
+          </h2>
+        </Link>
+      </div>
       {/* Main content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="max-w-3xl w-full">

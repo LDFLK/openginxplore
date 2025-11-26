@@ -222,21 +222,16 @@ const MinistryCardGrid = () => {
   };
 
   const fetchActiveMinistryList = async () => {
-    if (
-      !selectedDate ||
-      !allMinistryData ||
-      Object.keys(allMinistryData).length === 0
-    )
-      return;
+    if (!selectedDate || !allMinistryData || Object.keys(allMinistryData).length === 0) return;
 
     try {
       setMinistryLoading(true);
+
       const activeMinistry = await api.fetchActiveMinistries(
         selectedDate,
         allMinistryData,
         selectedPresident
       );
-
       const enrichedMinistries = await Promise.all(
         activeMinistry.children.map(async (ministry) => {
           const response = await api.fetchActiveRelationsForMinistry(
@@ -244,33 +239,22 @@ const MinistryCardGrid = () => {
             ministry.id,
             "AS_APPOINTED"
           );
-          const res = await response.json();
 
-          const startTimeMap = new Map();
-          res.forEach((relation) => {
-            if (relation.relatedEntityId)
-              startTimeMap.set(relation.relatedEntityId, relation.startTime);
-          });
+          const relations = await response.json();
 
-          const personListInDetail = Array.from(startTimeMap.keys())
-            .map((id) => {
-              const person = allPersonDict[id];
-              if (!person) return null;
-              return { ...person, startTime: startTimeMap.get(id) || null, id };
-            })
-            .filter(Boolean);
+          const rel = relations[0] || null;
 
-          const headMinisterName = personListInDetail[0]?.name || null;
-          const headMinisterStartTime =
-            personListInDetail[0]?.startTime || null;
-          const headMinisterId = personListInDetail[0]?.id || null;
+          const person = rel ? allPersonDict[rel.relatedEntityId] : null;
+
+          const headMinisterId = rel?.relatedEntityId || null;
+          const headMinisterName = person?.name || null;
+          const headMinisterStartTime = rel?.startTime || null;
 
           return {
             ...ministry,
             headMinisterId,
             headMinisterName,
-            newPerson:
-              headMinisterStartTime?.startsWith(selectedDate.date) || false,
+            newPerson: headMinisterStartTime?.startsWith(selectedDate.date) || false,
             newMin: ministry.startTime?.startsWith(selectedDate.date) || false,
           };
         })
@@ -429,7 +413,7 @@ const MinistryCardGrid = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
-                  ml: 1.5,
+                  ml: 2,
                 }}
               >
                 <Avatar
@@ -770,50 +754,48 @@ const MinistryCardGrid = () => {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
-            justifyContent: "right",
+            justifyContent: "flex-end",
             alignItems: { xs: "flex-end", sm: "center" },
-            gap: 2,
+            gap: 1, // reduced gap
             mb: 1,
-            px: 5,
-            pt: 3,
+            px: { xs: 2, sm: 3 }, // smaller padding on mobile
+            pt: 2,
+            width: "100%",
           }}
         >
-          {/* Right Controls (Search + Filter + ViewMode Toggle) */}
           <Box
             sx={{
               display: "flex",
               flexDirection: { xs: "column", sm: "row" },
-              gap: 2,
+              gap: 1,
               alignItems: "center",
               width: { xs: "100%", sm: "auto" },
-              justifyContent: "flex-end", // push everything to end
+              justifyContent: "flex-end",
             }}
           >
-            {/* Hide Search + Filter if current step label === "Departments & People" */}
             {steps[activeStep]?.label !== "Departments & People" && (
               <>
                 {/* Search Bar */}
                 <Box
                   sx={{
                     flex: 1,
-                    minWidth: { xs: "100%", sm: 250 },
-                    maxWidth: { sm: 400 },
+                    minWidth: { xs: "100%", sm: 200 }, 
+                    maxWidth: { sm: 300 },
                   }}
                 >
                   <TextField
                     fullWidth
+                    size="small"
                     label="Search ministries"
                     id="ministry-search"
                     onChange={handleChange}
                     value={searchText}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <SearchIcon sx={{ color: colors.textMuted }} />
-                          </InputAdornment>
-                        ),
-                      },
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <SearchIcon sx={{ color: colors.textMuted, fontSize: 15 }} />
+                        </InputAdornment>
+                      ),
                     }}
                     sx={{
                       backgroundColor: colors.backgroundColor,
@@ -838,13 +820,18 @@ const MinistryCardGrid = () => {
                   />
                 </Box>
 
-                {/* Dropdown Filter */}
+                {/* Filter Dropdown */}
                 <FormControl
-                  sx={{ minWidth: { xs: "100%", sm: 150 }, flexShrink: 0 }}
+                  size="small"
+                  sx={{
+                    minWidth: { xs: "100%", sm: 120 },
+                    flexShrink: 0,
+                  }}
                 >
                   <InputLabel
                     sx={{
                       color: colors.textMuted,
+                      fontSize: 13,
                       "&.Mui-focused": { color: colors.textMuted },
                     }}
                   >
@@ -857,25 +844,17 @@ const MinistryCardGrid = () => {
                     sx={{
                       backgroundColor: colors.backgroundColor,
                       color: colors.textMuted,
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.textMuted,
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.textMuted,
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: colors.textMuted,
-                      },
-                      "&.MuiOutlinedInput-root:hover": {
-                        backgroundColor: colors.backgroundColor,
-                      },
-                      "& .MuiSvgIcon-root": { color: colors.textMuted },
+                      fontSize: 13,
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
+                      "& .MuiSvgIcon-root": { color: colors.textMuted, fontSize: 18 },
                     }}
                     MenuProps={{
                       PaperProps: {
                         sx: {
                           backgroundColor: colors.backgroundPrimary,
-                          "& .MuiMenuItem-root": { color: colors.textPrimary },
+                          "& .MuiMenuItem-root": { color: colors.textPrimary, fontSize: 13 },
                           "& .MuiMenuItem-root.Mui-selected": {
                             color: colors.textMuted,
                             backgroundColor: `${colors.backgroundColor} !important`,
@@ -888,16 +867,9 @@ const MinistryCardGrid = () => {
                     }}
                   >
                     <MenuItem value="all">All Ministries</MenuItem>
-
-                    <MenuItem value="newPerson">
-                      New Ministers Appointed
-                    </MenuItem>
-
+                    <MenuItem value="newPerson">New Ministers Appointed</MenuItem>
                     <MenuItem value="newMinistry">New Ministries</MenuItem>
-
-                    <MenuItem value="presidentAsMinister">
-                      President as Minister
-                    </MenuItem>
+                    <MenuItem value="presidentAsMinister">President as Minister</MenuItem>
                   </Select>
                 </FormControl>
               </>
@@ -910,7 +882,6 @@ const MinistryCardGrid = () => {
             />
           </Box>
         </Box>
-
         {pmloading || ministryLoading ? (
           <Box
             sx={{
@@ -934,7 +905,7 @@ const MinistryCardGrid = () => {
               sx={{
                 width: "100%",
                 display: "flex",
-                pl: viewMode == "Grid" ? 8 : 0,
+                pl: viewMode == "Grid" ? 6.5 : 0,
               }}
             >
               {viewMode == "Grid" ? (

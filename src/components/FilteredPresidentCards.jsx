@@ -270,7 +270,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                 <img
                   src={president.imageUrl || president.image || ""}
                   alt={nameText}
-                  className="w-10 h-10 object-cover rounded-full mr-3 border border-border flex-shrink-0"
+                  className="w-14 h-14 object-cover rounded-full mr-3 border border-border flex-shrink-0"
                 />
                 <div className="flex flex-col flex-1 text-left min-w-0">
                   <p
