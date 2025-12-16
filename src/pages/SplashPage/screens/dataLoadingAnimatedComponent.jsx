@@ -16,7 +16,7 @@ import PersonProfile from "../../PersonProfilePage/screens/PersonProfile";
 import Error500 from "../../ErrorBoundaries/screens/500Error";
 import DepartmentProfile from "../../DepartmentPage/screens/DepartmentProfile";
 import SplashPage from "../components/splash_page";
-import OpenginXplore from "../../OpenginXplore/openginexplore";
+import HomePage from "../../HomePage/screens/HomePage";
 
 export default function DataLoadingAnimatedComponent({ mode }) {
   const [loading, setLoading] = useState(false);
@@ -172,7 +172,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
       ) : (
         <>
           {Object.keys(presidentDict).length > 0 && mode === "orgchart" ? (
-            <OpenginXplore />
+            <HomePage />
           ) : Object.keys(presidentDict).length > 0 &&
             mode === "person-profile" ? (
             <PersonProfile />

@@ -1,8 +1,8 @@
 import { Card, Typography, Box, Stack } from "@mui/material";
-import utils from "../utils/utils";
+import utils from "../../../utils/utils";
 import { useSelector } from "react-redux";
-import { useThemeContext } from "../themeContext";
-import { useBadgeContext } from "./badgeContext";
+import { useThemeContext } from "../../../context/themeContext";
+import { useBadgeContext } from "../../../context/badgeContext";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 

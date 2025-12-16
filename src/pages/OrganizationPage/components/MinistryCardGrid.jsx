@@ -18,9 +18,9 @@ import {
 import MinistryCard from "./MinistryCard";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import api from "./../services/services";
+import api from "../../../services/services";
 import { ClipLoader } from "react-spinners";
-import { useThemeContext } from "../themeContext";
+import { useThemeContext } from "../../../context/themeContext";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
@@ -28,11 +28,11 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import PeopleIcon from "@mui/icons-material/People";
-import InfoTooltip from "../components/InfoToolTip";
+import InfoTooltip from "../../../components/InfoToolTip";
 import { Link, useLocation } from "react-router-dom";
 
-import utils from "./../utils/utils";
-import MinistryViewModeToggleButton from "./ministryViewModeToggleButton";
+import utils from "../../../utils/utils";
+import MinistryViewModeToggleButton from "../../../components/ministryViewModeToggleButton";
 import GraphComponent from "./graphComponent";
 import { clearTimeout } from "highcharts";
 
@@ -41,9 +41,9 @@ import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import StepContent from "@mui/material/StepContent";
 import PersonsTab from "./PersonsTab";
-import useUrlParamState from "../hooks/singleSharingURL";
+import useUrlParamState from "../../../hooks/singleSharingURL";
 import DepartmentTab from "./DepartmentTab";
-import personImages from "../assets/personImages.json";
+import personImages from "../../../assets/personImages.json";
 
 const MinistryCardGrid = () => {
   const { allMinistryData } = useSelector((state) => state.allMinistryData);

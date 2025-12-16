@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import formatText from "../../utils/common_functions";
+import formatText from "../../../utils/common_functions";
 import { ExportButton } from "./export-button";
 
 export function DataTable({ columns, rows, title }) {

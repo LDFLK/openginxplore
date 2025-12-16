@@ -1,4 +1,4 @@
-import { useThemeContext } from "../themeContext";
+import { useThemeContext } from "../context/themeContext";
 
 export default function LoadingComponent({ size = 40, OsColorMode = true }) {
   const { colors } = useThemeContext();

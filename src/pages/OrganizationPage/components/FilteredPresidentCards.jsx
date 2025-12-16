@@ -1,11 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useMemo, useEffect, useRef } from "react";
-import utils from "../utils/utils";
+import utils from "../../../utils/utils";
 import {
   setSelectedPresident,
   setSelectedDate,
-} from "../store/presidencySlice";
-import { setGazetteData } from "../store/gazetteDate";
+} from "../../../store/presidencySlice";
+import { setGazetteData } from "../../../store/gazetteDate";
 import { Link, useLocation } from "react-router-dom";
 import { EyeIcon } from "lucide-react";
 

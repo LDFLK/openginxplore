@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import utils from "../utils/utils";
-import api from "../services/services";
-import { useThemeContext } from "../themeContext";
+import utils from "../../../utils/utils";
+import api from "../../../services/services";
+import { useThemeContext } from "../../../context/themeContext";
 import { ClipLoader } from "react-spinners";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -11,7 +11,6 @@ import {
 } from "react-vertical-timeline-component";
 import { Landmark } from "lucide-react";
 
-import "./../assets/verticalTimeLineCSS.css";
 
 const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
   const allMinistryData = useSelector(

@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Error404 from "./pages/ErrorBoundaries/screens/404Error";
-import { useThemeContext } from "./themeContext";
-import XploreGovHomepage from "./pages/XploreGovHome/screens/XploreGovHome";
+import { useThemeContext } from "./context/themeContext";
+import LandingPage from "./pages/LandingPage/screens/LandingPage";
 import DataLoadingAnimatedComponent from "./pages/SplashPage/screens/dataLoadingAnimatedComponent";
 import DocsPage from "./pages/DocsPage/screens/DocsPage";
 
@@ -12,7 +12,7 @@ const App = () => {
       <div className={isDark ? "dark" : ""}>
         <Router>
           <Routes>
-            <Route path="/" element={<XploreGovHomepage />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
             <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
             <Route path="/docs" element={<DocsPage />} />

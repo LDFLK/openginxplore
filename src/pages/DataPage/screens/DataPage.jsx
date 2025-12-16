@@ -2,13 +2,13 @@ import { Folder, FileText } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Breadcrumb } from "./breadcrumb";
-import formatText from "../../utils/common_functions";
-import apiData from "./../../services/xploredataServices";
-import { DatasetView } from "./dataset-view";
+import { Breadcrumb } from "../components/breadcrumb";
+import formatText from "../../../utils/common_functions";
+import apiData from "../../../services/xploredataServices";
+import { DatasetView } from "../components/dataset-view";
 import { ClipLoader } from "react-spinners";
 
-export default function XploreDataTab({ setExternalDateRange }) {
+export default function DataPage({ setExternalDateRange }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

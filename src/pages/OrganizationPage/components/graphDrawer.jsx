@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { CiCircleChevLeft } from "react-icons/ci";
-import { useThemeContext } from "../themeContext";
+import { useThemeContext } from "../../../context/themeContext";
 import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import { Building, History, UserRound, Building2, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import utils from "../utils/utils";
+import utils from "../../../utils/utils";
 
 export default function Drawer({
   expandDrawer,
