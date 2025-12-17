@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import BackgroundGradientEffect from "../../XploreGovHome/components/backgroundGradientEffect";
-import AnimatedDots from "../../XploreGovHome/components/animatedDots";
+import BackgroundGradientEffect from "../../LandingPage/components/backgroundGradientEffect";
+import AnimatedDots from "../../LandingPage/components/animatedDots";
 import { Link } from "react-router-dom";
 
 const SplashPage = ({ progress, setProgress }) => {

@@ -1,10 +1,10 @@
-import PresidencyTimeline from "./PresidencyTimeline";
-import MinistryCardGrid from "./MinistryCardGrid";
+import GazetteTimeline from "../components/GazetteTimeline";
+import MinistryCardGrid from "../components/MinistryCardGrid";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useThemeContext } from "../themeContext";
-import FilteredPresidentCards from "./FilteredPresidentCards";
+import { useThemeContext } from "../../../context/themeContext";
+import FilteredPresidentCards from "../components/FilteredPresidentCards";
 
 const Organization = ({ dateRange }) => {
   const { selectedDate, selectedPresident } = useSelector(
@@ -33,7 +33,7 @@ const Organization = ({ dateRange }) => {
           <FilteredPresidentCards dateRange={dateRange} />
         </div>
       )}
-      <PresidencyTimeline />
+      <GazetteTimeline />
       {selectedPresident && <>{selectedDate != null && <MinistryCardGrid />}</>}
     </div>
   );

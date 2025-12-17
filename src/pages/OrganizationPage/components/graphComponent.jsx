@@ -7,15 +7,15 @@ import React, {
 } from "react";
 import { Box, Alert, AlertTitle } from "@mui/material";
 import ForceGraph3D from "react-force-graph-3d";
-import api from "../services/services";
-import utils from "../utils/utils";
+import api from "../../../services/services";
+import utils from "../../../utils/utils";
 import { useSelector } from "react-redux";
 
-import Drawer from "../components/graphDrawer";
+import Drawer from "./graphDrawer";
 import SpriteText from "three-spritetext";
-import WebGLChecker, { isWebGLAvailable } from "../components/webgl_checker";
-import LoadingComponent from "./loading_component";
-import { useThemeContext } from "../themeContext";
+import WebGLChecker, { isWebGLAvailable } from "../../../components/webgl_checker";
+import LoadingComponent from "../../../components/loading_component";
+import { useThemeContext } from "../../../context/themeContext";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 

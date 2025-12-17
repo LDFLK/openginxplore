@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useThemeContext } from "../../../themeContext";
+import { useThemeContext } from "../../../context/themeContext";
 
 export default function TextLogo({ isExpanded }) {
   const { isDark } = useThemeContext();

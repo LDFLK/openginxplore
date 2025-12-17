@@ -1,11 +1,11 @@
 import { DataTable } from "./table-view";
 import { useEffect, useState, useMemo } from "react";
 import { ClipLoader } from "react-spinners";
-import apiData from "../../services/xploredataServices";
+import apiData from "../../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
 import { Eye, EyeIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useThemeContext } from "../../themeContext";
+import { useThemeContext } from "../../../context/themeContext";
 
 export function DatasetView({ data, setExternalDateRange }) {
   const datasets = data;

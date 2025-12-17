@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import DepartmentHistoryTimeline from "../../../components/DepartmentHistoryTimeline";
-import { useThemeContext } from "../../../themeContext";
+import DepartmentHistoryTimeline from "../components/DepartmentHistoryTimeline";
+import { useThemeContext } from "../../../context/themeContext";
 import utils from "../../../utils/utils";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";

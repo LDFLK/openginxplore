@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import "./../../../assets/verticalTimeLineCSS.css";
-import { useThemeContext } from "../../../themeContext";
+import { useThemeContext } from "../../../context/themeContext";
 import { ClipLoader } from "react-spinners";
 import utils from "../../../utils/utils";
 import api from "../../../services/services";

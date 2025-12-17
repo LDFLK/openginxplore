@@ -7,14 +7,14 @@ import {
   MessageSquareHeart,
   SquareLibrary,
 } from "lucide-react";
-import XploreDataTab from "../../components/xploreData/XploreDataTab";
-import YearRangeSelector from "../../components/Timeline";
+import DataPage from "../../DataPage/screens/DataPage";
+import TimeRangeSelector from "../components/TimeRangeSelector";
 import { useSelector } from "react-redux";
-import Organization from "../../components/Organization";
+import Organization from "../../OrganizationPage/screens/Organization";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import TextLogo from "../XploreGovHome/components/textLogo";
-import ThemeToggle from "../../components/theme-toggle";
-import ShareLinkButton from "../../components/ShareLinkButton";
+import TextLogo from "../../LandingPage/components/textLogo";
+import ThemeToggle from "../../../components/theme-toggle";
+import ShareLinkButton from "../../../components/ShareLinkButton";
 import { toast, ToastContainer } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
@@ -22,7 +22,7 @@ const feedbackFormUrl = window?.configs?.feedbackFormUrl
   ? window.configs.feedbackFormUrl
   : "/";
 
-export default function OpenginXplore() {
+export default function HomePage() {
   const [isExpanded, setIsExpanded] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -233,7 +233,7 @@ export default function OpenginXplore() {
             <ThemeToggle />
           </div>
         </div>
-        <YearRangeSelector
+        <TimeRangeSelector
           startYear={2019}
           dates={selectedTab === "organization" ? dates : []}
           latestPresStartDate={latestPresStartDate}
@@ -245,7 +245,7 @@ export default function OpenginXplore() {
             <Organization dateRange={userSelectedDateRange} />
           </>
         ) : selectedTab === "data" ? (
-          <XploreDataTab setExternalDateRange={setExternalDateRange} />
+          <DataPage setExternalDateRange={setExternalDateRange} />
         ) : (
           <div className="text-primary p-8">Tab not found: {selectedTab}</div>
         )}

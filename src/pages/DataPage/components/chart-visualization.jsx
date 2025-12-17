@@ -9,8 +9,8 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import formatText from "../../utils/common_functions";
-import { useThemeContext } from "../../themeContext";
+import formatText from "../../../utils/common_functions";
+import { useThemeContext } from "../../../context/themeContext";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 

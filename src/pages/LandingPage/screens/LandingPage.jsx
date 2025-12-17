@@ -17,7 +17,7 @@ import Footer from "../components/footer";
 import BackgroundGradientEffect from "../components/backgroundGradientEffect";
 import AnimatedDots from "../components/animatedDots";
 import PresidentialTimeline from "../components/PresidentialTimeline";
-import { useThemeContext } from "../../../themeContext";
+import { useThemeContext } from "../../../context/themeContext";
 
 // Simulate the 3D network data structure
 const genRandomTree = (N = 100) => {
@@ -35,7 +35,7 @@ const genRandomTree = (N = 100) => {
   };
 };
 
-const XploreGovHomepage = () => {
+const LandingPage = () => {
   const navigate = useNavigate();
   const graphData = genRandomTree();
   const { colors, isDark } = useThemeContext();
@@ -287,4 +287,4 @@ const XploreGovHomepage = () => {
   );
 };
 
-export default XploreGovHomepage;
+export default LandingPage;

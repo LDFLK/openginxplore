@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
-import lightColors from "./assets/colors";
-import darkColors from "./assets/darkColors";
+import lightColors from "../assets/colors";
+import darkColors from "../assets/darkColors";
 
 const ThemeContext = createContext();
 
