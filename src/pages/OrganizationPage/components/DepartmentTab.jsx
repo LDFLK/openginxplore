@@ -15,7 +15,7 @@ import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import DomainAddIcon from "@mui/icons-material/DomainAdd";
 import utils from "../../../utils/utils";
-import api from "../../../services/services"
+import api from "../../../services/services";
 import { useThemeContext } from "../../../context/themeContext";
 import InfoTooltip from "../../../components/InfoToolTip";
 
