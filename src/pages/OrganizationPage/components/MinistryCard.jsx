@@ -1,5 +1,4 @@
 import { Card, Typography, Box, Stack } from "@mui/material";
-import utils from "../../../utils/utils";
 import { useSelector } from "react-redux";
 import { useThemeContext } from "../../../context/themeContext";
 import { useBadgeContext } from "../../../context/badgeContext";
@@ -16,7 +15,7 @@ const MinistryCard = ({ card, onClick }) => {
 
   const handleOpenProfile = (id) => {
     navigate(`/person-profile/${id}`, {
-      state:{ mode: "back", from: location.pathname + location.search  }
+      state: { mode: "back", from: location.pathname + location.search }
     })
   }
 
@@ -25,14 +24,8 @@ const MinistryCard = ({ card, onClick }) => {
       sx={{
         cursor: "pointer",
         boxShadow: "none",
-        // border: `2px solid ${colors.backgroundSecondary}50`,
         border: `1px solid ${selectedPresident.themeColorLight}99`,
         transition: "box-shadow 0.2s",
-        "&:hover": {
-          // border: `2px solid ${colors.ministryCardBorderHover}`,
-          // border: `2px solid ${selectedPresident.themeColorLight}`,
-        },
-
         backgroundColor: colors.backgroundWhite,
         borderRadius: "10px",
         position: "relative",
@@ -86,11 +79,11 @@ const MinistryCard = ({ card, onClick }) => {
                 fontSize: "14px"
               }}
             >
-              {card.name.split(":")[0]}
+              {card.name}
             </Typography>
           </Box>
 
-          {card.newMin && showMinistryBadge && (
+          {card.isNew && showMinistryBadge && (
             <Box
               sx={{
                 backgroundColor: colors.green,
@@ -115,7 +108,6 @@ const MinistryCard = ({ card, onClick }) => {
           spacing={0.5}
           sx={{
             p: 1,
-            // minHeight: '50px',
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between", // push name to bottom
@@ -128,10 +120,7 @@ const MinistryCard = ({ card, onClick }) => {
           {/* Name & Badge Section */}
           <Stack direction="column" spacing={0}>
             {/* President Label */}
-            {!card.headMinisterName ||
-              (selectedPresident &&
-                utils.extractNameFromProtobuf(card.headMinisterName) ===
-                utils.extractNameFromProtobuf(selectedPresident.name).split(":")[0]) ? (
+            {card.ministers?.[0]?.isPresident ? (
               <Box sx={{ display: "flex", alignItems: "flex-end" }}>
                 <Typography
                   variant="subtitle2"
@@ -141,7 +130,7 @@ const MinistryCard = ({ card, onClick }) => {
                     py: "2px",
                     px: "6px",
                     fontSize: "10px",
-                    backgroundColor: `${selectedPresident.themeColorLight}`,
+                    backgroundColor: selectedPresident?.themeColorLight,
                     borderRadius: "3px",
                     mb: "2px",
                   }}
@@ -156,7 +145,7 @@ const MinistryCard = ({ card, onClick }) => {
               <Typography
                 variant="subtitle2"
                 onClick={() =>
-                  handleOpenProfile(card.headMinisterId || selectedPresident?.id)
+                  handleOpenProfile(card.ministers?.[0]?.id)
                 }
                 sx={{
                   fontWeight: 400,
@@ -172,17 +161,14 @@ const MinistryCard = ({ card, onClick }) => {
                   },
                 }}
               >
-                {card.headMinisterName
-                  ? utils.extractNameFromProtobuf(card.headMinisterName)
-                  : selectedPresident &&
-                  utils.extractNameFromProtobuf(selectedPresident.name).split(":")[0]}
+                {card.ministers?.[0]?.name}
               </Typography>
 
-              {card.newPerson && showPersonBadge && (
+              {card.ministers?.[0]?.isNew && showPersonBadge && (
                 <Box
                   sx={{
                     border: `1px solid ${colors.green}`,
-                    color: `${colors.green}`,
+                    color: colors.green,
                     fontSize: "0.65rem",
                     fontWeight: "semibold",
                     borderRadius: "4px",
@@ -197,7 +183,6 @@ const MinistryCard = ({ card, onClick }) => {
             </Stack>
           </Stack>
         </Stack>
-
       </Stack>
     </Card>
   );

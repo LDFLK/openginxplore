@@ -1,74 +1,77 @@
 import {
-  Box,
-  Grid,
-  Typography,
-  Alert,
-  AlertTitle,
-  Chip,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  Card,
-  DialogContent,
-  Avatar,
+  Box, Grid, Typography, Alert, AlertTitle, TextField, Select, MenuItem, FormControl, InputLabel, Button, Card, DialogContent, Avatar,
 } from "@mui/material";
-import MinistryCard from "./MinistryCard";
-import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useRef, useState } from "react";
-import api from "../../../services/services";
-import { ClipLoader } from "react-spinners";
-import { useThemeContext } from "../../../context/themeContext";
-import InputAdornment from "@mui/material/InputAdornment";
-import SearchIcon from "@mui/icons-material/Search";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import ApartmentIcon from "@mui/icons-material/Apartment";
-import PeopleIcon from "@mui/icons-material/People";
-import InfoTooltip from "../../../components/InfoToolTip";
+
+import { useEffect, useRef, useState, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
-import utils from "../../../utils/utils";
+import { useThemeContext } from "../../../context/themeContext";
+import useUrlParamState from "../../../hooks/singleSharingURL";
+import { useActivePortfolioList } from "../../../hooks/useActivePortfolioList";
+
+import MinistryCard from "./MinistryCard";
 import MinistryViewModeToggleButton from "../../../components/ministryViewModeToggleButton";
 import GraphComponent from "./graphComponent";
-import { clearTimeout } from "highcharts";
+import PersonsTab from "./PersonsTab";
+import DepartmentTab from "./DepartmentTab";
+import InfoTooltip from "../../../components/InfoToolTip";
 
+import api from "../../../services/services";
+import utils from "../../../utils/utils";
+import personImages from "../../../assets/personImages.json";
+
+import { ClipLoader } from "react-spinners";
+
+import InputAdornment from "@mui/material/InputAdornment";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import StepContent from "@mui/material/StepContent";
-import PersonsTab from "./PersonsTab";
-import useUrlParamState from "../../../hooks/singleSharingURL";
-import DepartmentTab from "./DepartmentTab";
-import personImages from "../../../assets/personImages.json";
+
+import {
+  Search as SearchIcon,
+  AccountBalance as AccountBalanceIcon,
+  WorkspacePremium as WorkspacePremiumIcon,
+  PersonAddAlt1 as PersonAddAlt1Icon,
+  Apartment as ApartmentIcon,
+  People as PeopleIcon
+} from "@mui/icons-material";
+
+import { clearTimeout } from "highcharts";
+
 
 const MinistryCardGrid = () => {
-  const { allMinistryData } = useSelector((state) => state.allMinistryData);
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );
   const allPersonDict = useSelector((state) => state.allPerson.allPerson);
-  const [activeMinistryList, setActiveMinistryList] = useState([]);
-  const [filteredMinistryList, setFilteredMinistryList] = useState([]);
   const [pmloading, setPmLoading] = useState(true);
-  const [filterLoading, setFilterLoading] = useState(false);
   const [searchText, setSearchText] = useUrlParamState("filterByName", "");
   const [filterType, setFilterType] = useUrlParamState("filterByType", "all");
   const [viewMode, setViewMode] = useUrlParamState("viewMode", "Grid");
   const [activeStep, setActiveStep] = useState(0);
   const [activeTab, setActiveTab] = useState("departments");
   const [selectedCard, setSelectedCard] = useState(null);
-  const [ministryLoading, setMinistryLoading] = useState(false);
   const { colors } = useThemeContext();
-  const dispatch = useDispatch();
   const location = useLocation();
   const [primeMinister, setPrimeMinister] = useState({
     relation: null,
     person: null,
   });
+
+  const { data, isLoading, error } = useActivePortfolioList(
+    selectedPresident?.id,
+    selectedDate?.date
+  );
+
+  const activeMinistryList = data?.portfolioList || [];
+
+  const activeMinistriesCount = data?.activeMinistries || 0;
+  const newMinistriesCount = data?.newMinistries || 0;
+  const newMinistersCount = data?.newMinisters || 0;
+  const ministriesUnderPresident = data?.ministriesUnderPresident || 0;
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -85,24 +88,11 @@ const MinistryCardGrid = () => {
     );
 
     if (matchedCard) {
-      // dispatch(setSelectedMinistry(matchedCard.id));
       setSelectedCard(matchedCard);
       setActiveStep(1);
     }
   }, [location.search, activeMinistryList, viewMode]);
 
-  useEffect(() => {
-    if (
-      !selectedDate ||
-      !allMinistryData ||
-      Object.keys(allMinistryData).length === 0
-    ) {
-      return;
-    }
-    setTimeout(() => {
-      fetchActiveMinistryList();
-    }, 1500);
-  }, [selectedDate, allMinistryData, selectedPresident]);
 
   useEffect(() => {
     if (!selectedDate) {
@@ -154,119 +144,38 @@ const MinistryCardGrid = () => {
     }
   };
 
-  useEffect(() => {
-    let delayDebounceFunction;
-    setFilterLoading(true);
-    delayDebounceFunction = setTimeout(() => {
-      let result = activeMinistryList;
+  const filteredMinistryList = useMemo(() => {
+    if (!data?.portfolioList) return [];
 
-      if (filterType == "all") {
-        result = activeMinistryList;
-      } else if (filterType === "newPerson") {
-        result = result.filter((m) => m.newPerson);
-      } else if (filterType === "newMinistry") {
-        result = result.filter((m) => m.newMin);
-      } else if (filterType === "presidentAsMinister") {
-        result = result.filter((m) => {
-          const headName = m.headMinisterName
-            ? utils.extractNameFromProtobuf(m.headMinisterName)
-            : selectedPresident?.name
-            ? utils
-                .extractNameFromProtobuf(selectedPresident.name)
-                .split(":")[0]
-            : null;
+    let result = data.portfolioList;
 
-          const presidentName = selectedPresident?.name
-            ? utils
-                .extractNameFromProtobuf(selectedPresident.name)
-                .split(":")[0]
-            : null;
-
-          return (
-            headName &&
-            presidentName &&
-            headName.toLowerCase().trim() === presidentName.toLowerCase().trim()
-          );
-        });
-      }
-
-      if (searchText !== "") {
-        result = searchByText(searchText, result);
-      }
-      setFilteredMinistryList(result);
-      setFilterLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(delayDebounceFunction);
-  }, [searchText, filterType, activeMinistryList, selectedPresident]);
-
-  const searchByText = (searchText, list = activeMinistryList) => {
-    if (searchText !== "") {
-      const normalizedSearchText = (
-        searchText ? String(searchText).trim() : ""
-      ).toLowerCase();
-
-      return list.filter((minister) => {
-        const ministerName = minister.name
-          ? minister.name.toLowerCase().trim()
-          : "";
-        return ministerName.includes(normalizedSearchText);
-      });
-    } else {
-      return list;
+    switch (filterType) {
+      case "newPerson":
+        result = result.filter((m) => m.ministers?.[0]?.isNew);
+        break;
+      case "newMinistry":
+        result = result.filter((m) => m.isNew);
+        break;
+      case "presidentAsMinister":
+        result = result.filter((m) => m.ministers?.[0]?.isPresident);
+        break;
+      case "all":
+      default:
+        break;
     }
-  };
+
+    if (searchText?.trim() !== "") {
+      const normalizedSearchText = searchText.trim().toLowerCase();
+      result = result.filter((m) =>
+        m.name.toLowerCase().includes(normalizedSearchText)
+      );
+    }
+
+    return result;
+  }, [data?.portfolioList, filterType, searchText]);
 
   const handleChange = (event) => {
     setSearchText(event.target.value);
-  };
-
-  const fetchActiveMinistryList = async () => {
-    if (!selectedDate || !allMinistryData || Object.keys(allMinistryData).length === 0) return;
-
-    try {
-      setMinistryLoading(true);
-
-      const activeMinistry = await api.fetchActiveMinistries(
-        selectedDate,
-        allMinistryData,
-        selectedPresident
-      );
-      const enrichedMinistries = await Promise.all(
-        activeMinistry.children.map(async (ministry) => {
-          const response = await api.fetchActiveRelationsForMinistry(
-            selectedDate.date,
-            ministry.id,
-            "AS_APPOINTED"
-          );
-
-          const relations = await response.json();
-
-          const rel = relations[0] || null;
-
-          const person = rel ? allPersonDict[rel.relatedEntityId] : null;
-
-          const headMinisterId = rel?.relatedEntityId || null;
-          const headMinisterName = person?.name || null;
-          const headMinisterStartTime = rel?.startTime || null;
-
-          return {
-            ...ministry,
-            headMinisterId,
-            headMinisterName,
-            newPerson: headMinisterStartTime?.startsWith(selectedDate.date) || false,
-            newMin: ministry.startTime?.startsWith(selectedDate.date) || false,
-          };
-        })
-      );
-
-      setActiveMinistryList(enrichedMinistries);
-      setFilteredMinistryList(enrichedMinistries);
-      setMinistryLoading(false);
-    } catch (e) {
-      console.log("error fetch ministry list : ", e.message);
-      setMinistryLoading(false);
-    }
   };
 
   const steps = [
@@ -279,7 +188,6 @@ const MinistryCardGrid = () => {
       description: "All departments under this ministry",
     },
   ];
-
   // Custom icon component
   const StepIcon = ({ label }) => {
     let IconComponent = null;
@@ -406,8 +314,8 @@ const MinistryCardGrid = () => {
         >
           <Box sx={{ mt: -0.5 }}>
             {primeMinister.person &&
-            primeMinister.relation &&
-            selectedPresident ? (
+              primeMinister.relation &&
+              selectedPresident ? (
               <Box
                 sx={{
                   display: "flex",
@@ -455,14 +363,12 @@ const MinistryCardGrid = () => {
                   </Typography>
                   <Typography sx={{ fontSize: 14, color: colors.textMuted }}>
                     {primeMinister.relation.endTime
-                      ? `${
-                          primeMinister.relation.startTime.split("-")[0]
-                        } - ${new Date(
-                          primeMinister.relation.endTime
-                        ).getFullYear()}`
-                      : `${
-                          primeMinister.relation.startTime.split("-")[0]
-                        } - Present`}
+                      ? `${primeMinister.relation.startTime.split("-")[0]
+                      } - ${new Date(
+                        primeMinister.relation.endTime
+                      ).getFullYear()}`
+                      : `${primeMinister.relation.startTime.split("-")[0]
+                      } - Present`}
                   </Typography>
                   <Button
                     component={Link}
@@ -555,7 +461,7 @@ const MinistryCardGrid = () => {
             }}
           >
             {/* Active Ministries */}
-            {activeMinistryList.length > 0 && (
+            {activeMinistriesCount > 0 && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <AccountBalanceIcon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
@@ -585,13 +491,13 @@ const MinistryCardGrid = () => {
                     color: colors.textPrimary,
                   }}
                 >
-                  {activeMinistryList.length}
+                  {activeMinistriesCount}
                 </Typography>
               </Box>
             )}
 
             {/* New Ministries */}
-            {activeMinistryList.filter((m) => m.newMin).length > 0 && (
+            {newMinistriesCount > 0 && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <AccountBalanceIcon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
@@ -621,13 +527,13 @@ const MinistryCardGrid = () => {
                     color: colors.textPrimary,
                   }}
                 >
-                  {activeMinistryList.filter((m) => m.newMin).length}
+                  {newMinistriesCount}
                 </Typography>
               </Box>
             )}
 
             {/* New Ministers */}
-            {activeMinistryList.filter((m) => m.newPerson).length > 0 && (
+            {newMinistersCount > 0 && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <PersonAddAlt1Icon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
@@ -657,29 +563,13 @@ const MinistryCardGrid = () => {
                     color: colors.textPrimary,
                   }}
                 >
-                  {activeMinistryList.filter((m) => m.newPerson).length}
+                  {newMinistersCount}
                 </Typography>
               </Box>
             )}
 
             {/* Ministries under president */}
-            {activeMinistryList.filter((m) => {
-              const headName = m.headMinisterName
-                ? utils.extractNameFromProtobuf(m.headMinisterName)
-                : null;
-              const presidentName = selectedPresident?.name
-                ? utils
-                    .extractNameFromProtobuf(selectedPresident.name)
-                    .split(":")[0]
-                : null;
-              if (!headName && presidentName) return true;
-              return (
-                headName &&
-                presidentName &&
-                headName.toLowerCase().trim() ===
-                  presidentName.toLowerCase().trim()
-              );
-            }).length > 0 && (
+            {ministriesUnderPresident > 0 && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <WorkspacePremiumIcon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
@@ -709,25 +599,7 @@ const MinistryCardGrid = () => {
                     color: colors.textPrimary,
                   }}
                 >
-                  {
-                    activeMinistryList.filter((m) => {
-                      const headName = m.headMinisterName
-                        ? utils.extractNameFromProtobuf(m.headMinisterName)
-                        : null;
-                      const presidentName = selectedPresident?.name
-                        ? utils
-                            .extractNameFromProtobuf(selectedPresident.name)
-                            .split(":")[0]
-                        : null;
-                      if (!headName && presidentName) return true;
-                      return (
-                        headName &&
-                        presidentName &&
-                        headName.toLowerCase().trim() ===
-                          presidentName.toLowerCase().trim()
-                      );
-                    }).length
-                  }
+                  {ministriesUnderPresident}
                 </Typography>
               </Box>
             )}
@@ -779,7 +651,7 @@ const MinistryCardGrid = () => {
                 <Box
                   sx={{
                     flex: 1,
-                    minWidth: { xs: "100%", sm: 200 }, 
+                    minWidth: { xs: "100%", sm: 200 },
                     maxWidth: { sm: 300 },
                   }}
                 >
@@ -882,7 +754,7 @@ const MinistryCardGrid = () => {
             />
           </Box>
         </Box>
-        {pmloading || ministryLoading ? (
+        {isLoading ? (
           <Box
             sx={{
               display: "flex",
@@ -893,7 +765,7 @@ const MinistryCardGrid = () => {
           >
             <ClipLoader
               color={selectedPresident.themeColorLight}
-              loading={pmloading || ministryLoading}
+              loading={isLoading}
               size={25}
               aria-label="Loading Spinner"
               data-testid="loader"
@@ -938,8 +810,8 @@ const MinistryCardGrid = () => {
                             (activeStep != 0 &&
                               step.label == "Ministries" &&
                               selectedCard) ||
-                            (activeStep == 1 &&
-                              step.label == "Departments & People")
+                              (activeStep == 1 &&
+                                step.label == "Departments & People")
                               ? handleBack
                               : null
                           }
@@ -971,8 +843,8 @@ const MinistryCardGrid = () => {
                             }}
                           >
                             {selectedCard &&
-                            step.label == "Ministries" &&
-                            activeStep !== 0
+                              step.label == "Ministries" &&
+                              activeStep !== 0
                               ? selectedCard.name
                               : step.label}
                           </Typography>
@@ -989,7 +861,7 @@ const MinistryCardGrid = () => {
                                 sx={{ width: "100%" }}
                               >
                                 {filteredMinistryList &&
-                                filteredMinistryList.length > 0 ? (
+                                  filteredMinistryList.length > 0 ? (
                                   filteredMinistryList.map((card) => (
                                     <Grid
                                       key={card.id}
@@ -1015,7 +887,7 @@ const MinistryCardGrid = () => {
                                       />
                                     </Grid>
                                   ))
-                                ) : !ministryLoading &&
+                                ) : !isLoading &&
                                   activeMinistryList &&
                                   activeMinistryList.length === 0 ? (
                                   <Box
@@ -1065,7 +937,7 @@ const MinistryCardGrid = () => {
                                   </Box>
                                 )}
                               </Grid>
-                              {/* If filtering is happening, overlay a subtle loader */}
+                              {/* If filtering is happening, overlay a subtle loader
                               {filterLoading && (
                                 <Box
                                   sx={{
@@ -1080,7 +952,7 @@ const MinistryCardGrid = () => {
                                     size={18}
                                   />
                                 </Box>
-                              )}
+                              )} */}
                             </>
                           ) : (
                             step.label == "Departments & People" && (
