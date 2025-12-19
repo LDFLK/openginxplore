@@ -14,6 +14,7 @@ const MinistryCard = ({ card, onClick }) => {
   const location = useLocation();
 
   const handleOpenProfile = (id) => {
+    if (!id) return;
     navigate(`/person-profile/${id}`, {
       state: { mode: "back", from: location.pathname + location.search }
     })
