@@ -1,7 +1,21 @@
 import utils from "../utils/utils";
+import axios from "@/lib/axios";
 
 const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
 // const apiUrl = "";
+
+const GI_SERVICE_URL = "/v1/organisation";
+
+export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
+  const { data } = await axios.post(
+    `${GI_SERVICE_URL}/active-portfolio-list`,
+    { date },
+    { params: { presidentId }, 
+    signal }
+  );
+
+  return data;
+};
 
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
