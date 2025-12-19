@@ -7,6 +7,7 @@ export const useActivePortfolioList = (presidentId, date) => {
     queryFn: ({ signal }) =>
       getActivePortfolioList({ presidentId, date, signal }),
     enabled: !!presidentId && !!date,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // data becomes stale, but still cached
+    gcTime: 1000 * 60 * 10, // If no component uses the query, it gets garbage-collected after this
   });
 };
