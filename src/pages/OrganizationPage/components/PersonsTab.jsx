@@ -4,7 +4,7 @@ import { Box, Typography, Divider, Stack } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import utils from "../../../utils/utils";
-import api from "../../../services/services"
+import api from "../../../services/services";
 import { useThemeContext } from "../../../context/themeContext";
 import InfoTooltip from "../../../components/InfoToolTip";
 import { Link, useLocation } from "react-router-dom";
