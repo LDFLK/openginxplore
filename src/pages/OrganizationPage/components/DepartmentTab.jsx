@@ -241,7 +241,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
           {/* Department List */}
 
           {filteredDepartments.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-4">
               {filteredDepartments.map((dep) => {
                 return (
                   <div
@@ -295,7 +295,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         History
                       </Link>
 
-                      {dep.hasData ? (
+                      {dep.hasData && (
                         <Link
                           to={`/data?parentId=${dep.id}`}
                           className="text-sm font-normal hover:underline"
@@ -303,15 +303,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         >
                           Data
                         </Link>
-                      ) : (
-                        <span
-                          className="text-sm font-normal"
-                          style={{ color: colors.textMuted }}
-                        >
-                          Data
-                        </span>
-                      )}
-
+                      ) }
                     </div>
                   </div>
                 );
