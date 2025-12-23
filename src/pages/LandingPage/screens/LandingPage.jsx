@@ -160,7 +160,7 @@ const LandingPage = () => {
                   <ChevronRight className="w-6 h-6" />
                 </button>
                 <Link
-                  to={"https://ldflk.github.io/nexoan/"}
+                  to={"https://ldflk.github.io/OpenGIN/"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-none border mx-3 border-accent cursor-pointer text-accent px-3.5 py-2 rounded-lg font-normal text-lg hover:scale-105 transition transform inline-flex items-center hover:cursor-pointer"
