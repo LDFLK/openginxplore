@@ -298,15 +298,15 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                       {dep.hasData ? (
                         <Link
                           to={`/data?parentId=${dep.id}`}
-                          className="text-sm font-small hover:underline"
+                          className="text-sm font-normal hover:underline"
                           style={{ color: selectedPresident.themeColorLight }}
                         >
                           Data
                         </Link>
                       ) : (
                         <span
-                          className="text-sm font-small"
-                          style={{ color: "#999" }}
+                          className="text-sm font-normal"
+                          style={{ color: colors.textMuted }}
                         >
                           Data
                         </span>
