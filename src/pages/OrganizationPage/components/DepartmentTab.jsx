@@ -37,9 +37,9 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
   const newDepartments = data?.newDepartments || 0;
 
   const filteredDepartments =
-    departmentListForMinistry?.filter((dep) =>
+    departmentListForMinistry.filter((dep) =>
       dep.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || [];
+    );
 
   return (
     <Box sx={{ mt: -2 }}>
