@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getDepartmentsByPortfolio } from "../services/services";
-
-const FIVE_MINUTES_IN_MS = 1000 * 60 * 5;
-const TEN_MINUTES_IN_MS = 1000 * 60 * 10;
+import { STALE_TIME, GC_TIME } from "../constants/constants";
 
 export const useDepartmentsByPortfolio = (portfolioId, date) => {
   return useQuery({
@@ -10,7 +8,7 @@ export const useDepartmentsByPortfolio = (portfolioId, date) => {
     queryFn: ({ signal }) =>
       getDepartmentsByPortfolio({ portfolioId, date, signal }),
     enabled: !!portfolioId && !!date,
-    staleTime: FIVE_MINUTES_IN_MS,
-    gcTime: TEN_MINUTES_IN_MS,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
   });
 };

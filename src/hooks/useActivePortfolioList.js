@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivePortfolioList } from "../services/services";
+import { STALE_TIME, GC_TIME } from "../constants/constants";
 
 export const useActivePortfolioList = (presidentId, date) => {
   return useQuery({
@@ -7,7 +8,7 @@ export const useActivePortfolioList = (presidentId, date) => {
     queryFn: ({ signal }) =>
       getActivePortfolioList({ presidentId, date, signal }),
     enabled: !!presidentId && !!date,
-    staleTime: 1000 * 60 * 5, // data becomes stale, but still cached
-    gcTime: 1000 * 60 * 10, // If no component uses the query, it gets garbage-collected after this
+    staleTime: STALE_TIME, 
+    gcTime: GC_TIME, 
   });
 };
