@@ -8,6 +8,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Cell,
 } from "recharts";
 import formatText from "../../../utils/common_functions";
 import { useThemeContext } from "../../../context/themeContext";
@@ -42,39 +43,60 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   }, [yearlyData, rows]);
 
   // Detect columns
+  // Detect columns and handle single-row numeric datasets
   useEffect(() => {
     const stringCols = [];
     const numericCols = [];
-    const sampleRows =
+    const rows =
       normalizedYearlyData.length > 0 ? normalizedYearlyData[0].rows : [];
 
-    if (!sampleRows || sampleRows.length === 0 || !columns.length) {
+    if (!rows || rows.length === 0 || !columns.length) {
       setNumericColumns([]);
       setStringColumns([]);
       return;
     }
 
-    columns.forEach((col, idx) => {
-      const isNumeric = sampleRows.some((row) => {
-        const val = row[idx];
-        return (
-          typeof val === "number" ||
-          (!isNaN(Number(val)) && val !== null && val !== "")
-        );
-      });
-
-      if (isNumeric) numericCols.push(col);
-      else stringCols.push(col);
+    // Check if this is a single-row dataset with all numeric values
+    const isSingleRowAllNumeric = rows.length === 1 && columns.every((col, idx) => {
+      const val = rows[0][idx];
+      return (
+        typeof val === "number" ||
+        (!isNaN(Number(val)) && val !== null && val !== "")
+      );
     });
 
-    setNumericColumns(numericCols);
-    setStringColumns(stringCols);
+    if (isSingleRowAllNumeric) {
+      // For single-row numeric datasets, treat all columns as potential categories
+      // The user will select which columns to visualize
+      setStringColumns(["_category"]); // Virtual X-axis
+      setNumericColumns(columns);
+      setXAxis("_category");
+    } else {
+      // Normal detection logic
+      columns.forEach((col, idx) => {
+        const isNumeric = rows.some((row) => {
+          const val = row[idx];
+          return (
+            typeof val === "number" ||
+            (!isNaN(Number(val)) && val !== null && val !== "")
+          );
+        });
+
+        if (isNumeric) numericCols.push(col);
+        else stringCols.push(col);
+      });
+
+      setNumericColumns(numericCols);
+      setStringColumns(stringCols);
+    }
 
     setSelectedYColumns((prev) =>
-      prev.filter((col) => numericCols.includes(col))
+      prev.filter((col) => (isSingleRowAllNumeric ? columns : numericCols).includes(col))
     );
   }, [columns, normalizedYearlyData]);
-const forceRGBColors = () => {
+
+
+  const forceRGBColors = () => {
     const style = document.createElement("style");
     style.id = "force-rgb-style";
     style.innerHTML = `
@@ -192,6 +214,33 @@ const forceRGBColors = () => {
       return [];
     }
 
+    const rows = normalizedYearlyData.length > 0 ? normalizedYearlyData[0].rows : [];
+
+    // Check if single-row all-numeric dataset
+    const isSingleRowAllNumeric = rows.length === 1 && xAxis === "_category";
+
+    if (isSingleRowAllNumeric) {
+      // Transform: each selected column becomes a data point with values from all years
+      return selectedYColumns.map((col) => {
+        const colIdx = columns.indexOf(col);
+        const dataPoint = {
+          [xAxis]: formatText({ name: col }), // Use column name as category
+        };
+
+        // Add value for each year
+        normalizedYearlyData.forEach((dataset) => {
+          // Make sure we're getting the value from the correct dataset's rows
+          if (dataset.rows && dataset.rows.length > 0) {
+            const value = dataset.rows[0][colIdx];
+            dataPoint[`${dataset.year}_value`] = Number(value) || 0;
+          }
+        });
+
+        return dataPoint;
+      });
+    }
+
+    // Normal multi-row dataset logic
     const dataMap = new Map();
 
     normalizedYearlyData.forEach((dataset) => {
@@ -393,20 +442,19 @@ const forceRGBColors = () => {
                 </select>
               </div>
             </div>
-            {/* <div className="flex justify-end gap-2 mb-4">
-              <button
-                onClick={handleDownloadImage}
-                className="px-3 py-1 text-sm bg-accent/70 hover:bg-accent text-white rounded-md"
-              >
-                Download PNG
-              </button>
-              <button
-                onClick={handleDownloadPDF}
-                className="px-3 py-1 text-sm bg-primary/70 hover:bg-primary text-white rounded-md"
-              >
-                Download PDF
-              </button>
-            </div> */}
+
+            {/* Custom Tooltip */}
+            <style>
+              {`
+                .custom-tooltip-bullet {
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 50%;
+                  display: inline-block;
+                  margin-right: 8px;
+                }
+              `}
+            </style>
 
             {/* Chart */}
             <div
@@ -592,28 +640,76 @@ const forceRGBColors = () => {
                                 tick={{ fill: "transparent" }}
                               />
                               <Tooltip
-                                contentStyle={{
-                                  backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                  color: isDark ? "#dbdbdb" : "#1f2937",
-                                  border: "1px solid #dbdbdb",
-                                  borderRadius: "0.5rem",
+                                content={({ active, payload, label }) => {
+                                  if (active && payload && payload.length) {
+                                    return (
+                                      <div
+                                        className="rounded-lg border border-[#dbdbdb] p-2 text-sm shadow-md"
+                                        style={{
+                                          backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+                                          color: isDark ? "#dbdbdb" : "#1f2937",
+                                        }}
+                                      >
+                                        <p className="font-semibold mb-1">{label}</p>
+                                        {payload.map((entry, index) => {
+                                          let finalColor = entry.color;
+                                          if (!isMultiYear && xAxis === "_category") {
+                                            const dataIndex = chartData.findIndex((d) => d[xAxis] === label);
+                                            if (dataIndex !== -1) {
+                                              finalColor = COLORS[dataIndex % COLORS.length];
+                                            }
+                                          }
+                                          return (
+                                            <div key={index} className="flex items-center gap-2">
+                                              <span
+                                                className="custom-tooltip-bullet"
+                                                style={{ backgroundColor: finalColor }}
+                                              />
+                                              <span>{formatText({ name: entry.name })}:</span>
+                                              <span className="font-medium">{entry.value}</span>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    );
+                                  }
+                                  return null;
                                 }}
-                                formatter={(value, name) => [value, formatText({ name })]}
-                                shared={false}
                               />
-                              {selectedYColumns.map((col, colIdx) =>
+                              {xAxis === "_category" ? (
+                                // Single-row numeric dataset: bars for each year
                                 normalizedYearlyData.map((d, yearIdx) => (
                                   <Bar
-                                    key={`${d.year}_${col}`}
-                                    dataKey={`${d.year}_${col}`}
-                                    fill={
-                                      isMultiYear
-                                        ? COLORS[yearIdx % COLORS.length]
-                                        : COLORS[colIdx % COLORS.length]
-                                    }
+                                    key={d.year}
+                                    dataKey={`${d.year}_value`}
+                                    fill={COLORS[yearIdx % COLORS.length]}
                                     maxBarSize={barWidth}
-                                  />
+                                  >
+                                    {!isMultiYear &&
+                                      chartData.map((entry, index) => (
+                                        <Cell
+                                          key={`cell-${index}`}
+                                          fill={COLORS[index % COLORS.length]}
+                                        />
+                                      ))}
+                                  </Bar>
                                 ))
+                              ) : (
+                                // Normal multi-row dataset
+                                selectedYColumns.map((col, colIdx) =>
+                                  normalizedYearlyData.map((d, yearIdx) => (
+                                    <Bar
+                                      key={`${d.year}_${col}`}
+                                      dataKey={`${d.year}_${col}`}
+                                      fill={
+                                        isMultiYear
+                                          ? COLORS[yearIdx % COLORS.length]
+                                          : COLORS[colIdx % COLORS.length]
+                                      }
+                                      maxBarSize={barWidth}
+                                    />
+                                  ))
+                                )
                               )}
                             </BarChart>
                           ) : (
@@ -685,31 +781,87 @@ const forceRGBColors = () => {
                                 tick={{ fill: "transparent" }}
                               />
                               <Tooltip
-                                contentStyle={{
-                                  backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                  color: isDark ? "#dbdbdb" : "#1f2937",
-                                  border: "1px solid #dbdbdb",
-                                  borderRadius: "0.5rem",
+                                content={({ active, payload, label }) => {
+                                  if (active && payload && payload.length) {
+                                    return (
+                                      <div
+                                        className="rounded-lg border border-[#dbdbdb] p-2 text-sm shadow-md"
+                                        style={{
+                                          backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+                                          color: isDark ? "#dbdbdb" : "#1f2937",
+                                        }}
+                                      >
+                                        <p className="font-semibold mb-1">{label}</p>
+                                        {payload.map((entry, index) => {
+                                          let finalColor = entry.color;
+                                          if (!isMultiYear && xAxis === "_category") {
+                                            const dataIndex = chartData.findIndex((d) => d[xAxis] === label);
+                                            if (dataIndex !== -1) {
+                                              finalColor = COLORS[dataIndex % COLORS.length];
+                                            }
+                                          }
+                                          return (
+                                            <div key={index} className="flex items-center gap-2">
+                                              <span
+                                                className="custom-tooltip-bullet"
+                                                style={{ backgroundColor: finalColor }}
+                                              />
+                                              <span>{formatText({ name: entry.name })}:</span>
+                                              <span className="font-medium">{entry.value}</span>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    );
+                                  }
+                                  return null;
                                 }}
-                                formatter={(value, name) => [value, formatText({ name })]}
                                 shared={false}
                               />
-                              {selectedYColumns.map((col, colIdx) =>
+                              {xAxis === "_category" ? (
+                                // Single-row numeric dataset: lines for each year
                                 normalizedYearlyData.map((d, yearIdx) => (
                                   <Line
-                                    key={`${d.year}_${col}`}
+                                    key={d.year}
                                     type="monotone"
-                                    dataKey={`${d.year}_${col}`}
-                                    stroke={
-                                      isMultiYear
-                                        ? COLORS[yearIdx % COLORS.length]
-                                        : COLORS[colIdx % COLORS.length]
-                                    }
+                                    dataKey={`${d.year}_value`}
+                                    stroke={COLORS[yearIdx % COLORS.length]}
                                     strokeWidth={2}
-                                    dot={{ r: 2 }}
-                                    activeDot={{ r: 4 }}
+                                    dot={(props) => {
+                                      const { cx, cy, index } = props;
+                                      return (
+                                        <circle
+                                          key={`dot-${index}`}
+                                          cx={cx}
+                                          cy={cy}
+                                          r={4}
+                                          fill={!isMultiYear ? COLORS[index % COLORS.length] : COLORS[yearIdx % COLORS.length]}
+                                          stroke="none"
+                                        />
+                                      );
+                                    }}
+                                    activeDot={{ r: 6 }}
                                   />
                                 ))
+                              ) : (
+                                // Normal multi-row dataset
+                                selectedYColumns.map((col, colIdx) =>
+                                  normalizedYearlyData.map((d, yearIdx) => (
+                                    <Line
+                                      key={`${d.year}_${col}`}
+                                      type="monotone"
+                                      dataKey={`${d.year}_${col}`}
+                                      stroke={
+                                        isMultiYear
+                                          ? COLORS[yearIdx % COLORS.length]
+                                          : COLORS[colIdx % COLORS.length]
+                                      }
+                                      strokeWidth={2}
+                                      dot={{ r: 2 }}
+                                      activeDot={{ r: 4 }}
+                                    />
+                                  ))
+                                )
                               )}
                             </LineChart>
                           )}
