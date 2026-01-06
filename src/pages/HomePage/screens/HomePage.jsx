@@ -210,11 +210,11 @@ export default function HomePage() {
       >
         {/* Header */}
         <div className="flex justify-between items-center py-2 px-4 md:px-8 lg:px-12 border-b border-border bg-background">
-          <div className="flex gap-2 flex justify-center items-center">
+          <div className="flex gap-2 justify-center items-center">
             <div className="w-[40px]">
               <img src={SlFlag} />
             </div>
-            <h1 className="text-md xl:text-md font-semibold text-primary">
+            <h1 className="text-md xl:text-md font-semibold text-primary hidden md:block">
               Sri Lanka
             </h1>
           </div>
@@ -226,7 +226,7 @@ export default function HomePage() {
             >
               <div className="flex gap-2 justify-center items-center px-3 py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border">
                 <BookOpenText size={22} />
-                <span>Learn</span>
+                <span className="hidden md:block">Learn</span>
               </div>
             </Link>
             <ShareLinkButton />

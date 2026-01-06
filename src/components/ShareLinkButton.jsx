@@ -18,7 +18,7 @@ const ShareLinkButton = () => {
         `}
       >
         <Share2 size={22} />
-        <span className="text-sm whitespace-nowrap">Share</span>
+        <span className="text-sm whitespace-nowrap hidden md:block">Share</span>
       </button>
     </div>
   );
