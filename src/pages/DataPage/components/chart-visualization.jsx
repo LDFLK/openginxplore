@@ -21,7 +21,7 @@ const COLORS = [
 ];
 
 export function ChartVisualization({ columns, rows, yearlyData }) {
-  const [xAxis, setXAxis] = useState("district");
+  const [xAxis, setXAxis] = useState("_category");
   const [selectedYColumns, setSelectedYColumns] = useState([]);
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
@@ -222,17 +222,20 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     if (isSingleRowAllNumeric) {
       // Transform: each selected column becomes a data point with values from all years
       return selectedYColumns.map((col) => {
-        const colIdx = columns.indexOf(col);
         const dataPoint = {
           [xAxis]: formatText({ name: col }), // Use column name as category
         };
 
-        // Add value for each year
+        // Add value for each year - using column name matching
         normalizedYearlyData.forEach((dataset) => {
-          // Make sure we're getting the value from the correct dataset's rows
-          if (dataset.rows && dataset.rows.length > 0) {
+          // Find the column index in this year's dataset by name
+          const colIdx = dataset.columns?.indexOf(col) ?? columns.indexOf(col);
+
+          if (dataset.rows && dataset.rows.length > 0 && colIdx !== -1) {
             const value = dataset.rows[0][colIdx];
             dataPoint[`${dataset.year}_value`] = Number(value) || 0;
+          } else {
+            dataPoint[`${dataset.year}_value`] = 0; // Column doesn't exist in this year
           }
         });
 
@@ -240,63 +243,68 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       });
     }
 
-    // Normal multi-row dataset logic
+    // multi-row dataset logic with column name matching
     const dataMap = new Map();
 
     normalizedYearlyData.forEach((dataset) => {
-      let yearXIndex = -1;
+      // Get this year's column names
+      const yearColumns = dataset.columns || columns;
 
-      if (dataset.rows.length > 0) {
-        const firstRow = dataset.rows[0];
-        firstRow.forEach((val, idx) => {
-          if (typeof val === "string" && val.length > 2 &&
-            isNaN(parseFloat(val))
-          ) {
-            yearXIndex = idx;
-          }
-        });
+      // Find the x-axis column index in this year's data by name
+      const yearXIndex = yearColumns.indexOf(xAxis);
+
+      if (yearXIndex === -1) {
+        console.warn(`X-axis column "${xAxis}" not found in ${dataset.year} data`);
+        return; // Skip this year if x-axis column doesn't exist
       }
-
-      if (yearXIndex === -1) return;
-
-      const globalXIndex = columns.indexOf(xAxis);
 
       dataset.rows.forEach((row) => {
         const rawXVal = row[yearXIndex];
         const normalizedXVal = normalizeString(rawXVal);
         if (!normalizedXVal) return;
 
+        // Initialize data point if it doesn't exist
         if (!dataMap.has(normalizedXVal)) {
           dataMap.set(normalizedXVal, { [xAxis]: rawXVal });
         }
 
         const dataPoint = dataMap.get(normalizedXVal);
 
+        // For each selected Y column, find it by NAME in this year's columns
         selectedYColumns.forEach((col) => {
-          const globalYIndex = columns.indexOf(col);
-          const offset = yearXIndex - globalXIndex;
-          const actualYIndex = globalYIndex + offset;
+          const yearYIndex = yearColumns.indexOf(col);
 
-          const value = row[actualYIndex];
-          const key = `${dataset.year}_${col}`;
-          const numValue = Number(value) || 0;
-
-          dataPoint[key] = numValue;
+          if (yearYIndex !== -1) {
+            // Column exists in this year
+            const value = row[yearYIndex];
+            const key = `${dataset.year}_${col}`;
+            const numValue = Number(value) || 0;
+            dataPoint[key] = numValue;
+          } else {
+            // Column doesn't exist in this year - set to 0
+            const key = `${dataset.year}_${col}`;
+            dataPoint[key] = 0;
+            console.warn(`Column "${col}" not found in ${dataset.year} data`);
+          }
         });
       });
     });
 
     const result = Array.from(dataMap.values());
+
+    // Fill in any missing year/column combinations with 0
     result.forEach((dataPoint) => {
       normalizedYearlyData.forEach((dataset) => {
         selectedYColumns.forEach((col) => {
           const key = `${dataset.year}_${col}`;
-          if (dataPoint[key] === undefined) dataPoint[key] = 0;
+          if (dataPoint[key] === undefined) {
+            dataPoint[key] = 0;
+          }
         });
       });
     });
 
-    // Sort for highest total
+    // Sort by highest total
     result.sort((a, b) => {
       const sumA = selectedYColumns.reduce((acc, col) => {
         return acc + normalizedYearlyData.reduce((yearAcc, d) => {
@@ -310,10 +318,10 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
         }, 0);
       }, 0);
 
-      return sumB - sumA; // Highest first
+      return sumB - sumA;
     });
-    return result;
 
+    return result;
   }, [columns, xAxis, selectedYColumns, normalizedYearlyData]);
 
   // Extract Y-axis ticks

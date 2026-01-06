@@ -106,10 +106,11 @@ export function DatasetView({ data, setExternalDateRange }) {
     return fetchedDatasets.map((d) => ({
       year: d.year,
       rows: d.data.rows,
+      columns: d.data.columns
     }));
   }, [fetchedDatasets]);
 
-  // Check if dataset is plottable (has numeric columns and string columns)
+  // Check if dataset is plottable (has numeric columns)
   const isPlottable = useMemo(() => {
     if (fetchedDatasets.length === 0) return false;
 
