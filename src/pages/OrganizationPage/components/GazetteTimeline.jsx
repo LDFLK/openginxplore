@@ -135,7 +135,8 @@ export default function GazetteTimeline() {
         alignItems: "center",
         gap: 2,
         width: "100%",
-        pt: "30px",
+        pt: "25px",
+        mb: { xs: "-20px", md: "auto"}
       }}
     >
       {selectedPresident && (
@@ -153,6 +154,8 @@ export default function GazetteTimeline() {
           <IconButton
             onClick={() => scroll("left")}
             sx={{
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 },
               zIndex: 10,
               mt: -6.8,
               backgroundColor: colors.backgroundPrimary,
@@ -162,6 +165,7 @@ export default function GazetteTimeline() {
                 backgroundColor: colors.backgroundPrimary,
               },
               color: colors.timelineColor,
+              "& svg": { fontSize: { xs: "1rem", sm: "1.2rem" } },
             }}
           >
             <ArrowBackIosNewIcon />
@@ -428,6 +432,8 @@ export default function GazetteTimeline() {
           <IconButton
             onClick={() => scroll("right")}
             sx={{
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 },
               zIndex: 9,
               mt: -6.8,
               backgroundColor: colors.backgroundPrimary,
@@ -437,6 +443,7 @@ export default function GazetteTimeline() {
                 backgroundColor: colors.backgroundPrimary,
               },
               color: colors.timelineColor,
+              "& svg": { fontSize: { xs: "1rem", sm: "1.2rem" } },
             }}
           >
             <ArrowForwardIosIcon />

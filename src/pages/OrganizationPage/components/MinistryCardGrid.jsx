@@ -1,5 +1,5 @@
 import {
-  Box, Grid, Typography, Alert, AlertTitle, TextField, Select, MenuItem, FormControl, InputLabel, Button, Card, DialogContent, Avatar,
+  Box, Grid, Typography, Alert, AlertTitle, TextField, Select, MenuItem, FormControl, InputLabel, Button, Card, DialogContent, Avatar, ToggleButtonGroup, ToggleButton,
 } from "@mui/material";
 
 import { useEffect, useRef, useState, useMemo } from "react";
@@ -281,8 +281,8 @@ const MinistryCardGrid = () => {
           width: "100%",
           gap: { xs: 2, sm: 2, md: 2, lg: 4, xl: 3 },
           mb: 3,
-          py: 2,
-          px: 3,
+          py: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 },
+          px: { xs: 1, sm: 1, md: 3, lg: 3, xl: 3 },
           backgroundColor: colors.backgroundWhite,
           borderRadius: 2,
           border: "1px solid",
@@ -312,7 +312,10 @@ const MinistryCardGrid = () => {
             },
           }}
         >
-          <Box sx={{ mt: -0.5 }}>
+          <Box sx={{ 
+            mt: -0.5
+          }}
+          >
             {primeMinister.person &&
               primeMinister.relation &&
               selectedPresident ? (
@@ -321,6 +324,7 @@ const MinistryCardGrid = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
+                  gap: { xs: 1.5, sm: 1.5, md: 0 },
                   ml: 2,
                 }}
               >
@@ -333,7 +337,10 @@ const MinistryCardGrid = () => {
                     backgroundColor: colors.backgroundPrimary,
                   }}
                 />
-                <Box sx={{ display: "block", ml: 1 }}>
+                <Box sx={{ 
+                  display: "block", 
+                  ml: 1
+                  }}>
                   <Typography
                     sx={{
                       fontSize: 12,
@@ -447,13 +454,13 @@ const MinistryCardGrid = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            mb: { xs: 2, md: 0 },
+            mb: { xs: 1, md: 0 },
             borderRadius: 2,
           }}
         >
           <Box
             sx={{
-              width: "90%",
+              width: { xs: "100%", sm: "100%", md: "90%" },
               px: 1,
               display: "flex",
               flexDirection: "column",
@@ -462,7 +469,11 @@ const MinistryCardGrid = () => {
           >
             {/* Active Ministries */}
             {activeMinistriesCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 2,
+              }}>
                 <AccountBalanceIcon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
                 />
@@ -498,7 +509,7 @@ const MinistryCardGrid = () => {
 
             {/* New Ministries */}
             {newMinistriesCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2}}>
                 <AccountBalanceIcon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
                 />
@@ -534,7 +545,7 @@ const MinistryCardGrid = () => {
 
             {/* New Ministers */}
             {newMinistersCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2}}>
                 <PersonAddAlt1Icon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
                 />
@@ -570,7 +581,7 @@ const MinistryCardGrid = () => {
 
             {/* Ministries under president */}
             {ministriesUnderPresident > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2}}>
                 <WorkspacePremiumIcon
                   sx={{ color: colors.textMuted, fontSize: 18 }}
                 />
@@ -614,7 +625,8 @@ const MinistryCardGrid = () => {
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          py: 2,
+          py: {xs: 0, md: 2},
+          pb: {xs: 2},
           borderRadius: 2,
           backgroundColor: colors.backgroundWhite,
           border: "1px solid",
@@ -653,6 +665,7 @@ const MinistryCardGrid = () => {
                     flex: 1,
                     minWidth: { xs: "100%", sm: 200 },
                     maxWidth: { sm: 300 },
+                    mb: {xs: "10px", md: 0},
                   }}
                 >
                   <TextField
@@ -698,6 +711,7 @@ const MinistryCardGrid = () => {
                   sx={{
                     minWidth: { xs: "100%", sm: 120 },
                     flexShrink: 0,
+                    mb: {xs: "8px", md: 0},
                   }}
                 >
                   <InputLabel
@@ -777,7 +791,13 @@ const MinistryCardGrid = () => {
               sx={{
                 width: "100%",
                 display: "flex",
-                pl: viewMode == "Grid" ? 6.5 : 0,
+              pl: {
+                xs: 0,
+                sm: 0,
+                md: viewMode == "Grid" ? 6.5 : 0,
+              },
+              px: { xs: 1, sm: 1, md: 6.5}
+        
               }}
             >
               {viewMode == "Grid" ? (
@@ -787,7 +807,7 @@ const MinistryCardGrid = () => {
                     width: "100%",
                     "& .MuiStepConnector-line": {
                       borderColor: colors.textMuted,
-                    },
+                    }  
                   }}
                   orientation="vertical"
                 >
@@ -958,22 +978,21 @@ const MinistryCardGrid = () => {
                             step.label == "Departments & People" && (
                               <DialogContent
                                 sx={{
-                                  p: 4,
-                                  borderRadius: "14px",
-                                  mr: 4,
+                                  p: { xs:0, sm:0, md:4 },
+                                  borderRadius: { xs: 0, sm: 0, md: "14px" },
+                                  mr: 1,
                                   mt: 2,
                                   display: "flex",
                                   flexDirection: "column",
                                   overflowY: "auto",
                                   scrollbarWidth: "none",
-                                  backgroundColor: colors.backgroundDark,
+                                  backgroundColor: {xs: colors.backgroundWhite, sm: colors.backgroundWhite, md: colors.backgroundDark},
                                   "&::-webkit-scrollbar": { display: "none" },
                                 }}
                               >
                                 <Box
                                   sx={{
                                     display: "flex",
-                                    flexWrap: "wrap",
                                     gap: 2,
                                     mb: 4,
                                     justifyContent: {
@@ -982,45 +1001,136 @@ const MinistryCardGrid = () => {
                                     },
                                   }}
                                 >
-                                  {["departments", "people"].map((tab) => {
-                                    const label =
-                                      tab.charAt(0).toUpperCase() +
-                                      tab.slice(1);
-                                    const isActive = tab == activeTab;
-                                    return (
-                                      <Button
-                                        key={tab}
-                                        variant={
-                                          isActive ? "contained" : "outlined"
-                                        }
-                                        onClick={() => setActiveTab(tab)}
-                                        sx={{
-                                          textTransform: "none",
-                                          borderRadius: "50px",
-                                          px: { xs: 2, sm: 3 },
-                                          py: 0.8,
-                                          backgroundColor: isActive
-                                            ? selectedPresident.themeColorLight
-                                            : "none",
-                                          borderColor:
-                                            selectedPresident.themeColorLight,
-                                          color: isActive
-                                            ? colors.white
-                                            : selectedPresident.themeColorLight,
-                                          fontFamily: "poppins",
-                                          fontSize: {
-                                            xs: "0.8rem",
-                                            sm: "0.9rem",
-                                            md: "1rem",
-                                          },
-                                        }}
-                                      >
-                                        {label}
-                                      </Button>
-                                    );
-                                  })}
+                                  {/* Toggle for xs and sm screens */}
+                                  <ToggleButtonGroup
+                                    value={activeTab}
+                                    exclusive
+                                    onChange={(e, newValue) => {
+                                      if (newValue !== null) {
+                                        setActiveTab(newValue);
+                                      }
+                                    }}
+                                    sx={{
+                                      display: { xs: "flex", sm: "flex", md: "none" },
+                                      gap: 0,
+                                      "& .MuiToggleButtonGroup-grouped": {
+                                        border: `1px solid ${selectedPresident.themeColorLight}`,
+                                        borderRadius: "50px",
+                                        "&:not(:first-of-type)": {
+                                          borderLeft: `1px solid ${selectedPresident.themeColorLight}`,
+                                          marginLeft: "-1px",
+                                        },
+                                        "&:first-of-type": {
+                                          borderTopRightRadius: 0,
+                                          borderBottomRightRadius: 0,
+                                        },
+                                        "&:last-of-type": {
+                                          borderTopLeftRadius: 0,
+                                          borderBottomLeftRadius: 0,
+                                        },
+                                      },
+                                    }}
+                                  >
+                                    {["departments", "people"].map((tab) => {
+                                      const label =
+                                        tab.charAt(0).toUpperCase() +
+                                        tab.slice(1);
+                                      const isActive = activeTab === tab;
+                                      const IconComponent = tab === "departments" ? ApartmentIcon : PeopleIcon;
+                                      return (
+                                        <ToggleButton
+                                          key={tab}
+                                          value={tab}
+                                          sx={{
+                                            textTransform: "none",
+                                            px: 2,
+                                            py: 0.8,
+                                            width: isActive ? "130px" : "70px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            transition: "width 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out",
+                                            backgroundColor:
+                                              isActive
+                                                ? selectedPresident.themeColorLight
+                                                : "transparent",
+                                            color:
+                                              isActive
+                                                ? colors.white
+                                                : selectedPresident.themeColorLight,
+                                            fontFamily: "poppins",
+                                            fontSize: "0.8rem",
+                                            "&.Mui-selected": {
+                                              backgroundColor: selectedPresident.themeColorLight,
+                                              color: colors.white,
+                                              "&:hover": {
+                                                backgroundColor: selectedPresident.themeColorLight,
+                                              },
+                                            },
+                                            "&:hover": {
+                                              backgroundColor:
+                                                isActive
+                                                  ? selectedPresident.themeColorLight
+                                                  : `${selectedPresident.themeColorLight}20`,
+                                            },
+                                          }}
+                                        >
+                                          {isActive ? (
+                                            label
+                                          ) : (
+                                            <IconComponent sx={{ fontSize: 18 }} />
+                                          )}
+                                        </ToggleButton>
+                                      );
+                                    })}
+                                  </ToggleButtonGroup>
+
+                                  {/* Buttons for md and larger screens */}
+                                  <Box
+                                    sx={{
+                                      display: { xs: "none", sm: "none", md: "flex" },
+                                      gap: 2,
+                                    }}
+                                  >
+                                    {["departments", "people"].map((tab) => {
+                                      const label =
+                                        tab.charAt(0).toUpperCase() +
+                                        tab.slice(1);
+                                      const isActive = tab == activeTab;
+                                      return (
+                                        <Button
+                                          key={tab}
+                                          variant={
+                                            isActive ? "contained" : "outlined"
+                                          }
+                                          onClick={() => setActiveTab(tab)}
+                                          sx={{
+                                            textTransform: "none",
+                                            borderRadius: "50px",
+                                            px: 3,
+                                            py: 0.8,
+                                            backgroundColor: isActive
+                                              ? selectedPresident.themeColorLight
+                                              : "none",
+                                            borderColor:
+                                              selectedPresident.themeColorLight,
+                                            color: isActive
+                                              ? colors.white
+                                              : selectedPresident.themeColorLight,
+                                            fontFamily: "poppins",
+                                            fontSize: "1rem",
+                                          }}
+                                        >
+                                          {label}
+                                        </Button>
+                                      );
+                                    })}
+                                  </Box>
                                 </Box>
-                                <Box sx={{ flexGrow: 1, mt: 2, width: "100%" }}>
+                                <Box sx={{
+                                   flexGrow: 1, 
+                                   mt: {xs: 0, sm: 0, md: 2}, 
+                                   width: "100%" }}>
                                   <>
                                     {selectedCard &&
                                       activeTab === "departments" && (

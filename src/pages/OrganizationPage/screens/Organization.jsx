@@ -29,7 +29,7 @@ const Organization = ({ dateRange }) => {
     <div>
       {/* FilteredPresidentCards Component */}
       {dateRange[0] && dateRange[1] && (
-        <div className="mb-6 px-4 md:px-8 lg:px-12 mt-6">
+        <div className="mb-1 md:mb-6 px-2 md:px-8 lg:px-12 mt-6">
           <FilteredPresidentCards dateRange={dateRange} />
         </div>
       )}
