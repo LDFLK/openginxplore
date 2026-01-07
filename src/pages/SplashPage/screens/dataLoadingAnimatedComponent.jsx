@@ -33,30 +33,32 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   useEffect(() => {
     const initialFetchData = async () => {
-      if (Object.keys(presidentDict).length === 0) {
-        setLoading(true);
-        try {
-          const totalSteps = 4;
-          let completedSteps = 0;
+      if (Object.keys(presidentDict).length !== 0) return;
 
-          await fetchPersonData();
+      setLoading(true);
+
+      try {
+        const totalSteps = 4;
+        let completedSteps = 0;
+
+        const track = async (promise) => {
+          await promise;
           completedSteps++;
           updateProgress(completedSteps, totalSteps);
-          await fetchAllMinistryData();
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-          await fetchAllDepartmentData();
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-          await fetchAllGazetteDate();
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-          setTimeout(() => {
-            setLoading(false);
-          }, 1000);
-        } catch (e) {
-          console.error("Error loading initial data:", e.message);
-        }
+        };
+
+        await Promise.allSettled([
+          track(fetchPersonData()),
+          track(fetchAllMinistryData()),
+          track(fetchAllDepartmentData()),
+          track(fetchAllGazetteDate()),
+        ]);
+
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      } catch (e) {
+        console.error("Error loading initial data:", e.message);
       }
     };
 
