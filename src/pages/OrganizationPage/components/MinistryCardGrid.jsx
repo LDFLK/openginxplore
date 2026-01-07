@@ -16,6 +16,7 @@ import GraphComponent from "./graphComponent";
 import PersonsTab from "./PersonsTab";
 import DepartmentTab from "./DepartmentTab";
 import InfoTooltip from "../../../components/InfoToolTip";
+import LandscapeRequired from "../../../components/landscapeRequired";
 
 import api from "../../../services/services";
 import utils from "../../../utils/utils";
@@ -35,7 +36,8 @@ import {
   WorkspacePremium as WorkspacePremiumIcon,
   PersonAddAlt1 as PersonAddAlt1Icon,
   Apartment as ApartmentIcon,
-  People as PeopleIcon
+  People as PeopleIcon,
+  Landscape
 } from "@mui/icons-material";
 
 import { clearTimeout } from "highcharts";
@@ -765,6 +767,7 @@ const MinistryCardGrid = () => {
             <MinistryViewModeToggleButton
               viewMode={viewMode}
               setViewMode={setViewMode}
+              
             />
           </Box>
         </Box>
@@ -1159,10 +1162,12 @@ const MinistryCardGrid = () => {
                   })}
                 </Stepper>
               ) : (
-                <GraphComponent
+                <LandscapeRequired>
+                   <GraphComponent
                   activeMinistries={filteredMinistryList}
                   filterType={filterType}
                 />
+                </LandscapeRequired>
               )}
             </Box>
           </>

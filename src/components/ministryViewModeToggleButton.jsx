@@ -5,7 +5,7 @@ export default function MinistryViewModeToggleButton({ viewMode, setViewMode }) 
   const isGraph = viewMode === "Graph";
 
   return (
-    <div className="flex justify-end w-full sm:w-auto">
+    <div className="flex justify-end w-full sm:w-auto landscape:-mt-2 portrait:mt-0">
       <div className="relative flex bg-transparent border border-foreground/80 rounded-md w-38 h-10 select-none">
         <div
           className={`absolute top-0 bottom-0 w-1/2 rounded-md transition-all duration-300 ${
