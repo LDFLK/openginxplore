@@ -42,6 +42,14 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     return [];
   }, [yearlyData, rows]);
 
+  const isNumericValue = (val) => {
+    return (
+      typeof val === "number" ||
+      (!isNaN(Number(val)) && val !== null && val !== "")
+    );
+  };
+
+
   // Detect columns
   // Detect columns and handle single-row numeric datasets
   useEffect(() => {
@@ -57,13 +65,10 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     }
 
     // Check if this is a single-row dataset with all numeric values
-    const isSingleRowAllNumeric = rows.length === 1 && columns.every((col, idx) => {
-      const val = rows[0][idx];
-      return (
-        typeof val === "number" ||
-        (!isNaN(Number(val)) && val !== null && val !== "")
-      );
-    });
+    const isSingleRowAllNumeric =
+      rows.length === 1 &&
+      columns.every((_, idx) => isNumericValue(rows[0][idx]));
+
 
     if (isSingleRowAllNumeric) {
       // For single-row numeric datasets, treat all columns as potential categories
@@ -74,14 +79,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     } else {
       // Normal detection logic
       columns.forEach((col, idx) => {
-        const isNumeric = rows.some((row) => {
-          const val = row[idx];
-          return (
-            typeof val === "number" ||
-            (!isNaN(Number(val)) && val !== null && val !== "")
-          );
-        });
-
+        const isNumeric = rows.some((row) => isNumericValue(row[idx]));
         if (isNumeric) numericCols.push(col);
         else stringCols.push(col);
       });
