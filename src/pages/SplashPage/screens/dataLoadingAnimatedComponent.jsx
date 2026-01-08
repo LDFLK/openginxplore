@@ -24,38 +24,41 @@ export default function DataLoadingAnimatedComponent({ mode }) {
   const { presidentDict, selectedPresident } = useSelector(
     (state) => state.presidency
   );
-  const [progress, setProgress] = useState(0);
   const dispatch = useDispatch();
 
-  const updateProgress = (step, totalSteps) => {
-    setProgress(Math.round((step / totalSteps) * 100));
-  };
+  const totalSteps = 4;
+  const [completedSteps, setCompletedSteps] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    setProgress(Math.round((completedSteps / totalSteps) * 100));
+  }, [completedSteps]);
 
   useEffect(() => {
     const initialFetchData = async () => {
       if (Object.keys(presidentDict).length !== 0) return;
 
       setLoading(true);
-      
-        const totalSteps = 4;
-        let completedSteps = 0;
+      setCompletedSteps(0);
 
-        const track = async (promise) => {
+      const track = async (promise) => {
+        try {
           await promise;
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-        };
+        } finally {
+          setCompletedSteps((prev) => prev + 1);
+        }
+      };
 
-        await Promise.allSettled([
-          track(fetchPersonData()),
-          track(fetchAllMinistryData()),
-          track(fetchAllDepartmentData()),
-          track(fetchAllGazetteDate()),
-        ]);
+      await Promise.allSettled([
+        track(fetchPersonData()),
+        track(fetchAllMinistryData()),
+        track(fetchAllDepartmentData()),
+        track(fetchAllGazetteDate()),
+      ]);
 
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     };
 
     initialFetchData();
