@@ -5,26 +5,25 @@ export default function LandscapeRequired({
   children,
   message = "Rotate your device to landscape 📱↔️"
 }) {
-  const [isLandscape, setIsLandscape] = useState(
-    window.innerWidth > window.innerHeight
-  );
-
-  const isSmallScreen = window.innerWidth < smallMaxWidth;
+  // Initialize with safe defaults
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
-    const onResize = () => {
+    const updateSizes = () => {
       setIsLandscape(window.innerWidth > window.innerHeight);
+      setIsSmallScreen(window.innerWidth < smallMaxWidth);
     };
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+
+    // Set initial values on mount
+    updateSizes();
+
+    window.addEventListener("resize", updateSizes);
+    return () => window.removeEventListener("resize", updateSizes);
+  }, [smallMaxWidth]); // depend on smallMaxWidth prop
 
   if (isSmallScreen && !isLandscape) {
-    return (
-      <div style={overlayStyle}>
-        {message}
-      </div>
-    );
+    return <div style={overlayStyle}>{message}</div>;
   }
 
   return children;
