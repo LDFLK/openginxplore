@@ -772,7 +772,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 axisLine={false}
                                 tick={{ fill: "transparent" }}
                               />
-                              <Tooltip content={renderCustomTooltip} shared={false} />
+                              <Tooltip content={renderCustomTooltip}/>
 
 
                               {xAxis === "_category" ? (
