@@ -27,6 +27,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { tab } = useParams();
+  const MOBILE_BREAKPOINT = 768;
 
   const selectedTab = tab || "organization";
 
@@ -137,7 +138,7 @@ export default function HomePage() {
     });
     
     // Close sidebar on mobile after selecting a tab
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < MOBILE_BREAKPOINT) {
       setIsExpanded(false);
     }
   };
