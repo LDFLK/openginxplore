@@ -36,8 +36,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
       if (Object.keys(presidentDict).length !== 0) return;
 
       setLoading(true);
-
-      try {
+      
         const totalSteps = 4;
         let completedSteps = 0;
 
@@ -57,9 +56,6 @@ export default function DataLoadingAnimatedComponent({ mode }) {
         setTimeout(() => {
           setLoading(false);
         }, 1000);
-      } catch (e) {
-        console.error("Error loading initial data:", e.message);
-      }
     };
 
     initialFetchData();
