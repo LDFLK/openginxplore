@@ -363,6 +363,41 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
   const totalChartWidth = Math.max(chartData.length * widthPerCategory, 1200);
 
+  const renderCustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          className="rounded-lg border border-[#dbdbdb] p-2 text-sm shadow-md"
+          style={{
+            backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+            color: isDark ? "#dbdbdb" : "#1f2937",
+          }}
+        >
+          <p className="font-semibold mb-1">{label}</p>
+          {payload.map((entry, index) => {
+            let finalColor = entry.color;
+            if (!isMultiYear && xAxis === "_category") {
+              const dataIndex = chartData.findIndex((d) => d[xAxis] === label);
+              if (dataIndex !== -1) {
+                finalColor = COLORS[dataIndex % COLORS.length];
+              }
+            }
+            return (
+              <div key={index} className="flex items-center gap-2">
+                <span
+                  style={{ backgroundColor: finalColor , width: 8, height: 8, borderRadius: "50%" , display: "inline-block", marginRight: 8}}
+                />
+                <span>{formatText({ name: entry.name })}:</span>
+                <span className="font-medium">{entry.value}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       {numericColumns.length > 0 &&
@@ -448,19 +483,6 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                 </select>
               </div>
             </div>
-
-            {/* Custom Tooltip */}
-            <style>
-              {`
-                .custom-tooltip-bullet {
-                  width: 8px;
-                  height: 8px;
-                  border-radius: 50%;
-                  display: inline-block;
-                  margin-right: 8px;
-                }
-              `}
-            </style>
 
             {/* Chart */}
             <div
@@ -645,43 +667,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 axisLine={false}
                                 tick={{ fill: "transparent" }}
                               />
-                              <Tooltip
-                                content={({ active, payload, label }) => {
-                                  if (active && payload && payload.length) {
-                                    return (
-                                      <div
-                                        className="rounded-lg border border-[#dbdbdb] p-2 text-sm shadow-md"
-                                        style={{
-                                          backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                          color: isDark ? "#dbdbdb" : "#1f2937",
-                                        }}
-                                      >
-                                        <p className="font-semibold mb-1">{label}</p>
-                                        {payload.map((entry, index) => {
-                                          let finalColor = entry.color;
-                                          if (!isMultiYear && xAxis === "_category") {
-                                            const dataIndex = chartData.findIndex((d) => d[xAxis] === label);
-                                            if (dataIndex !== -1) {
-                                              finalColor = COLORS[dataIndex % COLORS.length];
-                                            }
-                                          }
-                                          return (
-                                            <div key={index} className="flex items-center gap-2">
-                                              <span
-                                                className="custom-tooltip-bullet"
-                                                style={{ backgroundColor: finalColor }}
-                                              />
-                                              <span>{formatText({ name: entry.name })}:</span>
-                                              <span className="font-medium">{entry.value}</span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                              />
+                              <Tooltip content={renderCustomTooltip} />
                               {xAxis === "_category" ? (
                                 // Single-row numeric dataset: bars for each year
                                 normalizedYearlyData.map((d, yearIdx) => (
@@ -786,44 +772,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 axisLine={false}
                                 tick={{ fill: "transparent" }}
                               />
-                              <Tooltip
-                                content={({ active, payload, label }) => {
-                                  if (active && payload && payload.length) {
-                                    return (
-                                      <div
-                                        className="rounded-lg border border-[#dbdbdb] p-2 text-sm shadow-md"
-                                        style={{
-                                          backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                          color: isDark ? "#dbdbdb" : "#1f2937",
-                                        }}
-                                      >
-                                        <p className="font-semibold mb-1">{label}</p>
-                                        {payload.map((entry, index) => {
-                                          let finalColor = entry.color;
-                                          if (!isMultiYear && xAxis === "_category") {
-                                            const dataIndex = chartData.findIndex((d) => d[xAxis] === label);
-                                            if (dataIndex !== -1) {
-                                              finalColor = COLORS[dataIndex % COLORS.length];
-                                            }
-                                          }
-                                          return (
-                                            <div key={index} className="flex items-center gap-2">
-                                              <span
-                                                className="custom-tooltip-bullet"
-                                                style={{ backgroundColor: finalColor }}
-                                              />
-                                              <span>{formatText({ name: entry.name })}:</span>
-                                              <span className="font-medium">{entry.value}</span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                                shared={false}
-                              />
+                              <Tooltip content={renderCustomTooltip} shared={false} />
+
+
                               {xAxis === "_category" ? (
                                 // Single-row numeric dataset: lines for each year
                                 normalizedYearlyData.map((d, yearIdx) => (
