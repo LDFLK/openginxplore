@@ -32,7 +32,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   useEffect(() => {
     setProgress(Math.round((completedSteps / totalSteps) * 100));
-  }, [completedSteps]);
+  }, [completedSteps, totalSteps]);
 
   useEffect(() => {
     const initialFetchData = async () => {
