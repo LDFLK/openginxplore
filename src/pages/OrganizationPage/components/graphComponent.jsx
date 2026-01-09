@@ -646,7 +646,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
       <div className="flex h-screen w-full relative">
         <div
           className={`${
-            expandDrawer ? "w-2/3" : "w-full"
+            expandDrawer ? "w-1/4 lg:w-2/3" : "w-full"
           } transition-all duration-300 ease-in-out`}
           style={{
             backgroundColor: colors.backgroundPrimary,

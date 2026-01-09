@@ -89,7 +89,7 @@ export default function Drawer({
 
   return (
     <div
-      className={`overflow-hidden ${expandDrawer ? "w-1/3 p-4" : "w-0"
+      className={`overflow-hidden ${expandDrawer ? "w-3/4 lg:w-1/3 p-4" : "w-0"
         } transition-all duration-300 ease-in-out border-border border-l h-full flex-shrink-0 bg-background-dark`}
       style={{
         overflow: expandDrawer ? "visible" : "hidden",
@@ -292,7 +292,7 @@ export default function Drawer({
                 )}
 
                 {/* Lazy Load */}
-                <div className="w-full flex flex-col items-center">
+                <div className="w-full flex flex-col items-center mb-5">
                   {drawerContentList &&
                     Object.keys(drawerContentList).length > visibleCount && (
                       <button

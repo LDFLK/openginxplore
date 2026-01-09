@@ -27,6 +27,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { tab } = useParams();
+  const MOBILE_BREAKPOINT = 768;
 
   const selectedTab = tab || "organization";
 
@@ -135,10 +136,15 @@ export default function HomePage() {
       pathname: `/${tabName}`,
       search: params.toString() ? `?${params.toString()}` : "",
     });
+    
+    // Close sidebar on mobile after selecting a tab
+    if (window.innerWidth < MOBILE_BREAKPOINT) {
+      setIsExpanded(false);
+    }
   };
 
   return (
-    <div className="flex">
+    <div className="flex relative">
       {/* <ToastContainer
         position="top-center"
         autoClose={5000}
@@ -154,46 +160,59 @@ export default function HomePage() {
         bodyClassName={() => "text-sm"}
         progressClassName="bg-primary"
       /> */}
+      {/* Backdrop overlay for mobile when sidebar is expanded */}
+      {isExpanded && (
+        <div
+          className="fixed inset-0 bg-black/50 z-10 md:hidden"
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Fixed on mobile, normal positioning on desktop */}
       <div
-        className={`fixed top-0 left-0 z-20 h-screen ${isExpanded ? "w-64" : "w-16"
-          } bg-background h-full transition-all ease-in-out flex flex-col items-center p-2 border-r border-border`}
+        className={`md:relative fixed top-0 left-0 z-20 h-screen bg-background transition-all duration-300 ease-in-out flex flex-col items-center p-2 border-r border-border
+          ${isExpanded ? "w-64" : "w-16"}
+        `}
       >
         <TextLogo isExpanded={isExpanded} />
 
-      
-
         <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen mt-4">
           <button
-            className={`${selectedTab === "organization"
-              ? "bg-accent text-primary-foreground font-semibold"
-              : "hover:bg-background-dark/85"
-              }  hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
+            className={`${
+              selectedTab === "organization"
+                ? "bg-accent text-primary-foreground font-semibold"
+                : "hover:bg-background-dark/85"
+            } hover:cursor-pointer ${
+              isExpanded ? "px-4" : "px-0"
+            } py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("organization")}
           >
-            <Binoculars className={`${isExpanded ? "mr-3" : "mx-auto"}`}  />
+            <Binoculars className={`${isExpanded ? "mr-3" : "mx-auto"}`} />
             {isExpanded && "Organization"}
           </button>
           <button
-            className={`${selectedTab === "data"
-              ? "bg-accent text-primary-foreground font-semibold"
-              : "hover:bg-background-dark/85"
-              } hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
+            className={`${
+              selectedTab === "data"
+                ? "bg-accent text-primary-foreground font-semibold"
+                : "hover:bg-background-dark/85"
+            } hover:cursor-pointer ${
+              isExpanded ? "px-4" : "px-0"
+            } py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("data")}
           >
-            <SquareLibrary className={`${isExpanded ? "mr-3" : "mx-auto"}`}  />
+            <SquareLibrary className={`${isExpanded ? "mr-3" : "mx-auto"}`} />
             {isExpanded && "Data"}
           </button>
 
-            <button
-          onClick={() => setIsExpanded(!isExpanded)}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
             className="px-3 py-1 absolute bottom-12 left-1/2 -translate-x-1/2 
              flex items-center rounded-md text-primary/80 hover:text-primary 
              cursor-pointer"
           >
-          {isExpanded ? <ChevronLeft /> : <ChevronRight />}
-        </button>
+            {isExpanded ? <ChevronLeft /> : <ChevronRight />}
+          </button>
+
           <Link to={feedbackFormUrl} target="_blank" rel="noopener noreferrer">
             <div className="flex absolute bottom-0 w-full gap-2 justify-center items-center px-3 py-2 rounded-md text-active-green/100 hover:text-active-green bg-active-green/10 hover:bg-active-green/15 border-active-green/15 hover:border-active-green/15 cursor-pointer border duration-1000 transition-all animation">
               <MessageSquareHeart size={22} />
@@ -203,18 +222,19 @@ export default function HomePage() {
         </nav>
       </div>
 
-      {/* Main content */}
+      {/* Main content - Fixed margin on mobile, responsive margin on desktop */}
       <div
-        className={`flex-1 overflow-auto bg-background-dark transition-all ease-in-out animation ${isExpanded ? "ml-64" : "ml-16"
-          } h-screen`}
+        className={`flex-1 overflow-auto bg-background-dark transition-all duration-300 ease-in-out h-screen 
+          ml-16 md:ml-0
+        `}
       >
         {/* Header */}
         <div className="flex justify-between items-center py-2 px-4 md:px-8 lg:px-12 border-b border-border bg-background">
-          <div className="flex gap-2 flex justify-center items-center">
+          <div className="flex gap-2 justify-center items-center">
             <div className="w-[40px]">
               <img src={SlFlag} />
             </div>
-            <h1 className="text-md xl:text-md font-semibold text-primary">
+            <h1 className="text-md xl:text-md font-semibold text-primary hidden md:block">
               Sri Lanka
             </h1>
           </div>
@@ -226,7 +246,7 @@ export default function HomePage() {
             >
               <div className="flex gap-2 justify-center items-center px-3 py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border">
                 <BookOpenText size={22} />
-                <span>Learn</span>
+                <span className="hidden md:block">Learn</span>
               </div>
             </Link>
             <ShareLinkButton />
