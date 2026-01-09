@@ -106,23 +106,23 @@ export function DatasetView({ data, setExternalDateRange }) {
     return fetchedDatasets.map((d) => ({
       year: d.year,
       rows: d.data.rows,
+      columns: d.data.columns
     }));
   }, [fetchedDatasets]);
 
-  // Check if dataset is plottable (has numeric columns and string columns)
+  // Check if dataset is plottable (has numeric columns)
   const isPlottable = useMemo(() => {
     if (fetchedDatasets.length === 0) return false;
 
     const cols = fetchedDatasets[0].data.columns;
-    const sampleRows = fetchedDatasets[0].data.rows;
+    const rows = fetchedDatasets[0].data.rows;
 
-    if (!sampleRows || sampleRows.length === 0 || !cols.length) return false;
+    if (!rows || rows.length === 0 || !cols.length) return false;
 
     let hasNumeric = false;
-    let hasString = false;
 
     cols.forEach((col, idx) => {
-      const isNumeric = sampleRows.some((row) => {
+      const isNumeric = rows.some((row) => {
         const val = row[idx];
         return (
           typeof val === "number" ||
@@ -132,12 +132,10 @@ export function DatasetView({ data, setExternalDateRange }) {
 
       if (isNumeric && col !== "id") {
         hasNumeric = true;
-      } else if (!isNumeric) {
-        hasString = true;
-      }
+      } 
     });
 
-    return hasNumeric && hasString;
+    return hasNumeric;
   }, [fetchedDatasets]);
 
   // Checkbox handler

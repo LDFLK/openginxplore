@@ -8,6 +8,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Cell,
 } from "recharts";
 import formatText from "../../../utils/common_functions";
 import { useThemeContext } from "../../../context/themeContext";
@@ -20,7 +21,7 @@ const COLORS = [
 ];
 
 export function ChartVisualization({ columns, rows, yearlyData }) {
-  const [xAxis, setXAxis] = useState("district");
+  const [xAxis, setXAxis] = useState("_category");
   const [selectedYColumns, setSelectedYColumns] = useState([]);
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
@@ -41,40 +42,59 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     return [];
   }, [yearlyData, rows]);
 
+  const isNumericValue = (val) => {
+    return (
+      typeof val === "number" ||
+      (!isNaN(Number(val)) && val !== null && val !== "")
+    );
+  };
+
+
   // Detect columns
+  // Detect columns and handle single-row numeric datasets
   useEffect(() => {
     const stringCols = [];
     const numericCols = [];
-    const sampleRows =
+    const rows =
       normalizedYearlyData.length > 0 ? normalizedYearlyData[0].rows : [];
 
-    if (!sampleRows || sampleRows.length === 0 || !columns.length) {
+    if (!rows || rows.length === 0 || !columns.length) {
       setNumericColumns([]);
       setStringColumns([]);
       return;
     }
 
-    columns.forEach((col, idx) => {
-      const isNumeric = sampleRows.some((row) => {
-        const val = row[idx];
-        return (
-          typeof val === "number" ||
-          (!isNaN(Number(val)) && val !== null && val !== "")
-        );
+    // Check if this is a single-row dataset with all numeric values
+    const isSingleRowAllNumeric =
+      rows.length === 1 &&
+      columns.every((_, idx) => isNumericValue(rows[0][idx]));
+
+
+    if (isSingleRowAllNumeric) {
+      // For single-row numeric datasets, treat all columns as potential categories
+      // The user will select which columns to visualize
+      setStringColumns(["_category"]); // Virtual X-axis
+      setNumericColumns(columns);
+      setXAxis("_category");
+    } else {
+      // Normal detection logic
+      columns.forEach((col, idx) => {
+        const isNumeric = rows.some((row) => isNumericValue(row[idx]));
+        if (isNumeric) numericCols.push(col);
+        else stringCols.push(col);
       });
 
-      if (isNumeric) numericCols.push(col);
-      else stringCols.push(col);
-    });
-
-    setNumericColumns(numericCols);
-    setStringColumns(stringCols);
+      setNumericColumns(numericCols);
+      setStringColumns(stringCols);
+    }
 
     setSelectedYColumns((prev) =>
-      prev.filter((col) => numericCols.includes(col))
+      prev.filter((col) => (isSingleRowAllNumeric ? columns : numericCols).includes(col))
     );
   }, [columns, normalizedYearlyData]);
-const forceRGBColors = () => {
+
+
+  const forceRGBColors = () => {
     const style = document.createElement("style");
     style.id = "force-rgb-style";
     style.innerHTML = `
@@ -192,62 +212,97 @@ const forceRGBColors = () => {
       return [];
     }
 
+    const rows = normalizedYearlyData.length > 0 ? normalizedYearlyData[0].rows : [];
+
+    // Check if single-row all-numeric dataset
+    const isSingleRowAllNumeric = rows.length === 1 && xAxis === "_category";
+
+    if (isSingleRowAllNumeric) {
+      // Transform: each selected column becomes a data point with values from all years
+      return selectedYColumns.map((col) => {
+        const dataPoint = {
+          [xAxis]: formatText({ name: col }), // Use column name as category
+        };
+
+        // Add value for each year - using column name matching
+        normalizedYearlyData.forEach((dataset) => {
+          // Find the column index in this year's dataset by name
+          const colIdx = dataset.columns?.indexOf(col) ?? columns.indexOf(col);
+
+          if (dataset.rows && dataset.rows.length > 0 && colIdx !== -1) {
+            const value = dataset.rows[0][colIdx];
+            dataPoint[`${dataset.year}_value`] = Number(value) || 0;
+          } else {
+            dataPoint[`${dataset.year}_value`] = 0; // Column doesn't exist in this year
+          }
+        });
+
+        return dataPoint;
+      });
+    }
+
+    // multi-row dataset logic with column name matching
     const dataMap = new Map();
 
     normalizedYearlyData.forEach((dataset) => {
-      let yearXIndex = -1;
+      // Get this year's column names
+      const yearColumns = dataset.columns || columns;
 
-      if (dataset.rows.length > 0) {
-        const firstRow = dataset.rows[0];
-        firstRow.forEach((val, idx) => {
-          if (typeof val === "string" && val.length > 2 &&
-            isNaN(parseFloat(val))
-          ) {
-            yearXIndex = idx;
-          }
-        });
+      // Find the x-axis column index in this year's data by name
+      const yearXIndex = yearColumns.indexOf(xAxis);
+
+      if (yearXIndex === -1) {
+        console.warn(`X-axis column "${xAxis}" not found in ${dataset.year} data`);
+        return; // Skip this year if x-axis column doesn't exist
       }
-
-      if (yearXIndex === -1) return;
-
-      const globalXIndex = columns.indexOf(xAxis);
 
       dataset.rows.forEach((row) => {
         const rawXVal = row[yearXIndex];
         const normalizedXVal = normalizeString(rawXVal);
         if (!normalizedXVal) return;
 
+        // Initialize data point if it doesn't exist
         if (!dataMap.has(normalizedXVal)) {
           dataMap.set(normalizedXVal, { [xAxis]: rawXVal });
         }
 
         const dataPoint = dataMap.get(normalizedXVal);
 
+        // For each selected Y column, find it by NAME in this year's columns
         selectedYColumns.forEach((col) => {
-          const globalYIndex = columns.indexOf(col);
-          const offset = yearXIndex - globalXIndex;
-          const actualYIndex = globalYIndex + offset;
+          const yearYIndex = yearColumns.indexOf(col);
 
-          const value = row[actualYIndex];
-          const key = `${dataset.year}_${col}`;
-          const numValue = Number(value) || 0;
-
-          dataPoint[key] = numValue;
+          if (yearYIndex !== -1) {
+            // Column exists in this year
+            const value = row[yearYIndex];
+            const key = `${dataset.year}_${col}`;
+            const numValue = Number(value) || 0;
+            dataPoint[key] = numValue;
+          } else {
+            // Column doesn't exist in this year - set to 0
+            const key = `${dataset.year}_${col}`;
+            dataPoint[key] = 0;
+            console.warn(`Column "${col}" not found in ${dataset.year} data`);
+          }
         });
       });
     });
 
     const result = Array.from(dataMap.values());
+
+    // Fill in any missing year/column combinations with 0
     result.forEach((dataPoint) => {
       normalizedYearlyData.forEach((dataset) => {
         selectedYColumns.forEach((col) => {
           const key = `${dataset.year}_${col}`;
-          if (dataPoint[key] === undefined) dataPoint[key] = 0;
+          if (dataPoint[key] === undefined) {
+            dataPoint[key] = 0;
+          }
         });
       });
     });
 
-    // Sort for highest total
+    // Sort by highest total
     result.sort((a, b) => {
       const sumA = selectedYColumns.reduce((acc, col) => {
         return acc + normalizedYearlyData.reduce((yearAcc, d) => {
@@ -261,10 +316,10 @@ const forceRGBColors = () => {
         }, 0);
       }, 0);
 
-      return sumB - sumA; // Highest first
+      return sumB - sumA;
     });
-    return result;
 
+    return result;
   }, [columns, xAxis, selectedYColumns, normalizedYearlyData]);
 
   // Extract Y-axis ticks
@@ -307,6 +362,41 @@ const forceRGBColors = () => {
   const widthPerCategory = (barsPerCategory * (barWidth + barGap)) + categoryGap;
 
   const totalChartWidth = Math.max(chartData.length * widthPerCategory, 1200);
+
+  const renderCustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          className="rounded-lg border border-[#dbdbdb] p-2 text-sm shadow-md"
+          style={{
+            backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
+            color: isDark ? "#dbdbdb" : "#1f2937",
+          }}
+        >
+          <p className="font-semibold mb-1">{label}</p>
+          {payload.map((entry, index) => {
+            let finalColor = entry.color;
+            if (!isMultiYear && xAxis === "_category") {
+              const dataIndex = chartData.findIndex((d) => d[xAxis] === label);
+              if (dataIndex !== -1) {
+                finalColor = COLORS[dataIndex % COLORS.length];
+              }
+            }
+            return (
+              <div key={index} className="flex items-center gap-2">
+                <span
+                  style={{ backgroundColor: finalColor , width: 8, height: 8, borderRadius: "50%" , display: "inline-block", marginRight: 8}}
+                />
+                <span>{formatText({ name: entry.name })}:</span>
+                <span className="font-medium">{entry.value}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <>
@@ -393,20 +483,6 @@ const forceRGBColors = () => {
                 </select>
               </div>
             </div>
-            {/* <div className="flex justify-end gap-2 mb-4">
-              <button
-                onClick={handleDownloadImage}
-                className="px-3 py-1 text-sm bg-accent/70 hover:bg-accent text-white rounded-md"
-              >
-                Download PNG
-              </button>
-              <button
-                onClick={handleDownloadPDF}
-                className="px-3 py-1 text-sm bg-primary/70 hover:bg-primary text-white rounded-md"
-              >
-                Download PDF
-              </button>
-            </div> */}
 
             {/* Chart */}
             <div
@@ -591,29 +667,41 @@ const forceRGBColors = () => {
                                 axisLine={false}
                                 tick={{ fill: "transparent" }}
                               />
-                              <Tooltip
-                                contentStyle={{
-                                  backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                  color: isDark ? "#dbdbdb" : "#1f2937",
-                                  border: "1px solid #dbdbdb",
-                                  borderRadius: "0.5rem",
-                                }}
-                                formatter={(value, name) => [value, formatText({ name })]}
-                                shared={false}
-                              />
-                              {selectedYColumns.map((col, colIdx) =>
+                              <Tooltip content={renderCustomTooltip} />
+                              {xAxis === "_category" ? (
+                                // Single-row numeric dataset: bars for each year
                                 normalizedYearlyData.map((d, yearIdx) => (
                                   <Bar
-                                    key={`${d.year}_${col}`}
-                                    dataKey={`${d.year}_${col}`}
-                                    fill={
-                                      isMultiYear
-                                        ? COLORS[yearIdx % COLORS.length]
-                                        : COLORS[colIdx % COLORS.length]
-                                    }
+                                    key={d.year}
+                                    dataKey={`${d.year}_value`}
+                                    fill={COLORS[yearIdx % COLORS.length]}
                                     maxBarSize={barWidth}
-                                  />
+                                  >
+                                    {!isMultiYear &&
+                                      chartData.map((entry, index) => (
+                                        <Cell
+                                          key={`cell-${index}`}
+                                          fill={COLORS[index % COLORS.length]}
+                                        />
+                                      ))}
+                                  </Bar>
                                 ))
+                              ) : (
+                                // Normal multi-row dataset
+                                selectedYColumns.map((col, colIdx) =>
+                                  normalizedYearlyData.map((d, yearIdx) => (
+                                    <Bar
+                                      key={`${d.year}_${col}`}
+                                      dataKey={`${d.year}_${col}`}
+                                      fill={
+                                        isMultiYear
+                                          ? COLORS[yearIdx % COLORS.length]
+                                          : COLORS[colIdx % COLORS.length]
+                                      }
+                                      maxBarSize={barWidth}
+                                    />
+                                  ))
+                                )
                               )}
                             </BarChart>
                           ) : (
@@ -684,32 +772,53 @@ const forceRGBColors = () => {
                                 axisLine={false}
                                 tick={{ fill: "transparent" }}
                               />
-                              <Tooltip
-                                contentStyle={{
-                                  backgroundColor: !isDark ? "#dbdbdb" : "#1f2937",
-                                  color: isDark ? "#dbdbdb" : "#1f2937",
-                                  border: "1px solid #dbdbdb",
-                                  borderRadius: "0.5rem",
-                                }}
-                                formatter={(value, name) => [value, formatText({ name })]}
-                                shared={false}
-                              />
-                              {selectedYColumns.map((col, colIdx) =>
+                              <Tooltip content={renderCustomTooltip}/>
+
+
+                              {xAxis === "_category" ? (
+                                // Single-row numeric dataset: lines for each year
                                 normalizedYearlyData.map((d, yearIdx) => (
                                   <Line
-                                    key={`${d.year}_${col}`}
+                                    key={d.year}
                                     type="monotone"
-                                    dataKey={`${d.year}_${col}`}
-                                    stroke={
-                                      isMultiYear
-                                        ? COLORS[yearIdx % COLORS.length]
-                                        : COLORS[colIdx % COLORS.length]
-                                    }
+                                    dataKey={`${d.year}_value`}
+                                    stroke={COLORS[yearIdx % COLORS.length]}
                                     strokeWidth={2}
-                                    dot={{ r: 2 }}
-                                    activeDot={{ r: 4 }}
+                                    dot={(props) => {
+                                      const { cx, cy, index } = props;
+                                      return (
+                                        <circle
+                                          key={`dot-${index}`}
+                                          cx={cx}
+                                          cy={cy}
+                                          r={4}
+                                          fill={!isMultiYear ? COLORS[index % COLORS.length] : COLORS[yearIdx % COLORS.length]}
+                                          stroke="none"
+                                        />
+                                      );
+                                    }}
+                                    activeDot={{ r: 6 }}
                                   />
                                 ))
+                              ) : (
+                                // Normal multi-row dataset
+                                selectedYColumns.map((col, colIdx) =>
+                                  normalizedYearlyData.map((d, yearIdx) => (
+                                    <Line
+                                      key={`${d.year}_${col}`}
+                                      type="monotone"
+                                      dataKey={`${d.year}_${col}`}
+                                      stroke={
+                                        isMultiYear
+                                          ? COLORS[yearIdx % COLORS.length]
+                                          : COLORS[colIdx % COLORS.length]
+                                      }
+                                      strokeWidth={2}
+                                      dot={{ r: 2 }}
+                                      activeDot={{ r: 4 }}
+                                    />
+                                  ))
+                                )
                               )}
                             </LineChart>
                           )}
