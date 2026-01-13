@@ -103,7 +103,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
       // Enrich presidents
       const enrichedPresidents = presidentDictInDetail.map((president) => {
         const matchedDetail = presidentDetails.find((detail) =>
-          detail.presidentName
+          detail.personName
             .toLowerCase()
             .includes(
               utils.extractNameFromProtobuf(president.name).toLowerCase()
