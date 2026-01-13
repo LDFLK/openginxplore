@@ -364,7 +364,7 @@ const MinistryCardGrid = () => {
                   </Button>
                 </Box>
               </Box>
-            ) : primeMinister == null &&
+            ) : !primeMinister &&
               !pmIsLoading ? (
               <Typography
                 sx={{
