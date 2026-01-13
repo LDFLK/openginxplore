@@ -408,159 +408,171 @@ const MinistryCardGrid = () => {
             borderRadius: 2,
           }}
         >
-          <Box
-            sx={{
-              width: "90%",
-              px: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.4,
-            }}
-          >
-            {/* Active Ministries */}
-            {activeMinistriesCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <AccountBalanceIcon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  Active Ministries{" "}
-                  <InfoTooltip
-                    message="Number of ministry portfolios active on the selected date"
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+          {!isLoading ? (
+            <Box
+              sx={{
+                width: "90%",
+                px: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: 0.4,
+              }}
+            >
+              {/* Active Ministries */}
+              {activeMinistriesCount > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <AccountBalanceIcon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {activeMinistriesCount}
-                </Typography>
-              </Box>
-            )}
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    Active Ministries{" "}
+                    <InfoTooltip
+                      message="Number of ministry portfolios active on the selected date"
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {activeMinistriesCount}
+                  </Typography>
+                </Box>
+              )}
 
-            {/* New Ministries */}
-            {newMinistriesCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <AccountBalanceIcon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  New Ministries{" "}
-                  <InfoTooltip
-                    message="New ministry portfolios created on selected date"
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+              {/* New Ministries */}
+              {newMinistriesCount > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <AccountBalanceIcon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {newMinistriesCount}
-                </Typography>
-              </Box>
-            )}
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    New Ministries{" "}
+                    <InfoTooltip
+                      message="New ministry portfolios created on selected date"
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {newMinistriesCount}
+                  </Typography>
+                </Box>
+              )}
 
-            {/* New Ministers */}
-            {newMinistersCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <PersonAddAlt1Icon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  New Ministers{" "}
-                  <InfoTooltip
-                    message="New ministers assigned to portfolios on selected date"
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+              {/* New Ministers */}
+              {newMinistersCount > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <PersonAddAlt1Icon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {newMinistersCount}
-                </Typography>
-              </Box>
-            )}
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    New Ministers{" "}
+                    <InfoTooltip
+                      message="New ministers assigned to portfolios on selected date"
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {newMinistersCount}
+                  </Typography>
+                </Box>
+              )}
 
-            {/* Ministries under president */}
-            {ministriesUnderPresident > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <WorkspacePremiumIcon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  Ministries under president{" "}
-                  <InfoTooltip
-                    message="The number of minister portfolios assigned to the president - if the president is newly elected and has not released a cabinet yet, all ministers from the prior cabinet are temporarily assigned to them."
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+              {/* Ministries under president */}
+              {ministriesUnderPresident > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <WorkspacePremiumIcon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {ministriesUnderPresident}
-                </Typography>
-              </Box>
-            )}
-          </Box>
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    Ministries under president{" "}
+                    <InfoTooltip
+                      message="The number of minister portfolios assigned to the president - if the president is newly elected and has not released a cabinet yet, all ministers from the prior cabinet are temporarily assigned to them."
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {ministriesUnderPresident}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          ) : (
+            <Typography
+              sx={{
+                fontStyle: "italic",
+                color: colors.textMuted,
+                textAlign: "left",
+              }}
+            >
+              Loading Highlights...
+            </Typography>
+          )}
         </Card>
       </Box>
 
