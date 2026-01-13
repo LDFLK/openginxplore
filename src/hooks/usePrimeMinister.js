@@ -14,7 +14,7 @@ export const usePrimeMinister = (date) => {
 
     select: (data) => {
       const person = data?.body;
-      if (!person?.name) return data;
+      if (!person?.name) return { ...data, body: null };
 
       const found = personImages.find(
         (img) => img.presidentName.trim() === person.name.trim()
