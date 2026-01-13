@@ -33,7 +33,7 @@ const PersonProfile = () => {
   );
 
   const matchingPresident = personDetails.find(
-    (p) => p.presidentName === personName
+    (p) => p.personName === personName
   );
 
   const imageUrl = matchingPresident ? matchingPresident.imageUrl : null;

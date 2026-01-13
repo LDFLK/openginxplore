@@ -17,7 +17,7 @@ export const usePrimeMinister = (date) => {
       if (!person?.name) return { ...data, body: null };
 
       const found = personImages.find(
-        (img) => img.presidentName.trim() === person.name.trim()
+        (img) => img.personName.trim() === person.name.trim()
       );
 
       if (!found?.imageUrl) return data;
