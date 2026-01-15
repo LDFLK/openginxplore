@@ -1,6 +1,6 @@
 ## OpenGINXplore
 
-**A Frontend** applicatioin that calls to the [GI-Service](https://github.com/LDFLK/GI-SERVICE.git) BFF service to show the data.
+**A Frontend** application that calls to the [GI-Service](https://github.com/LDFLK/GI-SERVICE.git) BFF service to show the data.
 
 ### High Level Overview
 ```mermaid
@@ -26,7 +26,7 @@
 #### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/LDFLK/openginxplore.git
 cd openginxplore
 ```
 
@@ -38,12 +38,12 @@ npm install
 
 #### 3. Configuration
 
-Create a `config.js` file inside the public config file
+Create a `config.js` file in the `public` directory
 ```
 window.configs = {
-     apiUrl : "<OPENGIN_BASE_URL>",
-     apiUrlData: "<GI_SERVICE_BASE_URL>",
- };
+  apiUrl: "<OPENGIN_BASE_URL>",
+  apiUrlData: "<GI_SERVICE_BASE_URL>",
+};
 ```
 
 #### 4. Run the Application (development)
@@ -60,7 +60,7 @@ The application will be available at: `http://localhost:5173`
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature-name`
-3. Commit changes: `git commit -am 'Add feature'`
+3. Commit changes: `git commit -m 'feat: your descriptive commit message'`
 4. Push to branch: `git push origin feature-name`
 5. Submit a Pull Request
 
@@ -68,4 +68,3 @@ The application will be available at: `http://localhost:5173`
 
 For support and questions:
 - Create an issue in the repository
-- Contact the development team
