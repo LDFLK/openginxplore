@@ -1,6 +1,23 @@
 ## OpenGINXplore
 
-**A Frontend** application that calls to the [GI-Service](https://github.com/LDFLK/GI-SERVICE.git) BFF service to show the data.
+This Frontend application consumes the [GI-Service](https://github.com/LDFLK/GI-SERVICE.git) (BFF) to present structured, discoverable information about the Government of Sri Lanka in an intuitive and visual manner.
+
+The application provides a unified interface to explore government entities, including ministries, departments and people, their hierarchical relationships, historical leadership, and published data. It is designed to make complex government structures easier to understand and navigate for the users.
+
+### Features
+
+- Government Structure Visualization
+    - Explore the hierarchical structure of the Sri Lankan government
+    - View relationships between ministries, departments, and affiliated entities
+- Graph-Based Exploration
+    - Interactive graph view to visually navigate government entities and their connections
+    - Enables intuitive exploration of complex organizational relationships
+- Data Catalog Discovery
+    - Browse datasets published by the government, ministries, and departments
+    - Centralized access to public data catalogs
+- Historical Information
+    - View historical records of ministries, departments, and key personnel
+    - Track changes in government structures over time
 
 ### High Level Overview
 ```mermaid
