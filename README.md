@@ -15,6 +15,7 @@ The application provides a unified interface to explore government entities, inc
 - Data Catalog Discovery
     - Browse datasets published by the government, ministries, and departments
     - Centralized access to public data catalogs
+    - Data visualisation and comparison across years as well
 - Historical Information
     - View historical records of ministries, departments, and key personnel
     - Track changes in government structures over time
