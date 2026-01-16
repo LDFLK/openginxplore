@@ -16,17 +16,17 @@ export const usePrimeMinister = (date) => {
       const person = data?.body;
       if (!person?.name) return { ...data, body: null };
 
-      const found = personImages.find(
+      const filtered_person = personImages.find(
         (img) => img.personName.trim() === person.name.trim()
       );
 
-      if (!found?.imageUrl) return data;
+      if (!filtered_person?.imageUrl) return data;
 
       return {
         ...data,
         body: {
           ...person,
-          imageUrl: found.imageUrl,
+          imageUrl: filtered_person.imageUrl,
         },
       };
     },
