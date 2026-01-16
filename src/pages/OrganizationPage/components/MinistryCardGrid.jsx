@@ -9,6 +9,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../../context/themeContext";
 import useUrlParamState from "../../../hooks/singleSharingURL";
 import { useActivePortfolioList } from "../../../hooks/useActivePortfolioList";
+import { usePrimeMinister } from "../../../hooks/usePrimeMinister";
 
 import MinistryCard from "./MinistryCard";
 import MinistryViewModeToggleButton from "../../../components/ministryViewModeToggleButton";
@@ -16,10 +17,6 @@ import GraphComponent from "./graphComponent";
 import PersonsTab from "./PersonsTab";
 import DepartmentTab from "./DepartmentTab";
 import InfoTooltip from "../../../components/InfoToolTip";
-
-import api from "../../../services/services";
-import utils from "../../../utils/utils";
-import personImages from "../../../assets/personImages.json";
 
 import { ClipLoader } from "react-spinners";
 
@@ -38,15 +35,11 @@ import {
   People as PeopleIcon
 } from "@mui/icons-material";
 
-import { clearTimeout } from "highcharts";
-
 
 const MinistryCardGrid = () => {
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );
-  const allPersonDict = useSelector((state) => state.allPerson.allPerson);
-  const [pmloading, setPmLoading] = useState(true);
   const [searchText, setSearchText] = useUrlParamState("filterByName", "");
   const [filterType, setFilterType] = useUrlParamState("filterByType", "all");
   const [viewMode, setViewMode] = useUrlParamState("viewMode", "Grid");
@@ -55,10 +48,6 @@ const MinistryCardGrid = () => {
   const [selectedCard, setSelectedCard] = useState(null);
   const { colors } = useThemeContext();
   const location = useLocation();
-  const [primeMinister, setPrimeMinister] = useState({
-    relation: null,
-    person: null,
-  });
 
   const { data, isLoading, error } = useActivePortfolioList(
     selectedPresident?.id,
@@ -93,56 +82,12 @@ const MinistryCardGrid = () => {
     }
   }, [location.search, activeMinistryList, viewMode]);
 
+  const {
+    data: primeMinisterData,
+    isLoading: pmIsLoading,
+  } = usePrimeMinister(selectedDate?.date);
 
-  useEffect(() => {
-    if (!selectedDate) {
-      return;
-    }
-    setPrimeMinister({ relation: null, person: null });
-    const timeoutId = setTimeout(() => {
-      fetchPrimeMinister();
-    }, 1000);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [selectedDate]);
-
-  const fetchPrimeMinister = async () => {
-    try {
-      setPmLoading(true);
-      var response = await api.fetchActiveRelationsForMinistry(
-        selectedDate.date,
-        "gov_01",
-        "AS_PRIME_MINISTER"
-      );
-
-      response = await response.json();
-      if (response.length === 0) {
-        setPmLoading(false);
-        return;
-      }
-      let pmPerson = allPersonDict[response[0].relatedEntityId];
-      // Try to find a matching image from personImages
-      if (pmPerson && pmPerson.name) {
-        const pmName = utils.extractNameFromProtobuf(pmPerson.name).trim();
-        const found = personImages.find(
-          (img) => img.presidentName.trim() === pmName
-        );
-        if (found && found.imageUrl) {
-          pmPerson = { ...pmPerson, imageUrl: found.imageUrl };
-        }
-      }
-      if (response.length > 0 && pmPerson) {
-        setPrimeMinister({
-          relation: response[0],
-          person: pmPerson,
-        });
-      }
-      setPmLoading(false);
-    } catch (e) {
-      console.error("Failed to fetch prime minister data:", e);
-    }
-  };
+  const primeMinister = primeMinisterData?.body;
 
   const filteredMinistryList = useMemo(() => {
     if (!data?.portfolioList) return [];
@@ -313,8 +258,7 @@ const MinistryCardGrid = () => {
           }}
         >
           <Box sx={{ mt: -0.5 }}>
-            {primeMinister.person &&
-              primeMinister.relation &&
+            {primeMinister &&
               selectedPresident ? (
               <Box
                 sx={{
@@ -325,8 +269,8 @@ const MinistryCardGrid = () => {
                 }}
               >
                 <Avatar
-                  src={primeMinister.person.imageUrl}
-                  alt={primeMinister.person.name}
+                  src={primeMinister?.imageUrl}
+                  alt={primeMinister?.name}
                   sx={{
                     width: 55,
                     height: 55,
@@ -349,30 +293,44 @@ const MinistryCardGrid = () => {
                   >
                     Prime Minister
                   </Typography>
-                  <Typography
-                    sx={{
-                      fontWeight: 400,
-                      fontSize: 15,
-                      fontFamily: "poppins",
-                      color: colors.textPrimary,
-                      textAlign: "left",
-                      margin: 0,
-                    }}
-                  >
-                    {utils.extractNameFromProtobuf(primeMinister.person.name)}
-                  </Typography>
+                  <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1 }}>
+                    <Typography
+                      sx={{
+                        fontWeight: 400,
+                        fontSize: 15,
+                        fontFamily: "poppins",
+                        color: colors.textPrimary,
+                        margin: 0,
+                      }}
+                    >
+                      {primeMinister?.name}
+                    </Typography>
+                    {primeMinister?.isNew && (
+                      <Box
+                        sx={{
+                          border: `1px solid ${colors.green}`,
+                          color: colors.green,
+                          fontSize: "0.65rem",
+                          fontWeight: 600,
+                          borderRadius: "4px",
+                          px: 1,
+                          py: 0.5,
+                          fontFamily: "poppins",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          lineHeight: 1,
+                        }}
+                      >
+                        NEW
+                      </Box>
+                    )}
+                  </Box>
                   <Typography sx={{ fontSize: 14, color: colors.textMuted }}>
-                    {primeMinister.relation.endTime
-                      ? `${primeMinister.relation.startTime.split("-")[0]
-                      } - ${new Date(
-                        primeMinister.relation.endTime
-                      ).getFullYear()}`
-                      : `${primeMinister.relation.startTime.split("-")[0]
-                      } - Present`}
+                    {primeMinister?.term}
                   </Typography>
                   <Button
                     component={Link}
-                    to={`/person-profile/${primeMinister.person?.id}`}
+                    to={`/person-profile/${primeMinister?.id}`}
                     state={{
                       mode: "back",
                       from: location.pathname + location.search,
@@ -406,9 +364,8 @@ const MinistryCardGrid = () => {
                   </Button>
                 </Box>
               </Box>
-            ) : primeMinister.person == null &&
-              primeMinister.relation == null &&
-              !pmloading ? (
+            ) : !primeMinister &&
+              !pmIsLoading ? (
               <Typography
                 sx={{
                   fontStyle: "italic",
@@ -419,7 +376,7 @@ const MinistryCardGrid = () => {
                 No Prime Minister appointed on this date.
               </Typography>
             ) : (
-              pmloading && (
+              pmIsLoading && (
                 <Typography
                   sx={{
                     fontStyle: "italic",
@@ -451,159 +408,171 @@ const MinistryCardGrid = () => {
             borderRadius: 2,
           }}
         >
-          <Box
-            sx={{
-              width: "90%",
-              px: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.4,
-            }}
-          >
-            {/* Active Ministries */}
-            {activeMinistriesCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <AccountBalanceIcon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  Active Ministries{" "}
-                  <InfoTooltip
-                    message="Number of ministry portfolios active on the selected date"
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+          {!isLoading ? (
+            <Box
+              sx={{
+                width: "90%",
+                px: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: 0.4,
+              }}
+            >
+              {/* Active Ministries */}
+              {activeMinistriesCount > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <AccountBalanceIcon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {activeMinistriesCount}
-                </Typography>
-              </Box>
-            )}
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    Active Ministries{" "}
+                    <InfoTooltip
+                      message="Number of ministry portfolios active on the selected date"
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {activeMinistriesCount}
+                  </Typography>
+                </Box>
+              )}
 
-            {/* New Ministries */}
-            {newMinistriesCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <AccountBalanceIcon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  New Ministries{" "}
-                  <InfoTooltip
-                    message="New ministry portfolios created on selected date"
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+              {/* New Ministries */}
+              {newMinistriesCount > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <AccountBalanceIcon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {newMinistriesCount}
-                </Typography>
-              </Box>
-            )}
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    New Ministries{" "}
+                    <InfoTooltip
+                      message="New ministry portfolios created on selected date"
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {newMinistriesCount}
+                  </Typography>
+                </Box>
+              )}
 
-            {/* New Ministers */}
-            {newMinistersCount > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <PersonAddAlt1Icon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  New Ministers{" "}
-                  <InfoTooltip
-                    message="New ministers assigned to portfolios on selected date"
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+              {/* New Ministers */}
+              {newMinistersCount > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <PersonAddAlt1Icon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {newMinistersCount}
-                </Typography>
-              </Box>
-            )}
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    New Ministers{" "}
+                    <InfoTooltip
+                      message="New ministers assigned to portfolios on selected date"
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {newMinistersCount}
+                  </Typography>
+                </Box>
+              )}
 
-            {/* Ministries under president */}
-            {ministriesUnderPresident > 0 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <WorkspacePremiumIcon
-                  sx={{ color: colors.textMuted, fontSize: 18 }}
-                />
-                <Typography
-                  sx={{
-                    flex: 1,
-                    fontFamily: "Poppins",
-                    fontWeight: 500,
-                    color: colors.textMuted,
-                    fontSize: 15,
-                  }}
-                >
-                  Ministries under president{" "}
-                  <InfoTooltip
-                    message="The number of minister portfolios assigned to the president - if the president is newly elected and has not released a cabinet yet, all ministers from the prior cabinet are temporarily assigned to them."
-                    iconColor={colors.textPrimary}
-                    iconSize={13}
-                    placement="right"
+              {/* Ministries under president */}
+              {ministriesUnderPresident > 0 && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <WorkspacePremiumIcon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
                   />
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: 17,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {ministriesUnderPresident}
-                </Typography>
-              </Box>
-            )}
-          </Box>
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Poppins",
+                      fontWeight: 500,
+                      color: colors.textMuted,
+                      fontSize: 15,
+                    }}
+                  >
+                    Ministries under president{" "}
+                    <InfoTooltip
+                      message="The number of minister portfolios assigned to the president - if the president is newly elected and has not released a cabinet yet, all ministers from the prior cabinet are temporarily assigned to them."
+                      iconColor={colors.textPrimary}
+                      iconSize={13}
+                      placement="right"
+                    />
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Poppins",
+                      fontSize: 17,
+                      fontWeight: 500,
+                      color: colors.textPrimary,
+                    }}
+                  >
+                    {ministriesUnderPresident}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          ) : (
+            <Typography
+              sx={{
+                fontStyle: "italic",
+                color: colors.textMuted,
+                textAlign: "left",
+              }}
+            >
+              Loading Highlights...
+            </Typography>
+          )}
         </Card>
       </Box>
 
@@ -838,7 +807,7 @@ const MinistryCardGrid = () => {
                             sx={{
                               color: colors.textPrimary,
                               fontWeight: "semibold",
-                              fontSize: "1.1rem", // Increase text size
+                              fontSize: "1.1rem",
                               transition: "text-decoration 0.2s ease-in-out",
                             }}
                           >
