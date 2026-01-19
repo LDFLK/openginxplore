@@ -6,21 +6,23 @@ export default function Footer() {
       className={`absolute lg:bottom-0 z-100 border-t border-border px-2 lg:px-6 w-full`}
     >
       <div className="py-6 p-2 md:px-14 lg:px-24 xl:px-56 mx-auto">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-0">
           {/* Copyright */}
           <a
             href="https://opendata.lk"
             target="_blank"
             rel="noopener noreferrer"
+            className="text-center lg:text-left order-3 lg:order-1"
           >
             <p className="text-primary/75 text-sm">
               <span className="hover:text-accent">Open Data</span> ©{" "}
+              <br className="lg:hidden" />
               {new Date().getFullYear()}. All rights reserved.
             </p>
           </a>
 
           {/* Social Media Links */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 order-2 lg:order-2">
             <a
               href="https://discord.gg/mg94NtHD9Y"
               target="_blank"
