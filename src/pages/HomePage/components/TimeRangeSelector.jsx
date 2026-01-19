@@ -698,6 +698,7 @@ export default function TimeRangeSelector({
         Select a Date range
       </div>
       <div className="flex gap-2 mb-2 md:mb-4 flex-wrap sm:justify-start justify-center">
+        <div className="flex justify-between items-center md:w-43 w-full">
         {/* Year presets */}
         {[
           { label: "1Y", years: 1 },
@@ -746,9 +747,12 @@ export default function TimeRangeSelector({
             {preset.label}
           </button>
         ))}
+        </div>
+        
+      
 
         {/* Presidents dropdown */}
-        <div className="relative w-56 text-xs">
+        <div className="relative md:w-56 w-full text-xs">
           {/* Main button */}
           <button
             className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${
@@ -876,7 +880,7 @@ export default function TimeRangeSelector({
         </div>
 
         {/* Calendar button */}
-        <div className="relative w-full sm:w-auto">
+        <div className="relative w-full sm:w-auto ">
           <button
             onClick={() => {
               setCalendarStart(startDate);
@@ -1196,7 +1200,7 @@ export default function TimeRangeSelector({
         </div>
 
         {/* Selected range display */}
-        <div className="flex items-center gap-1 w-full justify-center sm:w-auto sm:ml-auto sm:justify-end">
+        <div className="flex items-center gap-1.5 w-full justify-between sm:w-auto sm:ml-auto sm:justify-end">
           <div className="px-2 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
             {new Date(
               tempStartDate.toISOString().split("T")[0]
@@ -1217,6 +1221,7 @@ export default function TimeRangeSelector({
             })}
           </div>
         </div>
+        
       </div>
 
       {/* Scrollable chart */}
