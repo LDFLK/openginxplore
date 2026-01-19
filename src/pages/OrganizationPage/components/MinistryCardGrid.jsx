@@ -1165,7 +1165,7 @@ const MinistryCardGrid = () => {
                   })}
                 </Stepper>
               ) : (
-                <LandscapeRequired>
+                <LandscapeRequired onBack={() => window.history.back()}>
                    <GraphComponent
                   activeMinistries={filteredMinistryList}
                   filterType={filterType}
