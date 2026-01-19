@@ -70,19 +70,21 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                 flexDirection: "column",
                 alignItems: "flex-start",
                 width: {xs:"100%", sm:"100%", md:"40%"},
-                border: {xs:0,sm:0,md:`1px solid ${colors.backgroundWhite}`},
-                p: {xs:0,sm:0,md:2},
-                backgroundColor: colors.backgroundWhite,
-                borderRadius: {xs:0,sm:0,md:"14px"}
+                border: {xs:"None",sm:"None",md:`1px solid ${colors.backgroundWhite}`},
+                // p: {xs:0,sm:0,md:2},
+                backgroundColor: {xs:colors.backgroundDark,sm:colors.backgroundDark,md:colors.backgroundWhite},
+                borderRadius: {xs:1,sm:1,md:"14px"},
+                // padding: {xs:"5px 3px",sm:"5px 3px",md:2}
+                p: 2
               }}
             >
               <Typography
                 sx={{
                   fontFamily: "Poppins",
-                  fontSize: "1.2rem",
+                  fontSize: {xs:"1rem",sm:"1rem",md:"1.2rem"},
                   fontWeight: 500,
                   color: colors.textPrimary,
-                  mb: 2,
+                  mb: 2
                 }}
               >
                 Key Highlights
@@ -116,7 +118,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         sx={{
                           display: { xs: "block", sm: "block", md: "none" },
                           fontFamily: "Poppins",
-                          fontSize: 20,
+                          fontSize: {xs:"1rem",sm:"1rem",md:"1.2rem"},
                           fontWeight: 500,
                           color: colors.textPrimary,
                         }}
@@ -131,7 +133,8 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         sx={{
                           fontFamily: "Poppins",
                           fontWeight: 500,
-                          color: colors.textMuted
+                          color: colors.textMuted,
+                          fontSize: {xs:"1rem",sm:"1rem",md:"1.2rem"},
                         }}
                       >
                         Total Departments{" "}
@@ -148,7 +151,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                       sx={{
                         display: { xs: "none", sm: "none", md: "block" },
                         fontFamily: "Poppins",
-                        fontSize: 20,
+                        fontSize: {xs:"1rem",sm:"1rem",md:"1.2rem"},
                         fontWeight: 500,
                         color: colors.textPrimary,
                       }}
@@ -174,7 +177,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         sx={{
                           display: { xs: "block", sm: "block", md: "none" },
                           fontFamily: "Poppins",
-                          fontSize: 20,
+                          fontSize: {xs:"1rem",sm:"1rem",md:"1.2rem"},
                           fontWeight: 500,
                           color: colors.textPrimary,
                         }}
@@ -206,7 +209,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                       sx={{
                         display: { xs: "none", sm: "none", md: "block" },
                         fontFamily: "Poppins",
-                        fontSize: 20,
+                        fontSize: {xs:"1rem",sm:"1rem",md:"1.2rem"},
                         fontWeight: 500,
                         color: colors.textPrimary,
                       }}
@@ -226,7 +229,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                 justifyContent: "space-between",
                 alignItems: {xs:"flex-start", sm:"flex-start", md:"center"},
                 flexDirection: {xs:"column",sm:"column",md:"row"},
-                mt: 2,
+                mt: 2
               }}
             >
               <Typography
@@ -243,9 +246,10 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
               </Typography>
 
               <Box sx={{ 
-                width: {xs:200,sm:200,md:250}
+                width: {xs:"100%",sm:"100%", md:"auto"}
                 }}>
                 <TextField
+
                   size="small"
                   label="Search departments"
                   value={searchQuery}
@@ -275,6 +279,8 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                     },
                     "& .MuiInputLabel-root.Mui-focused": { color: colors.textMuted },
                     "& .MuiInputBase-input": { color: colors.textMuted },
+                    width: {xs:"100%",sm:"100%", md:"auto"}
+                   
                   }}
                 />
               </Box>
