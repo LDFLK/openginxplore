@@ -100,7 +100,7 @@ export default function TimeRangeSelector({
     const newEnd = endDate.toISOString().split("T")[0];
     const currentStart = params.get("startDate");
     const currentEnd = params.get("endDate");
-    
+
     // merge with existing URL params
     params.set("startDate", newStart);
     params.set("endDate", newEnd);
@@ -126,7 +126,7 @@ export default function TimeRangeSelector({
 
       // SelectedDate year is within the URL range → keep URL range as-is
       if (targetDate >= urlStart && targetDate <= urlEnd) {
-        
+
       }
       // SelectedDate year is outside URL range but within available range → override range to full year
       else if (targetDate >= minDate && targetDate <= maxDate) {
@@ -699,67 +699,65 @@ export default function TimeRangeSelector({
       </div>
       <div className="flex gap-2 mb-2 md:mb-4 flex-wrap sm:justify-start justify-center">
         <div className="flex justify-between items-center md:w-43 w-full">
-        {/* Year presets */}
-        {[
-          { label: "1Y", years: 1 },
-          { label: "2Y", years: 2 },
-          { label: "3Y", years: 3 },
-          { label: "5Y", years: 5 },
-          { label: "All", years: endYear - startYear + 1 },
-        ].map((preset) => (
-          <button
-            key={preset.label}
-            onClick={() => {
-              if (preset.label === "All") {
-                setStartDate(new Date(Date.UTC(startYear, 0, 1)));
-                setTempStartDate(new Date(Date.UTC(startYear, 0, 1)));
-                setEndDate(new Date());
-                setTempEndDate(new Date());
-                setSelectedRange([startYear, endYear]);
-              } else {
-                const today = new Date();
-                const start = new Date(
-                  Date.UTC(
-                    today.getUTCFullYear() - preset.years,
-                    today.getUTCMonth(),
-                    today.getUTCDate()
-                  )
-                );
-                setStartDate(start);
-                setTempStartDate(start);
-                setEndDate(today);
-                setTempEndDate(today);
-                setSelectedRange([
-                  start.getUTCFullYear(),
-                  today.getUTCFullYear(),
-                ]);
-              }
-              setPreciseMode(true);
-              setActivePreset(preset.label);
-              setActivePresident("");
-            }}
-            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${
-              activePreset === preset.label
+          {/* Year presets */}
+          {[
+            { label: "1Y", years: 1 },
+            { label: "2Y", years: 2 },
+            { label: "3Y", years: 3 },
+            { label: "5Y", years: 5 },
+            { label: "All", years: endYear - startYear + 1 },
+          ].map((preset) => (
+            <button
+              key={preset.label}
+              onClick={() => {
+                if (preset.label === "All") {
+                  setStartDate(new Date(Date.UTC(startYear, 0, 1)));
+                  setTempStartDate(new Date(Date.UTC(startYear, 0, 1)));
+                  setEndDate(new Date());
+                  setTempEndDate(new Date());
+                  setSelectedRange([startYear, endYear]);
+                } else {
+                  const today = new Date();
+                  const start = new Date(
+                    Date.UTC(
+                      today.getUTCFullYear() - preset.years,
+                      today.getUTCMonth(),
+                      today.getUTCDate()
+                    )
+                  );
+                  setStartDate(start);
+                  setTempStartDate(start);
+                  setEndDate(today);
+                  setTempEndDate(today);
+                  setSelectedRange([
+                    start.getUTCFullYear(),
+                    today.getUTCFullYear(),
+                  ]);
+                }
+                setPreciseMode(true);
+                setActivePreset(preset.label);
+                setActivePresident("");
+              }}
+              className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${activePreset === preset.label
                 ? "bg-accent/20 text-primary"
                 : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
-            }`}
-          >
-            {preset.label}
-          </button>
-        ))}
+                }`}
+            >
+              {preset.label}
+            </button>
+          ))}
         </div>
-        
-      
+
+
 
         {/* Presidents dropdown */}
         <div className="relative md:w-56 w-full text-xs">
           {/* Main button */}
           <button
-            className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${
-              activePresident
-                ? "bg-accent/20 text-primary"
-                : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
-            }`}
+            className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${activePresident
+              ? "bg-accent/20 text-primary"
+              : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
+              }`}
             onClick={() => setIsDropdownOpen((o) => !o)}
           >
             <span>
@@ -806,11 +804,10 @@ export default function TimeRangeSelector({
                 <div key={id} className="group relative">
                   {/* President row */}
                   <button
-                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-border ${
-                      activePresident === id
-                        ? "bg-accent/20 text-primary"
-                        : "text-primary"
-                    }`}
+                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-border ${activePresident === id
+                      ? "bg-accent/20 text-primary"
+                      : "text-primary"
+                      }`}
                     onClick={() => {
                       if (data.terms.length === 1) {
                         const term = data.terms[0];
@@ -841,14 +838,13 @@ export default function TimeRangeSelector({
                       {data.terms.map((term, idx) => (
                         <button
                           key={idx}
-                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-border ${
-                            activePresident === id &&
+                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-border ${activePresident === id &&
                             startDate.getTime() ===
                             new Date(term.start).getTime() &&
                             endDate.getTime() === new Date(term.end).getTime()
-                              ? "bg-accent text-white"
-                              : "text-primary"
-                          }`}
+                            ? "bg-accent text-white"
+                            : "text-primary"
+                            }`}
                           onClick={() => {
                             setActivePresident(id);
                             setStartDate(new Date(term.start));
@@ -888,19 +884,18 @@ export default function TimeRangeSelector({
               setCalendarOpen((o) => !o);
             }}
             className={`flex items-center justify-center gap-2 w-full sm:w-auto px-2.5 py-1.5 text-xs rounded-md transition-colors cursor-pointer
-      ${
-        calendarRange &&
-        startDate.toISOString() === calendarRange.start &&
-        endDate.toISOString() === calendarRange.end
-          ? "bg-accent text-white hover:bg-accent"
-          : "bg-foreground/10 text-primary font-medium hover:bg-border"
-      }`}
+      ${calendarRange &&
+                startDate.toISOString() === calendarRange.start &&
+                endDate.toISOString() === calendarRange.end
+                ? "bg-accent text-white hover:bg-accent"
+                : "bg-foreground/10 text-primary font-medium hover:bg-border"
+              }`}
           >
             By Date
           </button>
 
           {calendarOpen && (
-            <div className="absolute left-1/2 -translate-x-1/2 mt-1.5 z-50 w-full sm:w-auto bg-background p-3 rounded-md shadow-lg flex flex-col">
+            <div className="absolute left-1/2 -translate-x-1/2 mt-1.5 z-15 w-full sm:w-auto bg-background p-3 rounded-md shadow-lg flex flex-col">
               <div className="flex flex-col sm:flex-row gap-3">
                 {/* From date */}
                 <div className="flex-1 flex flex-col">
@@ -940,7 +935,7 @@ export default function TimeRangeSelector({
                       );
 
                       return (
-                        <div className="flex justify-between items-center px-2 py-1 gap-2">
+                        <div className="flex justify-between items-center px:1 md:px-2 py-1 gap-2">
                           <button
                             onClick={decreaseMonth}
                             disabled={prevMonthButtonDisabled}
@@ -957,13 +952,11 @@ export default function TimeRangeSelector({
                             onChange={(e) =>
                               changeMonth(Number(e.target.value))
                             }
-                            className="bg-white text-gray-900 px-2 py-1 rounded-sm border border-gray-300"
+                            className="bg-white text-gray-900 px-0 md:px-2 py-1 rounded-sm border border-gray-300"
                           >
                             {months.map((m) => (
                               <option key={m} value={m}>
-                                {new Date(0, m).toLocaleString("default", {
-                                  month: "long",
-                                })}
+                                  {window.innerWidth <= 390 ? new Date(0, m).toLocaleString("default", { month: "short" }) : new Date(0, m).toLocaleString("default", { month: "long" })}
                               </option>
                             ))}
                           </select>
@@ -971,7 +964,7 @@ export default function TimeRangeSelector({
                           <select
                             value={date.getFullYear()}
                             onChange={(e) => changeYear(Number(e.target.value))}
-                            className="bg-white text-gray-900 px-2 py-1 rounded-sm border border-gray-300"
+                            className="bg-white text-gray-900 px-0 md:px-2 py-1 rounded-sm border border-gray-300"
                           >
                             {years.map((y) => (
                               <option key={y} value={y}>
@@ -1070,7 +1063,8 @@ export default function TimeRangeSelector({
                       );
 
                       return (
-                        <div className="flex justify-between items-center px-2 py-1 gap-2">
+                        <div className="flex justify-between items-center px:1 md:px-2 py-1 gap-2">
+                          
                           <button
                             onClick={decreaseMonth}
                             disabled={prevMonthButtonDisabled}
@@ -1087,13 +1081,11 @@ export default function TimeRangeSelector({
                             onChange={(e) =>
                               changeMonth(Number(e.target.value))
                             }
-                            className="bg-white text-gray-900 px-2 py-1 rounded-sm border border-gray-300"
+                            className="bg-white text-gray-900 px-0 md:px-2 py-1 rounded-sm border border-gray-300"
                           >
                             {months.map((m) => (
                               <option key={m} value={m}>
-                                {new Date(0, m).toLocaleString("default", {
-                                  month: "long",
-                                })}
+                               {window.innerWidth <= 390 ? new Date(0, m).toLocaleString("default", { month: "short" }) : new Date(0, m).toLocaleString("default", { month: "long" })}
                               </option>
                             ))}
                           </select>
@@ -1101,7 +1093,7 @@ export default function TimeRangeSelector({
                           <select
                             value={date.getFullYear()}
                             onChange={(e) => changeYear(Number(e.target.value))}
-                            className="bg-white text-gray-900 px-2 py-1 rounded-sm border border-gray-300"
+                            className="bg-white text-gray-900 px-0 md:px-2 py-1 rounded-sm border border-gray-300"
                           >
                             {years.map((y) => (
                               <option key={y} value={y}>
@@ -1199,6 +1191,8 @@ export default function TimeRangeSelector({
           )}
         </div>
 
+
+
         {/* Selected range display */}
         <div className="flex items-center gap-1.5 w-full justify-between sm:w-auto sm:ml-auto sm:justify-end">
           <div className="px-2 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
@@ -1221,7 +1215,7 @@ export default function TimeRangeSelector({
             })}
           </div>
         </div>
-        
+
       </div>
 
       {/* Scrollable chart */}
@@ -1242,9 +1236,8 @@ export default function TimeRangeSelector({
               return (
                 <div
                   key={year}
-                  className={`relative transition-all duration-200 hover:cursor-pointer ${
-                    isInRange ? "opacity-100" : "opacity-40"
-                  } border-l-1 border-r-1 border-foreground/50`}
+                  className={`relative transition-all duration-200 hover:cursor-pointer ${isInRange ? "opacity-100" : "opacity-40"
+                    } border-l-1 border-r-1 border-foreground/50`}
                   style={{ height: "40px", flex: "1 0 0" }}
                   onClick={() => {
                     setSelectedRange([year, year]);
@@ -1278,9 +1271,8 @@ export default function TimeRangeSelector({
                     isInRange={isInRange}
                   />
                   <div
-                    className={`absolute -bottom- left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${
-                      isInRange ? "text-accent" : "text-primary"
-                    }`}
+                    className={`absolute -bottom- left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${isInRange ? "text-accent" : "text-primary"
+                      }`}
                   >
                     {year}
                   </div>

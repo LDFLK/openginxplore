@@ -163,7 +163,7 @@ export default function HomePage() {
       {/* Backdrop overlay for mobile when sidebar is expanded */}
       {isExpanded && (
         <div
-          className="fixed inset-0 bg-black/50 z-10 md:hidden"
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
           onClick={() => setIsExpanded(false)}
         />
       )}
