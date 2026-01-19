@@ -10,7 +10,7 @@ const ShareLinkButton = () => {
   };
 
   return (
-    <div className="relative z-50">
+    <div className="relative">
       <button
         onClick={copyLink}
         className={`

@@ -1312,7 +1312,7 @@ export default function TimeRangeSelector({
 
           {/* Drag handles */}
           <div
-            className="absolute top-0 bottom-0 w-2 bg-accent cursor-ew-resize hover:bg-accent transition-colors z-10"
+            className="absolute top-0 bottom-0 w-2 bg-accent cursor-ew-resize hover:bg-accent transition-colors"
             style={{
               left: handlePositions.startLeft,
               transform: "translateX(-50%)",
@@ -1320,7 +1320,7 @@ export default function TimeRangeSelector({
             onMouseDown={(e) => handleMouseDown(e, "start")}
           />
           <div
-            className="absolute top-0 bottom-0 w-2 bg-accent cursor-ew-resize hover:bg-accent transition-colors z-10"
+            className="absolute top-0 bottom-0 w-2 bg-accent cursor-ew-resize hover:bg-accent transition-colors"
             style={{
               left: handlePositions.endLeft,
               transform: "translateX(-50%)",
