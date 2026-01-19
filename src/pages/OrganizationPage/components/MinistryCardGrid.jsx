@@ -667,7 +667,7 @@ const MinistryCardGrid = () => {
                     flex: 1,
                     minWidth: { xs: "100%", sm: 200 },
                     maxWidth: { sm: 300 },
-                    mb: {xs: "10px", md: 0},
+                    mb: {xs: "8px", md: 0},
                   }}
                 >
                   <TextField
@@ -703,6 +703,7 @@ const MinistryCardGrid = () => {
                         color: colors.textMuted,
                       },
                       "& .MuiInputBase-input": { color: colors.textMuted },
+                      
                     }}
                   />
                 </Box>
@@ -714,6 +715,7 @@ const MinistryCardGrid = () => {
                     minWidth: { xs: "100%", sm: 120 },
                     flexShrink: 0,
                     mb: {xs: "8px", md: 0},
+                  
                   }}
                 >
                   <InputLabel
@@ -737,6 +739,7 @@ const MinistryCardGrid = () => {
                       "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
                       "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.textMuted },
                       "& .MuiSvgIcon-root": { color: colors.textMuted, fontSize: 18 },
+                      padding: "2px 0px 2px 0px"
                     }}
                     MenuProps={{
                       PaperProps: {
