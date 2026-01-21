@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState, useRef } from "react";
 import {
   BarChart,
@@ -9,6 +10,7 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
+  ResponsiveContainer,
 } from "recharts";
 import formatText from "../../../utils/common_functions";
 import { useThemeContext } from "../../../context/themeContext";
@@ -26,6 +28,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
   const [detectedTicks, setDetectedTicks] = useState([]);
+  const [detectedXTicks, setDetectedXTicks] = useState([]);
+  const [tickRevision, setTickRevision] = useState(0);
   const [chartType, setChartType] = useState("bar");
   const chartRef = useRef(null);
   const chartContainerRef = useRef(null);
@@ -93,111 +97,6 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     );
   }, [columns, normalizedYearlyData]);
 
-
-  const forceRGBColors = () => {
-    const style = document.createElement("style");
-    style.id = "force-rgb-style";
-    style.innerHTML = `
-    * {
-      --background: #ffffff !important;
-      --foreground: #1f2937 !important;
-      --muted: #9ca3af !important;
-      --muted-foreground: #e5e7eb !important;
-      --border: #d1d5db !important;
-      --input: #d1d5db !important;
-      --ring: #2563eb !important;
-      --primary: #2563eb !important;
-      --primary-foreground: #ffffff !important;
-      --secondary: #6b7280 !important;
-      --secondary-foreground: #f9fafb !important;
-      --accent: #4b5563 !important;
-      --accent-foreground: #ffffff !important;
-      --destructive: #ef4444 !important;
-      --destructive-foreground: #ffffff !important;
-      color-scheme: light !important;
-    }
-
-    /* Target only non-legend items */
-    :not(.legend-color-box) {
-      background: rgb(255,255,255) !important;
-      color: rgb(31,41,55) !important;
-      border-color: rgb(209,213,219) !important;
-      box-shadow: none !important;
-    }
-    
-    /* Fix legend box alignment */
-    .legend-color-box {
-      display: inline-block !important;
-      vertical-align: middle !important;
-    }
-    
-    /* Fix Y-axis label rotation for html2canvas */
-    .y-axis-label-export {
-      writing-mode: horizontal-tb !important;
-      transform: rotate(-90deg) !important;
-      transform-origin: center center !important;
-    }
-  `;
-    document.head.appendChild(style);
-  };
-
-  const removeForcedRGB = () => {
-    const style = document.getElementById("force-rgb-style");
-    if (style) style.remove();
-  };
-
-
-  const handleDownloadImage = async () => {
-    if (!chartContainerRef.current) return;
-    forceRGBColors();
-
-    try {
-      const canvas = await html2canvas(chartContainerRef.current, {
-        scale: 2,
-        backgroundColor: isDark ? "#1f2937" : "#ffffff",
-        useCORS: true,
-        logging: false,
-      });
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = "chart.png";
-      link.click();
-    } catch (err) {
-      console.error("html2canvas failed:", err);
-    } finally {
-      removeForcedRGB();
-    }
-  };
-
-  const handleDownloadPDF = async () => {
-    if (!chartContainerRef.current) return;
-    forceRGBColors();
-
-    try {
-      const canvas = await html2canvas(chartContainerRef.current, {
-        scale: 2,
-        backgroundColor: isDark ? "#1f2937" : "#ffffff",
-        useCORS: true,
-        logging: false,
-      });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "px",
-        format: [canvas.width, canvas.height],
-      });
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-      pdf.save("chart.pdf");
-    } catch (err) {
-      console.error("PDF export failed:", err);
-    } finally {
-      removeForcedRGB();
-    }
-  };
-
-
-
   const normalizeString = (str) => {
     if (str === null || str === undefined) return "";
     return String(str)
@@ -207,8 +106,28 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       .replace(/\s+/g, "");
   };
 
+  const isXString = useMemo(() => stringColumns.includes(xAxis), [xAxis, stringColumns]);
+  const yStringColumn = useMemo(() => selectedYColumns.find(col => stringColumns.includes(col)), [selectedYColumns, stringColumns]);
+  const isAnyYString = !!yStringColumn;
+
+  // Determine layout: Horizontal if Y has a string and X doesn't
+  const chartLayout = (isAnyYString && !isXString) ? 'horizontal' : 'vertical';
+
+  // For data transformation
+  const categoryAxisKey = chartLayout === 'horizontal' ? yStringColumn : xAxis;
+  const valueColumns = useMemo(() => {
+    if (chartLayout === 'horizontal') {
+      // If layout is horizontal, X is always a measure, plus any numeric Y columns
+      const cols = [xAxis, ...selectedYColumns.filter(col => numericColumns.includes(col))].filter(Boolean);
+      return [...new Set(cols)]; // Remove duplicates
+    } else {
+      // If layout is vertical, only numeric Y columns are measures
+      return selectedYColumns.filter(col => numericColumns.includes(col));
+    }
+  }, [chartLayout, xAxis, selectedYColumns, numericColumns]);
+
   const chartData = useMemo(() => {
-    if (normalizedYearlyData.length === 0 || selectedYColumns.length === 0) {
+    if (normalizedYearlyData.length === 0 || (selectedYColumns.length === 0 && !isAnyYString)) {
       return [];
     }
 
@@ -245,44 +164,34 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     const dataMap = new Map();
 
     normalizedYearlyData.forEach((dataset) => {
-      // Get this year's column names
       const yearColumns = dataset.columns || columns;
+      const yearCategoryIndex = yearColumns.indexOf(categoryAxisKey);
 
-      // Find the x-axis column index in this year's data by name
-      const yearXIndex = yearColumns.indexOf(xAxis);
-
-      if (yearXIndex === -1) {
-        console.warn(`X-axis column "${xAxis}" not found in ${dataset.year} data`);
-        return; // Skip this year if x-axis column doesn't exist
+      if (yearCategoryIndex === -1) {
+        console.warn(`Category column "${categoryAxisKey}" not found in ${dataset.year} data`);
+        return;
       }
 
       dataset.rows.forEach((row) => {
-        const rawXVal = row[yearXIndex];
-        const normalizedXVal = normalizeString(rawXVal);
-        if (!normalizedXVal) return;
+        const rawCategoryVal = row[yearCategoryIndex];
+        const normalizedCategoryVal = normalizeString(rawCategoryVal);
+        if (!normalizedCategoryVal) return;
 
-        // Initialize data point if it doesn't exist
-        if (!dataMap.has(normalizedXVal)) {
-          dataMap.set(normalizedXVal, { [xAxis]: rawXVal });
+        if (!dataMap.has(normalizedCategoryVal)) {
+          dataMap.set(normalizedCategoryVal, { [categoryAxisKey]: rawCategoryVal });
         }
 
-        const dataPoint = dataMap.get(normalizedXVal);
+        const dataPoint = dataMap.get(normalizedCategoryVal);
 
-        // For each selected Y column, find it by NAME in this year's columns
-        selectedYColumns.forEach((col) => {
-          const yearYIndex = yearColumns.indexOf(col);
+        valueColumns.forEach((col) => {
+          const yearValueIndex = yearColumns.indexOf(col);
+          const key = `${dataset.year}_${col}`;
 
-          if (yearYIndex !== -1) {
-            // Column exists in this year
-            const value = row[yearYIndex];
-            const key = `${dataset.year}_${col}`;
-            const numValue = Number(value) || 0;
-            dataPoint[key] = numValue;
+          if (yearValueIndex !== -1) {
+            const value = row[yearValueIndex];
+            dataPoint[key] = Number(value) || 0;
           } else {
-            // Column doesn't exist in this year - set to 0
-            const key = `${dataset.year}_${col}`;
             dataPoint[key] = 0;
-            console.warn(`Column "${col}" not found in ${dataset.year} data`);
           }
         });
       });
@@ -290,27 +199,25 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
     const result = Array.from(dataMap.values());
 
-    // Fill in any missing year/column combinations with 0
+    // Fill missing values
     result.forEach((dataPoint) => {
       normalizedYearlyData.forEach((dataset) => {
-        selectedYColumns.forEach((col) => {
+        valueColumns.forEach((col) => {
           const key = `${dataset.year}_${col}`;
-          if (dataPoint[key] === undefined) {
-            dataPoint[key] = 0;
-          }
+          if (dataPoint[key] === undefined) dataPoint[key] = 0;
         });
       });
     });
 
     // Sort by highest total
     result.sort((a, b) => {
-      const sumA = selectedYColumns.reduce((acc, col) => {
+      const sumA = valueColumns.reduce((acc, col) => {
         return acc + normalizedYearlyData.reduce((yearAcc, d) => {
           return yearAcc + (a[`${d.year}_${col}`] || 0);
         }, 0);
       }, 0);
 
-      const sumB = selectedYColumns.reduce((acc, col) => {
+      const sumB = valueColumns.reduce((acc, col) => {
         return acc + normalizedYearlyData.reduce((yearAcc, d) => {
           return yearAcc + (b[`${d.year}_${col}`] || 0);
         }, 0);
@@ -320,9 +227,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     });
 
     return result;
-  }, [columns, xAxis, selectedYColumns, normalizedYearlyData]);
+  }, [columns, xAxis, selectedYColumns, normalizedYearlyData, categoryAxisKey, valueColumns, isAnyYString]);
 
-  // Extract Y-axis ticks
+  // Extract labels from the fixed Y-axis (left axis) for manual rendering
   useEffect(() => {
     if (!chartRef.current) return;
 
@@ -331,29 +238,103 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
         const svg = chartRef.current.querySelector("svg");
         if (!svg) return;
 
-        const yAxisTicks = svg.querySelectorAll(
-          ".recharts-yAxis .recharts-cartesian-axis-tick"
-        );
-        const ticks = Array.from(yAxisTicks)
+        // The sticky left axis is always the Recharts YAxis
+        const yAxisTicksNodes = svg.querySelectorAll(".recharts-yAxis .recharts-cartesian-axis-tick");
+        const ticks = Array.from(yAxisTicksNodes)
           .map((tick) => {
             const text = tick.querySelector("text");
-            return text ? parseFloat(text.textContent) : 0;
-          })
-          .filter((val) => !isNaN(val))
-          .sort((a, b) => b - a);
+            const transform = tick.getAttribute("transform");
+            let y = 0;
+            if (transform && transform.includes("translate")) {
+              const parts = transform.replace("translate(", "").replace(")", "").split(/[\s,]+/);
+              if (parts.length >= 2) {
+                y = parseFloat(parts[1]);
+              } else if (parts.length === 1) {
+                y = parseFloat(parts[0]);
+              }
+            } else if (text) {
+              const attrY = text.getAttribute("y");
+              if (attrY) y = parseFloat(attrY);
+            }
 
-        if (ticks.length > 0) setDetectedTicks(ticks);
+            // Extract label, preserving spaces between tspans (Recharts' default wrapping)
+            let label = "";
+            if (text) {
+              if (text.childNodes.length > 0) {
+                label = Array.from(text.childNodes)
+                  .map(node => node.textContent)
+                  .join(" ")
+                  .trim()
+                  .replace(/\s+/g, " "); // collapse multiple spaces
+              } else {
+                label = text.textContent;
+              }
+            }
+
+            return {
+              label: label,
+              y: y
+            };
+          })
+          .filter((t) => t.label !== "");
+
+        if (ticks.length > 0) {
+          setDetectedTicks(ticks);
+        }
+
+        // Extract X-axis ticks for horizontal sticky axis
+        const xAxisTicksNodes = svg.querySelectorAll(".recharts-xAxis .recharts-cartesian-axis-tick");
+        const xTicks = Array.from(xAxisTicksNodes)
+          .map((tick) => {
+            const text = tick.querySelector("text");
+            const transform = tick.getAttribute("transform");
+            let x = 0;
+            if (transform && transform.includes("translate")) {
+              const parts = transform.replace("translate(", "").replace(")", "").split(/[\s,]+/);
+              if (parts.length >= 1) {
+                x = parseFloat(parts[0]);
+              }
+            } else if (text) {
+              const attrX = text.getAttribute("x");
+              if (attrX) x = parseFloat(attrX);
+            }
+            // Extract label, preserving spaces
+            let label = "";
+            if (text) {
+              if (text.childNodes.length > 0) {
+                label = Array.from(text.childNodes)
+                  .map(node => node.textContent)
+                  .join(" ")
+                  .trim()
+                  .replace(/\s+/g, " ");
+              } else {
+                label = text.textContent;
+              }
+            }
+
+            return {
+              label: label,
+              x: x
+            };
+          })
+          .filter((t) => t.label !== "");
+
+        setDetectedXTicks(xTicks);
       } catch (e) {
         console.log("Could not extract ticks", e);
       }
-    }, 100);
+    }, 250);
 
     return () => clearTimeout(timer);
-  }, [chartData, selectedYColumns]);
+  }, [chartData, selectedYColumns, chartLayout, chartType, tickRevision]);
 
   const isMultiYear = normalizedYearlyData.length > 1;
 
-  const barsPerCategory = normalizedYearlyData.length * selectedYColumns.length;
+  // Layout constants
+  const yAxisGutterWidth = chartLayout === 'horizontal' ? 150 : 100;
+  const yAxisLabelSectionWidth = yAxisGutterWidth - 25; // Reserve space for title
+
+  const barsPerCategory = normalizedYearlyData.length * valueColumns.length;
 
   const barWidth = 40;
   const barGap = -20;
@@ -361,7 +342,13 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
   const widthPerCategory = (barsPerCategory * (barWidth + barGap)) + categoryGap;
 
-  const totalChartWidth = Math.max(chartData.length * widthPerCategory, 1200);
+  const totalChartWidth = chartLayout === 'vertical'
+    ? Math.max(chartData.length * widthPerCategory, 1200)
+    : "100%"; // Responsive width for horizontal bars
+
+  const totalChartHeight = chartLayout === 'horizontal'
+    ? Math.max(chartData.length * widthPerCategory, 450)
+    : 450;
 
   const renderCustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -385,7 +372,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
             return (
               <div key={index} className="flex items-center gap-2">
                 <span
-                  style={{ backgroundColor: finalColor , width: 8, height: 8, borderRadius: "50%" , display: "inline-block", marginRight: 8}}
+                  style={{ backgroundColor: finalColor, width: 8, height: 8, borderRadius: "50%", display: "inline-block", marginRight: 8 }}
                 />
                 <span>{formatText({ name: entry.name })}:</span>
                 <span className="font-medium">{entry.value}</span>
@@ -421,13 +408,26 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                 </label>
                 <select
                   value={xAxis}
-                  onChange={(e) => setXAxis(e.target.value)}
+                  onChange={(e) => {
+                    const newX = e.target.value;
+                    setXAxis(newX);
+                    // If new X is string, remove any strings from selectedYColumns to enforce "no two string axes" rule
+                    if (stringColumns.includes(newX)) {
+                      setSelectedYColumns(prev => prev.filter(col => !stringColumns.includes(col)));
+                    }
+                  }}
                   className="mt-1 block w-full border text-primary/75 border-border rounded-md p-2 text-sm bg-background focus:border-none"
                 >
                   <option value="">Select column</option>
+                  {/* Allow selecting both string and numeric columns for X-axis */}
                   {stringColumns.map((col) => (
                     <option key={col} value={col}>
-                      {col}
+                      {col} (String)
+                    </option>
+                  ))}
+                  {numericColumns.filter(col => col.toLowerCase() !== "id").map((col) => (
+                    <option key={col} value={col}>
+                      {col} (Numeric)
                     </option>
                   ))}
                 </select>
@@ -439,32 +439,43 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   Y-Axis (Values):
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
-                  {numericColumns
+                  {/* Allow selecting both numeric and string columns for Y-axis */}
+                  {columns
                     .filter((col) => {
                       const lower = col.toLowerCase();
                       return lower !== "id";
                     })
-                    .map((col) => (
-                      <label
-                        key={col}
-                        className="flex justify-start items-center space-x-2 text-sm break-words"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedYColumns.includes(col)}
-                          onChange={(e) => {
-                            setSelectedYColumns((prev) =>
-                              e.target.checked
-                                ? [...prev, col]
-                                : prev.filter((c) => c !== col)
-                            );
-                          }}
-                        />
-                        <span className="break-words max-w-[220px] text-primary">
-                          {formatText({ name: col })}
-                        </span>
-                      </label>
-                    ))}
+                    .map((col) => {
+                      const isString = stringColumns.includes(col);
+                      const isXString = stringColumns.includes(xAxis);
+                      const isAlreadySelectedString = selectedYColumns.some(c => stringColumns.includes(c) && c !== col);
+
+                      // Disable string column if X is already string OR another string is already selected in Y
+                      const isDisabled = isString && (isXString || isAlreadySelectedString);
+
+                      return (
+                        <label
+                          key={col}
+                          className={`flex justify-start items-center space-x-2 text-sm break-words ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          <input
+                            type="checkbox"
+                            disabled={isDisabled}
+                            checked={selectedYColumns.includes(col)}
+                            onChange={(e) => {
+                              setSelectedYColumns((prev) =>
+                                e.target.checked
+                                  ? [...prev, col]
+                                  : prev.filter((c) => c !== col)
+                              );
+                            }}
+                          />
+                          <span className="break-words max-w-[220px] text-primary">
+                            {formatText({ name: col })} {isString ? "(String)" : "(Num)"}
+                          </span>
+                        </label>
+                      );
+                    })}
                 </div>
               </div>
 
@@ -512,7 +523,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                         </div>
 
                       ))
-                      : selectedYColumns.map((col, i) => (
+                      : valueColumns.map((col, i) => (
                         <div key={col} className="flex items-center gap-2">
                           <div
                             className="legend-color-box"
@@ -529,309 +540,449 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       ))}
                   </div>
 
-                  {/* Chart */}
-                  <div className="flex flex-col">
-                    <div className="flex">
-                      {/* --- Y-Axis Section --- */}
+                  {/* Chart Area */}
+                  <div className="relative">
+                    {/* Fixed Y-Axis Title for Horizontal Layout */}
+                    {chartLayout === 'horizontal' && (
                       <div
-                        className="flex-shrink-0 bg-background-dark flex"
+                        className="absolute left-0 top-0 z-50 bg-background-dark py-4 ml-5 pointer-events-none"
                         style={{
-                          position: "relative",
-                          height: 425,
-                          left: 0,
-                          zIndex: 10,
-                          borderRight: "1px solid #374151",
-                          marginBottom: 0,
+                          width: 20,
+                          height: 455
                         }}
                       >
-                        {/* Y-axis title */}
                         <div
                           className="flex items-center justify-center text-center text-primary/80"
                           style={{
-                            width: 20,
                             writingMode: "vertical-rl",
                             transform: "rotate(180deg)",
                             fontSize: "0.85rem",
                             fontWeight: 500,
-                          }}
-                        >
-                          {selectedYColumns.length >= 1 &&
-                            "Value"}
-                        </div>
-
-                        {/* Y-axis tick labels */}
-                        <div
-                          style={{
-                            width: 60,
-                            position: "relative",
                             height: "100%",
+                            minHeight: "100px"
                           }}
                         >
-                          {detectedTicks.length > 0 &&
-                            detectedTicks.map((tickVal, i) => {
-                              const totalTicks = detectedTicks.length;
-                              const percentage = (i / (totalTicks - 1)) * 100;
-                              return (
+                          {formatText({ name: categoryAxisKey })}
+                        </div>
+                      </div>
+                    )}
+                    <div
+                      className={`relative border border-border rounded-lg no-scrollbar ${chartLayout === 'horizontal' ? 'overflow-x-hidden overflow-y-auto' : 'overflow-auto'}`}
+                      ref={chartRef}
+                      style={{ height: 455 }}
+                    >
+                      <div
+                        className="flex flex-row"
+                        style={{
+                          minWidth: chartLayout === 'vertical' ? `${totalChartWidth + yAxisGutterWidth + 40}px` : "100%",
+                          height: `${totalChartHeight}px`,
+                          width: chartLayout === 'horizontal' ? "100%" : "auto"
+                        }}
+                      >
+                        {/* --- Y-Axis Section --- */}
+                        <div
+                          className="sticky left-0 bg-background-dark flex z-60"
+                          style={{
+                            height: "100%",
+
+
+                          }}
+                        >
+
+                          <div
+                            className="sticky left-0 bg-background-dark flex z-60"
+                            style={{
+                              height: chartLayout === 'vertical' ? "94%" : "100%",
+                              borderRight: "1px solid #374151",
+                              width: yAxisGutterWidth,
+                            }}
+                          >
+                            {/* Y-axis title (only shown in vertical layout, horizontal uses fixed overlay) */}
+                            {chartLayout === 'vertical' && (
+                              <div
+                                className="sticky ml-5 z-30 bg-background-dark py-4"
+                                style={{ width: 20 }}
+                              >
                                 <div
-                                  key={`${tickVal}-${i}`}
-                                  className="text-xs text-right pr-1 text-primary/75"
+                                  className="flex items-center justify-center text-center text-primary/80"
                                   style={{
-                                    position: "absolute",
-                                    top: `${percentage}%`,
-                                    transform: "translateY(-50%)",
-                                    width: "100%",
-                                    paddingRight: "4px",
+                                    writingMode: "vertical-rl",
+                                    transform: "rotate(180deg)",
+                                    fontSize: "0.85rem",
+                                    fontWeight: 500,
+                                    height: "100%",
+                                    minHeight: "100px"
                                   }}
                                 >
-                                  {Math.round(tickVal)}
+                                  {valueColumns.length === 1 ? formatText({ name: valueColumns[0] }) : (valueColumns.length > 1 ? "Value" : "")}
                                 </div>
-                              );
-                            })}
-                        </div>
-                      </div>
+                              </div>
+                            )}
 
-                      {/* --- Scrollable Chart Area --- */}
-                      <div className="overflow-x-auto flex-1 no-scrollbar" ref={chartRef}>
+                            {/* Y-axis labels */}
+                            <div
+                              style={{
+                                width: yAxisLabelSectionWidth,
+                                position: "relative",
+                                height: "100%",
+                              }}
+                            >
+                              {detectedTicks.map((tick, i) => {
+                                const text = (tick.label || "").trim();
+                                const words = text.split(/\s+/);
+                                const maxChars = 13;
+                                const lines = [];
+                                let currentLine = "";
+
+                                words.forEach((word) => {
+                                  if (!currentLine) {
+                                    currentLine = word;
+                                  } else if ((currentLine + " " + word).length <= maxChars) {
+                                    currentLine += " " + word;
+                                  } else {
+                                    lines.push(currentLine);
+                                    currentLine = word;
+                                  }
+                                });
+                                if (currentLine) lines.push(currentLine);
+
+                                return (
+                                  <div
+                                    key={i}
+                                    className="text-[11px] text-right pr-2 text-primary/75 absolute w-full flex flex-col justify-center"
+                                    style={{
+                                      top: `${tick.y}px`,
+                                      transform: "translateY(-50%)",
+                                      lineHeight: "1.1",
+                                    }}
+                                    title={text}
+                                  >
+                                    {lines.map((line, idx) => (
+                                      <div key={idx} className="truncate">{line}</div>
+                                    ))}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* --- Chart Content --- */}
                         <div
+                          className="flex-1 relative z-10"
                           style={{
-                            minWidth: `${totalChartWidth}px`,
-                            height: 455,
-                            overflow: "hidden",
+                            width: chartLayout === 'horizontal' ? "100%" : totalChartWidth,
+                            height: totalChartHeight
                           }}
                         >
-                          {chartType === "bar" ? (
-                            <BarChart
-                              data={chartData}
-                              width={totalChartWidth}
-                              height={450}
-                              margin={{ left: -60, bottom: -60 }}
-                            >
-                              <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#374151"
-                                strokeOpacity={0.5}
-                              />
-                              <XAxis
-                                dataKey={xAxis}
-                                stroke="white"
-                                interval={0}
-                                height={86}
-                                tickLine={false}
-                                axisLine={{ stroke: "#374151" }}
-                                tick={({ x, y, payload }) => {
-                                  const maxCharsPerLine = 13;
-                                  const text = payload.value;
-                                  let line1 = text;
-                                  let line2 = "";
-                                  if (text.length > maxCharsPerLine) {
-                                    const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
-                                    if (splitIndex > 0) {
-                                      line1 = text.slice(0, splitIndex);
-                                      line2 = text.slice(splitIndex + 1);
-                                    } else {
-                                      line1 = text.slice(0, maxCharsPerLine);
-                                      line2 = text.slice(maxCharsPerLine);
-                                    }
-                                  }
-                                  return (
-                                    <g transform={`translate(${x},${y + 2.5})`}>
-                                      <text
-                                        x={0}
-                                        y={0}
-                                        textAnchor="middle"
-                                        fontSize={11.5}
-                                        fill={isDark ? "white" : "dark"}
-                                        fillOpacity={0.7}
-                                      >
-                                        {line1}
-                                      </text>
-                                      {line2 && (
-                                        <text
-                                          x={0}
-                                          y={12}
-                                          textAnchor="middle"
-                                          fontSize={11.5}
-                                          fill={isDark ? "white" : "dark"}
-                                          fillOpacity={0.7}
-                                        >
-                                          {line2}
-                                        </text>
-                                      )}
-                                    </g>
-                                  );
-                                }}
-                              />
-                              <YAxis
-                                stroke="transparent"
-                                tickLine={false}
-                                axisLine={false}
-                                tick={{ fill: "transparent" }}
-                              />
-                              <Tooltip content={renderCustomTooltip} />
-                              {xAxis === "_category" ? (
-                                // Single-row numeric dataset: bars for each year
-                                normalizedYearlyData.map((d, yearIdx) => (
-                                  <Bar
-                                    key={d.year}
-                                    dataKey={`${d.year}_value`}
-                                    fill={COLORS[yearIdx % COLORS.length]}
-                                    maxBarSize={barWidth}
-                                  >
-                                    {!isMultiYear &&
-                                      chartData.map((entry, index) => (
-                                        <Cell
-                                          key={`cell-${index}`}
-                                          fill={COLORS[index % COLORS.length]}
-                                        />
-                                      ))}
-                                  </Bar>
-                                ))
-                              ) : (
-                                // Normal multi-row dataset
-                                selectedYColumns.map((col, colIdx) =>
-                                  normalizedYearlyData.map((d, yearIdx) => (
-                                    <Bar
-                                      key={`${d.year}_${col}`}
-                                      dataKey={`${d.year}_${col}`}
-                                      fill={
-                                        isMultiYear
-                                          ? COLORS[yearIdx % COLORS.length]
-                                          : COLORS[colIdx % COLORS.length]
+                          <div
+                            style={{
+                              width: "100%",
+                              height: `${totalChartHeight}px`,
+                              overflow: "hidden",
+                            }}
+                          >
+                            {chartType === "bar" ? (
+                              <ResponsiveContainer width="100%" height="100%" onResize={() => setTickRevision(r => r + 1)}>
+                                <BarChart
+                                  data={chartData}
+                                  layout={chartLayout === 'horizontal' ? 'vertical' : 'horizontal'}
+                                  margin={{
+                                    left: -40,
+                                    bottom: chartLayout === "horizontal" ? -40 : -60,
+                                    right: 40,
+                                    top: 10
+                                  }}
+                                >
+                                  <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke="#374151"
+                                    strokeOpacity={0.5}
+                                  />
+                                  <XAxis
+                                    dataKey={chartLayout === "horizontal" ? undefined : categoryAxisKey}
+                                    type={chartLayout === "horizontal" ? "number" : "category"}
+                                    domain={chartLayout === "horizontal" ? [0, 'auto'] : undefined}
+                                    nice={chartLayout === "horizontal"}
+                                    stroke="white"
+                                    interval={0}
+                                    height={chartLayout === "horizontal" ? 30 : 86}
+                                    tickLine={false}
+                                    axisLine={{ stroke: "#374151" }}
+                                    tick={chartLayout === "horizontal" ? { fill: "transparent" } : ({ x, y, payload }) => {
+                                      const maxCharsPerLine = 8;
+                                      const text = payload.value;
+                                      let line1 = text;
+                                      let line2 = "";
+                                      if (text.length > maxCharsPerLine) {
+                                        const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                        if (splitIndex > 0) {
+                                          line1 = text.slice(0, splitIndex);
+                                          line2 = text.slice(splitIndex + 1);
+                                        } else {
+                                          line1 = text.slice(0, maxCharsPerLine);
+                                          line2 = text.slice(maxCharsPerLine);
+                                        }
                                       }
-                                      maxBarSize={barWidth}
-                                    />
-                                  ))
-                                )
-                              )}
-                            </BarChart>
-                          ) : (
-                            <LineChart
-                              data={chartData}
-                              width={totalChartWidth}
-                              height={450}
-                              margin={{ left: -25, bottom: -60, right: 50 }}
-                            >
-                              <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#374151"
-                                strokeOpacity={0.5}
-                              />
-                              <XAxis
-                                dataKey={xAxis}
-                                stroke="white"
-                                interval={0}
-                                height={86}
-                                tickLine={false}
-                                axisLine={{ stroke: "#374151" }}
-                                tick={({ x, y, payload }) => {
-                                  const maxCharsPerLine = 13;
-                                  const text = payload.value;
-                                  let line1 = text;
-                                  let line2 = "";
-                                  if (text.length > maxCharsPerLine) {
-                                    const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
-                                    if (splitIndex > 0) {
-                                      line1 = text.slice(0, splitIndex);
-                                      line2 = text.slice(splitIndex + 1);
-                                    } else {
-                                      line1 = text.slice(0, maxCharsPerLine);
-                                      line2 = text.slice(maxCharsPerLine);
-                                    }
-                                  }
-                                  return (
-                                    <g transform={`translate(${x},${y + 2.5})`}>
-                                      <text
-                                        x={0}
-                                        y={0}
-                                        textAnchor="middle"
-                                        fontSize={11.5}
-                                        fill={isDark ? "white" : "dark"}
-                                        fillOpacity={0.7}
-                                      >
-                                        {line1}
-                                      </text>
-                                      {line2 && (
-                                        <text
-                                          x={0}
-                                          y={12}
-                                          textAnchor="middle"
-                                          fontSize={11.5}
-                                          fill={isDark ? "white" : "dark"}
-                                          fillOpacity={0.7}
-                                        >
-                                          {line2}
-                                        </text>
-                                      )}
-                                    </g>
-                                  );
-                                }}
-                              />
-                              <YAxis
-                                stroke="transparent"
-                                tickLine={false}
-                                axisLine={false}
-                                tick={{ fill: "transparent" }}
-                              />
-                              <Tooltip content={renderCustomTooltip}/>
-
-
-                              {xAxis === "_category" ? (
-                                // Single-row numeric dataset: lines for each year
-                                normalizedYearlyData.map((d, yearIdx) => (
-                                  <Line
-                                    key={d.year}
-                                    type="monotone"
-                                    dataKey={`${d.year}_value`}
-                                    stroke={COLORS[yearIdx % COLORS.length]}
-                                    strokeWidth={2}
-                                    dot={(props) => {
-                                      const { cx, cy, index } = props;
                                       return (
-                                        <circle
-                                          key={`dot-${index}`}
-                                          cx={cx}
-                                          cy={cy}
-                                          r={4}
-                                          fill={!isMultiYear ? COLORS[index % COLORS.length] : COLORS[yearIdx % COLORS.length]}
-                                          stroke="none"
-                                        />
+                                        <g transform={`translate(${x},${y + 2.5})`}>
+                                          <text
+                                            x={0}
+                                            y={0}
+                                            textAnchor="middle"
+                                            fontSize={11.5}
+                                            fill={isDark ? "white" : "dark"}
+                                            fillOpacity={0.7}
+                                          >
+                                            {line1}
+                                          </text>
+                                          {line2 && (
+                                            <text
+                                              x={0}
+                                              y={12}
+                                              textAnchor="middle"
+                                              fontSize={11.5}
+                                              fill={isDark ? "white" : "dark"}
+                                              fillOpacity={0.7}
+                                            >
+                                              {line2}
+                                            </text>
+                                          )}
+                                        </g>
                                       );
                                     }}
-                                    activeDot={{ r: 6 }}
                                   />
-                                ))
-                              ) : (
-                                // Normal multi-row dataset
-                                selectedYColumns.map((col, colIdx) =>
-                                  normalizedYearlyData.map((d, yearIdx) => (
-                                    <Line
-                                      key={`${d.year}_${col}`}
-                                      type="monotone"
-                                      dataKey={`${d.year}_${col}`}
-                                      stroke={
-                                        isMultiYear
-                                          ? COLORS[yearIdx % COLORS.length]
-                                          : COLORS[colIdx % COLORS.length]
+                                  <YAxis
+                                    dataKey={chartLayout === 'horizontal' ? categoryAxisKey : undefined}
+                                    type={chartLayout === 'horizontal' ? 'category' : 'number'}
+                                    domain={chartLayout === 'vertical' ? [0, 'auto'] : undefined}
+                                    nice={chartLayout === 'vertical'}
+                                    stroke="transparent"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tick={{ fill: "transparent" }}
+                                    width={40}
+                                    interval={chartLayout === 'horizontal' ? 0 : "preserveEnd"}
+                                  />
+                                  <Tooltip content={renderCustomTooltip} />
+                                  {xAxis === "_category" ? (
+                                    // Single-row numeric dataset: bars for each year
+                                    normalizedYearlyData.map((d, yearIdx) => (
+                                      <Bar
+                                        key={d.year}
+                                        dataKey={`${d.year}_value`}
+                                        fill={COLORS[yearIdx % COLORS.length]}
+                                        maxBarSize={barWidth}
+                                      >
+                                        {!isMultiYear &&
+                                          chartData.map((entry, index) => (
+                                            <Cell
+                                              key={`cell-${index}`}
+                                              fill={COLORS[index % COLORS.length]}
+                                            />
+                                          ))}
+                                      </Bar>
+                                    ))
+                                  ) : (
+                                    // Normal multi-row dataset
+                                    valueColumns.map((col, colIdx) =>
+                                      normalizedYearlyData.map((d, yearIdx) => (
+                                        <Bar
+                                          key={`${d.year}_${col}`}
+                                          dataKey={`${d.year}_${col}`}
+                                          fill={
+                                            isMultiYear
+                                              ? COLORS[yearIdx % COLORS.length]
+                                              : COLORS[colIdx % COLORS.length]
+                                          }
+                                          maxBarSize={barWidth}
+                                        />
+                                      ))
+                                    )
+                                  )}
+                                </BarChart>
+                              </ResponsiveContainer>
+                            ) : (
+                              <ResponsiveContainer width="100%" height="100%" onResize={() => setTickRevision(r => r + 1)}>
+                                <LineChart
+                                  data={chartData}
+                                  layout={chartLayout === "horizontal" ? "vertical" : "horizontal"}
+                                  margin={{ left: 0, bottom: chartLayout === "horizontal" ? 0 : -60, right: 50, top: 10 }}
+                                >
+                                  <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke="#374151"
+                                    strokeOpacity={0.5}
+                                  />
+                                  <XAxis
+                                    dataKey={chartLayout === "horizontal" ? undefined : categoryAxisKey}
+                                    type={chartLayout === "horizontal" ? "number" : "category"}
+                                    domain={chartLayout === "horizontal" ? [0, 'auto'] : undefined}
+                                    nice={chartLayout === "horizontal"}
+                                    stroke="white"
+                                    interval={0}
+                                    height={chartLayout === "horizontal" ? 30 : 86}
+                                    tickLine={false}
+                                    axisLine={{ stroke: "#374151" }}
+                                    tick={chartLayout === "horizontal" ? { fill: "transparent" } : ({ x, y, payload }) => {
+                                      const maxCharsPerLine = 13;
+                                      const text = payload.value;
+                                      let line1 = text;
+                                      let line2 = "";
+                                      if (text.length > maxCharsPerLine) {
+                                        const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                        if (splitIndex > 0) {
+                                          line1 = text.slice(0, splitIndex);
+                                          line2 = text.slice(splitIndex + 1);
+                                        } else {
+                                          line1 = text.slice(0, maxCharsPerLine);
+                                          line2 = text.slice(maxCharsPerLine);
+                                        }
                                       }
-                                      strokeWidth={2}
-                                      dot={{ r: 2 }}
-                                      activeDot={{ r: 4 }}
-                                    />
-                                  ))
-                                )
-                              )}
-                            </LineChart>
-                          )}
+                                      return (
+                                        <g transform={`translate(${x},${y + 2.5})`}>
+                                          <text
+                                            x={0}
+                                            y={0}
+                                            textAnchor="middle"
+                                            fontSize={11.5}
+                                            fill={isDark ? "white" : "dark"}
+                                            fillOpacity={0.7}
+                                          >
+                                            {line1}
+                                          </text>
+                                          {line2 && (
+                                            <text
+                                              x={0}
+                                              y={12}
+                                              textAnchor="middle"
+                                              fontSize={11.5}
+                                              fill={isDark ? "white" : "dark"}
+                                              fillOpacity={0.7}
+                                            >
+                                              {line2}
+                                            </text>
+                                          )}
+                                        </g>
+                                      );
+                                    }}
+                                  />
+                                  <YAxis
+                                    dataKey={chartLayout === 'horizontal' ? categoryAxisKey : undefined}
+                                    type={chartLayout === 'horizontal' ? 'category' : 'number'}
+                                    domain={chartLayout === 'vertical' ? [0, 'auto'] : undefined}
+                                    nice={chartLayout === 'vertical'}
+                                    stroke="transparent"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tick={{ fill: "transparent" }}
+                                    width={40}
+                                    interval={chartLayout === 'horizontal' ? 0 : "preserveEnd"}
+                                  />
+                                  <Tooltip content={renderCustomTooltip} />
+
+
+                                  {xAxis === "_category" ? (
+                                    // Single-row numeric dataset: lines for each year
+                                    normalizedYearlyData.map((d, yearIdx) => (
+                                      <Line
+                                        key={d.year}
+                                        type="monotone"
+                                        dataKey={`${d.year}_value`}
+                                        stroke={COLORS[yearIdx % COLORS.length]}
+                                        strokeWidth={2}
+                                        dot={(props) => {
+                                          const { cx, cy, index } = props;
+                                          return (
+                                            <circle
+                                              key={`dot-${index}`}
+                                              cx={cx}
+                                              cy={cy}
+                                              r={4}
+                                              fill={!isMultiYear ? COLORS[index % COLORS.length] : COLORS[yearIdx % COLORS.length]}
+                                              stroke="none"
+                                            />
+                                          );
+                                        }}
+                                        activeDot={{ r: 6 }}
+                                      />
+                                    ))
+                                  ) : (
+                                    // Normal multi-row dataset
+                                    valueColumns.map((col, colIdx) =>
+                                      normalizedYearlyData.map((d, yearIdx) => (
+                                        <Line
+                                          key={`${d.year}_${col}`}
+                                          type="monotone"
+                                          dataKey={`${d.year}_${col}`}
+                                          stroke={
+                                            isMultiYear
+                                              ? COLORS[yearIdx % COLORS.length]
+                                              : COLORS[colIdx % COLORS.length]
+                                          }
+                                          strokeWidth={2}
+                                          dot={{ r: 2 }}
+                                          activeDot={{ r: 4 }}
+                                        />
+                                      ))
+                                    )
+                                  )}
+                                </LineChart>
+                              </ResponsiveContainer>
+                            )}
+
+                            {/* End of Bars/Lines */}
+                          </div>
+
                         </div>
                       </div>
-                    </div>
+                      {/* Sticky X-Axis Labels (Numerical Axis in Horizontal Layout) */}
+                      {chartLayout === "horizontal" && detectedXTicks.length > 0 && (
+                        <div
+                          className="bg-background-dark sticky bottom-0 left-0 right-0 flex z-[1000] overflow-visible"
+                          style={{
+                            height: 35,
+                            width: "100%",
+                            pointerEvents: "none"
+                          }}
+                        >
+                          {/* Spacer for Y-axis - No visual elements here */}
+                          <div style={{ width: yAxisGutterWidth }} />
 
-                    {/* --- X-axis Title --- */}
-                    <div className="text-center mt-1">
-                      <span className="text-sm text-primary/80 font-medium">
-                        {formatText({ name: xAxis })}
-                      </span>
+                          {/* The actual axis area - only this part has border and background */}
+                          <div
+                            className="bg-background-dark flex-1 relative border-t border-[#374151] flex items-end pointer-events-auto"
+                          >
+                            {detectedXTicks.map((tick, i) => (
+                              <div
+                                key={i}
+                                className="absolute text-[11px] text-primary/75 whitespace-nowrap"
+                                style={{
+                                  left: `${tick.x}px`,
+                                  transform: "translateX(-50%)",
+                                  bottom: 6,
+                                }}
+                              >
+                                {tick.label}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  </div>
+
+                  {/* --- X-axis Title --- */}
+                  <div className="text-center mt-1">
+                    <span className="text-sm text-primary/80 font-medium">
+                      {chartLayout === "horizontal" && valueColumns.length > 0
+                        ? valueColumns.length > 1
+                          ? "Value"
+                          : formatText({ name: valueColumns[0] })
+                        : xAxis === "_category"
+                          ? "Categories"
+                          : formatText({ name: xAxis })}
+                    </span>
                   </div>
                 </div>
               ) : (
