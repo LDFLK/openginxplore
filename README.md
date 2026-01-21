@@ -1,60 +1,88 @@
-# 🛠️ Contributing Guidelines
+## OpenGINXplore
 
-Thank you for your interest in contributing to this project! Please follow the steps below to set up your development environment and contribute effectively.
+This Frontend application consumes the [GI-Service](https://github.com/LDFLK/GI-SERVICE.git) (BFF) to present structured, discoverable information about the Government of Sri Lanka in an intuitive and visual manner.
 
-## 🚀 Getting Started
+The application provides a unified interface to explore government entities, including ministries, departments and people, their hierarchical relationships, historical leadership, and published data. It is designed to make complex government structures easier to understand and navigate for the users.
 
-### 1. Fork the Repository
-Instead of cloning directly, please fork the repository to your own GitHub account:
-- Go to the top-right corner of this repo and click **Fork**
+### Features
 
-### 2. Clone yout Fork
+- Government Structure Visualization
+    - Explore the hierarchical structure of the Sri Lankan government
+    - View relationships between ministries, departments, and affiliated entities
+- Graph-Based Exploration
+    - Interactive graph view to visually navigate government entities and their connections
+    - Enables intuitive exploration of complex organizational relationships
+- Data Catalog Discovery
+    - Browse datasets published by the government, ministries, and departments
+    - Centralized access to public data catalogs
+    - Data visualisation and comparison across years as well
+- Historical Information
+    - View historical records of ministries, departments, and key personnel
+    - Track changes in government structures over time
+
+### High Level Overview
+```mermaid
+     flowchart LR
+         N1["Frontend (OpenGINXplore)"]
+         N2["Backend for frontend (GI-Service)"]
+
+         N1 <-. API calls .-> N2
+```
+### Tech Stack
+
+- Framework: React(vite)
+- Communication: REST
+- Auth: None
+
+## Installation & Setup
+
+#### Prerequisite
+
+- Node V20+
+- Git
+
+#### 1. Clone the Repository
+
 ```bash
-git clone https://github.com/YOUR-USERNAME/REPO-NAME.git
-cd REPO-NAME
+git clone https://github.com/LDFLK/openginxplore.git
+cd openginxplore
 ```
 
-### 3. Create a New Branch
-Always create a separate branch for your work:
-```bash
-git checkout -b your-work-branch
-```
+#### 2. Install Dependencies
 
-## 💻 NEXOAN project
-You should have the NEXOAN project locally running on you device.
-```bash
-https://github.com/LDFLK/nexoan
-```
-You can get instructions from the above link.
-
-## 🔩 Setting up the Vite project
-
-### 1. Installing depandancies [on your project root]
 ```bash
 npm install
 ```
 
-### 2. Run the project
+#### 3. Configuration
+
+Create a `config.js` file in the `public` directory
+```
+window.configs = {
+  apiUrl: "<OPENGIN_BASE_URL>",
+  apiUrlData: "<GI_SERVICE_BASE_URL>",
+};
+```
+
+#### 4. Run the Application (development)
+
+##### Using Terminal
+
 ```bash
 npm run dev
 ```
 
-## 🔭 Resolving CORS Error
-For the development we have setup a proxy server on **package.json** file.
-```bash
-"proxy": "http://localhost:8081"
-```
-You can change the above base url to match your locally running backend's (NEXOAN) url
+The application will be available at: `http://localhost:5173`
 
-## 🙏 Guidelines
+### How to contribute?
 
-- Follow consistent code style
-- Test your changes before submitting
-- One feature/fix per pull request
-- Reference related issues (if any)
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -m 'feat: your descriptive commit message'`
+4. Push to branch: `git push origin feature-name`
+5. Submit a Pull Request
 
----
+## Support
 
-We appreciate your contributions and look forward to collaborating with you!
-
-
+For support and questions:
+- Create an issue in the repository

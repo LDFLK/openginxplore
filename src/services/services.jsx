@@ -27,6 +27,16 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal,}) =
   return data;
 };
 
+export const getPrimeMinister = async ({ date, signal}) => {
+  const { data } = await axios.post(
+    `${GI_SERVICE_URL}/prime-minister`,
+    { date },
+    { signal }
+  );
+
+  return data;
+};
+
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
   try {

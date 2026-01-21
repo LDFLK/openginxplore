@@ -24,40 +24,41 @@ export default function DataLoadingAnimatedComponent({ mode }) {
   const { presidentDict, selectedPresident } = useSelector(
     (state) => state.presidency
   );
-  const [progress, setProgress] = useState(0);
   const dispatch = useDispatch();
 
-  const updateProgress = (step, totalSteps) => {
-    setProgress(Math.round((step / totalSteps) * 100));
-  };
+  const totalSteps = 4;
+  const [completedSteps, setCompletedSteps] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    setProgress(Math.round((completedSteps / totalSteps) * 100));
+  }, [completedSteps, totalSteps]);
 
   useEffect(() => {
     const initialFetchData = async () => {
-      if (Object.keys(presidentDict).length === 0) {
-        setLoading(true);
-        try {
-          const totalSteps = 4;
-          let completedSteps = 0;
+      if (Object.keys(presidentDict).length !== 0) return;
 
-          await fetchPersonData();
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-          await fetchAllMinistryData();
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-          await fetchAllDepartmentData();
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-          await fetchAllGazetteDate();
-          completedSteps++;
-          updateProgress(completedSteps, totalSteps);
-          setTimeout(() => {
-            setLoading(false);
-          }, 1000);
-        } catch (e) {
-          console.error("Error loading initial data:", e.message);
+      setLoading(true);
+      setCompletedSteps(0);
+
+      const track = async (promise) => {
+        try {
+          await promise;
+        } finally {
+          setCompletedSteps((prev) => prev + 1);
         }
-      }
+      };
+
+      await Promise.allSettled([
+        track(fetchPersonData()),
+        track(fetchAllMinistryData()),
+        track(fetchAllDepartmentData()),
+        track(fetchAllGazetteDate()),
+      ]);
+
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     };
 
     initialFetchData();
@@ -102,7 +103,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
       // Enrich presidents
       const enrichedPresidents = presidentDictInDetail.map((president) => {
         const matchedDetail = presidentDetails.find((detail) =>
-          detail.presidentName
+          detail.personName
             .toLowerCase()
             .includes(
               utils.extractNameFromProtobuf(president.name).toLowerCase()
