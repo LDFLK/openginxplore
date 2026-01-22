@@ -404,7 +404,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
               {/* X-axis selector */}
               <div>
                 <label className="text-sm font-medium text-primary/50">
-                  X-Axis (Category):
+                  X-Axis:
                 </label>
                 <select
                   value={xAxis}
@@ -422,12 +422,12 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   {/* Allow selecting both string and numeric columns for X-axis */}
                   {stringColumns.map((col) => (
                     <option key={col} value={col}>
-                      {col}
+                      {formatText({ name: col })}
                     </option>
                   ))}
                   {numericColumns.filter(col => col.toLowerCase() !== "id").map((col) => (
                     <option key={col} value={col}>
-                      {col}
+                      {formatText({ name: col })}
                     </option>
                   ))}
                 </select>
@@ -436,7 +436,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
               {/* Y-axis checkboxes */}
               <div className="">
                 <label className="text-sm font-medium text-primary/60">
-                  Y-Axis (Values):
+                  Y-Axis:
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
                   {/* Allow selecting both numeric and string columns for Y-axis */}
@@ -807,7 +807,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 <LineChart
                                   data={chartData}
                                   layout={chartLayout === "horizontal" ? "vertical" : "horizontal"}
-                                  margin={{ left: 0, bottom: chartLayout === "horizontal" ? 0 : -60, right: 50, top: 10 }}
+                                  margin={{ left: chartLayout === "horizontal" ? -40 : -20, bottom: chartLayout === "horizontal" ? 0 : -60, right: 50, top: 10 }}
                                 >
                                   <CartesianGrid
                                     strokeDasharray="3 3"
