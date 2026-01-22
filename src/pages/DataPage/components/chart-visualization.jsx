@@ -422,12 +422,12 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   {/* Allow selecting both string and numeric columns for X-axis */}
                   {stringColumns.map((col) => (
                     <option key={col} value={col}>
-                      {col} (String)
+                      {col}
                     </option>
                   ))}
                   {numericColumns.filter(col => col.toLowerCase() !== "id").map((col) => (
                     <option key={col} value={col}>
-                      {col} (Numeric)
+                      {col}
                     </option>
                   ))}
                 </select>
@@ -471,7 +471,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             }}
                           />
                           <span className="break-words max-w-[220px] text-primary">
-                            {formatText({ name: col })} {isString ? "(String)" : "(Num)"}
+                            {formatText({ name: col })}
                           </span>
                         </label>
                       );
@@ -545,7 +545,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                     {/* Fixed Y-Axis Title for Horizontal Layout */}
                     {chartLayout === 'horizontal' && (
                       <div
-                        className="absolute left-0 top-0 z-50 bg-background-dark py-4 ml-5 pointer-events-none"
+                        className="absolute left-0 top-0 z-70 bg-background-dark py-4 ml-5 pointer-events-none"
                         style={{
                           width: 20,
                           height: 455
@@ -600,7 +600,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             {/* Y-axis title (only shown in vertical layout, horizontal uses fixed overlay) */}
                             {chartLayout === 'vertical' && (
                               <div
-                                className="sticky ml-5 z-30 bg-background-dark py-4"
+                                className="sticky ml-5 z-80 bg-background-dark py-4"
                                 style={{ width: 20 }}
                               >
                                 <div
