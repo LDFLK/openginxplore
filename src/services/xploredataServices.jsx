@@ -1,7 +1,20 @@
 import axios from "axios";
+import axiosInstance from "../lib/axios";
 
 const apiUrlData = window?.configs?.apiUrlData ? window.configs.apiUrlData : "/"
+
 // const apiUrlData = "";
+
+const GI_SERVICE_URL = "/v1/data";
+
+export const getDataCatalog = async ({ categoryIds = [], signal }) => {
+  const { data } = await axiosInstance.post(
+    `${GI_SERVICE_URL}/data-catalog`,
+    { categoryIds },
+    { signal }
+  );
+  return data;
+};
 
 const fetchCategoriesAndDatasets = async (parentId = "") => {
   try {
