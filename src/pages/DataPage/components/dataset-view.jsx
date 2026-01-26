@@ -106,23 +106,23 @@ export function DatasetView({ data, setExternalDateRange }) {
     return fetchedDatasets.map((d) => ({
       year: d.year,
       rows: d.data.rows,
+      columns: d.data.columns
     }));
   }, [fetchedDatasets]);
 
-  // Check if dataset is plottable (has numeric columns and string columns)
+  // Check if dataset is plottable (has numeric columns)
   const isPlottable = useMemo(() => {
     if (fetchedDatasets.length === 0) return false;
 
     const cols = fetchedDatasets[0].data.columns;
-    const sampleRows = fetchedDatasets[0].data.rows;
+    const rows = fetchedDatasets[0].data.rows;
 
-    if (!sampleRows || sampleRows.length === 0 || !cols.length) return false;
+    if (!rows || rows.length === 0 || !cols.length) return false;
 
     let hasNumeric = false;
-    let hasString = false;
 
     cols.forEach((col, idx) => {
-      const isNumeric = sampleRows.some((row) => {
+      const isNumeric = rows.some((row) => {
         const val = row[idx];
         return (
           typeof val === "number" ||
@@ -132,12 +132,10 @@ export function DatasetView({ data, setExternalDateRange }) {
 
       if (isNumeric && col !== "id") {
         hasNumeric = true;
-      } else if (!isNumeric) {
-        hasString = true;
       }
     });
 
-    return hasNumeric && hasString;
+    return hasNumeric;
   }, [fetchedDatasets]);
 
   // Checkbox handler
@@ -194,7 +192,7 @@ export function DatasetView({ data, setExternalDateRange }) {
           </h2>
           <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-primary/75">
             {datasets[firstSelectedYear] &&
-            datasets[firstSelectedYear][0].sourceType === "department" ? (
+              datasets[firstSelectedYear][0].sourceType === "department" ? (
               <div className="flex items-center">
                 <Link
                   to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
@@ -254,16 +252,14 @@ export function DatasetView({ data, setExternalDateRange }) {
               <label
                 key={year}
                 className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer 
-                ${
-                  selectedYears.includes(year)
+                ${selectedYears.includes(year)
                     ? "bg-background border-blue-500"
                     : "bg-background border-border hover:border-gray-500"
-                }
-                ${
-                  !isPlottable && !selectedYears.includes(year)
+                  }
+                ${!isPlottable && !selectedYears.includes(year)
                     ? "opacity-50"
                     : ""
-                }`}
+                  }`}
                 title={
                   !isPlottable && !selectedYears.includes(year)
                     ? "Only one year can be viewed at a time for this dataset"
@@ -297,9 +293,17 @@ export function DatasetView({ data, setExternalDateRange }) {
         {loadingDatasetId && (
           <div className="flex flex-col justify-center items-center z-50 rounded-md w-full">
             <ClipLoader size={25} color={isDark ? "white" : "black"} />
-            <p className="mt-2 text-sm text-primary/75">
-              Loading {loadingDatasetId} data...
-            </p>
+            {selectedYears.length > 1 ? (
+              <p className="mt-2 mb-2 text-sm text-primary/75">
+                Loading {loadingDatasetId} data...
+              </p>
+            ) :
+              (
+                <p className="mt-2 text-sm text-primary/75">
+                  Loading {loadingDatasetId} data...
+                </p>
+              )}
+
           </div>
         )}
 
@@ -317,7 +321,7 @@ export function DatasetView({ data, setExternalDateRange }) {
                 <DataTable
                   columns={fetchedDatasets[0].data.columns}
                   rows={fetchedDatasets[0].data.rows}
-                  title={fetchedDatasets[0].data.attributeName +" "+ selectedYears[0]}
+                  title={fetchedDatasets[0].data.attributeName + " " + selectedYears[0]}
                 />
               )}
             </>
