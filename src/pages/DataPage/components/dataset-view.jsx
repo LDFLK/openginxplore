@@ -132,7 +132,7 @@ export function DatasetView({ data, setExternalDateRange }) {
 
       if (isNumeric && col !== "id") {
         hasNumeric = true;
-      } 
+      }
     });
 
     return hasNumeric;
@@ -192,7 +192,7 @@ export function DatasetView({ data, setExternalDateRange }) {
           </h2>
           <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-primary/75">
             {datasets[firstSelectedYear] &&
-            datasets[firstSelectedYear][0].sourceType === "department" ? (
+              datasets[firstSelectedYear][0].sourceType === "department" ? (
               <div className="flex items-center">
                 <Link
                   to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
@@ -252,16 +252,14 @@ export function DatasetView({ data, setExternalDateRange }) {
               <label
                 key={year}
                 className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer 
-                ${
-                  selectedYears.includes(year)
+                ${selectedYears.includes(year)
                     ? "bg-background border-blue-500"
                     : "bg-background border-border hover:border-gray-500"
-                }
-                ${
-                  !isPlottable && !selectedYears.includes(year)
+                  }
+                ${!isPlottable && !selectedYears.includes(year)
                     ? "opacity-50"
                     : ""
-                }`}
+                  }`}
                 title={
                   !isPlottable && !selectedYears.includes(year)
                     ? "Only one year can be viewed at a time for this dataset"
@@ -295,7 +293,7 @@ export function DatasetView({ data, setExternalDateRange }) {
         {loadingDatasetId && (
           <div className="flex flex-col justify-center items-center z-50 rounded-md w-full">
             <ClipLoader size={25} color={isDark ? "white" : "black"} />
-            <p className="mt-2 text-sm text-primary/75">
+            <p className="mt-2 mb-2 text-sm text-primary/75">
               Loading {loadingDatasetId} data...
             </p>
           </div>
@@ -315,7 +313,7 @@ export function DatasetView({ data, setExternalDateRange }) {
                 <DataTable
                   columns={fetchedDatasets[0].data.columns}
                   rows={fetchedDatasets[0].data.rows}
-                  title={fetchedDatasets[0].data.attributeName +" "+ selectedYears[0]}
+                  title={fetchedDatasets[0].data.attributeName + " " + selectedYears[0]}
                 />
               )}
             </>

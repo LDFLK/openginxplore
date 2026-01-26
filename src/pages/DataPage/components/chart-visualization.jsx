@@ -985,7 +985,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                 </div>
               ) : (
                 <p className="text-center text-primary text-sm">
-                  Select X and Y columns to generate the chart.
+                  Select X and Y columns to create your chart
                 </p>
               )}
             </div>
