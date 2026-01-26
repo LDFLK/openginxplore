@@ -293,9 +293,17 @@ export function DatasetView({ data, setExternalDateRange }) {
         {loadingDatasetId && (
           <div className="flex flex-col justify-center items-center z-50 rounded-md w-full">
             <ClipLoader size={25} color={isDark ? "white" : "black"} />
-            <p className="mt-2 mb-2 text-sm text-primary/75">
-              Loading {loadingDatasetId} data...
-            </p>
+            {selectedYears.length > 1 ? (
+              <p className="mt-2 mb-2 text-sm text-primary/75">
+                Loading {loadingDatasetId} data...
+              </p>
+            ) :
+              (
+                <p className="mt-2 text-sm text-primary/75">
+                  Loading {loadingDatasetId} data...
+                </p>
+              )}
+
           </div>
         )}
 

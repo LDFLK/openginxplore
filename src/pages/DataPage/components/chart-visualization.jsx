@@ -585,11 +585,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                           className="sticky left-0 bg-background-dark flex z-60"
                           style={{
                             height: "100%",
-
-
                           }}
                         >
-
                           <div
                             className="sticky left-0 bg-background-dark flex z-60"
                             style={{
