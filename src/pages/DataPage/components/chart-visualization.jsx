@@ -412,6 +412,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                     // If new X is string, remove any strings from selectedYColumns to enforce "no two string axes" rule
                     if (stringColumns.includes(newX)) {
                       setSelectedYColumns(prev => prev.filter(col => !stringColumns.includes(col)));
+                    } else {
+                      setSelectedYColumns((prev) => prev.filter((col) => col !== newX));
                     }
                   }}
                   className="mt-1 block w-full border text-primary/75 border-border rounded-md p-2 text-sm bg-background focus:border-none"
@@ -449,7 +451,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       const isAlreadySelectedString = selectedYColumns.some(c => stringColumns.includes(c) && c !== col);
 
                       // Disable string column if X is already string OR another string is already selected in Y
-                      const isDisabled = isString && (isXString || isAlreadySelectedString);
+                      // Also disable if this column is the current X-axis
+                      const isDisabled = (col === xAxis) || (isString && (isXString || isAlreadySelectedString));
 
                       return (
                         <label
