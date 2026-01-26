@@ -36,6 +36,8 @@
     "highcharts-react-official": "^3.2.2",
     "i": "^0.3.7",
     "lucide-react": "^0.515.0",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "npm": "^11.5.2",
     "react": "^19.2.1",
     "react-chartjs-2": "^5.3.0",
