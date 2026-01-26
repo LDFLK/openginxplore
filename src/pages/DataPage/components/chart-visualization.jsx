@@ -14,8 +14,6 @@ import {
 } from "recharts";
 import formatText from "../../../utils/common_functions";
 import { useThemeContext } from "../../../context/themeContext";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 
 const COLORS = [
@@ -23,7 +21,7 @@ const COLORS = [
 ];
 
 export function ChartVisualization({ columns, rows, yearlyData }) {
-  const [xAxis, setXAxis] = useState("_category");
+  const [xAxis, setXAxis] = useState("");
   const [selectedYColumns, setSelectedYColumns] = useState([]);
   const [numericColumns, setNumericColumns] = useState([]);
   const [stringColumns, setStringColumns] = useState([]);
@@ -77,9 +75,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     if (isSingleRowAllNumeric) {
       // For single-row numeric datasets, treat all columns as potential categories
       // The user will select which columns to visualize
-      setStringColumns(["_category"]); // Virtual X-axis
+      setStringColumns([""]); // Virtual X-axis
       setNumericColumns(columns);
-      setXAxis("_category");
+      setXAxis("");
     } else {
       // Normal detection logic
       columns.forEach((col, idx) => {
@@ -93,7 +91,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     }
 
     setSelectedYColumns((prev) =>
-      prev.filter((col) => (isSingleRowAllNumeric ? columns : numericCols).includes(col))
+      prev.filter((col) => columns.includes(col))
     );
   }, [columns, normalizedYearlyData]);
 
@@ -134,7 +132,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     const rows = normalizedYearlyData.length > 0 ? normalizedYearlyData[0].rows : [];
 
     // Check if single-row all-numeric dataset
-    const isSingleRowAllNumeric = rows.length === 1 && xAxis === "_category";
+    const isSingleRowAllNumeric = rows.length === 1 && xAxis === "";
 
     if (isSingleRowAllNumeric) {
       // Transform: each selected column becomes a data point with values from all years
@@ -363,7 +361,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
           <p className="font-semibold mb-1">{label}</p>
           {payload.map((entry, index) => {
             let finalColor = entry.color;
-            if (!isMultiYear && xAxis === "_category") {
+            if (!isMultiYear && xAxis === "") {
               const dataIndex = chartData.findIndex((d) => d[xAxis] === label);
               if (dataIndex !== -1) {
                 finalColor = COLORS[dataIndex % COLORS.length];
@@ -418,7 +416,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   }}
                   className="mt-1 block w-full border text-primary/75 border-border rounded-md p-2 text-sm bg-background focus:border-none"
                 >
-                  <option value="">Select column</option>
+                  <option value="" hidden>Select column</option>
                   {/* Allow selecting both string and numeric columns for X-axis */}
                   {stringColumns.map((col) => (
                     <option key={col} value={col}>
@@ -765,7 +763,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                     interval={chartLayout === 'horizontal' ? 0 : "preserveEnd"}
                                   />
                                   <Tooltip content={renderCustomTooltip} />
-                                  {xAxis === "_category" ? (
+                                  {xAxis === "" ? (
                                     // Single-row numeric dataset: bars for each year
                                     normalizedYearlyData.map((d, yearIdx) => (
                                       <Bar
@@ -882,7 +880,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                   <Tooltip content={renderCustomTooltip} />
 
 
-                                  {xAxis === "_category" ? (
+                                  {xAxis === "" ? (
                                     // Single-row numeric dataset: lines for each year
                                     normalizedYearlyData.map((d, yearIdx) => (
                                       <Line
@@ -979,8 +977,8 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                         ? valueColumns.length > 1
                           ? "Value"
                           : formatText({ name: valueColumns[0] })
-                        : xAxis === "_category"
-                          ? "Categories"
+                        : xAxis === ""
+                          ? ""
                           : formatText({ name: xAxis })}
                     </span>
                   </div>
