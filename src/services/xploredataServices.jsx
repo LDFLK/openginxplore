@@ -1,12 +1,9 @@
-import axios from "axios";
-import axiosInstance from "../lib/axios";
-
-const apiUrlData = window?.configs?.apiUrlData ? window.configs.apiUrlData : "/"
+import axios from "../lib/axios";
 
 const GI_SERVICE_URL = "/v1/data";
 
 export const getDataCatalog = async ({ categoryIds = [], signal }) => {
-  const { data } = await axiosInstance.post(
+  const { data } = await axios.post(
     `${GI_SERVICE_URL}/data-catalog`,
     { categoryIds },
     { signal }
@@ -14,25 +11,20 @@ export const getDataCatalog = async ({ categoryIds = [], signal }) => {
   return data;
 };
 
-const fetchDataset = async (dataset) => {
-  try {
-    const response = await axios.post(
-      `${apiUrlData}/data/attribute/${dataset.parentId}`,
-
-      {
-        nameCode: dataset.name,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    return response;
-  } catch (e) {
-    console.error("Failed to fetch dataset : ", e);
-  }
+export const getAvailableYearsForDataset = async ({ datasetIds = [], signal }) => {
+  const { data } = await axios.post(
+    `${GI_SERVICE_URL}/datasets/years`,
+    { datasetIds },
+    { signal }
+  );
+  return data;
 };
 
-export default { fetchDataset };
+export const getDatasetById = async ({ datasetId, signal }) => {
+  const { data } = await axios.get(
+    `${GI_SERVICE_URL}/datasets/${datasetId}/data`,
+    { signal }
+  );
+  return data;
+};
+
