@@ -1,30 +1,77 @@
 import { DataTable } from "./table-view";
 import { useEffect, useState, useMemo } from "react";
 import { ClipLoader } from "react-spinners";
-import apiData from "../../../services/xploredataServices";
 import { ChartVisualization } from "./chart-visualization";
-import { Eye, EyeIcon } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../../context/themeContext";
+import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsForDataset";
+import { useGetDatasetsByYears } from "../../../hooks/useGetDatasetsByYears";
+import { useRootOrganizations } from "../../../hooks/useRootOrganizations";
 
 export function DatasetView({ data, setExternalDateRange }) {
-  const datasets = data;
-
-  const [loadingDatasetId, setLoadingDatasetId] = useState(null);
-  const [dataCache, setDataCache] = useState({});
-  const [years, setYears] = useState([]);
-
-  //  multi-year support
-  const [multiYearMode, setMultiYearMode] = useState(false);
-  const [selectedYears, setSelectedYears] = useState([]);
-  const [fetchedDatasets, setFetchedDatasets] = useState([]);
-
   const location = useLocation();
-
   const { isDark } = useThemeContext();
 
+  const [selectedYears, setSelectedYears] = useState([]);
+  const [filteredYears, setFilteredYears] = useState([]);
+
+  // fecth available years
+  const { data: availableYearsData, isLoading: yearsLoading } =
+    useAvailableYearsForDataset(data?.datasetIds ?? []);
+
+  //map year to dataset id
+  const yearToDatasetId = useMemo(() => {
+    if (!availableYearsData?.years) return {};
+    return Object.fromEntries(
+      availableYearsData.years.map((y) => [y.year, y.datasetId])
+    );
+  }, [availableYearsData]);
+
+  // fetch root organization for all selected years
+  const selectedDatasetIds = useMemo(() => {
+    return selectedYears.map(year => yearToDatasetId[year]).filter(Boolean);
+  }, [selectedYears, yearToDatasetId]);
+
+  // Fetch organization data for all selected datasets in parallel
+  const { data: organizationsData } = useRootOrganizations(selectedDatasetIds);
+
+  // Map organizations to years and check if all names are the same
+  const organizationsByYear = useMemo(() => {
+    const orgs = {};
+    selectedYears.forEach((year, index) => {
+      const orgData = organizationsData[index];
+      if (orgData) {
+        orgs[year] = orgData;
+      }
+    });
+    return orgs;
+  }, [selectedYears, organizationsData]);
+
+  const displayOrganizations = useMemo(() => {
+    const orgList = Object.entries(organizationsByYear);
+    if (orgList.length === 0) return null;
+
+    // Check if all organization names are the same
+    const allNames = orgList.map(([_, org]) => org.name);
+    const uniqueNames = [...new Set(allNames)];
+
+    if (uniqueNames.length === 1) {
+      // All names are the same, show one
+      return { type: 'single', data: orgList[0][1] };
+    } else {
+      // Different names, show with year labels
+      return { type: 'multiple', data: orgList.map(([year, org]) => ({ year, ...org })) };
+    }
+  }, [organizationsByYear]);
+
+  const allAvailableYears = useMemo(() => {
+    return Object.keys(yearToDatasetId).sort((a, b) => Number(a) - Number(b));
+  }, [yearToDatasetId]);
+
+  // filter years by date range
   useEffect(() => {
-    if (!datasets) return;
+    if (allAvailableYears.length === 0) return;
 
     const params = new URLSearchParams(window.location.search);
     const startDate = params.get("startDate");
@@ -32,123 +79,79 @@ export function DatasetView({ data, setExternalDateRange }) {
 
     if (!startDate || !endDate) {
       console.warn("Missing startDate or endDate in URL params");
+      setFilteredYears(allAvailableYears);
       return;
     }
 
     const startYear = startDate.split("-")[0];
     const endYear = endDate.split("-")[0];
 
-    const filteredYears = Object.keys(datasets).filter(
+    const yearsInRange = allAvailableYears.filter(
       (year) => year >= startYear && year <= endYear
     );
 
-    setYears(filteredYears);
-    setMultiYearMode(filteredYears.length > 1);
+    setFilteredYears(yearsInRange);
 
-    // Clear dataset when no years available
-    if (filteredYears.length === 0) {
-      setFetchedDatasets([]);
+    // Clear selection when no years in range
+    if (yearsInRange.length === 0) {
       setSelectedYears([]);
     }
-  }, [datasets, window.location.search]);
+  }, [allAvailableYears, window.location.search]);
 
+  const multiYearMode = filteredYears.length > 1;
+
+  // default year
   useEffect(() => {
-    if (years.length > 0) {
-      const sortedYears = [...years].sort((a, b) => Number(a) - Number(b));
-      const latestYear = sortedYears[sortedYears.length - 1];
-      setSelectedYears([latestYear]);
+    if (filteredYears.length > 0) {
+      setSelectedYears([filteredYears[filteredYears.length - 1]]);
     } else {
       setSelectedYears([]);
-      setFetchedDatasets([]);
     }
-  }, [years]);
+  }, [filteredYears]);
 
-  // Unified dataset fetching for both single and multi-year
-  useEffect(() => {
-    const fetchData = async () => {
-      if (selectedYears.length === 0) return;
+  // fetch datasets per year
+  const { fetchedDatasets, loadingYear, isAnyLoading } = useGetDatasetsByYears(
+    selectedYears,
+    yearToDatasetId
+  );
 
-      const all = [];
-      for (const y of selectedYears) {
-        if (!datasets[y]) continue;
-
-        if (!dataCache[y]) {
-          try {
-            setLoadingDatasetId(y);
-            const res = await apiData.fetchDataset(datasets[y][0]);
-            setDataCache((prev) => ({ ...prev, [y]: res.data }));
-            all.push({ year: y, data: res.data });
-          } catch (e) {
-            console.error(`Failed to fetch dataset for ${y}`, e);
-          } finally {
-            setLoadingDatasetId(null);
-          }
-        } else {
-          all.push({ year: y, data: dataCache[y] });
-        }
-      }
-      setFetchedDatasets(all);
-    };
-
-    fetchData();
-  }, [selectedYears, datasets]);
-
-  // Stabilize columns reference - only change if actual columns change
+  // stabilize columns
   const stableColumns = useMemo(() => {
     if (fetchedDatasets.length === 0) return [];
     return fetchedDatasets[0].data.columns;
-  }, [
-    fetchedDatasets.length > 0 ? fetchedDatasets[0].data.columns.join(",") : "",
-  ]);
+  }, [fetchedDatasets.length > 0 ? fetchedDatasets[0].data.columns.join(",") : ""]);
 
-  // Stabilize yearlyData reference
   const stableYearlyData = useMemo(() => {
     return fetchedDatasets.map((d) => ({
       year: d.year,
       rows: d.data.rows,
-      columns: d.data.columns
+      columns: d.data.columns,
     }));
   }, [fetchedDatasets]);
 
-  // Check if dataset is plottable (has numeric columns)
+  //check plottability
   const isPlottable = useMemo(() => {
     if (fetchedDatasets.length === 0) return false;
+    const { columns, rows } = fetchedDatasets[0].data;
+    if (!rows?.length || !columns?.length) return false;
 
-    const cols = fetchedDatasets[0].data.columns;
-    const rows = fetchedDatasets[0].data.rows;
-
-    if (!rows || rows.length === 0 || !cols.length) return false;
-
-    let hasNumeric = false;
-
-    cols.forEach((col, idx) => {
-      const isNumeric = rows.some((row) => {
+    return columns.some((col, idx) => {
+      if (col === "id") return false;
+      return rows.some((row) => {
         const val = row[idx];
-        return (
-          typeof val === "number" ||
-          (!isNaN(Number(val)) && val !== null && val !== "")
-        );
+        return typeof val === "number" || (val != null && val !== '' && !isNaN(Number(val)));
       });
-
-      if (isNumeric && col !== "id") {
-        hasNumeric = true;
-      }
     });
-
-    return hasNumeric;
   }, [fetchedDatasets]);
 
-  // Checkbox handler
+  // year toggle
   const handleYearToggle = (year) => {
-    // Prevent multi-year selection for unplottable datasets
     if (!isPlottable && !selectedYears.includes(year)) {
-      // If trying to add a year to unplottable dataset, switch to that year only
       setSelectedYears([year]);
       return;
     }
 
     if (selectedYears.includes(year)) {
-      // Prevent unchecking if it's the only one
       if (selectedYears.length === 1) return;
       setSelectedYears((prev) => prev.filter((y) => y !== year));
     } else {
@@ -156,107 +159,55 @@ export function DatasetView({ data, setExternalDateRange }) {
     }
   };
 
+  // show all available years
   const handleAvailableDatasetView = () => {
     try {
-      let yearKeys = Object.keys(datasets)
-        .map(Number)
-        .sort((a, b) => a - b);
-      const start = new Date(`${yearKeys[0]}-01-01`);
-      const end = new Date(`${yearKeys[yearKeys.length - 1]}-12-31`);
+      const sortedYears = allAvailableYears.map(Number).sort((a, b) => a - b);
+      const start = new Date(`${sortedYears[0]}-01-01`);
+      const end = new Date(`${sortedYears[sortedYears.length - 1]}-12-31`);
       setExternalDateRange([start, end]);
     } catch (e) {
-      console.error("Can't update the new dates", e);
+      console.error("Can't update date range", e);
     }
   };
 
-  if (!datasets) {
+  if (yearsLoading) {
     return (
-      <div className="flex items-center justify-center h-full mt-4">
-        <p className="text-primary/85 italic">Dataset not found</p>
+      <div className="flex justify-center mt-10">
+        <ClipLoader size={30} color={isDark ? "white" : "black"} />
       </div>
     );
   }
 
-  // Get the first selected year for metadata display
   const firstSelectedYear = selectedYears[0];
 
   return (
     <div className="p-4 md:p-6 space-y-6 w-full">
-      {/* Dataset Info */}
-      {years && years.length > 0 && (
+      {/* dataset info */}
+      {filteredYears.length > 0 && (
         <div className="space-y-1 mt-2">
           <h2 className="text-xl md:text-2xl font-bold text-primary/85">
-            {datasets[firstSelectedYear]
-              ? datasets[firstSelectedYear][0]?.nameExact
-              : "Select a Dataset"}
+            {data?.name ?? "Dataset"}
           </h2>
-          <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm text-primary/75">
-            {datasets[firstSelectedYear] &&
-              datasets[firstSelectedYear][0].sourceType === "department" ? (
-              <div className="flex items-center">
-                <Link
-                  to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
-                  state={{
-                    mode: "back",
-                    from: location.pathname + location.search,
-                  }}
-                >
-                  <span className="font-semibold text-primary/75">
-                    Published By :{" "}
-                  </span>{" "}
-                  {datasets[firstSelectedYear]
-                    ? datasets[firstSelectedYear][0]?.source
-                    : "—"}
-                </Link>
-                <Link
-                  to={`/department-profile/${datasets[firstSelectedYear][0]?.sourceId}`}
-                  state={{
-                    mode: "back",
-                    from: location.pathname + location.search,
-                  }}
-                  className="ml-5 inline-flex items-center px-2 py-2 gap-2 text-sm rounded-lg bg-background text-active-green"
-                  role="alert"
-                >
-                  <div>
-                    <EyeIcon />
-                  </div>
-                  <span className="sr-only">Info</span>
-                  <div>
-                    <span className="font-medium">Explore</span>
-                  </div>
-                </Link>
-              </div>
-            ) : (
-              <p>
-                <span className="font-semibold">Published By : </span>{" "}
-                {datasets[firstSelectedYear]
-                  ? datasets[firstSelectedYear][0]?.source
-                  : "—"}
-              </p>
-            )}
-          </div>
         </div>
       )}
 
-      {/* Year selector - checkboxes for multi-year, chip for single year */}
+      {/* year selector */}
       {multiYearMode ? (
         <div className="w-full space-y-2">
           {!isPlottable && fetchedDatasets.length > 0 && (
             <p className="text-xs text-yellow-600 dark:text-yellow-400/80 text-right">
-              This dataset cannot be visualized. Showing table view only for one
-              year.
+              This dataset cannot be visualized. Showing table view only for one year.
             </p>
           )}
           <div className="flex justify-end flex-wrap gap-2">
-            {years.map((year) => (
+            {filteredYears.map((year) => (
               <label
                 key={year}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer 
-                ${selectedYears.includes(year)
-                    ? "bg-background border-blue-500"
-                    : "bg-background border-border hover:border-gray-500"
-                  }
-                ${!isPlottable && !selectedYears.includes(year)
+                className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer ${selectedYears.includes(year)
+                  ? "bg-background border-blue-500"
+                  : "bg-background border-border hover:border-gray-500"
+                  } ${!isPlottable && !selectedYears.includes(year)
                     ? "opacity-50"
                     : ""
                   }`}
@@ -277,64 +228,113 @@ export function DatasetView({ data, setExternalDateRange }) {
           </div>
         </div>
       ) : (
-        years &&
-        years.length === 1 && (
+        filteredYears.length === 1 && (
           <div className="w-full flex justify-end">
             <div className="px-4 py-2 bg-background border border-border rounded-md text-primary/75">
-              {years[0]}
+              {filteredYears[0]}
             </div>
           </div>
         )
       )}
 
-      {/* Dataset Visualization */}
+      {/* visualization */}
       <div className="border border-border rounded-md p-4 shadow-sm bg-background relative">
-        {/* Loading overlay - doesn't unmount the chart */}
-        {loadingDatasetId && (
+        {loadingYear && (
           <div className="flex flex-col justify-center items-center z-50 rounded-md w-full">
             <ClipLoader size={25} color={isDark ? "white" : "black"} />
             {selectedYears.length > 1 ? (
               <p className="mt-2 mb-2 text-sm text-primary/75">
-                Loading {loadingDatasetId} data...
+                Loading {loadingYear} data...
               </p>
-            ) :
-              (
-                <p className="mt-2 text-sm text-primary/75">
-                  Loading {loadingDatasetId} data...
-                </p>
-              )}
-
+            ) : (
+              <p className="mt-2 text-sm text-primary/75">
+                Loading {loadingYear} data...
+              </p>
+            )}
           </div>
         )}
 
         <div className="overflow-x-auto">
           {fetchedDatasets.length > 0 ? (
             <>
-              {/* Unified chart for both single and multi-year */}
               <ChartVisualization
                 columns={stableColumns}
                 yearlyData={stableYearlyData}
               />
-
-              {/* Show table only if one year selected */}
               {selectedYears.length === 1 && (
-                <DataTable
-                  columns={fetchedDatasets[0].data.columns}
-                  rows={fetchedDatasets[0].data.rows}
-                  title={fetchedDatasets[0].data.attributeName + " " + selectedYears[0]}
-                />
+                <>
+                  <DataTable
+                    columns={fetchedDatasets[0].data.columns}
+                    rows={fetchedDatasets[0].data.rows}
+                    title={`${data?.name} ${firstSelectedYear}`}
+                  />
+
+                </>
+              )}
+              {displayOrganizations && (
+                <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
+                  <p className="text-sm text-primary/75">
+                    <span className="font-medium">Published by: </span>
+                    {displayOrganizations.type === 'single' ? (
+                      // Single organization display
+                      displayOrganizations.data.type === "department" ? (
+                        <Link
+                          to={`/department-profile/${displayOrganizations.data.id}`}
+                          state={{
+                            mode: "back",
+                            from: location.pathname + location.search,
+                          }}
+                          className="text-accent hover:underline"
+                        >
+                          {displayOrganizations.data.name}
+                        </Link>
+                      ) : (
+                        <span>{displayOrganizations.data.name}</span>
+                      )
+                    ) : (
+                      // Multiple organizations display
+                      <span className="block mt-1 space-y-1">
+                        {displayOrganizations.data.map((org, idx) => (
+                          <span key={org.year} className="block">
+                            <span className="font-medium">{org.year}</span> - {" "}
+                            {org.type === "department" ? (
+                              <Link
+                                to={`/department-profile/${org.id}`}
+                                state={{
+                                  mode: "back",
+                                  from: location.pathname + location.search,
+                                }}
+                                className="text-accent hover:underline"
+                              >
+                                {org.name}
+                              </Link>
+                            ) : (
+                              <span>{org.name}</span>
+                            )}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                  </p>
+                  <Link
+                    to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
+                    target="_blank"
+                    className="text-sm text-accent hover:underline mt-3"
+                  >
+                    See sources
+                  </Link>
+                </div>
               )}
             </>
           ) : (
-            years &&
-            years.length === 0 &&
-            Object.keys(datasets).length > 0 && (
+            filteredYears.length === 0 &&
+            allAvailableYears.length > 0 && (
               <div className="block justify-center items-center">
                 <p className="text-primary/75 italic text-center">
                   No available data yet! But you have data for
                 </p>
                 <div className="flex justify-center gap-2 mt-2">
-                  {Object.keys(datasets).map((year) => (
+                  {allAvailableYears.map((year) => (
                     <button key={year} className="text-green-400/75">
                       {year}
                     </button>
@@ -345,7 +345,8 @@ export function DatasetView({ data, setExternalDateRange }) {
                     className="flex text-accent/90 gap-2 cursor-pointer mt-2"
                     onClick={handleAvailableDatasetView}
                   >
-                    <Eye /> <span>Show me</span>
+                    <Eye />
+                    <span>Show me</span>
                   </button>
                 </div>
               </div>
