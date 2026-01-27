@@ -139,7 +139,7 @@ export function DatasetView({ data, setExternalDateRange }) {
       if (col === "id") return false;
       return rows.some((row) => {
         const val = row[idx];
-        return typeof val === "number" || (!isNaN(val) && val !== "");
+        return typeof val === "number" || (val != null && val !== '' && !isNaN(Number(val)));
       });
     });
   }, [fetchedDatasets]);
