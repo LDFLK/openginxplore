@@ -29,6 +29,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [detectedXTicks, setDetectedXTicks] = useState([]);
   const [tickRevision, setTickRevision] = useState(0);
   const [chartType, setChartType] = useState("bar");
+  const [tiltLabels, setTiltLabels] = useState(false);
   const chartRef = useRef(null);
   const chartContainerRef = useRef(null);
 
@@ -324,7 +325,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [chartData, selectedYColumns, chartLayout, chartType, tickRevision]);
+  }, [chartData, selectedYColumns, chartLayout, chartType, tickRevision, tiltLabels]);
 
   const isMultiYear = normalizedYearlyData.length > 1;
 
@@ -494,6 +495,18 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   <option value="line">Line Chart</option>
                 </select>
               </div>
+
+              {/* Tilt Labels Toggle */}
+              {chartLayout === 'vertical' && (
+                <div className="flex items-center gap-3 mt-3">
+                  <button
+                    onClick={() => setTiltLabels(!tiltLabels)}
+                    className="px-3 py-1.5 text-sm border border-border rounded-md bg-background text-primary hover:bg-background-dark transition-colors"
+                  >
+                    {tiltLabels ? 'Straighten Labels' : 'Tilt Labels'}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Chart */}
@@ -590,7 +603,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                           <div
                             className="sticky left-0 bg-background-dark flex z-60"
                             style={{
-                              height: chartLayout === 'vertical' ? "94%" : "100%",
+                              height: chartLayout === 'vertical' ? (tiltLabels ? "85%" : "94%") : "100%",
                               borderRight: "1px solid #374151",
                               width: yAxisGutterWidth,
                             }}
@@ -644,12 +657,17 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 });
                                 if (currentLine) lines.push(currentLine);
 
+                                // Adjust tick position based on chart layout
+                                const adjustedY = chartLayout === 'vertical' && tiltLabels
+                                  ? tick.y * (79 / 79) // Scale down when tilted
+                                  : tick.y;
+
                                 return (
                                   <div
                                     key={i}
-                                    className="text-[11px] text-right pr-2 text-primary/75 absolute w-full flex flex-col justify-center"
+                                    className="text-[11px] text-right pr-1 text-primary/75 absolute w-full flex flex-col justify-center"
                                     style={{
-                                      top: `${tick.y}px`,
+                                      top: `${adjustedY}px`,
                                       transform: "translateY(-50%)",
                                       lineHeight: "1.1",
                                     }}
@@ -704,50 +722,91 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                     nice={chartLayout === "horizontal"}
                                     stroke="white"
                                     interval={0}
-                                    height={chartLayout === "horizontal" ? 30 : 86}
+                                    height={chartLayout === "horizontal" ? 30 : (tiltLabels ? 128 : 86)}
                                     tickLine={false}
                                     axisLine={{ stroke: "#374151" }}
                                     tick={chartLayout === "horizontal" ? { fill: "transparent" } : ({ x, y, payload }) => {
-                                      const maxCharsPerLine = 8;
                                       const text = payload.value;
-                                      let line1 = text;
-                                      let line2 = "";
-                                      if (text.length > maxCharsPerLine) {
-                                        const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
-                                        if (splitIndex > 0) {
-                                          line1 = text.slice(0, splitIndex);
-                                          line2 = text.slice(splitIndex + 1);
-                                        } else {
-                                          line1 = text.slice(0, maxCharsPerLine);
-                                          line2 = text.slice(maxCharsPerLine);
+
+                                      if (tiltLabels) {
+                                        // Tilted labels - multi-line with rotation
+                                        const maxCharsPerLine = 12;
+                                        const words = text.split(/\s+/);
+                                        const lines = [];
+                                        let currentLine = "";
+
+                                        words.forEach((word) => {
+                                          if (!currentLine) {
+                                            currentLine = word;
+                                          } else if ((currentLine + " " + word).length <= maxCharsPerLine) {
+                                            currentLine += " " + word;
+                                          } else {
+                                            lines.push(currentLine);
+                                            currentLine = word;
+                                          }
+                                        });
+                                        if (currentLine) lines.push(currentLine);
+
+                                        return (
+                                          <g transform={`translate(${x - 20},${y})`}>
+                                            {lines.map((line, idx) => (
+                                              <text
+                                                key={idx}
+                                                x={0}
+                                                y={idx * 10}
+                                                textAnchor="end"
+                                                fontSize={8}
+                                                fill={isDark ? "white" : "dark"}
+                                                fillOpacity={0.7}
+                                                transform="rotate(-90)"
+                                              >
+                                                {line}
+                                              </text>
+                                            ))}
+                                          </g>
+                                        );
+                                      } else {
+                                        // Multi-line labels without tilt
+                                        const maxCharsPerLine = 8;
+                                        let line1 = text;
+                                        let line2 = "";
+                                        if (text.length > maxCharsPerLine) {
+                                          const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                          if (splitIndex > 0) {
+                                            line1 = text.slice(0, splitIndex);
+                                            line2 = text.slice(splitIndex + 1);
+                                          } else {
+                                            line1 = text.slice(0, maxCharsPerLine);
+                                            line2 = text.slice(maxCharsPerLine);
+                                          }
                                         }
-                                      }
-                                      return (
-                                        <g transform={`translate(${x},${y + 2.5})`}>
-                                          <text
-                                            x={0}
-                                            y={0}
-                                            textAnchor="middle"
-                                            fontSize={11.5}
-                                            fill={isDark ? "white" : "dark"}
-                                            fillOpacity={0.7}
-                                          >
-                                            {line1}
-                                          </text>
-                                          {line2 && (
+                                        return (
+                                          <g transform={`translate(${x},${y + 2.5})`}>
                                             <text
                                               x={0}
-                                              y={12}
+                                              y={0}
                                               textAnchor="middle"
                                               fontSize={11.5}
                                               fill={isDark ? "white" : "dark"}
                                               fillOpacity={0.7}
                                             >
-                                              {line2}
+                                              {line1}
                                             </text>
-                                          )}
-                                        </g>
-                                      );
+                                            {line2 && (
+                                              <text
+                                                x={0}
+                                                y={12}
+                                                textAnchor="middle"
+                                                fontSize={11.5}
+                                                fill={isDark ? "white" : "dark"}
+                                                fillOpacity={0.7}
+                                              >
+                                                {line2}
+                                              </text>
+                                            )}
+                                          </g>
+                                        );
+                                      }
                                     }}
                                   />
                                   <YAxis
@@ -805,7 +864,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                 <LineChart
                                   data={chartData}
                                   layout={chartLayout === "horizontal" ? "vertical" : "horizontal"}
-                                  margin={{ left: chartLayout === "horizontal" ? -40 : -20, bottom: chartLayout === "horizontal" ? 0 : -60, right: 50, top: 10 }}
+                                  margin={{ left: chartLayout === "horizontal" ? -40 : -20, bottom: chartLayout === "horizontal" ? 0 : -60, right: 50, top: 30 }}
                                 >
                                   <CartesianGrid
                                     strokeDasharray="3 3"
@@ -819,50 +878,91 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                     nice={chartLayout === "horizontal"}
                                     stroke="white"
                                     interval={0}
-                                    height={chartLayout === "horizontal" ? 30 : 86}
+                                    height={chartLayout === "horizontal" ? 30 : (tiltLabels ? 120 : 86)}
                                     tickLine={false}
                                     axisLine={{ stroke: "#374151" }}
                                     tick={chartLayout === "horizontal" ? { fill: "transparent" } : ({ x, y, payload }) => {
-                                      const maxCharsPerLine = 13;
                                       const text = payload.value;
-                                      let line1 = text;
-                                      let line2 = "";
-                                      if (text.length > maxCharsPerLine) {
-                                        const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
-                                        if (splitIndex > 0) {
-                                          line1 = text.slice(0, splitIndex);
-                                          line2 = text.slice(splitIndex + 1);
-                                        } else {
-                                          line1 = text.slice(0, maxCharsPerLine);
-                                          line2 = text.slice(maxCharsPerLine);
+
+                                      if (tiltLabels) {
+                                        // Tilted labels - multi-line with rotation
+                                        const maxCharsPerLine = 12;
+                                        const words = text.split(/\s+/);
+                                        const lines = [];
+                                        let currentLine = "";
+
+                                        words.forEach((word) => {
+                                          if (!currentLine) {
+                                            currentLine = word;
+                                          } else if ((currentLine + " " + word).length <= maxCharsPerLine) {
+                                            currentLine += " " + word;
+                                          } else {
+                                            lines.push(currentLine);
+                                            currentLine = word;
+                                          }
+                                        });
+                                        if (currentLine) lines.push(currentLine);
+
+                                        return (
+                                          <g transform={`translate(${x},${y})`}>
+                                            {lines.map((line, idx) => (
+                                              <text
+                                                key={idx}
+                                                x={0}
+                                                y={idx * 10}
+                                                textAnchor="end"
+                                                fontSize={9}
+                                                fill={isDark ? "white" : "dark"}
+                                                fillOpacity={0.7}
+                                                transform="rotate(-90)"
+                                              >
+                                                {line}
+                                              </text>
+                                            ))}
+                                          </g>
+                                        );
+                                      } else {
+                                        // Multi-line labels without tilt
+                                        const maxCharsPerLine = 13;
+                                        let line1 = text;
+                                        let line2 = "";
+                                        if (text.length > maxCharsPerLine) {
+                                          const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                          if (splitIndex > 0) {
+                                            line1 = text.slice(0, splitIndex);
+                                            line2 = text.slice(splitIndex + 1);
+                                          } else {
+                                            line1 = text.slice(0, maxCharsPerLine);
+                                            line2 = text.slice(maxCharsPerLine);
+                                          }
                                         }
-                                      }
-                                      return (
-                                        <g transform={`translate(${x},${y + 2.5})`}>
-                                          <text
-                                            x={0}
-                                            y={0}
-                                            textAnchor="middle"
-                                            fontSize={11.5}
-                                            fill={isDark ? "white" : "dark"}
-                                            fillOpacity={0.7}
-                                          >
-                                            {line1}
-                                          </text>
-                                          {line2 && (
+                                        return (
+                                          <g transform={`translate(${x},${y + 2.5})`}>
                                             <text
                                               x={0}
-                                              y={12}
+                                              y={0}
                                               textAnchor="middle"
                                               fontSize={11.5}
                                               fill={isDark ? "white" : "dark"}
                                               fillOpacity={0.7}
                                             >
-                                              {line2}
+                                              {line1}
                                             </text>
-                                          )}
-                                        </g>
-                                      );
+                                            {line2 && (
+                                              <text
+                                                x={0}
+                                                y={12}
+                                                textAnchor="middle"
+                                                fontSize={11.5}
+                                                fill={isDark ? "white" : "dark"}
+                                                fillOpacity={0.7}
+                                              >
+                                                {line2}
+                                              </text>
+                                            )}
+                                          </g>
+                                        );
+                                      }
                                     }}
                                   />
                                   <YAxis
