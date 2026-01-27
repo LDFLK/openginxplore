@@ -28,3 +28,10 @@ export const getDatasetById = async ({ datasetId, signal }) => {
   return data;
 };
 
+export const getRootOrganization = async ({ datasetId, signal }) => {
+  const { data } = await axios.get(
+    `${GI_SERVICE_URL}/datasets/${datasetId}/root`,
+    { signal }
+  );
+  return data;
+};

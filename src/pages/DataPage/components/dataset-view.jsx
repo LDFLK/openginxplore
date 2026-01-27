@@ -7,9 +7,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../../context/themeContext";
 import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsForDataset";
 import { useGetDatasetsByYears } from "../../../hooks/useGetDatasetsByYears";
+import { useRootOrganizations } from "../../../hooks/useRootOrganizations";
 
 export function DatasetView({ data, setExternalDateRange }) {
-  console.log("look data", data);
   const location = useLocation();
   const { isDark } = useThemeContext();
 
@@ -19,7 +19,6 @@ export function DatasetView({ data, setExternalDateRange }) {
   // fecth available years
   const { data: availableYearsData, isLoading: yearsLoading } =
     useAvailableYearsForDataset(data?.datasetIds ?? []);
-  console.log("availableYearsData", availableYearsData);
 
   //map year to dataset id
   const yearToDatasetId = useMemo(() => {
@@ -28,6 +27,43 @@ export function DatasetView({ data, setExternalDateRange }) {
       availableYearsData.years.map((y) => [y.year, y.datasetId])
     );
   }, [availableYearsData]);
+
+  // fetch root organization for all selected years
+  const selectedDatasetIds = useMemo(() => {
+    return selectedYears.map(year => yearToDatasetId[year]).filter(Boolean);
+  }, [selectedYears, yearToDatasetId]);
+
+  // Fetch organization data for all selected datasets in parallel
+  const { data: organizationsData } = useRootOrganizations(selectedDatasetIds);
+
+  // Map organizations to years and check if all names are the same
+  const organizationsByYear = useMemo(() => {
+    const orgs = {};
+    selectedYears.forEach((year, index) => {
+      const orgData = organizationsData[index];
+      if (orgData) {
+        orgs[year] = orgData;
+      }
+    });
+    return orgs;
+  }, [selectedYears, organizationsData]);
+
+  const displayOrganizations = useMemo(() => {
+    const orgList = Object.entries(organizationsByYear);
+    if (orgList.length === 0) return null;
+
+    // Check if all organization names are the same
+    const allNames = orgList.map(([_, org]) => org.name);
+    const uniqueNames = [...new Set(allNames)];
+
+    if (uniqueNames.length === 1) {
+      // All names are the same, show one
+      return { type: 'single', data: orgList[0][1] };
+    } else {
+      // Different names, show with year labels
+      return { type: 'multiple', data: orgList.map(([year, org]) => ({ year, ...org })) };
+    }
+  }, [organizationsByYear]);
 
   const allAvailableYears = useMemo(() => {
     return Object.keys(yearToDatasetId).sort((a, b) => Number(a) - Number(b));
@@ -226,11 +262,68 @@ export function DatasetView({ data, setExternalDateRange }) {
                 yearlyData={stableYearlyData}
               />
               {selectedYears.length === 1 && (
-                <DataTable
-                  columns={fetchedDatasets[0].data.columns}
-                  rows={fetchedDatasets[0].data.rows}
-                  title={`${data?.name} ${firstSelectedYear}`}
-                />
+                <>
+                  <DataTable
+                    columns={fetchedDatasets[0].data.columns}
+                    rows={fetchedDatasets[0].data.rows}
+                    title={`${data?.name} ${firstSelectedYear}`}
+                  />
+
+                </>
+              )}
+              {displayOrganizations && (
+                <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
+                  <p className="text-sm text-primary/75">
+                    <span className="font-medium">Published by: </span>
+                    {displayOrganizations.type === 'single' ? (
+                      // Single organization display
+                      displayOrganizations.data.type === "department" ? (
+                        <Link
+                          to={`/department-profile/${displayOrganizations.data.id}`}
+                          state={{
+                            mode: "back",
+                            from: location.pathname + location.search,
+                          }}
+                          className="text-accent hover:underline"
+                        >
+                          {displayOrganizations.data.name}
+                        </Link>
+                      ) : (
+                        <span>{displayOrganizations.data.name}</span>
+                      )
+                    ) : (
+                      // Multiple organizations display
+                      <span className="block mt-1 space-y-1">
+                        {displayOrganizations.data.map((org, idx) => (
+                          <span key={org.year} className="block">
+                            <span className="font-medium">{org.year}</span> - {" "}
+                            {org.type === "department" ? (
+                              <Link
+                                to={`/department-profile/${org.id}`}
+                                state={{
+                                  mode: "back",
+                                  from: location.pathname + location.search,
+                                }}
+                                className="text-accent hover:underline"
+                              >
+                                {org.name}
+                              </Link>
+                            ) : (
+                              <span>{org.name}</span>
+                            )}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                  </p>
+                  <Link
+                    to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
+                    target="_blank"
+                    className="text-sm text-accent hover:underline mt-3"
+                  >
+                    See sources
+                  </Link>
+                </div>
               )}
             </>
           ) : (
