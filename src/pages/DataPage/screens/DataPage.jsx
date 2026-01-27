@@ -1,4 +1,4 @@
-import { Folder, FileText } from "lucide-react";
+import { Folder, Loader2, TableProperties } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -13,6 +13,7 @@ export default function DataPage({ setExternalDateRange }) {
 
   const [breadcrumbTrail, setBreadcrumbTrail] = useState([]);
   const [selectedDataset, setSelectedDataset] = useState(null);
+  const [loadingCardId, setLoadingCardId] = useState(null);
 
   // Decode categoryIds from URL as an array
   const categoryIdsParam = searchParams.get("categoryIds") || "";
@@ -27,6 +28,9 @@ export default function DataPage({ setExternalDateRange }) {
   }
 
   const { data, isLoading } = useDataCatalog(categoryIds);
+
+  // Keep reference to previous data while loading
+  const [displayData, setDisplayData] = useState(null);
 
   // Initialize breadcrumb from URL or from first category
   useEffect(() => {
@@ -57,11 +61,24 @@ export default function DataPage({ setExternalDateRange }) {
     }
   }, [data, categoryIdsParam]);
 
+  // Update display data only when new data is fully loaded
+  useEffect(() => {
+    if (!isLoading && data) {
+      setDisplayData(data);
+      setLoadingCardId(null);
+    }
+  }, [isLoading, data]);
+
   const handleCategoryClick = (category) => {
+    // Prevent clicking while loading
+    if (isLoading) return;
+
     const categoryIdsArray = category.categoryIds; // full array
     const categoryName = category.name;
+    const cardId = category.categoryIds.join("-");
 
     if (!breadcrumbTrail.find((b) => b.label === categoryName)) {
+      setLoadingCardId(cardId);
       const newBreadcrumb = [
         ...breadcrumbTrail,
         {
@@ -83,9 +100,13 @@ export default function DataPage({ setExternalDateRange }) {
   };
 
   const handleDatasetClick = (dataset) => {
+    // Prevent clicking while loading
+    if (isLoading) return;
+
     const datasetName = dataset.name || formatText({ name: dataset.name });
 
     if (!breadcrumbTrail.find((b) => b.label === datasetName)) {
+      setLoadingCardId(datasetName);
       const newBreadcrumb = [
         ...breadcrumbTrail,
         {
@@ -114,6 +135,10 @@ export default function DataPage({ setExternalDateRange }) {
     const newTrail = breadcrumbTrail.slice(0, index + 1);
     const encodedTrail = encodeURIComponent(JSON.stringify(newTrail));
     setBreadcrumbTrail(newTrail);
+
+    // Clear states when navigating back
+    setSelectedDataset(null);
+    setLoadingCardId(null);
 
     const params = new URLSearchParams(location.search);
     const pidParam = url.searchParams.get("categoryIds");
@@ -147,28 +172,29 @@ export default function DataPage({ setExternalDateRange }) {
         />
       )}
 
-      {isLoading ? (
-        <div className="text-primary/70 text-center py-10">Loading...</div>
-      ) : selectedDataset ? (
+      {selectedDataset ? (
         <DatasetView
           data={selectedDataset}
           setExternalDateRange={setExternalDateRange}
         />
       ) : (
         <>
-          {data?.categories?.length > 0 && (
+          {displayData?.categories?.length > 0 && (
             <>
               <h3 className="text-xl font-semibold mt-6 mb-3 text-primary">
                 Categories
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {data.categories.map((item) => (
+                {displayData.categories.map((item) => (
                   <motion.div
                     key={item.categoryIds.join("-")}
-                    whileHover={{ y: -2, scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={!isLoading ? { y: -2, scale: 1.01 } : {}}
+                    whileTap={!isLoading ? { scale: 0.98 } : {}}
                     onClick={() => handleCategoryClick(item)}
-                    className="cursor-pointer bg-background shadow-2xs relative w-full h-[100px] border border-border rounded-2xl p-4 flex items-center justify-between hover:bg-border/10 transition"
+                    className={`bg-background shadow-2xs relative w-full h-[100px] border border-border rounded-2xl p-4 flex items-center justify-between transition ${isLoading
+                      ? "opacity-60 cursor-not-allowed"
+                      : "cursor-pointer hover:bg-border/10"
+                      }`}
                   >
                     <div className="flex items-center">
                       <Folder className="text-accent" />
@@ -176,29 +202,35 @@ export default function DataPage({ setExternalDateRange }) {
                         {formatText({ name: item.name })}
                       </p>
                     </div>
+                    {loadingCardId === item.categoryIds.join("-") && (
+                      <Loader2 className="w-5 h-5 text-accent animate-spin" />
+                    )}
                   </motion.div>
                 ))}
               </div>
             </>
           )}
 
-          {data?.datasets?.length > 0 && (
+          {displayData?.datasets?.length > 0 && (
             <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4 text-primary">
+              <h3 className="text-xl font-semibold mb-3 text-primary">
                 Datasets
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {data.datasets.map((dataset) => (
+                {displayData.datasets.map((dataset) => (
                   <motion.div
                     key={dataset.name}
-                    whileHover={{ y: -2, scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={!isLoading ? { y: -2, scale: 1.01 } : {}}
+                    whileTap={!isLoading ? { scale: 0.98 } : {}}
                     onClick={() => handleDatasetClick(dataset)}
-                    className="cursor-pointer shadow-2xs w-full h-[90px] border border-border rounded-xl p-4 flex items-center bg-dataset-card bg-background transition"
+                    className={`shadow-2xs w-full h-[90px] border border-border rounded-2xl p-4 flex items-center justify-between bg-dataset-card bg-background transition ${isLoading
+                      ? "opacity-60 cursor-not-allowed"
+                      : "cursor-pointer"
+                      }`}
                   >
-                    <FileText className=" text-accent" />
-                    <div className="ml-3 text-left">
-                      <p className="font-medium  text-primary">
+                    <div className="flex items-center">
+                      <TableProperties className="text-accent" />
+                      <p className="ml-3 text-start text-primary">
                         {dataset.name}
                       </p>
                     </div>
@@ -208,7 +240,7 @@ export default function DataPage({ setExternalDateRange }) {
             </div>
           )}
 
-          {data?.categories?.length === 0 && data?.datasets?.length === 0 && (
+          {displayData?.categories?.length === 0 && displayData?.datasets?.length === 0 && (
             <p className="text-primary/75 text-center mt-10">
               No categories or datasets found for this level.
             </p>

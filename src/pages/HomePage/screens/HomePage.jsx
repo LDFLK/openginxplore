@@ -195,7 +195,7 @@ export default function HomePage() {
             {isExpanded ? <ChevronLeft /> : <ChevronRight />}
           </button>
           <Link to={feedbackFormUrl} target="_blank" rel="noopener noreferrer">
-            <div className="flex absolute bottom-0 w-full gap-2 justify-center items-center px-3 py-2 rounded-md text-active-green/100 hover:text-active-green bg-active-green/10 hover:bg-active-green/15 border-active-green/15 hover:border-active-green/15 cursor-pointer border duration-1000 transition-all animation">
+            <div className="flex absolute bottom-0 w-full gap-2 justify-center items-center px-3 py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border duration-1000 transition-all animation">
               <MessageSquareHeart size={22} />
               {isExpanded && <span>Share feedback</span>}
             </div>

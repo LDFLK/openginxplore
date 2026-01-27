@@ -174,7 +174,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   if (yearsLoading) {
     return (
       <div className="flex justify-center mt-10">
-        <ClipLoader size={30} color={isDark ? "white" : "black"} />
+        <ClipLoader size={20} color={isDark ? "white" : "black"} />
       </div>
     );
   }
@@ -182,11 +182,11 @@ export function DatasetView({ data, setExternalDateRange }) {
   const firstSelectedYear = selectedYears[0];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 w-full">
+    <div className="p-4 md:p-6 space-y-3 w-full">
       {/* dataset info */}
       {filteredYears.length > 0 && (
         <div className="space-y-1 mt-2">
-          <h2 className="text-xl md:text-2xl font-bold text-primary/85">
+          <h2 className="text-xl md:text-2xl font-semibold text-primary/85">
             {data?.name ?? "Dataset"}
           </h2>
         </div>
@@ -194,7 +194,7 @@ export function DatasetView({ data, setExternalDateRange }) {
 
       {/* year selector */}
       {multiYearMode ? (
-        <div className="w-full space-y-2">
+        <div className="w-full">
           {!isPlottable && fetchedDatasets.length > 0 && (
             <p className="text-xs text-yellow-600 dark:text-yellow-400/80 text-right">
               This dataset cannot be visualized. Showing table view only for one year.
@@ -271,64 +271,10 @@ export function DatasetView({ data, setExternalDateRange }) {
 
                 </>
               )}
-              {displayOrganizations && (
-                <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
-                  <p className="text-sm text-primary/75">
-                    <span className="font-medium">Published by: </span>
-                    {displayOrganizations.type === 'single' ? (
-                      // Single organization display
-                      displayOrganizations.data.type === "department" ? (
-                        <Link
-                          to={`/department-profile/${displayOrganizations.data.id}`}
-                          state={{
-                            mode: "back",
-                            from: location.pathname + location.search,
-                          }}
-                          className="text-accent hover:underline"
-                        >
-                          {displayOrganizations.data.name}
-                        </Link>
-                      ) : (
-                        <span>{displayOrganizations.data.name}</span>
-                      )
-                    ) : (
-                      // Multiple organizations display
-                      <span className="block mt-1 space-y-1">
-                        {displayOrganizations.data.map((org, idx) => (
-                          <span key={org.year} className="block">
-                            <span className="font-medium">{org.year}</span> - {" "}
-                            {org.type === "department" ? (
-                              <Link
-                                to={`/department-profile/${org.id}`}
-                                state={{
-                                  mode: "back",
-                                  from: location.pathname + location.search,
-                                }}
-                                className="text-accent hover:underline"
-                              >
-                                {org.name}
-                              </Link>
-                            ) : (
-                              <span>{org.name}</span>
-                            )}
-                          </span>
-                        ))}
-                      </span>
-                    )}
-                  </p>
-                  <Link
-                    to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
-                    target="_blank"
-                    className="text-sm text-accent hover:underline mt-3"
-                  >
-                    See sources
-                  </Link>
-                </div>
-              )}
             </>
           ) : (
             filteredYears.length === 0 &&
-            allAvailableYears.length > 0 && (
+            allAvailableYears.length > 0 && !loadingYear && (
               <div className="block justify-center items-center">
                 <p className="text-primary/75 italic text-center">
                   No available data yet! But you have data for
@@ -351,6 +297,61 @@ export function DatasetView({ data, setExternalDateRange }) {
                 </div>
               </div>
             )
+          )}
+
+          {displayOrganizations && (
+            <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
+              <p className="text-sm text-primary/75">
+                <span className="font-medium">Published by: </span>
+                {displayOrganizations.type === 'single' ? (
+                  // Single organization display
+                  displayOrganizations.data.type === "department" ? (
+                    <Link
+                      to={`/department-profile/${displayOrganizations.data.id}`}
+                      state={{
+                        mode: "back",
+                        from: location.pathname + location.search,
+                      }}
+                      className="text-accent hover:underline"
+                    >
+                      {displayOrganizations.data.name}
+                    </Link>
+                  ) : (
+                    <span>{displayOrganizations.data.name}</span>
+                  )
+                ) : (
+                  // Multiple organizations display
+                  <span className="block mt-1 space-y-1">
+                    {displayOrganizations.data.map((org, idx) => (
+                      <span key={org.year} className="block">
+                        <span className="font-medium">{org.year}</span> - {" "}
+                        {org.type === "department" ? (
+                          <Link
+                            to={`/department-profile/${org.id}`}
+                            state={{
+                              mode: "back",
+                              from: location.pathname + location.search,
+                            }}
+                            className="text-accent hover:underline"
+                          >
+                            {org.name}
+                          </Link>
+                        ) : (
+                          <span>{org.name}</span>
+                        )}
+                      </span>
+                    ))}
+                  </span>
+                )}
+              </p>
+              <Link
+                to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
+                target="_blank"
+                className="text-sm text-accent hover:underline mt-3"
+              >
+                See sources
+              </Link>
+            </div>
           )}
         </div>
       </div>
