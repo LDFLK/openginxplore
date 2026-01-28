@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useThemeContext } from "../../../context/themeContext";
+import Version from "../../../components/version";
 
 export default function TextLogo({ isExpanded }) {
   const { isDark } = useThemeContext();
@@ -10,7 +11,7 @@ export default function TextLogo({ isExpanded }) {
       <h2 className="text-normal md:text-2xl py-6 font-semibold">
         {isExpanded ? (
           <span className="text-accent">
-            OpenGIN<span className="text-primary">Xplore</span>
+            OpenGIN<span className="text-primary">Xplore<Version /></span>
           </span>
         ) : isDark ? (
           <img width={35} height={35} src={"/openginexplore.ico"} />
