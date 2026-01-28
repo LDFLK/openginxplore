@@ -100,7 +100,7 @@ export default function DataPage({ setExternalDateRange }) {
       setBreadcrumbTrail(newBreadcrumb);
       setLoadingCardId(cardId);
 
-      const params = new URLSearchParams(location.search);
+      const params = new URLSearchParams(window.location.search);
       params.set("categoryIds", JSON.stringify(categoryIdsArray));
       params.set("breadcrumb", jsonTrail);
       navigate(`${location.pathname}?${params.toString()}`);
@@ -129,7 +129,7 @@ export default function DataPage({ setExternalDateRange }) {
       setBreadcrumbTrail(newBreadcrumb);
       setLoadingCardId(datasetName);
 
-      const params = new URLSearchParams(location.search);
+      const params = new URLSearchParams(window.location.search);
       params.set("datasetName", datasetName);
       params.set("categoryIds", JSON.stringify(categoryIds));
       params.set("breadcrumb", jsonTrail);
@@ -149,7 +149,7 @@ export default function DataPage({ setExternalDateRange }) {
     setSelectedDataset(null);
     setLoadingCardId(null);
 
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
     const pidParam = url.searchParams.get("categoryIds");
     const datasetName = url.searchParams.get("datasetName");
 
