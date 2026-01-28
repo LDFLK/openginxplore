@@ -105,6 +105,26 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       .replace(/\s+/g, "");
   };
 
+  const splitTextIntoLines = (text, maxChars) => {
+    const str = String(text || "").trim();
+    const words = str.split(/\s+/);
+    const lines = [];
+    let currentLine = "";
+
+    words.forEach((word) => {
+      if (!currentLine) {
+        currentLine = word;
+      } else if ((currentLine + " " + word).length <= maxChars) {
+        currentLine += " " + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  };
+
   const isXString = useMemo(() => stringColumns.includes(xAxis), [xAxis, stringColumns]);
   const yStringColumn = useMemo(() => selectedYColumns.find(col => stringColumns.includes(col)), [selectedYColumns, stringColumns]);
   const isAnyYString = !!yStringColumn;
@@ -664,28 +684,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                             >
                               {detectedTicks.map((tick, i) => {
                                 const text = (tick.label || "").trim();
-                                const words = text.split(/\s+/);
-                                const maxChars = 13;
-                                const lines = [];
-                                let currentLine = "";
-
-                                words.forEach((word) => {
-                                  if (!currentLine) {
-                                    currentLine = word;
-                                  } else if ((currentLine + " " + word).length <= maxChars) {
-                                    currentLine += " " + word;
-                                  } else {
-                                    lines.push(currentLine);
-                                    currentLine = word;
-                                  }
-                                });
-                                if (currentLine) lines.push(currentLine);
-
-                                // Adjust tick position based on chart layout
-                                const adjustedY = chartLayout === 'vertical' && tiltLabels
-                                  ? tick.y * (79 / 79) // Scale down when tilted
-                                  : tick.y;
-
+                                const lines = splitTextIntoLines(text, 13);
                                 // Calculate dynamic translateY for horizontal layout
                                 let translateY = "-50%";
                                 if (chartLayout === 'horizontal') {
@@ -709,7 +708,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                     key={i}
                                     className={`text-[11px] text-right pr-2 text-primary/75 absolute w-full flex flex-col justify-center`}
                                     style={{
-                                      top: `${adjustedY}px`,
+                                      top: `${tick.y}px`,
                                       transform: `translateY(${translateY})`,
                                       paddingTop: "2px",
                                       paddingBottom: "2px",
@@ -770,26 +769,11 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                     axisLine={{ stroke: "#374151" }}
                                     tickFormatter={chartLayout === 'horizontal' ? abbreviateNumber : undefined}
                                     tick={chartLayout === "horizontal" ? { fill: "transparent" } : ({ x, y, payload }) => {
-                                      const text = payload.value;
+                                      const text = String(payload.value || "");
 
                                       if (tiltLabels) {
                                         // Tilted labels - multi-line with rotation
-                                        const maxCharsPerLine = 12;
-                                        const words = text.split(/\s+/);
-                                        const lines = [];
-                                        let currentLine = "";
-
-                                        words.forEach((word) => {
-                                          if (!currentLine) {
-                                            currentLine = word;
-                                          } else if ((currentLine + " " + word).length <= maxCharsPerLine) {
-                                            currentLine += " " + word;
-                                          } else {
-                                            lines.push(currentLine);
-                                            currentLine = word;
-                                          }
-                                        });
-                                        if (currentLine) lines.push(currentLine);
+                                        const lines = splitTextIntoLines(text, 12);
 
                                         // Calculate x-offset based on number of lines
                                         const xOffset = lines.length > 1 ? -4 * (lines.length - 1) : 0;
@@ -818,20 +802,19 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                       } else {
                                         // Multi-line labels without tilt
                                         const maxCharsPerLine = 14;
-                                        let line1 = text;
+                                        const str = String(text || "");
+                                        let line1 = str;
                                         let line2 = "";
-                                        if (text.length > maxCharsPerLine) {
-                                          const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                        if (str.length > maxCharsPerLine) {
+                                          const splitIndex = str.lastIndexOf(" ", maxCharsPerLine);
                                           if (splitIndex > 0) {
-                                            line1 = text.slice(0, splitIndex);
-                                            line2 = text.slice(splitIndex + 1);
+                                            line1 = str.slice(0, splitIndex);
+                                            line2 = str.slice(splitIndex + 1);
                                           } else {
-                                            line1 = text.slice(0, maxCharsPerLine);
-                                            line2 = text.slice(maxCharsPerLine);
+                                            line1 = str.slice(0, maxCharsPerLine);
+                                            line2 = str.slice(maxCharsPerLine);
                                           }
                                         }
-
-                                        // Dynamic font size based on whether we have 2 lines
                                         const fontSize = line2 ? 10.5 : 11.5;
 
                                         return (
@@ -943,26 +926,11 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                     }
                                     tickFormatter={chartLayout === 'horizontal' ? abbreviateNumber : undefined}
                                     tick={chartLayout === "horizontal" ? { fill: "transparent" } : ({ x, y, payload }) => {
-                                      const text = payload.value;
+                                      const text = String(payload.value || "");
 
                                       if (tiltLabels) {
                                         // Tilted labels - multi-line with rotation
-                                        const maxCharsPerLine = 12;
-                                        const words = text.split(/\s+/);
-                                        const lines = [];
-                                        let currentLine = "";
-
-                                        words.forEach((word) => {
-                                          if (!currentLine) {
-                                            currentLine = word;
-                                          } else if ((currentLine + " " + word).length <= maxCharsPerLine) {
-                                            currentLine += " " + word;
-                                          } else {
-                                            lines.push(currentLine);
-                                            currentLine = word;
-                                          }
-                                        });
-                                        if (currentLine) lines.push(currentLine);
+                                        const lines = splitTextIntoLines(text, 12);
 
                                         // Calculate x-offset based on number of lines
                                         const xOffset = lines.length > 1 ? -2 * (lines.length - 1) : 0;
@@ -990,21 +958,22 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                                         );
                                       } else {
                                         // Multi-line labels without tilt
-                                        const maxCharsPerLine = 13;
-                                        let line1 = text;
+                                        const maxCharsPerLine = 14;
+                                        const str = String(text || "");
+                                        let line1 = str;
                                         let line2 = "";
-                                        if (text.length > maxCharsPerLine) {
-                                          const splitIndex = text.lastIndexOf(" ", maxCharsPerLine);
+                                        if (str.length > maxCharsPerLine) {
+                                          const splitIndex = str.lastIndexOf(" ", maxCharsPerLine);
                                           if (splitIndex > 0) {
-                                            line1 = text.slice(0, splitIndex);
-                                            line2 = text.slice(splitIndex + 1);
+                                            line1 = str.slice(0, splitIndex);
+                                            line2 = str.slice(splitIndex + 1);
                                           } else {
-                                            line1 = text.slice(0, maxCharsPerLine);
-                                            line2 = text.slice(maxCharsPerLine);
+                                            line1 = str.slice(0, maxCharsPerLine);
+                                            line2 = str.slice(maxCharsPerLine);
                                           }
                                         }
 
-                                        // Dynamic font size based on whether we have 2 lines
+
                                         const fontSize = line2 ? 10.5 : 11.5;
 
                                         return (
