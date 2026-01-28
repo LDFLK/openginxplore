@@ -1,23 +1,37 @@
-import { Github, Linkedin, MessageSquare } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
     <footer
-      className={`absolute lg:bottom-0 z-100 border-t border-border px-2 lg:px-6 w-full`}
+      className={`relative lg:absolute lg:bottom-0 z-100 border-t border-border px-2 lg:px-6 w-full`}
     >
       <div className="py-6 p-2 md:px-14 lg:px-24 xl:px-56 mx-auto">
+
         <div className="flex items-center justify-between">
           {/* Copyright */}
-          <a
-            href="https://opendata.lk"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <p className="text-primary/75 text-sm">
-              <span className="hover:text-accent">Open Data</span> ©{" "}
+          <div>
+            <p className="text-primary/75 text-sm mb-0.5">
+              <a
+                href="https://opendata.lk"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="hover:text-accent">Open Data</span> ©{" "}
+              </a>
               {new Date().getFullYear()}. All rights reserved.
             </p>
-          </a>
+            <p className="text-primary/75 text-xs mb-0.5">
+              Licensed under{" "}
+              <a
+                href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:underline"
+              >
+                CC BY-NC-SA 4.0
+              </a>
+            </p>
+          </div>
 
           {/* Social Media Links */}
           <div className="flex items-center space-x-4">
@@ -56,6 +70,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 }
