@@ -55,12 +55,12 @@ export default function DataPage({ setExternalDateRange }) {
   useEffect(() => {
     const breadcrumbParam = searchParams.get("breadcrumb");
     if (!breadcrumbParam && data?.categories?.length && categoryIds.length) {
+      const initialParams = new URLSearchParams();
+      initialParams.set("categoryIds", JSON.stringify(categoryIds));
       const initialBreadcrumb = [
         {
           label: "Data Catalog",
-          path: `/data?categoryIds=${encodeURIComponent(
-            JSON.stringify(categoryIds)
-          )}`,
+          path: `/data?${initialParams.toString()}`,
         },
       ];
       setBreadcrumbTrail(initialBreadcrumb);
@@ -85,17 +85,18 @@ export default function DataPage({ setExternalDateRange }) {
 
     if (!breadcrumbTrail.find((b) => b.label === categoryName)) {
       setLoadingCardId(cardId);
+
+      const breadcrumbParams = new URLSearchParams();
+      breadcrumbParams.set("categoryIds", JSON.stringify(categoryIdsArray));
+
       const newBreadcrumb = [
         ...breadcrumbTrail,
         {
           label: formatText({ name: categoryName }) || "Category",
-          path: `/data?categoryIds=${encodeURIComponent(
-            JSON.stringify(categoryIdsArray)
-          )}`,
+          path: `/data?${breadcrumbParams.toString()}`,
         },
       ];
 
-      const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
       const jsonTrail = JSON.stringify(newBreadcrumb);
       setBreadcrumbTrail(newBreadcrumb);
       setLoadingCardId(cardId);
@@ -115,13 +116,16 @@ export default function DataPage({ setExternalDateRange }) {
 
     if (!breadcrumbTrail.find((b) => b.label === datasetName)) {
       setLoadingCardId(datasetName);
+
+      const breadcrumbParams = new URLSearchParams();
+      breadcrumbParams.set("datasetName", datasetName);
+      breadcrumbParams.set("categoryIds", JSON.stringify(categoryIds));
+
       const newBreadcrumb = [
         ...breadcrumbTrail,
         {
           label: datasetName,
-          path: `/data?datasetName=${datasetName}&categoryIds=${encodeURIComponent(
-            JSON.stringify(categoryIds)
-          )}`,
+          path: `/data?${breadcrumbParams.toString()}`,
         },
       ];
 
@@ -142,7 +146,6 @@ export default function DataPage({ setExternalDateRange }) {
   const handleBreadcrumbClick = (index, item) => {
     const url = new URL(item.path, window.location.origin);
     const newTrail = breadcrumbTrail.slice(0, index + 1);
-    const encodedTrail = encodeURIComponent(JSON.stringify(newTrail));
     setBreadcrumbTrail(newTrail);
 
     // Clear states when navigating back
