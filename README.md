@@ -1,38 +1,43 @@
-## OpenGINXplore
+# OpenGINXplore
 
-This Frontend application consumes the [GI-Service](https://github.com/LDFLK/GI-SERVICE.git) (BFF) to present structured, discoverable information about the Government of Sri Lanka in an intuitive and visual manner.
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The application provides a unified interface to explore government entities, including ministries, departments and people, their hierarchical relationships, historical leadership, and published data. It is designed to make complex government structures easier to understand and navigate for the users.
+The OpenGINXplore Frontend application consumes the [GI-Service](https://github.com/LDFLK/GI-SERVICE)(BFF) to demonstrate how structured information can be presented in a clear, discoverable, and visual manner.
 
-### Features
+It provides a unified interface for exploring entities, their relationships, and other information along with their hierarchies and historical context.
 
-- Government Structure Visualization
-    - Explore the hierarchical structure of the Sri Lankan government
-    - View relationships between ministries, departments, and affiliated entities
-- Graph-Based Exploration
-    - Interactive graph view to visually navigate government entities and their connections
-    - Enables intuitive exploration of complex organizational relationships
-- Data Catalog Discovery
-    - Browse datasets published by the government, ministries, and departments
-    - Centralized access to public data catalogs
-    - Data visualisation and comparison across years as well
-- Historical Information
-    - View historical records of ministries, departments, and key personnel
-    - Track changes in government structures over time
+This application serves as a sample government exploration app, using data related to the Government of Sri Lanka as a reference implementation. It is intended to showcase how [OpenGIN-based](https://github.com/LDFLK/OpenGIN) data can be navigated, visualized, and understood by users, and can be adapted for other structured data.
 
-### High Level Overview
+### Architecture
 ```mermaid
-     flowchart LR
-         N1["Frontend (OpenGINXplore)"]
-         N2["Backend for frontend (GI-Service)"]
+flowchart LR
+    FE["Frontend<br/>(OpenGINXplore)"]
+    API["GI-Service<br/>(API Adapter / BFF)"]
+    CORE["OpenGIN<br/>(Core Data Platform)"]
 
-         N1 <-. API calls .-> N2
+    FE <-->| REST | API
+    API <-->| Query APIs | CORE
+
+    %% Base styles
+    classDef blue fill:#E3F2FD,stroke:#1565C0,stroke-width:1px,color:#0D47A1
+    classDef green fill:#C8E6C9,stroke:#1B5E20,stroke-width:3px,color:#0B3D0B
+
+    class API blue
+    class CORE blue
+    class FE green
 ```
-### Tech Stack
 
-- Framework: React(vite)
-- Communication: REST
-- Auth: None
+## Features
+
+| Feature | Description |
+|--------|-------------|
+| Government Structure Visualization | Enables exploration of the hierarchical structure of the Sri Lankan government, showing relationships between ministries, departments, and affiliated entities in a clear and structured manner. |
+| Graph-Based Exploration | Provides an interactive, graph-based interface to visually navigate government entities and understand complex organizational relationships intuitively. |
+| Data Catalog Discovery | Allows users to browse and discover datasets published by the government, ministries, and departments through a centralized data catalog. |
+| Data Visualization & Yearly Comparison | Supports visualization of published datasets and comparison across multiple years to identify trends and changes over time. |
+| Historical Government Information | Presents historical records of ministries, departments, and key personnel, enabling users to track structural and leadership changes over time. |
+
+## Getting Started
 
 ## Installation & Setup
 
@@ -41,30 +46,30 @@ The application provides a unified interface to explore government entities, inc
 - Node V20+
 - Git
 
-#### 1. Clone the Repository
+1. **Clone the Repository**
 
 ```bash
 git clone https://github.com/LDFLK/openginxplore.git
 cd openginxplore
 ```
 
-#### 2. Install Dependencies
+2. **Install Dependencies**
 
 ```bash
 npm install
 ```
 
-#### 3. Configuration
+3. **Configuration**
 
 Create a `config.js` file in the `public` directory
 ```
 window.configs = {
-  apiUrl: "<OPENGIN_BASE_URL>",
+  apiUrl: "<OPENGIN_READ_URL>",
   apiUrlData: "<GI_SERVICE_BASE_URL>",
 };
 ```
 
-#### 4. Run the Application (development)
+4. **Run the Application (development)**
 
 ##### Using Terminal
 
@@ -74,15 +79,69 @@ npm run dev
 
 The application will be available at: `http://localhost:5173`
 
-### How to contribute?
+5. **Config local proxy (React vite apps)**
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit changes: `git commit -m 'feat: your descriptive commit message'`
-4. Push to branch: `git push origin feature-name`
-5. Submit a Pull Request
+If you encounter any issues with the API calls CORS errors, configure a local proxy in the `vite.config.js` file.
 
-## Support
+Update `server` block in the `vite.config.js` file.
 
-For support and questions:
-- Create an issue in the repository
+```javascript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+    base: '/', 
+    plugins: [react()],
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './src'),
+        },
+    },
+    server: {
+        proxy: {
+            '/v1': {
+               target: 'http://localhost:8081',
+               changeOrigin: true,
+               secure: false,
+               rewrite: (path) => path.replace(/^\/v1/, '/v1'),
+            },
+        },
+    },
+})
+```
+
+## Configuration
+
+#### Configuration Variables
+
+Update the `config.js` file in the `public` directory
+
+| Variable | Required | Description | Default |
+|----------|----------|-------------|---------|
+| `apiUrl` | `Yes` | Query (Read) OpenGIN service URL | `http://0.0.0.0:8081` |
+| `apiUrlData` | `Yes` | GI-Service URL | `http://0.0.0.0:8000` |
+| `feedbackFormUrl` | `No` | Feedback Form URL | `empty` |
+| `version` | `No` | Application Version | `rc-0.1.0` |
+| `dataSources` | `No` | Data Sources | `https://data.gov.lk/` |
+
+## Contributing
+
+Please see our [Contributing](CONTRIBUTING.md).
+
+## Code of Conduct
+
+Please see our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+Please see our [Security Policy](SECURITY.md).
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## References
+
+- [OpenGIN](https://github.com/LDFLK/OpenGIN) 
+- [GI-Service](https://github.com/LDFLK/GI-SERVICE)
