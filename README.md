@@ -1,6 +1,9 @@
 # OpenGINXplore
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+[![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-Contributor-ff69b4.svg)](CODE_OF_CONDUCT.md)
+[![Security](https://img.shields.io/badge/Security-Policy-green.svg)](SECURITY.md)
+[![Contributing](https://img.shields.io/badge/Contributing-Guidelines-blue.svg)](CONTRIBUTING.md)
 
 The OpenGINXplore Frontend application consumes the [GI-Service](https://github.com/LDFLK/GI-SERVICE)(BFF) to demonstrate how structured information can be presented in a clear, discoverable, and visual manner.
 
