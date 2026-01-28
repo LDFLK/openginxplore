@@ -74,10 +74,10 @@ Mount the **public/config.js** file.
 #### Add Configuration Code:
 ```javascript
 window.configs = {
-    apiUrl: "http://0.0.0.0:8081",
-    apiUrlData: "http://0.0.0.0:8000",
+    apiUrl: "http://localhost:8081",
+    apiUrlData: "http://localhost:8000",
     feedbackFormUrl: "",
-    version: "rc-0.1.0",
+    version: "rc-1..0",
     dataSources: "https://data.gov.lk/"
 }
 ```
@@ -108,10 +108,10 @@ After successful deployment, access deployed **Web App URL** in the deployment t
 #### 2. Add Sample Configuration
    ```javascript
    window.configs = {
-      apiUrl: "http://0.0.0.0:8081",
-      apiUrlData: "http://0.0.0.0:8000",
+      apiUrl: "http://localhost:8081",
+      apiUrlData: "http://localhost:8000",
       feedbackFormUrl: "",
-      version: "rc-0.1.0",
+      version: "rc-1.0.0",
       dataSources: "https://data.gov.lk/"
    }
    ```

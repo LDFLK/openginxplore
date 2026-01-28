@@ -3,8 +3,8 @@
 // mount this to the ./public in deployement configurations
 
 // window.configs = {
-//     apiUrl : "http://0.0.0.0:8081",
-//     apiUrlData: "http://0.0.0.0:8000",
+//     apiUrl : "http://localhost:8081",
+//     apiUrlData: "http://localhost:8000",
 //     feedbackFormUrl: "",
 //     version : "rc-1.0.0",
 //     dataSources : "https://data.gov.lk/"

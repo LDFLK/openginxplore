@@ -39,7 +39,7 @@ flowchart LR
 
 ## Getting Started
 
-## Installation & Setup
+### Installation & Setup
 
 #### Prerequisite
 
@@ -119,10 +119,10 @@ Update the `config.js` file in the `public` directory
 
 | Variable | Required | Description | Default |
 |----------|----------|-------------|---------|
-| `apiUrl` | `Yes` | Query (Read) OpenGIN service URL | `http://0.0.0.0:8081` |
-| `apiUrlData` | `Yes` | GI-Service URL | `http://0.0.0.0:8000` |
+| `apiUrl` | `Yes` | Query (Read) OpenGIN service URL | `http://localhost:8081` |
+| `apiUrlData` | `Yes` | GI-Service URL | `http://localhost:8000` |
 | `feedbackFormUrl` | `No` | Feedback Form URL | `empty` |
-| `version` | `No` | Application Version | `rc-0.1.0` |
+| `version` | `No` | Application Version | `rc-1.0.0` |
 | `dataSources` | `No` | Data Sources | `https://data.gov.lk/` |
 
 ## Contributing
