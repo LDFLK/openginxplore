@@ -1,7 +1,7 @@
 import { Folder, Loader2, TableProperties } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Breadcrumb } from "../components/breadcrumb";
 import formatText from "../../../utils/common_functions";
 import { DatasetView } from "../components/dataset-view";
@@ -10,6 +10,7 @@ import { useDataCatalog } from "../../../hooks/useDataCatalog";
 export default function DataPage({ setExternalDateRange }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [breadcrumbTrail, setBreadcrumbTrail] = useState([]);
   const [selectedDataset, setSelectedDataset] = useState(null);
@@ -20,7 +21,8 @@ export default function DataPage({ setExternalDateRange }) {
   let categoryIds = [];
   if (categoryIdsParam) {
     try {
-      categoryIds = JSON.parse(decodeURIComponent(categoryIdsParam));
+      // searchParams.get already decodes once. No need for decodeURIComponent.
+      categoryIds = JSON.parse(categoryIdsParam);
       if (!Array.isArray(categoryIds)) categoryIds = [categoryIds];
     } catch {
       categoryIds = [categoryIdsParam];
@@ -32,34 +34,38 @@ export default function DataPage({ setExternalDateRange }) {
   // Keep reference to previous data while loading
   const [displayData, setDisplayData] = useState(null);
 
-  // Initialize breadcrumb from URL or from first category
+  // 1. Initialize breadcrumb from URL immediately
   useEffect(() => {
     const breadcrumbParam = searchParams.get("breadcrumb");
     if (breadcrumbParam) {
       try {
-        const decoded = JSON.parse(decodeURIComponent(breadcrumbParam));
-        if (Array.isArray(decoded)) setBreadcrumbTrail(decoded);
+        // searchParams.get already decodes once. No need for decodeURIComponent.
+        const decoded = JSON.parse(breadcrumbParam);
+        if (Array.isArray(decoded)) {
+          setBreadcrumbTrail(decoded);
+          return;
+        }
       } catch {
         console.warn("Invalid breadcrumb in URL");
       }
-    } else if (data?.categories?.length && categoryIds.length) {
-      const newBreadcrumb = [
+    }
+  }, [searchParams]);
+
+  // 2. Fallback initialization if no breadcrumb exists but data/categoryIds are present
+  useEffect(() => {
+    const breadcrumbParam = searchParams.get("breadcrumb");
+    if (!breadcrumbParam && data?.categories?.length && categoryIds.length) {
+      const initialBreadcrumb = [
         {
-          label: formatText({ name: data.categories[0].name }) || "Category",
-          path: `/datasets?categoryIds=${encodeURIComponent(
+          label: "Data Catalog",
+          path: `/data?categoryIds=${encodeURIComponent(
             JSON.stringify(categoryIds)
           )}`,
         },
       ];
-      const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
-      setBreadcrumbTrail(newBreadcrumb);
-
-      const params = new URLSearchParams(location.search);
-      params.set("categoryIds", encodeURIComponent(JSON.stringify(categoryIds)));
-      params.set("breadcrumb", encodedTrail);
-      navigate(`${location.pathname}?${params.toString()}`);
+      setBreadcrumbTrail(initialBreadcrumb);
     }
-  }, [data, categoryIdsParam]);
+  }, [data, categoryIds, searchParams]);
 
   // Update display data only when new data is fully loaded
   useEffect(() => {
@@ -83,18 +89,20 @@ export default function DataPage({ setExternalDateRange }) {
         ...breadcrumbTrail,
         {
           label: formatText({ name: categoryName }) || "Category",
-          path: `/datasets?categoryIds=${encodeURIComponent(
+          path: `/data?categoryIds=${encodeURIComponent(
             JSON.stringify(categoryIdsArray)
           )}`,
         },
       ];
 
       const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
+      const jsonTrail = JSON.stringify(newBreadcrumb);
       setBreadcrumbTrail(newBreadcrumb);
+      setLoadingCardId(cardId);
 
       const params = new URLSearchParams(location.search);
-      params.set("categoryIds", encodeURIComponent(JSON.stringify(categoryIdsArray)));
-      params.set("breadcrumb", encodedTrail);
+      params.set("categoryIds", JSON.stringify(categoryIdsArray));
+      params.set("breadcrumb", jsonTrail);
       navigate(`${location.pathname}?${params.toString()}`);
     }
   };
@@ -111,19 +119,20 @@ export default function DataPage({ setExternalDateRange }) {
         ...breadcrumbTrail,
         {
           label: datasetName,
-          path: `/datasets?datasetName=${datasetName}&categoryIds=${encodeURIComponent(
+          path: `/data?datasetName=${datasetName}&categoryIds=${encodeURIComponent(
             JSON.stringify(categoryIds)
           )}`,
         },
       ];
 
-      const encodedTrail = encodeURIComponent(JSON.stringify(newBreadcrumb));
+      const jsonTrail = JSON.stringify(newBreadcrumb);
       setBreadcrumbTrail(newBreadcrumb);
+      setLoadingCardId(datasetName);
 
       const params = new URLSearchParams(location.search);
       params.set("datasetName", datasetName);
-      params.set("categoryIds", encodeURIComponent(JSON.stringify(categoryIds)));
-      params.set("breadcrumb", encodedTrail);
+      params.set("categoryIds", JSON.stringify(categoryIds));
+      params.set("breadcrumb", jsonTrail);
       navigate(`${location.pathname}?${params.toString()}`);
     }
 
@@ -146,8 +155,9 @@ export default function DataPage({ setExternalDateRange }) {
 
     if (pidParam) {
       try {
-        const decodedPid = JSON.parse(decodeURIComponent(pidParam));
-        params.set("categoryIds", encodeURIComponent(JSON.stringify(decodedPid)));
+        // pidParam is already decoded by URLSearchParams.get
+        const decodedPid = JSON.parse(pidParam);
+        params.set("categoryIds", JSON.stringify(decodedPid));
       } catch {
         params.set("categoryIds", pidParam);
       }
@@ -158,7 +168,7 @@ export default function DataPage({ setExternalDateRange }) {
     if (datasetName) params.set("datasetName", datasetName);
     else params.delete("datasetName");
 
-    params.set("breadcrumb", encodedTrail);
+    params.set("breadcrumb", JSON.stringify(newTrail));
     navigate(`${location.pathname}?${params.toString()}`);
   };
 

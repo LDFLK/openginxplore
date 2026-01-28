@@ -297,13 +297,24 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
 
                       {dep.hasData && (
                         <Link
-                          to={`/data?parentId=${dep.id}`}
+                          to={`/data?categoryIds=${encodeURIComponent(
+                            JSON.stringify([dep.id])
+                          )}&breadcrumb=${encodeURIComponent(
+                            JSON.stringify([
+                              {
+                                label: dep.name,
+                                path: `/data?categoryIds=${encodeURIComponent(
+                                  JSON.stringify([dep.id])
+                                )}`,
+                              },
+                            ])
+                          )}`}
                           className="text-sm font-normal hover:underline"
                           style={{ color: selectedPresident.themeColorLight }}
                         >
                           Data
                         </Link>
-                      ) }
+                      )}
                     </div>
                   </div>
                 );
