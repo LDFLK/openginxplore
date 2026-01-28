@@ -11,14 +11,14 @@ It provides a unified interface for exploring entities, their relationships, and
 
 This application serves as a sample government exploration app, using data related to the Government of Sri Lanka as a reference implementation. It is intended to showcase how [OpenGIN-based](https://github.com/LDFLK/OpenGIN) data can be navigated, visualized, and understood by users, and can be adapted for other structured data.
 
-### Architecture
+### Data Flow
 ```mermaid
 flowchart LR
     FE["Frontend<br/>(OpenGINXplore)"]
     API["GI-Service<br/>(API Adapter / BFF)"]
     CORE["OpenGIN<br/>(Core Data Platform)"]
 
-    FE <-->| REST | API
+    FE <-->| REST APIs | API
     API <-->| Query APIs | CORE
 
     %% Base styles
