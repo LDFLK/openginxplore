@@ -5,11 +5,13 @@
 [![Security](https://img.shields.io/badge/Security-Policy-green.svg)](SECURITY.md)
 [![Contributing](https://img.shields.io/badge/Contributing-Guidelines-blue.svg)](CONTRIBUTING.md)
 
-The OpenGINXplore Frontend application consumes the [GI-Service](https://github.com/LDFLK/GI-SERVICE)(BFF) to demonstrate how structured information can be presented in a clear, discoverable, and visual manner.
+OpenGINXplore is a frontend web application for exploring structured government information in a clear, discoverable, and visual way.
 
-It provides a unified interface for exploring entities, their relationships, and other information along with their hierarchies and historical context.
+It provides a unified interface for navigating entities, their relationships, hierarchies, and historical changes over time, allowing users to understand how institutions, roles, and structures evolve.
 
-This application serves as a sample government exploration app, using data related to the Government of Sri Lanka as a reference implementation. It is intended to showcase how [OpenGIN-based](https://github.com/LDFLK/OpenGIN) data can be navigated, visualized, and understood by users, and can be adapted for other structured data.
+OpenGINXplore consumes the [GI-Service](https://github.com/LDFLK/GI-SERVICE) (Backend-for-Frontend), which exposes [OpenGIN-based](https://github.com/LDFLK/OpenGIN) structured data through a set of tailored APIs optimized for frontend exploration and visualization.
+
+This application serves as a sample government exploration app, using data related to the Government of Sri Lanka as a reference implementation. While the current dataset used is Sri Lanka–specific, the application is designed to be adaptable to any domain that follows the OpenGIN data model.
 
 ### Data Flow
 ```mermaid
@@ -84,7 +86,7 @@ The application will be available at: `http://localhost:5173`
 
 5. **Config local proxy (React vite apps)**
 
-If you encounter any issues with the API calls CORS errors, configure a local proxy in the `vite.config.js` file.
+If you encounter a CORS error, configure a local proxy in the `vite.config.js` file.
 
 Update `server` block in the `vite.config.js` file.
 
@@ -130,7 +132,7 @@ Update the `config.js` file in the `public` directory
 
 ## Contributing
 
-Please see our [Contributing](CONTRIBUTING.md).
+Please see our [Contributing Guidelines](CONTRIBUTING.md).
 
 ## Code of Conduct
 
