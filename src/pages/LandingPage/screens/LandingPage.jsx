@@ -150,24 +150,15 @@ const LandingPage = () => {
               </div>
               <div className="flex mt-6 justify-center lg:justify-start">
                 <button
-                  className="bg-accent text-accent-foreground px-2.5 py-2 rounded-lg font-normal text-lg hover:scale-105 transition transform inline-flex items-center hover:cursor-pointer"
+                  className="bg-accent text-accent-foreground px-5 py-2.5 rounded-lg font-normal text-lg hover:scale-105 transition transform inline-flex items-center hover:cursor-pointer"
                   onClick={() => navigate("/organization")}
                 >
                   <History className="w-6 h-6 mr-2" />
-                  <span className="text-sm md:text-normal">
+                  <span className="text-smlg:text-md md:text-normal">
                     Explore
                   </span>
                   <ChevronRight className="w-6 h-6" />
                 </button>
-                <Link
-                  to={"https://ldflk.github.io/OpenGIN/"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-none border mx-3 border-accent cursor-pointer text-accent px-3.5 py-2 rounded-lg font-normal text-lg hover:scale-105 transition transform inline-flex items-center hover:cursor-pointer"
-                >
-                  <FileText className="w-6 h-6 mr-2" />
-                  <span className="text-sm md:text-normal">Docs</span>
-                </Link>
               </div>
             </div>
 
@@ -266,15 +257,28 @@ const LandingPage = () => {
                 {cards.map((_, idx) => (
                   <span
                     key={idx}
-                    className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
-                      currentIndex === idx ? "bg-accent" : "bg-accent/25"
-                    }`}
+                    className={`w-2 h-2 rounded-full cursor-pointer transition-all ${currentIndex === idx ? "bg-accent" : "bg-accent/25"
+                      }`}
                     onClick={() => setCurrentIndex(idx)}
                   ></span>
                 ))}
               </div>
             </div>
           </div>
+
+          <p className="text-primary/75 text-xs lg:text-sm text-center mt-8 md:mt-12 lg:mt-16 mb-8 lg:mb-24">
+            Powered by{" "}
+            <a
+              href="https://ldflk.github.io/OpenGIN"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent hover:underline"
+            >
+              OpenGIN
+            </a>
+          </p>
+
+
         </div>
       </div>
 
