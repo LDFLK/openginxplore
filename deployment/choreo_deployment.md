@@ -121,25 +121,29 @@ After successful deployment, access deployed **Web App URL** in the deployment t
    Update `server` block in the `vite.config.js` file.
 
    ```javascript
-      export default defineConfig({
-         base: '/', 
-         plugins: [react()],
-         resolve: {
-            alias: {
-               '@': path.resolve(__dirname, './src'),
-            },
+   import { defineConfig } from 'vite'
+   import react from '@vitejs/plugin-react'
+   import path from 'path'
+
+   export default defineConfig({
+      base: '/', 
+      plugins: [react()],
+      resolve: {
+         alias: {
+            '@': path.resolve(__dirname, './src'),
          },
-         server: {
-            proxy: {
+      },
+      server: {
+         proxy: {
             '/v1': {
                target: 'http://localhost:8081',
                changeOrigin: true,
                secure: false,
                rewrite: (path) => path.replace(/^\/v1/, '/v1'),
             },
-            },
          },
-         })
+      },
+   })
    ```
 
 #### 4. Access Config in React Component
