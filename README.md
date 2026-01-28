@@ -18,7 +18,7 @@ flowchart LR
     API["GI-Service<br/>(API Adapter / BFF)"]
     CORE["OpenGIN<br/>(Core Data Platform)"]
 
-    FE <-->| REST APIs | API
+    FE <-->| REST | API
     API <-->| Query APIs | CORE
 
     %% Base styles
