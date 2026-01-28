@@ -9,13 +9,15 @@ export default function Footer() {
 
         <div className="flex items-center justify-between">
           {/* Copyright */}
-          <a
-            href="https://opendata.lk"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <div>
             <p className="text-primary/75 text-sm mb-0.5">
-              <span className="hover:text-accent">Open Data</span> ©{" "}
+              <a
+                href="https://opendata.lk"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="hover:text-accent">Open Data</span> ©{" "}
+              </a>
               {new Date().getFullYear()}. All rights reserved.
             </p>
             <p className="text-primary/75 text-xs mb-0.5">
@@ -29,7 +31,7 @@ export default function Footer() {
                 CC BY-NC-SA 4.0
               </a>
             </p>
-          </a>
+          </div>
 
           {/* Social Media Links */}
           <div className="flex items-center space-x-4">
@@ -68,6 +70,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 }

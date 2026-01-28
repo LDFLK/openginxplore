@@ -154,7 +154,7 @@ const LandingPage = () => {
                   onClick={() => navigate("/organization")}
                 >
                   <History className="w-6 h-6 mr-2" />
-                  <span className="text-smlg:text-md md:text-normal">
+                  <span className="text-sm lg:text-md md:text-normal">
                     Explore
                   </span>
                   <ChevronRight className="w-6 h-6" />
