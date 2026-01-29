@@ -2,7 +2,7 @@ import { DataTable } from "./table-view";
 import { useEffect, useState, useMemo } from "react";
 import { ClipLoader } from "react-spinners";
 import { ChartVisualization } from "./chart-visualization";
-import { Eye, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../../context/themeContext";
 import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsForDataset";
@@ -300,7 +300,7 @@ export function DatasetView({ data, setExternalDateRange }) {
             allAvailableYears.length > 0 && !loadingYear && (
               <div className="block justify-center items-center">
                 <p className="text-primary/75 italic text-center">
-                  No available data yet! But you have data for
+                  No available data yet! You can find data for the following years:
                 </p>
                 <div className="flex justify-center gap-2 mt-2">
                   {allAvailableYears.map((year) => (
@@ -314,7 +314,6 @@ export function DatasetView({ data, setExternalDateRange }) {
                     className="flex text-accent/90 gap-2 cursor-pointer mt-2"
                     onClick={handleAvailableDatasetView}
                   >
-                    <Eye />
                     <span>Show me</span>
                   </button>
                 </div>
