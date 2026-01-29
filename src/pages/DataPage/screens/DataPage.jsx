@@ -185,7 +185,7 @@ export default function DataPage({ setExternalDateRange }) {
         />
       )}
       {isError && (
-        <div className="mt-6 p-4 flex items-center justify-center text-red-700 rounded-xl">
+        <div className="mt-6 p-4 flex items-center justify-center text-primary/50 rounded-xl">
           <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
           <p className="text-sm font-medium">
             {error?.message || "An unexpected error occurred while fetching the data."}
@@ -210,7 +210,7 @@ export default function DataPage({ setExternalDateRange }) {
         />
       ) : (
         <>
-          {displayData?.categories?.length > 0 && (
+          {!isError && displayData?.categories?.length > 0 && (
             <>
               <h3 className="text-xl font-semibold mt-6 mb-3 text-primary">
                 Categories

@@ -34,7 +34,8 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [selectedYears, yearToDatasetId]);
 
   // Fetch organization data for all selected datasets in parallel
-  const { data: organizationsData } = useRootOrganizations(selectedDatasetIds);
+  const { data: organizationsData, isError: isOrgErrorReal } = useRootOrganizations(selectedDatasetIds);
+  const isOrgError = true; // Forced for testing
 
   // Map organizations to years and check if all names are the same
   const organizationsByYear = useMemo(() => {
@@ -182,7 +183,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   if (isYearsError) {
     return (
       <div className="p-6">
-        <div className="p-4 flex items-center justify-center text-red-700 rounded-xl mb-6">
+        <div className="p-4 flex items-center justify-center text-primary/50 rounded-xl mb-6">
           <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
           <p className="text-sm font-medium">
             {yearsError?.message || "Failed to load available years for this dataset."}
@@ -268,7 +269,7 @@ export function DatasetView({ data, setExternalDateRange }) {
         )}
 
         {isContentError && (
-          <div className="p-4 flex items-center justify-center text-red-700 rounded-xl my-4">
+          <div className="p-4 flex items-center justify-center text-primary/50 rounded-xl my-4">
             <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium">
               {contentError?.message || "Failed to load dataset content."}
@@ -321,32 +322,39 @@ export function DatasetView({ data, setExternalDateRange }) {
             )
           )}
 
-          {displayOrganizations && (
+          {(displayOrganizations || isOrgError) && (
             <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
-              <p className="text-sm text-primary/75">
-                <span className="font-medium">Published by: </span>
-                {displayOrganizations.type === 'single' ? (
-                  // Single organization display
-                  displayOrganizations.data.type === "department" ? (
-                    <Link
-                      to={`/department-profile/${displayOrganizations.data.id}`}
-                      state={{
-                        mode: "back",
-                        from: location.pathname + location.search,
-                      }}
-                      className="text-accent hover:underline"
-                    >
-                      {displayOrganizations.data.name}
-                    </Link>
-                  ) : (
-                    <span>{displayOrganizations.data.name}</span>
-                  )
-                ) : (
-                  // Multiple organizations display
-                  <span className="block mt-1 space-y-1">
-                    {displayOrganizations.data.map((org, idx) => (
-                      <span key={org.year} className="block">
-                        <span className="font-medium">{org.year}</span> - {" "}
+              <div className="text-sm text-primary/75">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium">Published by: </span>
+                  {isOrgError && !displayOrganizations && (
+                    <span className="text-primary/50 font-medium flex items-center gap-1">
+                      No publisher found
+                    </span>
+                  )}
+                  {displayOrganizations && displayOrganizations.type === 'single' && (
+                    displayOrganizations.data.type === "department" ? (
+                      <Link
+                        to={`/department-profile/${displayOrganizations.data.id}`}
+                        state={{
+                          mode: "back",
+                          from: location.pathname + location.search,
+                        }}
+                        className="text-accent hover:underline"
+                      >
+                        {displayOrganizations.data.name}
+                      </Link>
+                    ) : (
+                      <span>{displayOrganizations.data.name}</span>
+                    )
+                  )}
+                </div>
+
+                {displayOrganizations && displayOrganizations.type === 'multiple' && (
+                  <div className="mt-2 space-y-1">
+                    {displayOrganizations.data.map((org) => (
+                      <div key={org.year} className="flex gap-2">
+                        <span className="font-medium min-w-[40px]">{org.year}:</span>
                         {org.type === "department" ? (
                           <Link
                             to={`/department-profile/${org.id}`}
@@ -361,11 +369,11 @@ export function DatasetView({ data, setExternalDateRange }) {
                         ) : (
                           <span>{org.name}</span>
                         )}
-                      </span>
+                      </div>
                     ))}
-                  </span>
+                  </div>
                 )}
-              </p>
+              </div>
               <Link
                 to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
                 target="_blank"
