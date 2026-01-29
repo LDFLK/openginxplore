@@ -2,7 +2,7 @@ import { DataTable } from "./table-view";
 import { useEffect, useState, useMemo } from "react";
 import { ClipLoader } from "react-spinners";
 import { ChartVisualization } from "./chart-visualization";
-import { Eye } from "lucide-react";
+import { Eye, AlertCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../../context/themeContext";
 import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsForDataset";
@@ -17,7 +17,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   const [filteredYears, setFilteredYears] = useState([]);
 
   // fecth available years
-  const { data: availableYearsData, isLoading: yearsLoading } =
+  const { data: availableYearsData, isLoading: yearsLoading, isError: isYearsError, error: yearsError } =
     useAvailableYearsForDataset(data?.datasetIds ?? []);
 
   //map year to dataset id
@@ -110,7 +110,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [filteredYears]);
 
   // fetch datasets per year
-  const { fetchedDatasets, loadingYear, isAnyLoading } = useGetDatasetsByYears(
+  const { fetchedDatasets, loadingYear, isAnyLoading, isError: isContentError, error: contentError } = useGetDatasetsByYears(
     selectedYears,
     yearToDatasetId
   );
@@ -175,6 +175,19 @@ export function DatasetView({ data, setExternalDateRange }) {
     return (
       <div className="flex justify-center mt-10">
         <ClipLoader size={20} color={isDark ? "white" : "black"} />
+      </div>
+    );
+  }
+
+  if (isYearsError) {
+    return (
+      <div className="p-6">
+        <div className="p-4 flex items-center justify-center text-red-700 rounded-xl mb-6">
+          <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+          <p className="text-sm font-medium">
+            {yearsError?.message || "Failed to load available years for this dataset."}
+          </p>
+        </div>
       </div>
     );
   }
@@ -251,6 +264,15 @@ export function DatasetView({ data, setExternalDateRange }) {
                 Loading {loadingYear} data...
               </p>
             )}
+          </div>
+        )}
+
+        {isContentError && (
+          <div className="p-4 flex items-center justify-center text-red-700 rounded-xl my-4">
+            <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+            <p className="text-sm font-medium">
+              {contentError?.message || "Failed to load dataset content."}
+            </p>
           </div>
         )}
 

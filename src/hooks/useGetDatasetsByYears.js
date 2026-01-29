@@ -34,8 +34,10 @@ export const useGetDatasetsByYears = (selectedYears = [], yearToDatasetId = {}) 
             .filter(Boolean);
     }, [selectedYears, queries]);
 
-    // Check if any query is loading
+    // Check if any query is loading or has error
     const isAnyLoading = queries.some((query) => query.isLoading);
+    const isError = queries.some((query) => query.isError);
+    const error = queries.find((query) => query.error)?.error;
 
     // Get the current loading year (first loading query)
     const loadingYear = useMemo(() => {
@@ -46,6 +48,8 @@ export const useGetDatasetsByYears = (selectedYears = [], yearToDatasetId = {}) 
     return {
         fetchedDatasets,
         loadingYear,
-        isAnyLoading
+        isAnyLoading,
+        isError,
+        error
     };
 };

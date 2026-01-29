@@ -1,4 +1,4 @@
-import { Folder, Loader2, TableProperties } from "lucide-react";
+import { AlertCircle, Folder, Loader2, TableProperties } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
@@ -29,7 +29,7 @@ export default function DataPage({ setExternalDateRange }) {
     }
   }
 
-  const { data, isLoading } = useDataCatalog(categoryIds);
+  const { data, isLoading, isError, error } = useDataCatalog(categoryIds);
 
   // Keep reference to previous data while loading
   const [displayData, setDisplayData] = useState(null);
@@ -183,6 +183,24 @@ export default function DataPage({ setExternalDateRange }) {
           onItemClick={handleBreadcrumbClick}
           setSelectedDatasets={() => setSelectedDataset(null)}
         />
+      )}
+      {isError && (
+        <div className="mt-6 p-4 flex items-center justify-center text-red-700 rounded-xl">
+          <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+          <p className="text-sm font-medium">
+            {error?.message || "An unexpected error occurred while fetching the data."}
+          </p>
+        </div>
+
+      )}
+
+      {isLoading && !displayData && (
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <Loader2 className="w-7 h-7 text-accent animate-spin mb-4" />
+          <p className="text-primary/70 text-md">
+            Loading Data...
+          </p>
+        </div>
       )}
 
       {selectedDataset ? (
