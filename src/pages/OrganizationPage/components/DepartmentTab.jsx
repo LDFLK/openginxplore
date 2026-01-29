@@ -295,15 +295,29 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         History
                       </Link>
 
-                      {dep.hasData && (
-                        <Link
-                          to={`/data?parentId=${dep.id}`}
-                          className="text-sm font-normal hover:underline"
-                          style={{ color: selectedPresident.themeColorLight }}
-                        >
-                          Data
-                        </Link>
-                      ) }
+                      {dep.hasData && (() => {
+                        const pathParams = new URLSearchParams();
+                        pathParams.set("categoryIds", JSON.stringify([dep.id]));
+
+                        const outerParams = new URLSearchParams();
+                        outerParams.set("categoryIds", JSON.stringify([dep.id]));
+                        outerParams.set("breadcrumb", JSON.stringify([
+                          {
+                            label: dep.name,
+                            path: `/data?${pathParams.toString()}`,
+                          },
+                        ]));
+
+                        return (
+                          <Link
+                            to={`/data?${outerParams.toString()}`}
+                            className="text-sm font-normal hover:underline"
+                            style={{ color: selectedPresident.themeColorLight }}
+                          >
+                            Data
+                          </Link>
+                        );
+                      })()}
                     </div>
                   </div>
                 );

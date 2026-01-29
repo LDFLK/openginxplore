@@ -2,7 +2,7 @@ import { DataTable } from "./table-view";
 import { useEffect, useState, useMemo } from "react";
 import { ClipLoader } from "react-spinners";
 import { ChartVisualization } from "./chart-visualization";
-import { Eye } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../../context/themeContext";
 import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsForDataset";
@@ -17,7 +17,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   const [filteredYears, setFilteredYears] = useState([]);
 
   // fecth available years
-  const { data: availableYearsData, isLoading: yearsLoading } =
+  const { data: availableYearsData, isLoading: yearsLoading, isError: isYearsError, error: yearsError } =
     useAvailableYearsForDataset(data?.datasetIds ?? []);
 
   //map year to dataset id
@@ -34,7 +34,8 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [selectedYears, yearToDatasetId]);
 
   // Fetch organization data for all selected datasets in parallel
-  const { data: organizationsData } = useRootOrganizations(selectedDatasetIds);
+  const { data: organizationsData, isError: isOrgErrorReal } = useRootOrganizations(selectedDatasetIds);
+  const isOrgError = true; // Forced for testing
 
   // Map organizations to years and check if all names are the same
   const organizationsByYear = useMemo(() => {
@@ -110,7 +111,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [filteredYears]);
 
   // fetch datasets per year
-  const { fetchedDatasets, loadingYear, isAnyLoading } = useGetDatasetsByYears(
+  const { fetchedDatasets, loadingYear, isAnyLoading, isError: isContentError, error: contentError } = useGetDatasetsByYears(
     selectedYears,
     yearToDatasetId
   );
@@ -174,7 +175,20 @@ export function DatasetView({ data, setExternalDateRange }) {
   if (yearsLoading) {
     return (
       <div className="flex justify-center mt-10">
-        <ClipLoader size={30} color={isDark ? "white" : "black"} />
+        <ClipLoader size={20} color={isDark ? "white" : "black"} />
+      </div>
+    );
+  }
+
+  if (isYearsError) {
+    return (
+      <div className="p-6">
+        <div className="p-4 flex items-center justify-center text-primary/50 rounded-xl mb-6">
+          <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+          <p className="text-sm font-medium">
+            {yearsError?.message || "Failed to load available years for this dataset."}
+          </p>
+        </div>
       </div>
     );
   }
@@ -182,11 +196,11 @@ export function DatasetView({ data, setExternalDateRange }) {
   const firstSelectedYear = selectedYears[0];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 w-full">
+    <div className="p-4 md:p-6 space-y-3 w-full">
       {/* dataset info */}
       {filteredYears.length > 0 && (
         <div className="space-y-1 mt-2">
-          <h2 className="text-xl md:text-2xl font-bold text-primary/85">
+          <h2 className="text-xl md:text-2xl font-semibold text-primary/85">
             {data?.name ?? "Dataset"}
           </h2>
         </div>
@@ -194,7 +208,7 @@ export function DatasetView({ data, setExternalDateRange }) {
 
       {/* year selector */}
       {multiYearMode ? (
-        <div className="w-full space-y-2">
+        <div className="w-full">
           {!isPlottable && fetchedDatasets.length > 0 && (
             <p className="text-xs text-yellow-600 dark:text-yellow-400/80 text-right">
               This dataset cannot be visualized. Showing table view only for one year.
@@ -254,6 +268,15 @@ export function DatasetView({ data, setExternalDateRange }) {
           </div>
         )}
 
+        {isContentError && (
+          <div className="p-4 flex items-center justify-center text-primary/50 rounded-xl my-4">
+            <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+            <p className="text-sm font-medium">
+              {contentError?.message || "Failed to load dataset content."}
+            </p>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           {fetchedDatasets.length > 0 ? (
             <>
@@ -271,67 +294,13 @@ export function DatasetView({ data, setExternalDateRange }) {
 
                 </>
               )}
-              {displayOrganizations && (
-                <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
-                  <p className="text-sm text-primary/75">
-                    <span className="font-medium">Published by: </span>
-                    {displayOrganizations.type === 'single' ? (
-                      // Single organization display
-                      displayOrganizations.data.type === "department" ? (
-                        <Link
-                          to={`/department-profile/${displayOrganizations.data.id}`}
-                          state={{
-                            mode: "back",
-                            from: location.pathname + location.search,
-                          }}
-                          className="text-accent hover:underline"
-                        >
-                          {displayOrganizations.data.name}
-                        </Link>
-                      ) : (
-                        <span>{displayOrganizations.data.name}</span>
-                      )
-                    ) : (
-                      // Multiple organizations display
-                      <span className="block mt-1 space-y-1">
-                        {displayOrganizations.data.map((org, idx) => (
-                          <span key={org.year} className="block">
-                            <span className="font-medium">{org.year}</span> - {" "}
-                            {org.type === "department" ? (
-                              <Link
-                                to={`/department-profile/${org.id}`}
-                                state={{
-                                  mode: "back",
-                                  from: location.pathname + location.search,
-                                }}
-                                className="text-accent hover:underline"
-                              >
-                                {org.name}
-                              </Link>
-                            ) : (
-                              <span>{org.name}</span>
-                            )}
-                          </span>
-                        ))}
-                      </span>
-                    )}
-                  </p>
-                  <Link
-                    to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
-                    target="_blank"
-                    className="text-sm text-accent hover:underline mt-3"
-                  >
-                    See sources
-                  </Link>
-                </div>
-              )}
             </>
           ) : (
             filteredYears.length === 0 &&
-            allAvailableYears.length > 0 && (
+            allAvailableYears.length > 0 && !loadingYear && (
               <div className="block justify-center items-center">
                 <p className="text-primary/75 italic text-center">
-                  No available data yet! But you have data for
+                  No available data yet! You can find data for the following years:
                 </p>
                 <div className="flex justify-center gap-2 mt-2">
                   {allAvailableYears.map((year) => (
@@ -345,12 +314,73 @@ export function DatasetView({ data, setExternalDateRange }) {
                     className="flex text-accent/90 gap-2 cursor-pointer mt-2"
                     onClick={handleAvailableDatasetView}
                   >
-                    <Eye />
                     <span>Show me</span>
                   </button>
                 </div>
               </div>
             )
+          )}
+
+          {(displayOrganizations || isOrgError) && (
+            <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
+              <div className="text-sm text-primary/75">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium">Published by: </span>
+                  {isOrgError && !displayOrganizations && (
+                    <span className="text-primary/50 font-medium flex items-center gap-1">
+                      No publisher found
+                    </span>
+                  )}
+                  {displayOrganizations && displayOrganizations.type === 'single' && (
+                    displayOrganizations.data.type === "department" ? (
+                      <Link
+                        to={`/department-profile/${displayOrganizations.data.id}`}
+                        state={{
+                          mode: "back",
+                          from: location.pathname + location.search,
+                        }}
+                        className="text-accent hover:underline"
+                      >
+                        {displayOrganizations.data.name}
+                      </Link>
+                    ) : (
+                      <span>{displayOrganizations.data.name}</span>
+                    )
+                  )}
+                </div>
+
+                {displayOrganizations && displayOrganizations.type === 'multiple' && (
+                  <div className="mt-2 space-y-1">
+                    {displayOrganizations.data.map((org) => (
+                      <div key={org.year} className="flex gap-2">
+                        <span className="font-medium min-w-[40px]">{org.year}:</span>
+                        {org.type === "department" ? (
+                          <Link
+                            to={`/department-profile/${org.id}`}
+                            state={{
+                              mode: "back",
+                              from: location.pathname + location.search,
+                            }}
+                            className="text-accent hover:underline"
+                          >
+                            {org.name}
+                          </Link>
+                        ) : (
+                          <span>{org.name}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Link
+                to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
+                target="_blank"
+                className="text-sm text-accent hover:underline mt-3"
+              >
+                See sources
+              </Link>
+            </div>
           )}
         </div>
       </div>
