@@ -50,6 +50,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
             justifyContent: "center",
             alignItems: "center",
             height: "20vh",
+
           }}
         >
           <ClipLoader
@@ -68,11 +69,11 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-start",
-                width: "40%",
-                border: `1px solid ${colors.backgroundWhite}`,
-                p: 2,
+                width: { xs: "100%", sm: "100%", md: "40%" },
+                border: { xs: 0, sm: 0, md: `1px solid ${colors.backgroundWhite}` },
+                p: { xs: 0, sm: 0, md: 2 },
                 backgroundColor: colors.backgroundWhite,
-                borderRadius: "14px",
+                borderRadius: { xs: 0, sm: 0, md: "14px" }
               }}
             >
               <Typography
@@ -100,39 +101,54 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                   <Box
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
+                      gap: 2,
                       width: "100%",
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <ApartmentIcon sx={{ color: colors.textMuted }} />
+                    <ApartmentIcon sx={{
+                      color: colors.textMuted,
+                      fontSize: 18,
+                    }} />
+                    <Box
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: { xs: "column", sm: "row" },
+                        alignItems: { xs: "flex-start", sm: "center" },
+                        justifyContent: "space-between"
+                      }}
+                    >
                       <Typography
                         sx={{
                           fontFamily: "Poppins",
                           fontWeight: 500,
                           color: colors.textMuted,
+                          fontSize: 15,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5
                         }}
                       >
                         Total Departments{" "}
                         <InfoTooltip
                           message="Total of departments under the minister on this date"
                           iconColor={colors.textPrimary}
-                          iconSize={14}
+                          iconSize={13}
                           placement="right"
                         />
                       </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "Poppins",
+                          fontSize: 17,
+                          fontWeight: 500,
+                          color: colors.textPrimary,
+                        }}
+                      >
+                        {totalDepartments}
+                      </Typography>
                     </Box>
-                    <Typography
-                      sx={{
-                        fontFamily: "Poppins",
-                        fontSize: 20,
-                        fontWeight: 500,
-                        color: colors.textPrimary,
-                      }}
-                    >
-                      {totalDepartments}
-                    </Typography>
                   </Box>
                 )}
 
@@ -141,39 +157,54 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                   <Box
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
+                      gap: 2,
                       width: "100%",
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <DomainAddIcon sx={{ color: colors.textMuted }} />
+                    <DomainAddIcon sx={{
+                      color: colors.textMuted,
+                      fontSize: 18,
+                    }} />
+                    <Box
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: { xs: "column", sm: "row" },
+                        alignItems: { xs: "flex-start", sm: "center" },
+                        justifyContent: "space-between"
+                      }}
+                    >
                       <Typography
                         sx={{
                           fontFamily: "Poppins",
                           fontWeight: 500,
                           color: colors.textMuted,
+                          fontSize: 15,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5
                         }}
                       >
                         New Departments{" "}
                         <InfoTooltip
                           message="Total of newly added departments to this minister on this date"
                           iconColor={colors.textPrimary}
-                          iconSize={14}
+                          iconSize={13}
                           placement="right"
                         />
                       </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "Poppins",
+                          fontSize: 17,
+                          fontWeight: 500,
+                          color: colors.textPrimary,
+                        }}
+                      >
+                        {newDepartments}
+                      </Typography>
                     </Box>
-                    <Typography
-                      sx={{
-                        fontFamily: "Poppins",
-                        fontSize: 20,
-                        fontWeight: 500,
-                        color: colors.textPrimary,
-                      }}
-                    >
-                      {newDepartments}
-                    </Typography>
                   </Box>
                 )}
               </Box>
@@ -185,7 +216,8 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "center",
+                alignItems: { xs: "flex-start", sm: "flex-start", md: "center" },
+                flexDirection: { xs: "column", sm: "column", md: "row" },
                 mt: 2,
               }}
             >
@@ -196,12 +228,15 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                   color: colors.textPrimary,
                   fontFamily: "poppins",
                   fontWeight: 500,
+                  mb: { xs: "6px", sm: "6px", md: 0 }
                 }}
               >
                 Departments
               </Typography>
 
-              <Box sx={{ width: 250 }}>
+              <Box sx={{
+                width: { xs: 200, sm: 200, md: 250 }
+              }}>
                 <TextField
                   size="small"
                   label="Search departments"

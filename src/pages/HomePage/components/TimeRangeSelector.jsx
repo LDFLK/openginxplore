@@ -694,10 +694,10 @@ export default function TimeRangeSelector({
   return (
     <div className="bg-background border-b border-border py-6 px-12 w-full mx-auto">
       {/* Presets and calendar */}
-      <div className="pb-4 px-1 text-primary text-md font-semibold">
+      <div className="pb-4 px-1 text-primary text-center md:text-left md:px-0 text-md font-semibold">
         Select a Date range
       </div>
-      <div className="flex gap-2 mb-4 flex-wrap sm:justify-start justify-center">
+      <div className="flex gap-2 mb-2 md:mb-4 flex-wrap sm:justify-start justify-center">
         {/* Year presets */}
         {[
           { label: "1Y", years: 1 },
@@ -1196,8 +1196,8 @@ export default function TimeRangeSelector({
         </div>
 
         {/* Selected range display */}
-        <div className="flex items-center gap-1.5 w-full sm:w-auto ml-auto">
-          <div className="px-2.5 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
+        <div className="flex items-center gap-1 w-full justify-center sm:w-auto sm:ml-auto sm:justify-end">
+          <div className="px-2 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
             {new Date(
               tempStartDate.toISOString().split("T")[0]
             ).toLocaleDateString("en-GB", {
@@ -1207,7 +1207,7 @@ export default function TimeRangeSelector({
             })}
           </div>
           <span className="text-primary font-medium text-xs">→</span>
-          <div className="px-2.5 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
+          <div className="px-2 py-1 text-xs rounded-full bg-border border border-border text-primary font-medium">
             {new Date(
               tempEndDate.toISOString().split("T")[0]
             ).toLocaleDateString("en-GB", {
