@@ -17,22 +17,25 @@
   --primary: oklch(0.15 0 0);
   --primary-foreground: oklch(0.98 0 0);
 
-  --secondary: oklch(0.65 0.2 240);       /* soft blue */
+  --secondary: oklch(0.65 0.2 240);
+  /* soft blue */
   --secondary-foreground: oklch(1 0 0);
 
   --muted: oklch(0.92 0 0);
   --muted-foreground: oklch(0.5 0 0);
 
-  --accent: oklch(0.65 0.2 240);          /* same as secondary for accent */
+  --accent: oklch(0.65 0.2 240);
+  /* same as secondary for accent */
   --accent-foreground: oklch(1 0 0);
 
-  --destructive: oklch(0.577 0.245 27.325); /* red for destructive stays */
+  --destructive: oklch(0.577 0.245 27.325);
+  /* red for destructive stays */
   --destructive-foreground: oklch(0.577 0.245 27.325);
 
   --border: oklch(89.143% 0.0001 271.152);
   --input: oklch(0.92 0 0);
   --ring: oklch(0.65 0.2 240);
-  
+
   --active-green: oklch(72.3% 0.219 149.579);
 
   --purple-light: oklch(71.4% 0.203 305.504);
@@ -116,7 +119,7 @@ body {
 
 .react-datepicker {
   display: flex !important;
-  gap: 1rem; 
+  gap: 1rem;
 }
 
 .react-datepicker__month-container {
@@ -124,10 +127,11 @@ body {
 }
 
 .scroll-wrapper {
-  scrollbar-width: thin; 
+  scrollbar-width: thin;
   scrollbar-color: transparent transparent;
   transition: scrollbar-color 0.3s;
 }
+
 .react-datepicker__month-container {
   width: 100% !important;
 }
@@ -136,6 +140,7 @@ body {
   width: 100% !important;
 
 }
+
 .react-datepicker__day-names {
   width: 100% !important;
   display: flex;
@@ -170,13 +175,15 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 100, 100, 0.4); /* Thumb color */
+  background-color: rgba(100, 100, 100, 0.4);
+  /* Thumb color */
   border-radius: 4px;
 }
 
 /* Scrollbar Styling for Firefox */
 .custom-scrollbar {
-  scrollbar-width: thin; /* Makes it thin */
+  scrollbar-width: thin;
+  /* Makes it thin */
   scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
 }
 
@@ -184,6 +191,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -195,33 +203,28 @@ body {
 
 /* Hide scrollbar but allow scroll */
 .no-scrollbar {
-  -ms-overflow-style: none;  
-  scrollbar-width: none;    
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+
 .no-scrollbar::-webkit-scrollbar {
-  display: none;             
+  display: none;
 }
 
 ::-webkit-scrollbar {
-  width: 7px;              
-  height: 5px;           
+  width: 5px;
+  height: 3px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b; 
+  background: #d6dcdf;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #043077;
+  background-color: #0099ee;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #06359c; /* darker on hover */
+  background-color: #036fa9;
 }
-
-
-
-
-
-
