@@ -1,4 +1,4 @@
-import {useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import utils from "../../../utils/utils";
 import personDetails from "../../../assets/personImages.json";
@@ -44,10 +44,10 @@ const PersonProfile = () => {
     <div className="px-3 py-6 md:px-12 md:py-8 lg:px-18 xl:px-24 2xl:px-36 w-full bg-background-dark min-h-screen">
       {state.from && state.from !== "" ? (
         <button
-          onClick={() => navigate(state.from,{ state: {from: state.callback == true && state.callbackLink} })}
+          onClick={() => navigate(state.from, { state: { from: state.callback == true && state.callbackLink } })}
           className="flex items-center mb-2 text-primary cursor-pointer"
         >
-          <ChevronLeft className="text-primary"/>
+          <ChevronLeft className="text-primary" />
           <p className="text-primary">Back</p>
         </button>
       ) : (
@@ -55,7 +55,7 @@ const PersonProfile = () => {
           onClick={() => navigate("/")}
           className="flex items-center mb-2 text-primary cursor-pointer"
         >
-          <ChevronLeft className="text-primary"/>
+          <ChevronLeft className="text-primary" />
           <p className="text-primary">Go to OpenGINXplore</p>
         </button>
       )}
@@ -66,7 +66,7 @@ const PersonProfile = () => {
       {/* --- Person Card --- */}
       <div className="w-full flex justify-center">
         <div className="w-full md:w-2/3 lg:w-1/2 flex items-center gap-4 justify-center rounded-md border border-border bg-background my-6 p-5">
-          <div className="flex-shrink-0 rounded-full w-24 h-24 md:w-28 md:h-28 mb-2 shadow-md border border-border flex justify-center items-center">
+          <div className="flex-shrink-0 rounded-full w-12 h-12 md:w-28 md:h-28 mb-2 shadow-md border border-border flex justify-center items-center">
             {imageUrl != null ? (
               <img
                 className="rounded-full object-cover"
@@ -79,8 +79,8 @@ const PersonProfile = () => {
             )}
           </div>
 
-          <div className="flex flex-col gap-1 w-full text-center md:text-left">
-            <p className="font-semibold text-primary text-xl mb-3 mt-3 md:mt-5">
+          <div className="flex flex-col gap-1 w-full md:text-left">
+            <p className="font-semibold text-primary text-sm md:text-lg mb-3 mt-3 md:mt-5">
               {utils.extractNameFromProtobuf(selectedPerson?.name || "Unknown")}
             </p>
 
@@ -89,7 +89,7 @@ const PersonProfile = () => {
                 icon: <Landmark className="text-primary/50" />,
                 label: "Ministries Worked At",
                 value: workedMinistries,
-                showTooltip: workedAsPresident > 0, 
+                showTooltip: workedAsPresident > 0,
                 tooltipMessage: "This may include ministers inherited from the previous administration before the president released their own cabinet.",
               },
               {
@@ -107,7 +107,7 @@ const PersonProfile = () => {
                   key={idx}
                   className="flex justify-between flex-wrap gap-1 mb-3 w-full text-sm sm:text-base"
                 >
-                  <p className="flex items-center gap-2 font-normal text-primary/75">
+                  <p className="flex items-center gap-2 text-xs md:text-sm font-normal text-primary/75">
                     {item.icon}
                     {item.label}
                     {item.showTooltip && item.tooltipMessage && (
@@ -134,12 +134,11 @@ const PersonProfile = () => {
           return (
             <button
               key={tab}
-              className={`rounded-full ${
-                isActive
-                  ? "border-2 border-border hover:bg-accent"
-                  : "bg-background border border-border"
-              } cursor-pointer px-6 py-3 bg-background font-semibold text-accent`}
-              // onClick={() => setActiveTab(tab)}
+              className={`rounded-full ${isActive
+                ? "border-2 border-border hover:bg-accent"
+                : "bg-background border border-border"
+                } cursor-pointer px-6 py-3 bg-background font-semibold text-accent`}
+            // onClick={() => setActiveTab(tab)}
             >
               {label}
             </button>

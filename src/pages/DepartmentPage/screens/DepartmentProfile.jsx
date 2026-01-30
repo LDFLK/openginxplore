@@ -28,34 +28,34 @@ export default function DepartmentProfile() {
     <div className="px-3 py-6 md:px-12 md:py-8 lg:px-18 xl:px-24 2xl:px-36 w-full bg-background-dark min-h-screen">
       <div className="w-full flex justify-between items-center">
         {state.from && state.from !== "" ? (
-        <button
-          onClick={() => navigate(state.from)}
-          className="flex items-centertext-primary cursor-pointer"
-        >
-          <ChevronLeft className="text-primary" />
-          <p className="text-primary">Back</p>
-        </button>
-      ) : (
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center mb-2 text-primary cursor-pointer"
-        >
-          <ChevronLeft className="text-primary" />
-          <p className="text-primary">Go to OpenGINXplore</p>
-        </button>
-      )}
-          <ShareLinkButton />
+          <button
+            onClick={() => navigate(state.from)}
+            className="flex items-centertext-primary cursor-pointer"
+          >
+            <ChevronLeft className="text-primary" />
+            <p className="text-primary">Back</p>
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center mb-2 text-primary cursor-pointer"
+          >
+            <ChevronLeft className="text-primary" />
+            <p className="text-primary">Go to OpenGINXplore</p>
+          </button>
+        )}
+        <ShareLinkButton />
       </div>
 
       <div className="flex items-center justify-center w-full mt-6 text-primary">
-        <p className="text-xl font-semibold">
+        <p className="text-md md:text-lg font-semibold">
           {selectedDepartment &&
             utils.extractNameFromProtobuf(selectedDepartment.name)}
         </p>
 
       </div>
       <div className="flex justify-center">
-        <p className="border border-border text-accent font-semibold px-4 py-3 bg-background mt-4 rounded-full">
+        <p className="border border-border text-xs text-accent font-semibold px-4 py-3 bg-background mt-2 md:mt-4 rounded-full">
           Department History Timeline{" "}
           <InfoTooltip
             message="Ministers the department was under throughout the history"

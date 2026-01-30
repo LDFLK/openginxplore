@@ -351,7 +351,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
       {!loading ? (
         <>
           {enrichedMinistries && enrichedMinistries.length > 0 ? (
-            <div className=" rounded-md p-6 bg-background-dark">
+            <div className=" rounded-md p-4 md:p-6 bg-background-dark">
               <VerticalTimeline
                 animate={true}
                 layout="2-columns"
