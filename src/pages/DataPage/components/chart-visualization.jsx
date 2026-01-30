@@ -547,7 +547,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                     onClick={() => setTiltLabels(!tiltLabels)}
                     className="px-3 py-1.5 text-sm border border-border rounded-md bg-background text-primary hover:bg-background-dark transition-colors"
                   >
-                    {tiltLabels ? 'Straighten X-axis Labels' : 'Tilt X-axis Labels'}
+                    {tiltLabels ? 'Straighten X-axis Labels' : 'Rotate X-axis Labels'}
                   </button>
                 </div>
               )}

@@ -143,9 +143,9 @@ export function DataTable({ columns, rows, title }) {
             size="2"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer"
+            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:border-border"
           >
-            <ChevronLeft/>
+            <ChevronLeft />
             <span>Previous</span>
           </button>
           <button
@@ -153,11 +153,11 @@ export function DataTable({ columns, rows, title }) {
             onClick={() =>
               setCurrentPage(Math.min(totalPages, currentPage + 1))
             }
-            disabled={currentPage === totalPages}
-            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer"
+            disabled={currentPage >= totalPages}
+            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:border-border"
           >
             <span>Next</span>
-            <ChevronRight/>
+            <ChevronRight />
           </button>
         </div>
       </div>
