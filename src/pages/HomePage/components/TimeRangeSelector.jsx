@@ -124,19 +124,18 @@ export default function TimeRangeSelector({
     if (selectedDateParam) {
       const targetDate = new Date(selectedDateParam);
 
-      // SelectedDate year is within the URL range → keep URL range as-is
-      if (targetDate >= urlStart && targetDate <= urlEnd) {
-
-      }
-      // SelectedDate year is outside URL range but within available range → override range to full year
-      else if (targetDate >= minDate && targetDate <= maxDate) {
-        urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
-        urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
-      }
-      // SelectedDate outside available range → default
-      else {
-        urlStart = minDate;
-        urlEnd = maxDate;
+      // If outside current URL range, update it
+      if (!(targetDate >= urlStart && targetDate <= urlEnd)) {
+        // SelectedDate year is outside URL range but within available range → override range to full year
+        if (targetDate >= minDate && targetDate <= maxDate) {
+          urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
+          urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
+        }
+        // SelectedDate outside available range → default
+        else {
+          urlStart = minDate;
+          urlEnd = maxDate;
+        }
       }
     } else {
       // No selectedDate → clamp URL range to available range

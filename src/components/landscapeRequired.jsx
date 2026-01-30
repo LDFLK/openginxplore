@@ -40,6 +40,7 @@ export default function LandscapeRequired({
                 {onBack && (
                     <button
                         onClick={onBack}
+                        className="back-button"
                         style={{
                             position: "absolute",
                             top: "20px",
@@ -54,8 +55,6 @@ export default function LandscapeRequired({
                             justifyContent: "center",
                             transition: "background 0.2s"
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0, 0, 0, 0.15)"}
-                        onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0, 0, 0, 0.1)"}
                     >
                         <ArrowLeft size={24} color="#333" />
                     </button>
@@ -101,6 +100,9 @@ export default function LandscapeRequired({
           @keyframes rotate {
             0%, 100% { transform: rotate(0deg); }
             50% { transform: rotate(92deg); }
+          }
+          .back-button:hover {
+            background: rgba(0, 0, 0, 0.15) !important;
           }
         `}</style>
             </div>
