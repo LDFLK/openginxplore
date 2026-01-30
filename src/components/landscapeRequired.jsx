@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RotateCw, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { HiOutlineDevicePhoneMobile } from "react-icons/hi2";
 
 export default function LandscapeRequired({
