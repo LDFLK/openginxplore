@@ -100,7 +100,7 @@ export default function TimeRangeSelector({
     const newEnd = endDate.toISOString().split("T")[0];
     const currentStart = params.get("startDate");
     const currentEnd = params.get("endDate");
-    
+
     // merge with existing URL params
     params.set("startDate", newStart);
     params.set("endDate", newEnd);
@@ -126,7 +126,7 @@ export default function TimeRangeSelector({
 
       // SelectedDate year is within the URL range → keep URL range as-is
       if (targetDate >= urlStart && targetDate <= urlEnd) {
-        
+
       }
       // SelectedDate year is outside URL range but within available range → override range to full year
       else if (targetDate >= minDate && targetDate <= maxDate) {
@@ -692,7 +692,7 @@ export default function TimeRangeSelector({
   };
 
   return (
-    <div className="bg-background border-b border-border py-6 px-12 w-full mx-auto">
+    <div className="bg-background border-b border-border p-4 w-full mx-auto">
       {/* Presets and calendar */}
       <div className="pb-4 px-1 text-primary text-center md:text-left md:px-0 text-md font-semibold">
         Select a Date range
@@ -737,11 +737,10 @@ export default function TimeRangeSelector({
               setActivePreset(preset.label);
               setActivePresident("");
             }}
-            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${
-              activePreset === preset.label
-                ? "bg-accent/20 text-primary"
-                : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
-            }`}
+            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${activePreset === preset.label
+              ? "bg-accent/20 text-primary"
+              : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
+              }`}
           >
             {preset.label}
           </button>
@@ -751,11 +750,10 @@ export default function TimeRangeSelector({
         <div className="relative w-56 text-xs">
           {/* Main button */}
           <button
-            className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${
-              activePresident
-                ? "bg-accent/20 text-primary"
-                : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
-            }`}
+            className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${activePresident
+              ? "bg-accent/20 text-primary"
+              : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
+              }`}
             onClick={() => setIsDropdownOpen((o) => !o)}
           >
             <span>
@@ -802,11 +800,10 @@ export default function TimeRangeSelector({
                 <div key={id} className="group relative">
                   {/* President row */}
                   <button
-                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-border ${
-                      activePresident === id
-                        ? "bg-accent/20 text-primary"
-                        : "text-primary"
-                    }`}
+                    className={`w-full px-3 py-1.5 text-left flex justify-between items-center cursor-pointer hover:bg-border ${activePresident === id
+                      ? "bg-accent/20 text-primary"
+                      : "text-primary"
+                      }`}
                     onClick={() => {
                       if (data.terms.length === 1) {
                         const term = data.terms[0];
@@ -837,14 +834,13 @@ export default function TimeRangeSelector({
                       {data.terms.map((term, idx) => (
                         <button
                           key={idx}
-                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-border ${
-                            activePresident === id &&
+                          className={`w-full px-3 py-1.5 text-left cursor-pointer hover:bg-border ${activePresident === id &&
                             startDate.getTime() ===
                             new Date(term.start).getTime() &&
                             endDate.getTime() === new Date(term.end).getTime()
-                              ? "bg-accent text-white"
-                              : "text-primary"
-                          }`}
+                            ? "bg-accent text-white"
+                            : "text-primary"
+                            }`}
                           onClick={() => {
                             setActivePresident(id);
                             setStartDate(new Date(term.start));
@@ -884,13 +880,12 @@ export default function TimeRangeSelector({
               setCalendarOpen((o) => !o);
             }}
             className={`flex items-center justify-center gap-2 w-full sm:w-auto px-2.5 py-1.5 text-xs rounded-md transition-colors cursor-pointer
-      ${
-        calendarRange &&
-        startDate.toISOString() === calendarRange.start &&
-        endDate.toISOString() === calendarRange.end
-          ? "bg-accent text-white hover:bg-accent"
-          : "bg-foreground/10 text-primary font-medium hover:bg-border"
-      }`}
+      ${calendarRange &&
+                startDate.toISOString() === calendarRange.start &&
+                endDate.toISOString() === calendarRange.end
+                ? "bg-accent text-white hover:bg-accent"
+                : "bg-foreground/10 text-primary font-medium hover:bg-border"
+              }`}
           >
             By Date
           </button>
@@ -1223,7 +1218,6 @@ export default function TimeRangeSelector({
       <div
         ref={scrollWrapperRef}
         className="overflow-x-auto no-scrollbar overflow-y-hidden scroll-wrapper"
-        style={{ paddingLeft: "8px" }}
       >
         <div
           ref={containerRef}
@@ -1237,9 +1231,8 @@ export default function TimeRangeSelector({
               return (
                 <div
                   key={year}
-                  className={`relative transition-all duration-200 hover:cursor-pointer ${
-                    isInRange ? "opacity-100" : "opacity-40"
-                  } border-l-1 border-r-1 border-foreground/50`}
+                  className={`relative transition-all duration-200 hover:cursor-pointer ${isInRange ? "opacity-100" : "opacity-40"
+                    } border-l-1 border-r-1 border-foreground/50`}
                   style={{ height: "40px", flex: "1 0 0" }}
                   onClick={() => {
                     setSelectedRange([year, year]);
@@ -1273,9 +1266,8 @@ export default function TimeRangeSelector({
                     isInRange={isInRange}
                   />
                   <div
-                    className={`absolute -bottom- left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${
-                      isInRange ? "text-accent" : "text-primary"
-                    }`}
+                    className={`absolute -bottom- left-1/2 transform -translate-x-1/2 text-[11px] font-semibold ${isInRange ? "text-accent" : "text-primary"
+                      }`}
                   >
                     {year}
                   </div>

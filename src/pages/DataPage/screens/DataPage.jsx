@@ -242,7 +242,7 @@ export default function DataPage({ setExternalDateRange }) {
             </>
           )}
 
-          {displayData?.datasets?.length > 0 && (
+          {!isError && displayData?.datasets?.length > 0 && (
             <div className="mt-8">
               <h3 className="text-xl font-semibold mb-3 text-primary">
                 Datasets
