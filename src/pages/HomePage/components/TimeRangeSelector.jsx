@@ -691,10 +691,10 @@ export default function TimeRangeSelector({
   };
 
   return (
-    <div className="bg-background border-b border-border p-4 w-full mx-auto">
+    <div className="bg-background border-b border-border p-2 md:p-4 w-full mx-auto">
       {/* Presets and calendar */}
-      <div className="pb-4 px-1 text-primary text-center md:text-left md:px-0 text-md font-semibold">
-        Select a Date range
+      <div className="pb-2 md:pb-4 px-1 text-primary text-center md:text-left md:px-0 text-xs md:text-sm font-medium md:font-semibold">
+        Select a date range
       </div>
       <div className="flex gap-2 mb-2 md:mb-4 flex-wrap sm:justify-start justify-center">
         {/* Year presets */}
@@ -746,7 +746,7 @@ export default function TimeRangeSelector({
         ))}
 
         {/* Presidents dropdown */}
-        <div className="relative w-56 text-xs">
+        <div className="relative w-full md:w-56 text-xs">
           {/* Main button */}
           <button
             className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${activePresident
@@ -871,7 +871,7 @@ export default function TimeRangeSelector({
         </div>
 
         {/* Calendar button */}
-        <div className="relative w-full sm:w-auto">
+        <div className="relative w-full md:w-auto">
           <button
             onClick={() => {
               setCalendarStart(startDate);

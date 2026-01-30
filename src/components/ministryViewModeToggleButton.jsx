@@ -23,7 +23,7 @@ export default function MinistryViewModeToggleButton({ viewMode, setViewMode }) 
         {/* List Button */}
         <button
           onClick={() => setViewMode("Grid")}
-          className={`hover:cursor-pointer relative z-10 flex items-center justify-center gap-1 w-1/2 text-sm font-medium transition-all rounded-md ${!isGraph ? "text-primary/80 bg-foreground/10" : "text-primary/50"
+          className={`hover:cursor-pointer relative z-10 flex items-center justify-center gap-1 w-1/2 text-sm font-medium transition-all rounded-sm ${!isGraph ? "text-primary/80 bg-foreground/10" : "text-primary/50"
             }`}
         >
           <MdGridOn className={"text-base transition-all opacity-80"} />
@@ -33,7 +33,7 @@ export default function MinistryViewModeToggleButton({ viewMode, setViewMode }) 
         {/* Graph Button */}
         <button
           onClick={() => setViewMode("Graph")}
-          className={`hover:cursor-pointer relative z-10 flex items-center justify-center gap-1 w-1/2 text-sm font-medium transition-all rounded-md ${isGraph ? "text-primary/80 bg-foreground/10" : "text-primary/50"
+          className={`hover:cursor-pointer relative z-10 flex items-center justify-center gap-1 w-1/2 text-sm font-medium transition-all rounded-sm ${isGraph ? "text-primary/80 bg-foreground/10" : "text-primary/50"
             }`}
         >
           <PiGraph className={"text-base transition-all opacity-80"} />

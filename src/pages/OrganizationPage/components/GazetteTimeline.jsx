@@ -453,7 +453,7 @@ export default function GazetteTimeline() {
             sx={{
               mt: "-50px",
               mb: "30px",
-              fontSize: "0.95rem",
+              fontSize: { xs: "0.7rem", md: "0.95rem" },
               color: `${colors.textPrimary}99`,
             }}
           >

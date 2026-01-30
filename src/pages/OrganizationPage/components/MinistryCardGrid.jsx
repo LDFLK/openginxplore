@@ -275,8 +275,8 @@ const MinistryCardGrid = () => {
                   src={primeMinister?.imageUrl}
                   alt={primeMinister?.name}
                   sx={{
-                    width: 55,
-                    height: 55,
+                    width: { xs: 45, sm: 50, md: 55 },
+                    height: { xs: 45, sm: 50, md: 55 },
                     backgroundColor: colors.backgroundPrimary,
                   }}
                 />
@@ -303,7 +303,7 @@ const MinistryCardGrid = () => {
                     <Typography
                       sx={{
                         fontWeight: 400,
-                        fontSize: 15,
+                        fontSize: { xs: 12, md: 15 },
                         fontFamily: "poppins",
                         color: colors.textPrimary,
                         margin: 0,
@@ -316,7 +316,7 @@ const MinistryCardGrid = () => {
                         sx={{
                           border: `1px solid ${colors.green}`,
                           color: colors.green,
-                          fontSize: "0.65rem",
+                          fontSize: { xs: 10, md: 12 },
                           fontWeight: 600,
                           borderRadius: "4px",
                           px: 1,
@@ -331,7 +331,7 @@ const MinistryCardGrid = () => {
                       </Box>
                     )}
                   </Box>
-                  <Typography sx={{ fontSize: 14, color: colors.textMuted }}>
+                  <Typography sx={{ fontSize: { xs: 12, md: 15 }, color: colors.textMuted }}>
                     {primeMinister?.term}
                   </Typography>
                   <Button
@@ -377,6 +377,7 @@ const MinistryCardGrid = () => {
                   fontStyle: "italic",
                   color: colors.textMuted,
                   textAlign: "left",
+                  fontSize: { xs: 12, md: 15 },
                 }}
               >
                 No Prime Minister appointed on this date.
@@ -388,6 +389,7 @@ const MinistryCardGrid = () => {
                     fontStyle: "italic",
                     color: colors.textMuted,
                     textAlign: "left",
+                    fontSize: { xs: 12, md: 15 },
                   }}
                 >
                   Loading Prime Minister data...
@@ -448,7 +450,7 @@ const MinistryCardGrid = () => {
                         fontFamily: "Poppins",
                         fontWeight: 500,
                         color: colors.textMuted,
-                        fontSize: 15,
+                        fontSize: { xs: 12, md: 15 },
                         display: "flex",
                         alignItems: "center",
                         gap: 0.5
@@ -465,7 +467,7 @@ const MinistryCardGrid = () => {
                     <Typography
                       sx={{
                         fontFamily: "Poppins",
-                        fontSize: 17,
+                        fontSize: { xs: 14, md: 17 },
                         fontWeight: 500,
                         color: colors.textPrimary,
                       }}
@@ -496,7 +498,7 @@ const MinistryCardGrid = () => {
                         fontFamily: "Poppins",
                         fontWeight: 500,
                         color: colors.textMuted,
-                        fontSize: 15,
+                        fontSize: { xs: 12, md: 15 },
                         display: "flex",
                         alignItems: "center",
                         gap: 0.5
@@ -513,7 +515,7 @@ const MinistryCardGrid = () => {
                     <Typography
                       sx={{
                         fontFamily: "Poppins",
-                        fontSize: 17,
+                        fontSize: { xs: 14, md: 17 },
                         fontWeight: 500,
                         color: colors.textPrimary,
                       }}
@@ -544,7 +546,7 @@ const MinistryCardGrid = () => {
                         fontFamily: "Poppins",
                         fontWeight: 500,
                         color: colors.textMuted,
-                        fontSize: 15,
+                        fontSize: { xs: 12, md: 15 },
                         display: "flex",
                         alignItems: "center",
                         gap: 0.5
@@ -561,7 +563,7 @@ const MinistryCardGrid = () => {
                     <Typography
                       sx={{
                         fontFamily: "Poppins",
-                        fontSize: 17,
+                        fontSize: { xs: 14, md: 17 },
                         fontWeight: 500,
                         color: colors.textPrimary,
                       }}
@@ -592,7 +594,7 @@ const MinistryCardGrid = () => {
                         fontFamily: "Poppins",
                         fontWeight: 500,
                         color: colors.textMuted,
-                        fontSize: 15,
+                        fontSize: { xs: 12, md: 15 },
                         display: "flex",
                         alignItems: "center",
                         gap: 0.5
@@ -609,7 +611,7 @@ const MinistryCardGrid = () => {
                     <Typography
                       sx={{
                         fontFamily: "Poppins",
-                        fontSize: 17,
+                        fontSize: { xs: 14, md: 17 },
                         fontWeight: 500,
                         color: colors.textPrimary,
                       }}
@@ -626,6 +628,7 @@ const MinistryCardGrid = () => {
                 fontStyle: "italic",
                 color: colors.textMuted,
                 textAlign: "left",
+                fontSize: { xs: 12, md: 15 },
               }}
             >
               Loading Highlights...
@@ -845,7 +848,7 @@ const MinistryCardGrid = () => {
                         <Step key={step.label}>
                           <StepLabel
                             StepIconComponent={() => (
-                              <StepIcon label={step.label} />
+                              <StepIcon sx={{ fontSize: { xs: "1rem", md: "1.1rem" } }} label={step.label} />
                             )}
                             onClick={
                               (activeStep != 0 &&
@@ -879,7 +882,7 @@ const MinistryCardGrid = () => {
                               sx={{
                                 color: colors.textPrimary,
                                 fontWeight: "semibold",
-                                fontSize: "1.1rem",
+                                fontSize: { xs: "0.8rem", md: "1.1rem" },
                                 transition: "text-decoration 0.2s ease-in-out",
                               }}
                             >

@@ -124,7 +124,7 @@ const PersonsTab = ({ selectedDate }) => {
               <Typography
                 sx={{
                   fontFamily: "Poppins",
-                  fontSize: '1.2rem',
+                  fontSize: { xs: "0.8rem", md: "1rem" },
                   fontWeight: 500,
                   color: colors.textPrimary,
                   mb: 2,
@@ -153,7 +153,7 @@ const PersonsTab = ({ selectedDate }) => {
                   >
                     <PersonIcon sx={{
                       color: colors.textMuted,
-                      fontSize: 18,
+                      fontSize: { xs: "0.8rem", md: "1rem" },
                     }} />
                     <Box
                       sx={{
@@ -169,7 +169,7 @@ const PersonsTab = ({ selectedDate }) => {
                           fontFamily: "Poppins",
                           fontWeight: 500,
                           color: colors.textMuted,
-                          fontSize: 15,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           display: "flex",
                           alignItems: "center",
                           gap: 0.5
@@ -186,7 +186,7 @@ const PersonsTab = ({ selectedDate }) => {
                       <Typography
                         sx={{
                           fontFamily: "Poppins",
-                          fontSize: 17,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           fontWeight: 500,
                           color: colors.textPrimary,
                         }}
@@ -209,7 +209,7 @@ const PersonsTab = ({ selectedDate }) => {
                   >
                     <PersonAddAlt1Icon sx={{
                       color: colors.textMuted,
-                      fontSize: 18,
+                      fontSize: { xs: "0.8rem", md: "1rem" },
                     }} />
                     <Box
                       sx={{
@@ -225,7 +225,7 @@ const PersonsTab = ({ selectedDate }) => {
                           fontFamily: "Poppins",
                           fontWeight: 500,
                           color: colors.textMuted,
-                          fontSize: 15,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           display: "flex",
                           alignItems: "center",
                           gap: 0.5
@@ -242,7 +242,7 @@ const PersonsTab = ({ selectedDate }) => {
                       <Typography
                         sx={{
                           fontFamily: "Poppins",
-                          fontSize: 17,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           fontWeight: 500,
                           color: colors.textPrimary,
                         }}
@@ -261,7 +261,7 @@ const PersonsTab = ({ selectedDate }) => {
           sx={{
             mt: 2,
             mb: { xs: 2, sm: 2, md: 0 },
-            fontSize: "1rem",
+            fontSize: { xs: "0.8rem", md: "1rem" },
             color: colors.textPrimary,
             fontWeight: 500,
             fontFamily: "poppins",
@@ -336,7 +336,7 @@ const PersonsTab = ({ selectedDate }) => {
                         fontFamily: "Poppins, sans-serif",
                         color: colors.textMuted,
                         fontWeight: 500,
-                        fontSize: "0.95rem",
+                        fontSize: { xs: "0.8rem", md: "1rem" },
                       }}
                     >
                       {utils.extractNameFromProtobuf(person.name)}
@@ -385,7 +385,7 @@ const PersonsTab = ({ selectedDate }) => {
                       color: selectedPresident.themeColorLight,
                       fontFamily: "Poppins, sans-serif",
                       fontWeight: 500,
-                      fontSize: "0.9rem",
+                      fontSize: { xs: "0.5rem", md: "0.8rem" },
                       borderRadius: "8px",
                       transition: "all 0.3s ease",
                     }}
@@ -424,7 +424,7 @@ const PersonsTab = ({ selectedDate }) => {
                       fontFamily: "Poppins, sans-serif",
                       color: colors.textMuted,
                       fontWeight: 500,
-                      fontSize: "0.95rem",
+                      fontSize: { xs: "0.8rem", md: "1rem" },
                     }}
                   >
                     {utils.extractNameFromProtobuf(person.name)}
@@ -472,7 +472,7 @@ const PersonsTab = ({ selectedDate }) => {
                     color: selectedPresident.themeColorLight,
                     fontFamily: "Poppins, sans-serif",
                     fontWeight: 500,
-                    fontSize: "0.9rem",
+                    fontSize: { xs: "0.5rem", md: "0.8rem" },
                     borderRadius: "8px",
                     transition: "all 0.3s ease",
                   }}

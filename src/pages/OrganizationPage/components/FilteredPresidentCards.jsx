@@ -241,7 +241,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       )}
 
       {filteredPresidents.length === 0 ? (
-        <div className="text-left text-gray-500 py-2 text-xs italic">
+        <div className="text-left text-gray-500 py-2 text-xs md:text-sm italic">
           No president information found for the selected date range.
         </div>
       ) : (
@@ -260,33 +260,31 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
               <button
                 key={president.id}
                 onClick={() => selectPresidentAndDates(president)}
-                className={`flex items-center p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
-    ${
-      isSelected
-        ? "bg-accent/20 border-accent/35 shadow-md"
-        : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
-    }`}
+                className={`flex items-center p-1.5 md:p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
+    ${isSelected
+                    ? "bg-accent/20 border-accent/35 shadow-md"
+                    : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
+                  }`}
               >
                 <img
                   src={president.imageUrl || president.image || ""}
                   alt={nameText}
-                  className="w-14 h-14 object-cover rounded-full mr-3 border border-border flex-shrink-0"
+                  className="md:w-14 w-10 md:h-14 h-10 object-cover rounded-full mr-3 border border-border flex-shrink-0"
                 />
                 <div className="flex flex-col flex-1 text-left min-w-0">
                   <p
-                    className={`font-medium text-sm break-words whitespace-normal ${
-                      isSelected ? "text-accent" : "text-primary"
-                    }`}
+                    className={`font-medium text-xs md:text-sm break-words whitespace-normal ${isSelected ? "text-accent" : "text-primary"
+                      }`}
                   >
                     {nameText}
                   </p>
-                  <p className="text-xs text-primary/50 break-words whitespace-normal">
+                  <p className="text-xs md:text-sm text-primary/50 break-words whitespace-normal">
                     {term}
                   </p>
                   <Link
                     to={`/person-profile/${president?.id}`}
-                    state={{ mode: "back", from: location.pathname + location.search  }}
-                    className="text-primary/75 text-xs hover:text-accent transition-all animation duration-200 mt-1 flex"
+                    state={{ mode: "back", from: location.pathname + location.search }}
+                    className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
                   >
                     <EyeIcon size={16} className="mr-1" />
                     <p>View Profile</p>

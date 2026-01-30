@@ -79,7 +79,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
               <Typography
                 sx={{
                   fontFamily: "Poppins",
-                  fontSize: "1.2rem",
+                  fontSize: { xs: "0.8rem", md: "1rem" },
                   fontWeight: 500,
                   color: colors.textPrimary,
                   mb: 2,
@@ -108,7 +108,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                   >
                     <ApartmentIcon sx={{
                       color: colors.textMuted,
-                      fontSize: 18,
+                      fontSize: { xs: "1rem", md: "1.2rem" },
                     }} />
                     <Box
                       sx={{
@@ -124,7 +124,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                           fontFamily: "Poppins",
                           fontWeight: 500,
                           color: colors.textMuted,
-                          fontSize: 15,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           display: "flex",
                           alignItems: "center",
                           gap: 0.5
@@ -141,7 +141,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                       <Typography
                         sx={{
                           fontFamily: "Poppins",
-                          fontSize: 17,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           fontWeight: 500,
                           color: colors.textPrimary,
                         }}
@@ -164,7 +164,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                   >
                     <DomainAddIcon sx={{
                       color: colors.textMuted,
-                      fontSize: 18,
+                      fontSize: { xs: "0.8rem", md: "1rem" },
                     }} />
                     <Box
                       sx={{
@@ -180,7 +180,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                           fontFamily: "Poppins",
                           fontWeight: 500,
                           color: colors.textMuted,
-                          fontSize: 15,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           display: "flex",
                           alignItems: "center",
                           gap: 0.5
@@ -197,7 +197,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                       <Typography
                         sx={{
                           fontFamily: "Poppins",
-                          fontSize: 17,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
                           fontWeight: 500,
                           color: colors.textPrimary,
                         }}
@@ -234,9 +234,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                 Departments
               </Typography>
 
-              <Box sx={{
-                width: { xs: 200, sm: 200, md: 250 }
-              }}>
+              <Box>
                 <TextField
                   size="small"
                   label="Search departments"
@@ -301,7 +299,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                     >
                       <div className="flex flex-col justify-center flex-1 overflow-hidden">
                         <span
-                          className=" text-white  font-normal  text-[14px] leading-[1.4] font-poppins overflow-hidden text-ellipsis line-clamp-3">
+                          className=" text-white  font-normal  text-xs md:text-sm leading-[1.4] font-poppins overflow-hidden text-ellipsis line-clamp-3">
                           {dep.name}
                         </span>
                       </div>
@@ -324,7 +322,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                       <Link
                         to={`/department-profile/${dep.id}`}
                         state={{ mode: "back", from: location.pathname + location.search }}
-                        className="text-sm font-small hover:underline"
+                        className="text-xs md:text-sm font-small hover:underline"
                         style={{ color: selectedPresident.themeColorLight }}
                       >
                         History
@@ -346,7 +344,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         return (
                           <Link
                             to={`/data?${outerParams.toString()}`}
-                            className="text-sm font-normal hover:underline"
+                            className="text-xs md:text-sm font-normal hover:underline"
                             style={{ color: selectedPresident.themeColorLight }}
                           >
                             Data
