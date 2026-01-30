@@ -32,6 +32,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [tiltLabels, setTiltLabels] = useState(false);
   const chartRef = useRef(null);
   const chartContainerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
 
   const { isDark } = useThemeContext()
@@ -428,6 +431,38 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     return null;
   };
 
+  // Mouse Drag Handlers
+  const handleMouseDown = (e) => {
+    if (chartLayout !== "vertical") return;
+    setIsDragging(true);
+    setStartX(e.pageX - chartRef.current.offsetLeft);
+    setScrollLeft(chartRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || chartLayout !== "vertical") return;
+    e.preventDefault();
+    const x = e.pageX - chartRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed multiplier
+    chartRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleWheel = (e) => {
+    if (chartLayout !== "vertical") return;
+    // Map vertical wheel to horizontal scroll
+    if (e.deltaY !== 0) {
+      chartRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
   return (
     <>
       {numericColumns.length > 0 &&
@@ -625,9 +660,14 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       </div>
                     )}
                     <div
-                      className={`relative border border-border rounded-lg no-scrollbar ${chartLayout === 'horizontal' ? 'overflow-x-hidden overflow-y-auto' : 'overflow-auto'}`}
+                      className={`relative border border-border rounded-lg no-scrollbar ${chartLayout === 'horizontal' ? 'overflow-x-hidden overflow-y-auto' : 'overflow-auto'} ${chartLayout === 'vertical' ? 'cursor-grab active:cursor-grabbing select-none' : ''}`}
                       ref={chartRef}
                       style={{ height: 455 }}
+                      onMouseDown={handleMouseDown}
+                      onMouseLeave={handleMouseLeave}
+                      onMouseUp={handleMouseUp}
+                      onMouseMove={handleMouseMove}
+                      onWheel={handleWheel}
                     >
                       <div
                         className="flex flex-row"

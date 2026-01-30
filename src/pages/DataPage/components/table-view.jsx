@@ -12,10 +12,11 @@ export function DataTable({ columns, rows, title }) {
 
   const filteredRows = useMemo(() => {
     const safeRows = rows ?? [];
-    if (!searchTerm) return safeRows;
+    const trimmedSearch = searchTerm.trim();
+    if (!trimmedSearch) return safeRows;
     return safeRows.filter((row) =>
       row.some((cell) =>
-        String(cell).toLowerCase().includes(searchTerm.toLowerCase())
+        String(cell).toLowerCase().includes(trimmedSearch.toLowerCase())
       )
     );
   }, [rows, searchTerm]);
@@ -138,28 +139,30 @@ export function DataTable({ columns, rows, title }) {
           {sortedRows.length} results
         </p>
 
-        <div className="flex gap-2">
-          <button
-            size="2"
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:border-border"
-          >
-            <ChevronLeft />
-            <span>Previous</span>
-          </button>
-          <button
-            size="2"
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage >= totalPages}
-            className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:border-border"
-          >
-            <span>Next</span>
-            <ChevronRight />
-          </button>
-        </div>
+        {totalPages > 1 && (
+          <div className="flex gap-2">
+            <button
+              size="2"
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:bg-accent/10 transition-colors hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:border-border disabled:hover:bg-transparent"
+            >
+              <ChevronLeft />
+              <span>Previous</span>
+            </button>
+            <button
+              size="2"
+              onClick={() =>
+                setCurrentPage(Math.min(totalPages, currentPage + 1))
+              }
+              disabled={currentPage >= totalPages}
+              className="flex justify-center items-center border border-accent/75 px-2 py-1 rounded-md text-accent/75 hover:bg-accent/10 transition-colors hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:border-border disabled:hover:bg-transparent"
+            >
+              <span>Next</span>
+              <ChevronRight />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
