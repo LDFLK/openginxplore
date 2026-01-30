@@ -23,7 +23,7 @@ const feedbackFormUrl = window?.configs?.feedbackFormUrl
   : "/";
 
 export default function HomePage() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(window.innerWidth >= 768);
   const navigate = useNavigate();
   const location = useLocation();
   const { tab } = useParams();
@@ -157,12 +157,12 @@ export default function HomePage() {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 z-20 h-screen ${isExpanded ? "w-48 md:w-64" : "w-12 md:w-16"
-          } bg-background h-full transition-all ease-in-out flex flex-col items-center p-2 border-r border-border`}
+        className={`fixed top-0 left-0 z-20 h-[100dvh] ${isExpanded ? "w-48 md:w-64" : "w-12 md:w-16"
+          } bg-background transition-all ease-in-out flex flex-col items-center p-2 border-r border-border`}
       >
         <TextLogo isExpanded={isExpanded} />
 
-        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen mt-4">
+        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 flex-1 mt-4">
           <button
             className={`text-xs md:text-sm ${selectedTab === "organization"
               ? "bg-accent text-primary-foreground font-semibold"

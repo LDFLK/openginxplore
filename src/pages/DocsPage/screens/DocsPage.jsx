@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { Menu, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "../components/CopyButton";
@@ -17,8 +18,21 @@ export default function DocsPage() {
         window.location.hash?.replace("#", "") || ""
     );
     const [collapsedSections, setCollapsedSections] = useState(new Set());
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
 
     const contentRef = useRef(null);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                setIsSidebarOpen(true);
+            } else {
+                setIsSidebarOpen(false);
+            }
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
     const pendingFileRef = useRef(null);
     const pendingHashRef = useRef(null);
     const isManualScrollRef = useRef(false);
@@ -202,7 +216,7 @@ export default function DocsPage() {
             const newUrl = `?file=${fileSlug}#${h.hash}`;
             window.history.replaceState(null, "", newUrl);
             setCurrentHash(h.hash);
-            
+
             // Auto-expand parent section if clicking a child heading
             if (h.level === 3) {
                 const parentHeading = headings.find(
@@ -216,7 +230,7 @@ export default function DocsPage() {
                     });
                 }
             }
-            
+
             setTimeout(() => {
                 isManualScrollRef.current = false;
             }, 1000);
@@ -283,7 +297,7 @@ export default function DocsPage() {
                 const fileSlug = activeFile.slug || activeFile.file.replace(".md", "");
                 const newUrl = `?file=${fileSlug}#${activeHeading.hash}`;
                 window.history.replaceState(null, "", newUrl);
-                
+
                 // Auto-expand parent section when scrolling into a child heading
                 if (activeHeading.level === 3) {
                     const parentHeading = headings.find(
@@ -310,11 +324,31 @@ export default function DocsPage() {
     }, [activeFile, headings, currentHash]);
 
     return (
-        <div className="flex h-screen bg-gray-50 text-gray-800">
-            <nav className="w-90 bg-white border-r border-gray-200 shadow-xs p-4 overflow-y-auto">
-                <h2 className="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
-                    Documentation
-                </h2>
+        <div className="flex h-screen bg-gray-50 text-gray-800 relative">
+            {/* Mobile Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            <nav className={`
+                w-80 md:w-90 bg-white border-r border-gray-200 shadow-xs p-4 overflow-y-auto
+                fixed md:relative z-50 h-full transition-transform duration-300 ease-in-out
+                ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+            `}>
+                <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                    <h2 className="text-md md:text-lg font-semibold text-gray-800">
+                        Documentation
+                    </h2>
+                    <button
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="md:hidden p-1 hover:bg-gray-100 rounded-md"
+                    >
+                        <X size={20} />
+                    </button>
+                </div>
 
                 <ul className="space-y-3">
                     {files.map((f) => (
@@ -324,6 +358,7 @@ export default function DocsPage() {
                                     }`}
                                 onClick={() => {
                                     const fileSlug = f.slug;
+                                    if (window.innerWidth < 768) setIsSidebarOpen(false);
                                     if (activeFile?.file === f.file) {
                                         // Same file clicked — scroll to top and clear hash + highlight
                                         if (contentRef.current) {
@@ -354,7 +389,7 @@ export default function DocsPage() {
                                             (child) => child.level === 3 && child.hash.startsWith(h.hash + "-")
                                         );
                                         const isCollapsed = collapsedSections.has(h.hash);
-                                        
+
                                         // Only show level 2 headings and level 3 headings whose parent is not collapsed
                                         const shouldShow = h.level === 2 || (h.level === 3 && (() => {
                                             const parentHeading = headings.find(
@@ -362,19 +397,18 @@ export default function DocsPage() {
                                             );
                                             return parentHeading && !collapsedSections.has(parentHeading.hash);
                                         })());
-                                        
+
                                         if (!shouldShow) return null;
-                                        
+
                                         return (
                                             <li
                                                 key={h.id}
-                                                className={`p-1 cursor-pointer text-sm transition-colors duration-150 flex items-center gap-1 ${
-                                                    h.level === 2 ? "font-medium" : ""
-                                                } ${
-                                                    isSelected ? "text-blue-600" : h.level === 2 ? "text-gray-700" : "text-gray-600"
-                                                } hover:text-blue-600`}
+                                                className={`p-1 cursor-pointer text-sm transition-colors duration-150 flex items-center gap-1 ${h.level === 2 ? "font-medium" : ""
+                                                    } ${isSelected ? "text-blue-600" : h.level === 2 ? "text-gray-700" : "text-gray-600"
+                                                    } hover:text-blue-600`}
                                                 style={{ paddingLeft: `${(h.level - 2) * 12}px` }}
                                                 onClick={() => {
+                                                    if (!hasChildren && window.innerWidth < 768) setIsSidebarOpen(false);
                                                     if (hasChildren) {
                                                         setCollapsedSections((prev) => {
                                                             const next = new Set(prev);
@@ -428,7 +462,14 @@ export default function DocsPage() {
                 </ul>
             </nav>
 
-            <div ref={contentRef} className="flex-1 p-8 overflow-y-auto prose max-w-none">
+            <div ref={contentRef} className="flex-1 p-8 overflow-y-auto prose max-w-none w-full">
+                <button
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="md:hidden mb-4 p-2 hover:bg-gray-200 rounded-md flex items-center gap-2 text-gray-600"
+                >
+                    <Menu size={24} />
+                    <span className="font-medium">Menu</span>
+                </button>
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
