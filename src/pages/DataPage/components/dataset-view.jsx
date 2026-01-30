@@ -8,6 +8,7 @@ import { useThemeContext } from "../../../context/themeContext";
 import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsForDataset";
 import { useGetDatasetsByYears } from "../../../hooks/useGetDatasetsByYears";
 import { useRootOrganizations } from "../../../hooks/useRootOrganizations";
+import LandscapeRequired from "../../../components/landscapeRequired";
 
 export function DatasetView({ data, setExternalDateRange }) {
   const location = useLocation();
@@ -280,10 +281,12 @@ export function DatasetView({ data, setExternalDateRange }) {
         <div className="overflow-x-auto">
           {fetchedDatasets.length > 0 ? (
             <>
-              <ChartVisualization
-                columns={stableColumns}
-                yearlyData={stableYearlyData}
-              />
+              <LandscapeRequired onBack={() => window.history.back()}>
+                <ChartVisualization
+                  columns={stableColumns}
+                  yearlyData={stableYearlyData}
+                />
+              </LandscapeRequired>
               {selectedYears.length === 1 && (
                 <>
                   <DataTable

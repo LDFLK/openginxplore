@@ -693,7 +693,7 @@ export default function TimeRangeSelector({
   return (
     <div className="bg-background border-b border-border p-2 md:p-4 w-full mx-auto">
       {/* Presets and calendar */}
-      <div className="pb-2 md:pb-4 px-1 text-primary text-center md:text-left md:px-0 text-xs md:text-sm font-medium md:font-semibold">
+      <div className="hidden md:block pb-2 md:pb-4 px-1 text-primary text-center md:text-left md:px-0 text-xs md:text-sm font-medium md:font-semibold">
         Select a date range
       </div>
       <div className="flex gap-2 mb-2 md:mb-4 flex-wrap sm:justify-start justify-center">
@@ -736,7 +736,7 @@ export default function TimeRangeSelector({
               setActivePreset(preset.label);
               setActivePresident("");
             }}
-            className={`px-1.5 py-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${activePreset === preset.label
+            className={`p-1 md:p-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${activePreset === preset.label
               ? "bg-accent/20 text-primary"
               : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
               }`}
@@ -894,7 +894,7 @@ export default function TimeRangeSelector({
               <div className="flex flex-col sm:flex-row gap-3">
                 {/* From date */}
                 <div className="flex-1 flex flex-col">
-                  <p className="text-[11px] text-primary font-medium mb-1">From</p>
+                  <p className="text-xs md:text-sm text-primary font-medium mb-1">From</p>
                   <DatePicker
                     selected={calendarStart}
                     onChange={setCalendarStart}
@@ -1024,7 +1024,7 @@ export default function TimeRangeSelector({
 
                 {/* To date */}
                 <div className="flex-1 flex flex-col">
-                  <p className="text-[11px] text-primary font-medium mb-1">To</p>
+                  <p className="text-xs md:text-sm text-primary font-medium mb-1">To</p>
                   <DatePicker
                     selected={calendarEnd}
                     onChange={setCalendarEnd}

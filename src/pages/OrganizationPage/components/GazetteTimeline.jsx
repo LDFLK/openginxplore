@@ -134,7 +134,6 @@ export default function GazetteTimeline() {
         flexDirection: "column",
         gap: 2,
         width: "100%",
-        pt: "25px",
         mb: { xs: "-20px", md: "auto" }
       }}
     >

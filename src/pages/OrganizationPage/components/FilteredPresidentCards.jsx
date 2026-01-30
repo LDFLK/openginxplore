@@ -229,7 +229,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   }, [selectedDate]);
 
   return (
-    <div className="rounded-lg w-full mt-2 -mb-6">
+    <div className="rounded-lg w-full">
       {filteredPresidents.length > 4 && (
         <input
           type="text"
@@ -245,7 +245,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
           No president information found for the selected date range.
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 pb-2 md:pb-0 no-scrollbar">
           {filteredPresidents.map((president) => {
             const isSelected = selectedPresident?.id === president.id;
             const nameText = utils.extractNameFromProtobuf(president.name);
@@ -260,7 +260,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
               <button
                 key={president.id}
                 onClick={() => selectPresidentAndDates(president)}
-                className={`flex items-center p-1.5 md:p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
+                className={`min-w-[60vw] sm:min-w-[300px] md:min-w-0 flex-shrink-0 snap-center flex items-center p-1.5 md:p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
     ${isSelected
                     ? "bg-accent/20 border-accent/35 shadow-md"
                     : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"

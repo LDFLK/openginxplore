@@ -209,7 +209,7 @@ const MinistryCardGrid = () => {
   return (
     <Box
       sx={{
-        px: 2,
+        px: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 },
         mt: -2,
         my: 2,
       }}
@@ -227,7 +227,7 @@ const MinistryCardGrid = () => {
           alignItems: "stretch",
           width: "100%",
           gap: { xs: 2, sm: 2, md: 2, lg: 4, xl: 3 },
-          mb: 3,
+          mb: { xs: 1, md: 3 },
           py: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 },
           px: { xs: 1, sm: 1, md: 3, lg: 3, xl: 3 },
           backgroundColor: colors.backgroundWhite,
@@ -662,7 +662,7 @@ const MinistryCardGrid = () => {
             gap: 1, // reduced gap
             mb: 1,
             px: { xs: 2, sm: 3 }, // smaller padding on mobile
-            pt: 2,
+            p: 2,
             width: "100%",
           }}
         >
