@@ -8,7 +8,7 @@ export default function TextLogo({ isExpanded }) {
 
   return (
     <Link to={"/"}>
-      <h2 className="text-normal md:text-2xl py-6 font-semibold">
+      <h2 className="text-md md:text-2xl py-6 font-semibold">
         {isExpanded ? (
           <span className="text-accent">
             OpenGIN<span className="text-primary">Xplore<Version /></span>

@@ -77,7 +77,7 @@ const MinistryCard = ({ card, onClick }) => {
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 lineHeight: 1.4,
-                fontSize: "14px"
+                fontSize: { xs: "12px", md: "14px" }
               }}
             >
               {card.name}
@@ -89,7 +89,7 @@ const MinistryCard = ({ card, onClick }) => {
               sx={{
                 backgroundColor: colors.green,
                 color: "#fff",
-                fontSize: "0.7rem",
+                fontSize: { xs: "0.4rem", md: "0.7rem" },
                 fontWeight: "semibold",
                 borderRadius: "5px",
                 px: 1,
@@ -130,7 +130,7 @@ const MinistryCard = ({ card, onClick }) => {
                     fontFamily: "poppins",
                     py: "2px",
                     px: "6px",
-                    fontSize: "10px",
+                    fontSize: { xs: "0.6rem", md: "10px" },
                     backgroundColor: selectedPresident?.themeColorLight,
                     borderRadius: "3px",
                     mb: "2px",
@@ -150,7 +150,7 @@ const MinistryCard = ({ card, onClick }) => {
                 }
                 sx={{
                   fontWeight: 400,
-                  fontSize: "13px",
+                  fontSize: { xs: "0.7rem", md: "13px" },
                   color: colors.textPrimary,
                   fontFamily: "poppins",
                   textDecorationThickness: "1px",

@@ -44,8 +44,8 @@ const SplashPage = ({ progress, setProgress }) => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <BackgroundGradientEffect/>
-      <AnimatedDots/>
+      <BackgroundGradientEffect />
+      <AnimatedDots />
       <div className="absolute z-20 p-10 left-20">
         <Link to={"/"}>
           <h2 className="text-normal md:text-2xl font-semibold">
@@ -63,11 +63,10 @@ const SplashPage = ({ progress, setProgress }) => {
             {slides.map((slide, index) => (
               <div
                 key={index}
-                className={`absolute inset-0 transition-all duration-700 ${
-                  currentSlide === index
-                    ? "opacity-100 scale-100 translate-y-0"
-                    : "opacity-0 scale-95 translate-y-4"
-                }`}
+                className={`absolute inset-0 transition-all duration-700 ${currentSlide === index
+                  ? "opacity-100 scale-100 translate-y-0"
+                  : "opacity-0 scale-95 translate-y-4"
+                  }`}
               >
                 <div className="bg-gray-900/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl h-full flex flex-col">
                   {/* Image Section */}
@@ -85,7 +84,7 @@ const SplashPage = ({ progress, setProgress }) => {
 
                   {/* Text Content */}
                   <div className="p-6 bg-gray-900/90 backdrop-blur-sm">
-                    <h2 className="text-xl md:text-2xl text-white mb-2">
+                    <h2 className="text-md md:text-xl md:text-2xl text-white mb-2">
                       {slide.title}
                     </h2>
                     <p className="text-gray-400 text-base">{slide.message}</p>
@@ -118,11 +117,10 @@ const SplashPage = ({ progress, setProgress }) => {
               {slides.map((_, index) => (
                 <div
                   key={index}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentSlide === index
-                      ? "w-8 bg-accent"
-                      : "w-1.5 bg-muted"
-                  }`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
+                    ? "w-8 bg-accent"
+                    : "w-1.5 bg-muted"
+                    }`}
                 ></div>
               ))}
             </div>

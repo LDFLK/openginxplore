@@ -157,32 +157,30 @@ export default function HomePage() {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 z-20 h-screen ${isExpanded ? "w-64" : "w-16"
+        className={`fixed top-0 left-0 z-20 h-screen ${isExpanded ? "w-48 md:w-64" : "w-12 md:w-16"
           } bg-background h-full transition-all ease-in-out flex flex-col items-center p-2 border-r border-border`}
       >
         <TextLogo isExpanded={isExpanded} />
 
-
-
         <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 h-screen mt-4">
           <button
-            className={`${selectedTab === "organization"
+            className={`text-xs md:text-sm ${selectedTab === "organization"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
-              }  hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
+              }  hover:cursor-pointer ${isExpanded ? "px-2 md:px-4" : "px-0"} py-2 md:py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("organization")}
           >
-            <Binoculars className={`${isExpanded ? "mr-3" : "mx-auto"}`} />
+            <Binoculars className={`${isExpanded ? "mr-2 md:mr-3" : "mx-auto"}`} />
             {isExpanded && "Organization"}
           </button>
           <button
-            className={`${selectedTab === "data"
+            className={`text-xs md:text-sm ${selectedTab === "data"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
-              } hover:cursor-pointer ${isExpanded ? "px-4" : "px-0"} py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
+              } hover:cursor-pointer ${isExpanded ? "px-2 md:px-4" : "px-0"} py-2 md:py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
             onClick={() => handleTabChange("data")}
           >
-            <SquareLibrary className={`${isExpanded ? "mr-3" : "mx-auto"}`} />
+            <SquareLibrary className={`${isExpanded ? "mr-2 md:mr-3" : "mx-auto"}`} />
             {isExpanded && "Data"}
           </button>
 
@@ -195,7 +193,7 @@ export default function HomePage() {
             {isExpanded ? <ChevronLeft /> : <ChevronRight />}
           </button>
           <Link to={feedbackFormUrl} target="_blank" rel="noopener noreferrer">
-            <div className="flex absolute bottom-0 w-full gap-2 justify-center items-center px-3 py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border duration-1000 transition-all animation">
+            <div className="flex text-xs md:text-sm absolute bottom-0 w-full gap-2 justify-center items-center md:px-3 px-1 py-1 md:py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border duration-1000 transition-all animation">
               <MessageSquareHeart size={22} />
               {isExpanded && <span>Share feedback</span>}
             </div>
@@ -205,33 +203,36 @@ export default function HomePage() {
 
       {/* Main content */}
       <div
-        className={`flex-1 overflow-auto bg-background-dark transition-all ease-in-out animation ${isExpanded ? "ml-64" : "ml-16"
+        className={`flex-1 overflow-auto bg-background-dark transition-all ease-in-out animation ${isExpanded ? "ml-48 md:ml-64" : "ml-12 md:ml-16"
           } h-screen`}
       >
         {/* Header */}
-        <div className="flex justify-between items-center py-2 px-4 md:px-8 lg:px-12 border-b border-border bg-background">
-          <div className="flex gap-2 flex justify-center items-center">
+        <div className="flex justify-between items-center py-1 md:py-2 px-2 md:px-4 border-b border-border bg-background">
+          <div className="flex gap-2 justify-center items-center">
             <div className="w-[40px]">
               <img src={SlFlag} />
             </div>
-            <h1 className="text-md xl:text-md font-semibold text-primary">
+            <h1 className="text-md xl:text-md font-semibold text-primary hidden md:block">
               Sri Lanka
             </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             <Link
               to="/docs?file=information-pane"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="flex gap-2 justify-center items-center px-3 py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border">
+              <div className="flex gap-2 text-xs md:text-sm justify-center items-center px-2 md:px-3 py-1 md:py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border">
                 <BookOpenText size={22} />
-                <span>Learn</span>
+                <span className="hidden md:block">Learn</span>
               </div>
             </Link>
             <ShareLinkButton />
             <ThemeToggle />
           </div>
+        </div>
+        <div className="flex md:hidden justify-center items-center text-yellow-500 bg-yellow-100/90 dark:bg-yellow-500/20 border-yellow-100/90 dark:border-yellow-500/20 border">
+          <p className="text-xs md:text-sm text-center p-2">Use desktop for better user experience!</p>
         </div>
         <TimeRangeSelector
           startYear={2019}

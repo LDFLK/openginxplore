@@ -8,6 +8,7 @@ import { useThemeContext } from "../../../context/themeContext";
 import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsForDataset";
 import { useGetDatasetsByYears } from "../../../hooks/useGetDatasetsByYears";
 import { useRootOrganizations } from "../../../hooks/useRootOrganizations";
+import LandscapeRequired from "../../../components/landscapeRequired";
 
 export function DatasetView({ data, setExternalDateRange }) {
   const location = useLocation();
@@ -196,11 +197,11 @@ export function DatasetView({ data, setExternalDateRange }) {
   const firstSelectedYear = selectedYears[0];
 
   return (
-    <div className="p-4 md:p-6 space-y-3 w-full">
+    <div className="space-y-3 w-full">
       {/* dataset info */}
       {filteredYears.length > 0 && (
-        <div className="space-y-1 mt-2">
-          <h2 className="text-xl md:text-2xl font-semibold text-primary/85">
+        <div className="space-y-1 mt-2 md:mt-5">
+          <h2 className="text-md md:text-xl font-semibold text-primary/85">
             {data?.name ?? "Dataset"}
           </h2>
         </div>
@@ -210,15 +211,15 @@ export function DatasetView({ data, setExternalDateRange }) {
       {multiYearMode ? (
         <div className="w-full">
           {!isPlottable && fetchedDatasets.length > 0 && (
-            <p className="text-xs text-yellow-600 dark:text-yellow-400/80 text-right">
+            <p className="text-xs text-yellow-600 dark:text-yellow-400/80 text-center lg:text-right mb-2">
               This dataset cannot be visualized. Showing table view only for one year.
             </p>
           )}
-          <div className="flex justify-end flex-wrap gap-2">
+          <div className="flex justify-end flex-wrap gap-1 lg:gap-2">
             {filteredYears.map((year) => (
               <label
                 key={year}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md border transition cursor-pointer ${selectedYears.includes(year)
+                className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-2 rounded-md border transition cursor-pointer ${selectedYears.includes(year)
                   ? "bg-background border-blue-500"
                   : "bg-background border-border hover:border-gray-500"
                   } ${!isPlottable && !selectedYears.includes(year)
@@ -236,7 +237,7 @@ export function DatasetView({ data, setExternalDateRange }) {
                   checked={selectedYears.includes(year)}
                   onChange={() => handleYearToggle(year)}
                 />
-                <span className="text-primary/75">{year}</span>
+                <span className="text-primary/75 text-xs md:text-sm">{year}</span>
               </label>
             ))}
           </div>
@@ -252,16 +253,16 @@ export function DatasetView({ data, setExternalDateRange }) {
       )}
 
       {/* visualization */}
-      <div className="border border-border rounded-md p-4 shadow-sm bg-background relative">
+      <div className="border border-border rounded-lg p-1 md:p-2 shadow-sm bg-background relative mt-2">
         {loadingYear && (
           <div className="flex flex-col justify-center items-center z-50 rounded-md w-full">
             <ClipLoader size={25} color={isDark ? "white" : "black"} />
             {selectedYears.length > 1 ? (
-              <p className="mt-2 mb-2 text-sm text-primary/75">
+              <p className="mt-2 mb-2 text-xs md:text-sm text-primary/75">
                 Loading {loadingYear} data...
               </p>
             ) : (
-              <p className="mt-2 text-sm text-primary/75">
+              <p className="mt-2 text-xs md:text-sm text-primary/75">
                 Loading {loadingYear} data...
               </p>
             )}
@@ -269,7 +270,7 @@ export function DatasetView({ data, setExternalDateRange }) {
         )}
 
         {isContentError && (
-          <div className="p-4 flex items-center justify-center text-primary/50 rounded-xl my-4">
+          <div className="flex items-center justify-center text-primary/50 rounded-xl my-4">
             <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
             <p className="text-sm font-medium">
               {contentError?.message || "Failed to load dataset content."}
@@ -280,10 +281,12 @@ export function DatasetView({ data, setExternalDateRange }) {
         <div className="overflow-x-auto">
           {fetchedDatasets.length > 0 ? (
             <>
-              <ChartVisualization
-                columns={stableColumns}
-                yearlyData={stableYearlyData}
-              />
+              <LandscapeRequired onBack={() => window.history.back()}>
+                <ChartVisualization
+                  columns={stableColumns}
+                  yearlyData={stableYearlyData}
+                />
+              </LandscapeRequired>
               {selectedYears.length === 1 && (
                 <>
                   <DataTable
@@ -298,20 +301,20 @@ export function DatasetView({ data, setExternalDateRange }) {
           ) : (
             filteredYears.length === 0 &&
             allAvailableYears.length > 0 && !loadingYear && (
-              <div className="block justify-center items-center">
-                <p className="text-primary/75 italic text-center">
+              <div className="block justify-center items-center p-2">
+                <p className="text-primary/75 italic text-center text-xs md:text-sm">
                   No available data yet! You can find data for the following years:
                 </p>
                 <div className="flex justify-center gap-2 mt-2">
                   {allAvailableYears.map((year) => (
-                    <button key={year} className="text-green-400/75">
+                    <button key={year} className="text-green-400/75 text-xs md:text-sm">
                       {year}
                     </button>
                   ))}
                 </div>
                 <div className="flex justify-center">
                   <button
-                    className="flex text-accent/90 gap-2 cursor-pointer mt-2"
+                    className="flex text-accent/90 gap-2 cursor-pointer mt-2 text-xs md:text-sm"
                     onClick={handleAvailableDatasetView}
                   >
                     <span>Show me</span>
@@ -325,7 +328,7 @@ export function DatasetView({ data, setExternalDateRange }) {
             <div className="mt-4 p-3 bg-muted/50 rounded-md border border-border">
               <div className="text-sm text-primary/75">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium">Published by: </span>
+                  <span className="font-medium text-xs md:text-sm">Published by: </span>
                   {isOrgError && !displayOrganizations && (
                     <span className="text-primary/50 font-medium flex items-center gap-1">
                       No publisher found
@@ -339,12 +342,12 @@ export function DatasetView({ data, setExternalDateRange }) {
                           mode: "back",
                           from: location.pathname + location.search,
                         }}
-                        className="text-accent hover:underline"
+                        className="text-accent hover:underline text-xs md:text-sm"
                       >
                         {displayOrganizations.data.name}
                       </Link>
                     ) : (
-                      <span>{displayOrganizations.data.name}</span>
+                      <span className="text-xs md:text-sm">{displayOrganizations.data.name}</span>
                     )
                   )}
                 </div>
@@ -361,12 +364,12 @@ export function DatasetView({ data, setExternalDateRange }) {
                               mode: "back",
                               from: location.pathname + location.search,
                             }}
-                            className="text-accent hover:underline"
+                            className="text-accent hover:underline text-xs md:text-sm"
                           >
                             {org.name}
                           </Link>
                         ) : (
-                          <span>{org.name}</span>
+                          <span className="text-xs md:text-sm">{org.name}</span>
                         )}
                       </div>
                     ))}
@@ -376,7 +379,7 @@ export function DatasetView({ data, setExternalDateRange }) {
               <Link
                 to={window?.configs?.dataSources ? window.configs.dataSources : "/"}
                 target="_blank"
-                className="text-sm text-accent hover:underline mt-3"
+                className="text-xs md:text-sm text-accent hover:underline mt-3"
               >
                 See sources
               </Link>

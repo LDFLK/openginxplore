@@ -32,6 +32,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
   const [tiltLabels, setTiltLabels] = useState(false);
   const chartRef = useRef(null);
   const chartContainerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
 
   const { isDark } = useThemeContext()
@@ -428,6 +431,38 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     return null;
   };
 
+  // Mouse Drag Handlers
+  const handleMouseDown = (e) => {
+    if (chartLayout !== "vertical") return;
+    setIsDragging(true);
+    setStartX(e.pageX - chartRef.current.offsetLeft);
+    setScrollLeft(chartRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || chartLayout !== "vertical") return;
+    e.preventDefault();
+    const x = e.pageX - chartRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed multiplier
+    chartRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleWheel = (e) => {
+    if (chartLayout !== "vertical") return;
+    // Map vertical wheel to horizontal scroll
+    if (e.deltaY !== 0) {
+      chartRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
   return (
     <>
       {numericColumns.length > 0 &&
@@ -435,18 +470,18 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
         stringColumns.length !== 0 && (
           <div className="space-y-6 w-full">
             {/* Controls */}
-            <div className="bg-background-dark border border-border rounded-lg p-4 space-y-4">
-              <h3 className="text-lg font-semibold text-accent/75">
+            <div className="bg-background-dark border border-border rounded-lg p-2 md:p-4 space-y-2 md:space-y-4">
+              <h3 className="text-xs md:text-sm font-semibold text-accent/75">
                 Visualizations
               </h3>
 
-              <h3 className="text-sm font-semibold mb-2 text-primary/60">
+              <h3 className="text-xs md:text-sm font-semibold mb-1 md:mb-2 text-primary/60">
                 Select Chart Data
               </h3>
 
               {/* X-axis selector */}
               <div>
-                <label className="text-sm font-medium text-primary/50">
+                <label className="text-xs md:text-sm font-medium text-primary/50">
                   X-Axis:
                 </label>
                 <select
@@ -461,7 +496,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       setSelectedYColumns((prev) => prev.filter((col) => col !== newX));
                     }
                   }}
-                  className="mt-1 block w-full border text-primary/75 border-border rounded-md p-2 text-sm bg-background focus:border-none"
+                  className="mt-1 block w-full border text-primary/75 border-border rounded-md p-1 md:p-2 text-xs md:text-sm bg-background focus:border-none"
                 >
                   <option value="" hidden>Select column</option>
                   {/* Allow selecting both string and numeric columns for X-axis */}
@@ -480,7 +515,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
               {/* Y-axis checkboxes */}
               <div className="">
-                <label className="text-sm font-medium text-primary/60">
+                <label className="text-xs md:text-sm font-medium text-primary/60">
                   Y-Axis:
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
@@ -502,7 +537,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       return (
                         <label
                           key={col}
-                          className={`flex justify-start items-center space-x-2 text-sm break-words ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`flex justify-start items-center space-x-1 md:space-x-2 text-xs md:text-sm break-words ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <input
                             type="checkbox"
@@ -516,7 +551,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                               );
                             }}
                           />
-                          <span className="break-words max-w-[220px] text-primary">
+                          <span className="break-words max-w-[150px] md:max-w-[220px] text-primary">
                             {formatText({ name: col })}
                           </span>
                         </label>
@@ -526,14 +561,14 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
               </div>
 
               {/* Chart type selector */}
-              <div className="flex items-center gap-3 mt-3">
-                <label className="text-sm font-medium text-primary/75">
+              <div className="flex items-center gap-2 md:gap-3 mt-2 md:mt-3">
+                <label className="text-xs md:text-sm font-medium text-primary/75">
                   Chart Type:
                 </label>
                 <select
                   value={chartType}
                   onChange={(e) => setChartType(e.target.value)}
-                  className="border text-primary bg-background border-border rounded-md p-1.5 text-sm"
+                  className="border text-primary bg-background border-border rounded-md p-1.5 text-xs md:text-sm"
                 >
                   <option value="bar">Bar Chart</option>
                   <option value="line">Line Chart</option>
@@ -542,12 +577,12 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
               {/* Tilt Labels Toggle */}
               {chartLayout === 'vertical' && (
-                <div className="flex items-center gap-3 mt-3">
+                <div className="flex items-center gap-2 md:gap-3 mt-1 md:mt-2">
                   <button
                     onClick={() => setTiltLabels(!tiltLabels)}
-                    className="px-3 py-1.5 text-sm border border-border rounded-md bg-background text-primary hover:bg-background-dark transition-colors"
+                    className="px-3 py-1.5 text-xs md:text-sm border border-border rounded-md bg-background text-primary hover:bg-background-dark transition-colors"
                   >
-                    {tiltLabels ? 'Straighten X-axis Labels' : 'Tilt X-axis Labels'}
+                    {tiltLabels ? 'Straighten X-axis Labels' : 'Rotate X-axis Labels'}
                   </button>
                 </div>
               )}
@@ -555,10 +590,10 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
             {/* Chart */}
             <div
-              className="bg-background-dark border border-border rounded-lg p-4"
+              className="bg-background-dark border border-border rounded-lg p-2 md:p-4"
               ref={chartContainerRef}
             >
-              <h3 className="text-sm font-semibold mb-4 text-primary/80">
+              <h3 className="text-xs md:text-sm font-semibold mb-2 text-primary/80 ">
                 {chartType === "bar" ? "Bar Chart" : "Line Chart"}
               </h3>
 
@@ -577,7 +612,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                               backgroundColor: COLORS[yearIdx % COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-primary/75">{d.year}</span>
+                          <span className="text-xs md:text-sm text-primary/75">{d.year}</span>
                         </div>
 
                       ))
@@ -591,7 +626,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                               backgroundColor: COLORS[i % COLORS.length],
                             }}
                           />
-                          <span className="text-sm text-primary/75">
+                          <span className="text-xs md:text-sm text-primary/75">
                             {formatText({ name: col })}
                           </span>
                         </div>
@@ -603,7 +638,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                     {/* Fixed Y-Axis Title for Horizontal Layout */}
                     {chartLayout === 'horizontal' && (
                       <div
-                        className="absolute left-0 top-0 z-70 bg-background-dark py-4 ml-5 pointer-events-none"
+                        className="absolute left-0 top-0 z-70 bg-background-dark py-2 md:py-4 md:ml-5 pointer-events-none"
                         style={{
                           width: 20,
                           height: 455
@@ -625,9 +660,14 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                       </div>
                     )}
                     <div
-                      className={`relative border border-border rounded-lg no-scrollbar ${chartLayout === 'horizontal' ? 'overflow-x-hidden overflow-y-auto' : 'overflow-auto'}`}
+                      className={`relative border border-border rounded-lg no-scrollbar ${chartLayout === 'horizontal' ? 'overflow-x-hidden overflow-y-auto' : 'overflow-auto'} ${chartLayout === 'vertical' ? 'cursor-grab active:cursor-grabbing select-none' : ''}`}
                       ref={chartRef}
                       style={{ height: 455 }}
+                      onMouseDown={handleMouseDown}
+                      onMouseLeave={handleMouseLeave}
+                      onMouseUp={handleMouseUp}
+                      onMouseMove={handleMouseMove}
+                      onWheel={handleWheel}
                     >
                       <div
                         className="flex flex-row"
@@ -1125,7 +1165,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   </div>
                 </div>
               ) : (
-                <p className="text-center text-primary text-sm">
+                <p className="text-center text-primary text-xs md:text-sm">
                   Select X and Y columns to create your chart
                 </p>
               )}
