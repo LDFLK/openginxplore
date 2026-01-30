@@ -34,12 +34,11 @@ export default function DataPage({ setExternalDateRange }) {
   // Keep reference to previous data while loading
   const [displayData, setDisplayData] = useState(null);
 
-  // 1. Initialize breadcrumb from URL immediately
+  // 1. Sync breadcrumb from URL or set default
   useEffect(() => {
     const breadcrumbParam = searchParams.get("breadcrumb");
     if (breadcrumbParam) {
       try {
-        // searchParams.get already decodes once. No need for decodeURIComponent.
         const decoded = JSON.parse(breadcrumbParam);
         if (Array.isArray(decoded)) {
           setBreadcrumbTrail(decoded);
@@ -49,23 +48,10 @@ export default function DataPage({ setExternalDateRange }) {
         console.warn("Invalid breadcrumb in URL");
       }
     }
-  }, [searchParams]);
 
-  // 2. Fallback initialization if no breadcrumb exists but data/categoryIds are present
-  useEffect(() => {
-    const breadcrumbParam = searchParams.get("breadcrumb");
-    if (!breadcrumbParam && data?.categories?.length && categoryIds.length) {
-      const initialParams = new URLSearchParams();
-      initialParams.set("categoryIds", JSON.stringify(categoryIds));
-      const initialBreadcrumb = [
-        {
-          label: "Data Catalog",
-          path: `/data?${initialParams.toString()}`,
-        },
-      ];
-      setBreadcrumbTrail(initialBreadcrumb);
-    }
-  }, [data, categoryIds, searchParams]);
+    // Default root breadcrumb if param is missing
+    setBreadcrumbTrail([]);
+  }, [searchParams]);
 
   // Update display data only when new data is fully loaded
   useEffect(() => {
@@ -74,6 +60,19 @@ export default function DataPage({ setExternalDateRange }) {
       setLoadingCardId(null);
     }
   }, [isLoading, data]);
+
+  // 3. Sync selectedDataset with URL
+  useEffect(() => {
+    const datasetName = searchParams.get("datasetName");
+    if (!datasetName) {
+      setSelectedDataset(null);
+    } else if (displayData?.datasets) {
+      const found = displayData.datasets.find((d) => d.name === datasetName);
+      if (found) {
+        setSelectedDataset(found);
+      }
+    }
+  }, [searchParams, displayData]);
 
   const handleCategoryClick = (category) => {
     // Prevent clicking while loading
@@ -144,6 +143,10 @@ export default function DataPage({ setExternalDateRange }) {
   };
 
   const handleBreadcrumbClick = (index, item) => {
+    if (index === -1) {
+      navigate("/data");
+      return;
+    }
     const url = new URL(item.path, window.location.origin);
     const newTrail = breadcrumbTrail.slice(0, index + 1);
     setBreadcrumbTrail(newTrail);
