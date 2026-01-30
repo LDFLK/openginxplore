@@ -171,7 +171,7 @@ const LandingPage = () => {
                   style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                 >
                   {/* Card 1 */}
-                  <div className="min-w-full 2xl:min-h-[54vh] px-2 p-5 md:p-2border rounded-2xl border-border bg-foreground/8 shadow-2xl">
+                  <div className="min-w-full 2xl:min-h-[54vh] px-2 p-5 md:p-2 border rounded-2xl border-border bg-foreground/8 shadow-2xl">
                     {/* Soft light gradient overlay for frosted effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
