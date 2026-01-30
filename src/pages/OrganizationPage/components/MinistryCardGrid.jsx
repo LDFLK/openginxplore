@@ -631,7 +631,8 @@ const MinistryCardGrid = () => {
               Loading Highlights...
             </Typography>
           )}
-        </Card>      </Box >
+        </Card>
+      </Box>
 
       {/* Container for Active Ministries Section */}
       < Box
