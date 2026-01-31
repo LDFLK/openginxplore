@@ -101,7 +101,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
           return prev;
         }
         // Otherwise, keep it as is (don't reset to undefined)
-        return prev;
+        return "";
       });
     }
 

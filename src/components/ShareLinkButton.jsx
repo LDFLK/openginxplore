@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Share2, Check } from "lucide-react";
 
 const ShareLinkButton = () => {
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (copied) {
+      const timerId = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+
+      return () => clearTimeout(timerId);
+    }
+  }, [copied]);
 
   const copyLink = () => {
     const currentUrl = window.location.href;
@@ -10,9 +20,6 @@ const ShareLinkButton = () => {
       .writeText(currentUrl)
       .then(() => {
         setCopied(true);
-        setTimeout(() => {
-          setCopied(false);
-        }, 2000);
       })
       .catch(() => {
         alert("Failed to copy link.");

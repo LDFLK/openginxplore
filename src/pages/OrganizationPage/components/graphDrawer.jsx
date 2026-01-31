@@ -136,10 +136,7 @@ export default function Drawer({
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
                         <User className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Person</span>
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
-                      </div>
-                    )}
+                    ) : null}
                     <p className="text-base md:text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-300">
                       {selectedNode ? selectedNode.name : ""}
                     </p>

@@ -570,7 +570,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
             }
           }, 50);
         }
-      } catch (err) { }
+      } catch (err) { console.error("Error during node click handling:", err); }
 
       if (node.type === "minister") {
         const params = new URLSearchParams(location.search);
