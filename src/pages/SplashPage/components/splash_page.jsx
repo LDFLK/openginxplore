@@ -46,9 +46,9 @@ const SplashPage = ({ progress, setProgress }) => {
     <div className="min-h-screen bg-background relative overflow-hidden">
       <BackgroundGradientEffect />
       <AnimatedDots />
-      <div className="absolute z-20 p-10 left-20">
+      <div className="absolute z-20 p-4 md:p-10 left-1/2 md:left-20 -translate-x-1/2 md:translate-x-0">
         <Link to={"/"}>
-          <h2 className="text-normal md:text-2xl font-semibold">
+          <h2 className="text-normal md:text-2xl font-semibold text-center md:text-left">
             <span className="text-accent">
               OpenGIN<span className="text-primary">Xplore</span>
             </span>
