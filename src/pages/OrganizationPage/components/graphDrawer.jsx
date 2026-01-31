@@ -283,7 +283,7 @@ export default function Drawer({
                     )}
 
                     {/* Lazy Load */}
-                    <div className="w-full flex flex-col items-center">
+                    <div className="w-full flex flex-col items-center mb-6">
                       {drawerContentList &&
                         Object.keys(drawerContentList).length > visibleCount && (
                           <button
