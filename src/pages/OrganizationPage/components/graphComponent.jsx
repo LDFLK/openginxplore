@@ -41,10 +41,23 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   // Calculate graph width based on drawer state
   useEffect(() => {
     const calculateGraphWidth = () => {
+      const screenWidth = window.innerWidth;
+
       if (expandDrawer) {
-        setGraphWidth(Math.floor((window.innerWidth * 2) / 3));
+        // Mobile: full width (drawer overlays)
+        if (screenWidth < 768) {
+          setGraphWidth(screenWidth);
+        }
+        // Tablet: 50% for drawer
+        else if (screenWidth < 1024) {
+          setGraphWidth(Math.floor(screenWidth / 2));
+        }
+        // Desktop: 2/3 for graph, 1/3 for drawer
+        else {
+          setGraphWidth(Math.floor((screenWidth * 2) / 3));
+        }
       } else {
-        setGraphWidth(window.innerWidth);
+        setGraphWidth(screenWidth);
       }
     };
 
@@ -182,17 +195,17 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           } else if (filterType === "presidentAsMinister") {
             const headName = ministry.headMinisterName
               ? utils
-                  .extractNameFromProtobuf(ministry.headMinisterName)
-                  .split(":")[0]
-                  .toLowerCase()
-                  .trim()
+                .extractNameFromProtobuf(ministry.headMinisterName)
+                .split(":")[0]
+                .toLowerCase()
+                .trim()
               : null;
             const presidentName = selectedPresident
               ? utils
-                  .extractNameFromProtobuf(selectedPresident.name)
-                  .split(":")[0]
-                  .toLowerCase()
-                  .trim()
+                .extractNameFromProtobuf(selectedPresident.name)
+                .split(":")[0]
+                .toLowerCase()
+                .trim()
               : null;
 
             if (
@@ -535,7 +548,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           );
           if (cameraAnimTimeoutRef.current)
             clearTimeout(cameraAnimTimeoutRef.current);
-          cameraAnimTimeoutRef.current = setTimeout(() => {}, transitionMs + 2);
+          cameraAnimTimeoutRef.current = setTimeout(() => { }, transitionMs + 2);
           return true;
         };
 
@@ -557,7 +570,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
             }
           }, 50);
         }
-      } catch (err) {}
+      } catch (err) { console.error("Error during node click handling:", err); }
 
       if (node.type === "minister") {
         const params = new URLSearchParams(location.search);
@@ -643,11 +656,10 @@ export default function GraphComponent({ activeMinistries, filterType }) {
 
   return (
     <>
-      <div className="flex h-screen w-full relative">
+      <div className="flex h-screen w-full relative overflow-hidden">
         <div
-          className={`${
-            expandDrawer ? "w-2/3" : "w-full"
-          } transition-all duration-300 ease-in-out`}
+          className={`${expandDrawer ? "w-full md:w-1/2 lg:w-2/3" : "w-full"
+            } transition-all duration-300 ease-in-out relative`}
           style={{
             backgroundColor: colors.backgroundPrimary,
           }}
