@@ -29,6 +29,13 @@ const ENTITY_CONFIG = {
     textColor: "text-purple-600",
     borderColor: "border-purple-500/20",
   },
+  minister: {
+    icon: Landmark,
+    label: "Minister",
+    bgColor: "bg-purple-500/10",
+    textColor: "text-purple-600",
+    borderColor: "border-purple-500/20",
+  },
   dataset: {
     icon: Database,
     label: "Dataset",
@@ -133,10 +140,31 @@ export default function SearchPage() {
         break;
 
       case "ministry":
-        navigate(
-          `/organization?filterByName=${encodeURIComponent(result.name)}&viewMode=Grid&filterByType=all`
-        );
+      case "minister": {
+        // Build URL with proper date context for ministry/minister search
+        const params = new URLSearchParams();
+
+        // Use term_start date if available, otherwise use current date
+        const selectedDate = result.term_start
+          ? result.term_start.split("T")[0]
+          : new Date().toISOString().split("T")[0];
+
+        // Set date range (1 year before selected date to now)
+        const endDate = new Date().toISOString().split("T")[0];
+        const startDateObj = new Date(selectedDate);
+        startDateObj.setFullYear(startDateObj.getFullYear() - 1);
+        const startDate = startDateObj.toISOString().split("T")[0];
+
+        params.set("startDate", startDate);
+        params.set("endDate", endDate);
+        params.set("filterByType", "all");
+        params.set("viewMode", "Grid");
+        params.set("selectedDate", selectedDate);
+        params.set("filterByName", result.name);
+
+        navigate(`/organization?${params.toString()}`);
         break;
+      }
 
       case "dataset":
         setLoadingDatasetId(result.id);
