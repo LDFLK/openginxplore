@@ -93,8 +93,8 @@ export function ExportButton({ columns, rows, filename }) {
   return (
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <DropdownMenu.Trigger asChild>
-        <button className="flex hover:cursor-pointer bg-active-green/80 hover:bg-active-green items-center gap-2 border rounded-md px-3 py-1 text-sm transition">
-          <Download className="w-4 h-4" />
+        <button className="flex hover:cursor-pointer bg-active-green/80 hover:bg-active-green items-center gap-2 border rounded-md px-2 py-1 text-xs md:px-3 md:py-1 md:text-sm transition">
+          <Download className="w-3 h-3 md:w-4 md:h-4" />
           Export
         </button>
       </DropdownMenu.Trigger>

@@ -125,17 +125,16 @@ export default function GazetteTimeline() {
         });
       }, 100);
     }
-  }, [selectedDate]);
+  }, [selectedDate, gazetteData]);
 
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
         gap: 2,
         width: "100%",
-        pt: "30px",
+        mb: { xs: "-20px", md: "auto" }
       }}
     >
       {selectedPresident && (
@@ -144,7 +143,6 @@ export default function GazetteTimeline() {
             position: "relative",
             display: "flex",
             alignItems: "center",
-            maxWidth: { xs: "100vw", sm: "90vw", md: "80vw", lg: "85vw" },
             overflow: "hidden",
             width: "100%",
             height: "120px",
@@ -153,6 +151,8 @@ export default function GazetteTimeline() {
           <IconButton
             onClick={() => scroll("left")}
             sx={{
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 },
               zIndex: 10,
               mt: -6.8,
               backgroundColor: colors.backgroundPrimary,
@@ -162,6 +162,7 @@ export default function GazetteTimeline() {
                 backgroundColor: colors.backgroundPrimary,
               },
               color: colors.timelineColor,
+              "& svg": { fontSize: { xs: "1rem", sm: "1.2rem" } },
             }}
           >
             <ArrowBackIosNewIcon />
@@ -171,9 +172,9 @@ export default function GazetteTimeline() {
             sx={{
               position: "absolute",
               top: "calc(50% - 28px)",
-              width: "92%",
-              left: 50,
-              right: 50,
+              width: "96%",
+              left: 0,
+              right: 0,
               height: "2px",
               backgroundColor: colors.timelineColor,
               zIndex: 0,
@@ -223,10 +224,9 @@ export default function GazetteTimeline() {
                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                     variant="dot"
                     sx={{
-                      border: `4px solid ${
-                        selectedPresident?.themeColorLight ||
+                      border: `4px solid ${selectedPresident?.themeColorLight ||
                         colors.timelineColor
-                      }`,
+                        }`,
                       backgroundColor: colors.backgroundPrimary,
                       margin: "auto",
                       borderRadius: 50,
@@ -335,7 +335,7 @@ export default function GazetteTimeline() {
                                     rel="noopener noreferrer"
                                     className="hover:text-accent text-md"
                                   >
-                                    {`${index+1})
+                                    {`${index + 1})
                                     ${id}`}
                                   </a>
                                 </li>
@@ -355,7 +355,7 @@ export default function GazetteTimeline() {
                           borderRadius: "50%",
                           backgroundColor: isDateSelected
                             ? selectedPresident?.themeColorLight ||
-                              colors.timelineColor
+                            colors.timelineColor
                             : colors.dotColorInactive,
                           border: `3px solid ${colors.backgroundPrimary}`,
                           zIndex: 99,
@@ -371,7 +371,7 @@ export default function GazetteTimeline() {
                         mt: 0.5,
                         color: isDateSelected
                           ? selectedPresident?.themeColorLight ||
-                            colors.timelineColor
+                          colors.timelineColor
                           : colors.dotColorInactive,
                         fontSize: "0.75rem",
                         fontWeight: isDateSelected ? "bold" : "",
@@ -428,6 +428,8 @@ export default function GazetteTimeline() {
           <IconButton
             onClick={() => scroll("right")}
             sx={{
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 },
               zIndex: 9,
               mt: -6.8,
               backgroundColor: colors.backgroundPrimary,
@@ -437,45 +439,27 @@ export default function GazetteTimeline() {
                 backgroundColor: colors.backgroundPrimary,
               },
               color: colors.timelineColor,
+              "& svg": { fontSize: { xs: "1rem", sm: "1.2rem" } },
             }}
           >
             <ArrowForwardIosIcon />
           </IconButton>
         </Box>
       )}
-      {gazetteData?.length > 0 && (
-        <Typography
-          sx={{
-            mt: "-50px",
-            mb: "30px",
-            fontSize: "0.95rem",
-            color: `${colors.textPrimary}99`,
-          }}
-        >
-          Gazettes published dates
-        </Typography>
-      )}
-      {gazetteData?.length == 0 && selectedDate && (
-        <Typography
-          variant="caption"
-          sx={{
-            color: colors.success || "#28a745",
-            fontWeight: 500,
-            textAlign: "center",
-            fontSize: 14,
-          }}
-        >
-          Information corresponds to the last date of selected range:{" "}
-          {new Date(selectedDate.date).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
-        </Typography>
-      )}
-      {selectedDate?.date &&
-        !gazetteData.some((item) => item.date === selectedDate.date) &&
-        !gazetteData?.length == 0 && (
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+        {gazetteData?.length > 0 && (
+          <Typography
+            sx={{
+              mt: "-50px",
+              mb: "30px",
+              fontSize: { xs: "0.7rem", md: "0.95rem" },
+              color: `${colors.textPrimary}99`,
+            }}
+          >
+            Gazettes published dates
+          </Typography>
+        )}
+        {gazetteData?.length == 0 && selectedDate && (
           <Typography
             variant="caption"
             sx={{
@@ -485,15 +469,36 @@ export default function GazetteTimeline() {
               fontSize: 14,
             }}
           >
-            Information corresponds to the date:{" "}
+            Information corresponds to the last date of selected range:{" "}
             {new Date(selectedDate.date).toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "short",
               year: "numeric",
-            })}{" "}
-            (not a gazette published date)
+            })}
           </Typography>
         )}
+        {selectedDate?.date &&
+          !gazetteData.some((item) => item.date === selectedDate.date) &&
+          !gazetteData?.length == 0 && (
+            <Typography
+              variant="caption"
+              sx={{
+                color: colors.success || "#28a745",
+                fontWeight: 500,
+                textAlign: "center",
+                fontSize: 14,
+              }}
+            >
+              Information corresponds to the date:{" "}
+              {new Date(selectedDate.date).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}{" "}
+              (not a gazette published date)
+            </Typography>
+          )}
+      </Box>
     </Box>
   );
 }
