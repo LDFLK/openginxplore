@@ -1,0 +1,302 @@
+import { useState } from "react";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
+import { User, Building2, Landmark, Database, Search, Loader2, AlertCircle } from "lucide-react";
+import { useSearch } from "../../../hooks/useSearch";
+import { getDatasetCategories } from "../../../services/searchServices";
+
+/**
+ * Entity type configuration for styling and icons
+ */
+const ENTITY_CONFIG = {
+  person: {
+    icon: User,
+    label: "Person",
+    bgColor: "bg-green-500/10",
+    textColor: "text-green-600",
+    borderColor: "border-green-500/20",
+  },
+  department: {
+    icon: Building2,
+    label: "Department",
+    bgColor: "bg-blue-500/10",
+    textColor: "text-blue-600",
+    borderColor: "border-blue-500/20",
+  },
+  ministry: {
+    icon: Landmark,
+    label: "Ministry",
+    bgColor: "bg-purple-500/10",
+    textColor: "text-purple-600",
+    borderColor: "border-purple-500/20",
+  },
+  dataset: {
+    icon: Database,
+    label: "Dataset",
+    bgColor: "bg-orange-500/10",
+    textColor: "text-orange-600",
+    borderColor: "border-orange-500/20",
+  },
+};
+
+/**
+ * Format category name from snake_case to Title Case
+ */
+const formatCategoryName = (name) => {
+  if (!name) return "";
+  return name
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+/**
+ * Build dataset navigation URL from categories response
+ */
+const buildDatasetUrl = (datasetName, categories) => {
+  // Filter to Category types only, reverse to get root → child order
+  const categoryChain = categories
+    .filter((c) => c.kind?.major === "Category")
+    .reverse();
+
+  if (categoryChain.length === 0) return "/data";
+
+  const lastCategoryId = categoryChain[categoryChain.length - 1].id;
+
+  // Build breadcrumb array
+  const breadcrumb = categoryChain.map((cat) => ({
+    label: formatCategoryName(cat.name),
+    path: `/data?categoryIds=${encodeURIComponent(JSON.stringify([cat.id]))}`,
+  }));
+
+  // Add dataset as final breadcrumb
+  breadcrumb.push({
+    label: datasetName,
+    path: `/data?datasetName=${encodeURIComponent(datasetName)}&categoryIds=${encodeURIComponent(JSON.stringify([lastCategoryId]))}`,
+  });
+
+  // Build final URL
+  const params = new URLSearchParams({
+    categoryIds: JSON.stringify([lastCategoryId]),
+    datasetName: datasetName,
+    breadcrumb: JSON.stringify(breadcrumb),
+  });
+
+  return `/data?${params.toString()}`;
+};
+
+/**
+ * Search results page component
+ */
+export default function SearchPage() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const query = searchParams.get("q") || "";
+  const [loadingDatasetId, setLoadingDatasetId] = useState(null);
+  const [localQuery, setLocalQuery] = useState(query);
+
+  const { data, isLoading, isError, error } = useSearch(query);
+
+  // Sort results by match_score descending
+  const sortedResults = data?.results
+    ? [...data.results].sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+    : [];
+
+  /**
+   * Handle search form submission
+   */
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const trimmedQuery = localQuery.trim();
+    if (trimmedQuery.length >= 2) {
+      navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+    }
+  };
+
+  /**
+   * Handle result card click - navigate based on entity type
+   */
+  const handleResultClick = async (result) => {
+    const returnPath = location.pathname + location.search;
+
+    switch (result.type) {
+      case "person":
+        navigate(`/person-profile/${result.id}`, {
+          state: { from: returnPath },
+        });
+        break;
+
+      case "department":
+        navigate(`/department-profile/${result.id}`, {
+          state: { from: returnPath },
+        });
+        break;
+
+      case "ministry":
+        navigate(
+          `/organization?filterByName=${encodeURIComponent(result.name)}&viewMode=Grid&filterByType=all`
+        );
+        break;
+
+      case "dataset":
+        setLoadingDatasetId(result.id);
+        try {
+          const response = await getDatasetCategories({ datasetId: result.id });
+          const url = buildDatasetUrl(result.name, response.categories || []);
+          navigate(url);
+        } catch (err) {
+          console.error("Failed to fetch dataset categories:", err);
+          navigate("/data");
+        } finally {
+          setLoadingDatasetId(null);
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  // Empty query state - show search prompt
+  if (!query || query.length < 2) {
+    return (
+      <div className="p-4 md:p-8">
+        <div className="max-w-2xl mx-auto text-center py-12">
+          <Search className="w-12 h-12 text-primary/30 mx-auto mb-4" />
+          <h2 className="text-lg md:text-xl font-semibold text-primary mb-2">
+            Search OpenGINXplore
+          </h2>
+          <p className="text-sm text-primary/60 mb-6">
+            Find persons, departments, ministries, and datasets
+          </p>
+          <form onSubmit={handleSearchSubmit} className="max-w-md mx-auto">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/50" />
+              <input
+                type="text"
+                value={localQuery}
+                onChange={(e) => setLocalQuery(e.target.value)}
+                placeholder="Enter at least 2 characters..."
+                className="w-full pl-12 pr-4 py-3 text-sm md:text-base bg-background border border-border rounded-lg
+                           text-primary placeholder:text-primary/50
+                           focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent
+                           transition-colors"
+                autoFocus
+              />
+            </div>
+            <p className="text-xs text-primary/40 mt-2">Press Enter to search</p>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-2 md:p-4 lg:p-6">
+      {/* Header */}
+      <div className="mb-4 md:mb-6">
+        <h1 className="text-lg md:text-xl font-semibold text-primary">
+          Search results for "{query}"
+        </h1>
+        {data && (
+          <p className="text-xs md:text-sm text-primary/60 mt-1">
+            Found {data.total || 0} result{data.total !== 1 ? "s" : ""}
+          </p>
+        )}
+      </div>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex flex-col items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
+          <p className="text-sm text-primary/60">Searching...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {isError && (
+        <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-red-600">Search failed</p>
+            <p className="text-xs text-red-500/80">
+              {error?.message || "An unexpected error occurred"}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Empty Results */}
+      {!isLoading && !isError && sortedResults.length === 0 && (
+        <div className="text-center py-12">
+          <Search className="w-10 h-10 text-primary/20 mx-auto mb-3" />
+          <p className="text-sm text-primary/60">No results found for "{query}"</p>
+          <p className="text-xs text-primary/40 mt-1">Try different keywords</p>
+        </div>
+      )}
+
+      {/* Results List */}
+      {!isLoading && !isError && sortedResults.length > 0 && (
+        <div className="grid gap-2 md:gap-3">
+          {sortedResults.map((result, index) => {
+            const config = ENTITY_CONFIG[result.type] || ENTITY_CONFIG.person;
+            const Icon = config.icon;
+            const isLoadingDataset = loadingDatasetId === result.id;
+
+            return (
+              <div
+                key={`${result.type}-${result.id}-${index}`}
+                onClick={() => !isLoadingDataset && handleResultClick(result)}
+                className={`
+                  flex items-center gap-3 p-3 md:p-4
+                  bg-background border border-border rounded-lg
+                  hover:border-accent/50 hover:shadow-sm
+                  transition-all cursor-pointer
+                  ${isLoadingDataset ? "opacity-70 pointer-events-none" : ""}
+                `}
+              >
+                {/* Icon */}
+                <div className={`p-2 rounded-lg ${config.bgColor} flex-shrink-0`}>
+                  {isLoadingDataset ? (
+                    <Loader2 className={`w-5 h-5 ${config.textColor} animate-spin`} />
+                  ) : (
+                    <Icon className={`w-5 h-5 ${config.textColor}`} />
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className={`text-xs font-medium ${config.textColor}`}>
+                      {config.label}
+                    </span>
+                    {result.year && (
+                      <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary/70 rounded">
+                        {result.year}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-sm md:text-base font-medium text-primary truncate">
+                    {result.name}
+                  </h3>
+                  {result.parent_portfolio && (
+                    <p className="text-xs text-primary/50 truncate mt-0.5">
+                      {result.parent_portfolio}
+                    </p>
+                  )}
+                </div>
+
+                {/* Match Score Badge */}
+                {result.match_score !== undefined && (
+                  <div className="hidden md:block text-xs text-primary/40 flex-shrink-0">
+                    {Math.round(result.match_score * 100)}% match
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
