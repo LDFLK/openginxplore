@@ -15,6 +15,8 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import TextLogo from "../../LandingPage/components/textLogo";
 import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
+import SearchBar from "../../../components/SearchBar";
+import SearchPage from "../../SearchPage/screens/SearchPage";
 import { toast, ToastContainer } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
@@ -216,6 +218,7 @@ export default function HomePage() {
               Sri Lanka
             </h1>
           </div>
+          <SearchBar />
           <div className="flex items-center gap-1 md:gap-2">
             <Link
               to="/docs?file=information-pane"
@@ -234,19 +237,23 @@ export default function HomePage() {
         <div className="flex md:hidden justify-center items-center text-yellow-500 bg-yellow-100/90 dark:bg-yellow-500/20 border-yellow-100/90 dark:border-yellow-500/20 border">
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better user experience!</p>
         </div>
-        <TimeRangeSelector
-          startYear={2019}
-          dates={selectedTab === "organization" ? dates : []}
-          latestPresStartDate={latestPresStartDate}
-          onDateChange={handleDateRangeChange}
-          externalRange={externalDateRange}
-        />
+        {selectedTab !== "search" && (
+          <TimeRangeSelector
+            startYear={2019}
+            dates={selectedTab === "organization" ? dates : []}
+            latestPresStartDate={latestPresStartDate}
+            onDateChange={handleDateRangeChange}
+            externalRange={externalDateRange}
+          />
+        )}
         {selectedTab === "organization" ? (
           <>
             <Organization dateRange={userSelectedDateRange} />
           </>
         ) : selectedTab === "data" ? (
           <DataPage setExternalDateRange={setExternalDateRange} />
+        ) : selectedTab === "search" ? (
+          <SearchPage />
         ) : (
           <div className="text-primary p-8">Tab not found: {selectedTab}</div>
         )}
