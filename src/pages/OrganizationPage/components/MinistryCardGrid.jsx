@@ -902,7 +902,7 @@ const MinistryCardGrid = () => {
                                     sx={{
                                       backgroundColor: selectedPresident.themeColorLight,
                                       color: "#fff",
-                                      fontSize: { xs: "0.6rem", md: "0.75rem" },
+                                      fontSize: { xs: "0.6rem", md: "0.9rem" },
                                       borderRadius: "12px",
                                       px: 1.5,
                                       py: 0.7,
