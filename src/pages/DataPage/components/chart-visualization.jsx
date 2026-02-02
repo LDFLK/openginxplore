@@ -81,8 +81,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
       // The user will select which columns to visualize
       setStringColumns([""]); // Virtual X-axis
       setNumericColumns(columns);
-      // Only set xAxis to "" if it hasn't been set yet
-      setXAxis((prev) => prev === "" ? "" : prev);
+      if (!xAxis || !columns.includes(xAxis)) {
+        setXAxis("");
+      }
     } else {
       // Normal detection logic
       columns.forEach((col, idx) => {
@@ -93,16 +94,6 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
 
       setNumericColumns(numericCols);
       setStringColumns(stringCols);
-
-      // Only reset xAxis if the current selection is no longer available
-      setXAxis((prev) => {
-        // If previous xAxis is still valid (exists in stringCols or numericCols), keep it
-        if (prev && (stringCols.includes(prev) || numericCols.includes(prev))) {
-          return prev;
-        }
-        // Otherwise, keep it as is (don't reset to undefined)
-        return "";
-      });
     }
 
     setSelectedYColumns((prev) =>
@@ -512,11 +503,9 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
                   <option value="" hidden>Select column</option>
                   {/* Allow selecting both string and numeric columns for X-axis */}
                   {stringColumns.map((col) => (
-                    col === "" ? null : (
-                      <option key={col} value={col}>
-                        {formatText({ name: col })}
-                      </option>
-                    )
+                    <option key={col} value={col}>
+                      {formatText({ name: col })}
+                    </option>
                   ))}
                   {numericColumns.filter(col => col.toLowerCase() !== "id").map((col) => (
                     <option key={col} value={col}>
