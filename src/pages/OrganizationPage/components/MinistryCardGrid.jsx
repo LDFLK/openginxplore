@@ -889,7 +889,7 @@ const MinistryCardGrid = () => {
                               {selectedCard &&
                                 step.label == "Ministries" &&
                                 activeStep !== 0
-                                ? selectedCard.name
+                                ? `${selectedCard.name} - ${selectedCard.ministers?.[0]?.name}`
                                 : step.label}
                             </Typography>
                           </StepLabel>
