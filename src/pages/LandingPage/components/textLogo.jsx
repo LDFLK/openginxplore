@@ -7,18 +7,18 @@ export default function TextLogo({ isExpanded }) {
   const { isDark } = useThemeContext();
 
   return (
-    <Link to={"/"}>
-      <h2 className="text-md md:text-2xl py-6 font-semibold">
-        {isExpanded ? (
-          <span className="text-accent">
-            OpenGIN<span className="text-primary">Xplore<Version /></span>
-          </span>
-        ) : isDark ? (
-          <img width={35} height={35} src={"/openginexplore.ico"} />
-        ) : (
-          <img width={35} height={35} src={"/openginexplorelight.ico"} />
-        )}
-      </h2>
-    </Link>
+    // <Link to={"/"}>
+    <h2 className="text-md md:text-2xl py-6 font-semibold">
+      {isExpanded ? (
+        <span className="text-accent">
+          OpenGIN<span className="text-primary">Xplore<Version /></span>
+        </span>
+      ) : isDark ? (
+        <img width={35} height={35} src={"/openginexplore.ico"} />
+      ) : (
+        <img width={35} height={35} src={"/openginexplorelight.ico"} />
+      )}
+    </h2>
+    // </Link>
   );
 }

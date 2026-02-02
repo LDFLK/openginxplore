@@ -877,21 +877,62 @@ const MinistryCardGrid = () => {
                               },
                             }}
                           >
-                            <Typography
-                              component="span"
-                              sx={{
-                                color: colors.textPrimary,
-                                fontWeight: "semibold",
-                                fontSize: { xs: "0.8rem", md: "1.1rem" },
-                                transition: "text-decoration 0.2s ease-in-out",
-                              }}
-                            >
-                              {selectedCard &&
-                                step.label == "Ministries" &&
-                                activeStep !== 0
-                                ? selectedCard.name
-                                : step.label}
-                            </Typography>
+                            {selectedCard && step.label === "Ministries" && activeStep !== 0 ? (
+                              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 0.5 }}>
+                                <Typography
+                                  component="span"
+                                  sx={{
+                                    color: colors.textPrimary,
+                                    fontSize: { xs: "0.8rem", md: "1.1rem" },
+                                    transition: "text-decoration 0.2s ease-in-out",
+                                  }}
+                                >
+                                  {selectedCard.name}
+                                </Typography>
+                                <Link
+                                  to={`/person-profile/${selectedCard.ministers?.[0]?.id}`}
+                                  state={{
+                                    mode: "back",
+                                    from: location.pathname + location.search,
+                                  }}
+                                  style={{ textDecoration: "none" }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Box
+                                    sx={{
+                                      backgroundColor: selectedPresident.themeColorLight,
+                                      color: "#fff",
+                                      fontSize: { xs: "0.6rem", md: "0.9rem" },
+                                      borderRadius: "12px",
+                                      px: 1.5,
+                                      py: 0.7,
+                                      fontFamily: "poppins",
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      lineHeight: 1,
+                                      mt: 0.2,
+                                      cursor: "pointer",
+                                      "&:hover": {
+                                        opacity: 0.9,
+                                      },
+                                    }}
+                                  >
+                                    {selectedCard.ministers?.[0]?.name}
+                                  </Box>
+                                </Link>
+                              </Box>
+                            ) : (
+                              <Typography
+                                component="span"
+                                sx={{
+                                  color: colors.textPrimary,
+                                  fontSize: { xs: "0.8rem", md: "1.1rem" },
+                                  transition: "text-decoration 0.2s ease-in-out",
+                                }}
+                              >
+                                {step.label}
+                              </Typography>
+                            )}
                           </StepLabel>
                           <StepContent>
                             {step.label == "Ministries" ? (
