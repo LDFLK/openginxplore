@@ -155,11 +155,11 @@ const MinistryCard = ({ card, onClick }) => {
                   fontFamily: "poppins",
                   textDecorationThickness: "1px",
                   textUnderlineOffset: "3px",
-                  cursor: "pointer",
-                  "&:hover": {
+                  cursor: card.ministers?.[0]?.id ? "pointer" : "default",
+                  "&:hover": card.ministers?.[0]?.id ? {
                     textDecoration: "underline",
                     opacity: 0.9,
-                  },
+                  } : {},
                 }}
               >
                 {card.ministers?.[0]?.name}
