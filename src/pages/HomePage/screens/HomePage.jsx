@@ -218,7 +218,7 @@ export default function HomePage() {
               </div>
             </Link>
             {isExpanded && (
-              <p className="text-primary/75 text-[12px mt-2 mb-0.5 text-center leading-tight">
+              <p className="text-primary/75 text-[12px] mt-2 mb-0.5 text-center leading-tight">
                 Licensed under{" "}
                 <a
                   href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
