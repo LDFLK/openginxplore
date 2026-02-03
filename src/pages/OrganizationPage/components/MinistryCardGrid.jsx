@@ -889,18 +889,42 @@ const MinistryCardGrid = () => {
                                 >
                                   {selectedCard.name}
                                 </Typography>
-                                <Link
-                                  to={`/person-profile/${selectedCard.ministers?.[0]?.id}`}
-                                  state={{
-                                    mode: "back",
-                                    from: location.pathname + location.search,
-                                  }}
-                                  style={{ textDecoration: "none" }}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
+                                {selectedCard.ministers?.[0]?.id ? (
+                                  <Link
+                                    to={`/person-profile/${selectedCard.ministers?.[0]?.id}`}
+                                    state={{
+                                      mode: "back",
+                                      from: location.pathname + location.search,
+                                    }}
+                                    style={{ textDecoration: "none" }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <Box
+                                      sx={{
+                                        backgroundColor: selectedPresident.themeColorLight,
+                                        color: "#fff",
+                                        fontSize: { xs: "0.6rem", md: "0.9rem" },
+                                        borderRadius: "12px",
+                                        px: 1.5,
+                                        py: 0.7,
+                                        fontFamily: "poppins",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        lineHeight: 1,
+                                        mt: 0.2,
+                                        cursor: "pointer",
+                                        "&:hover": {
+                                          opacity: 0.9,
+                                        },
+                                      }}
+                                    >
+                                      {selectedCard.ministers?.[0]?.name}
+                                    </Box>
+                                  </Link>
+                                ) : (
                                   <Box
                                     sx={{
-                                      backgroundColor: selectedPresident.themeColorLight,
+                                      backgroundColor: `${selectedPresident.themeColorLight}66`,
                                       color: "#fff",
                                       fontSize: { xs: "0.6rem", md: "0.9rem" },
                                       borderRadius: "12px",
@@ -911,15 +935,11 @@ const MinistryCardGrid = () => {
                                       alignItems: "center",
                                       lineHeight: 1,
                                       mt: 0.2,
-                                      cursor: "pointer",
-                                      "&:hover": {
-                                        opacity: 0.9,
-                                      },
                                     }}
                                   >
                                     {selectedCard.ministers?.[0]?.name}
                                   </Box>
-                                </Link>
+                                )}
                               </Box>
                             ) : (
                               <Typography
