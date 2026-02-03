@@ -160,9 +160,27 @@ export default function HomePage() {
         className={`fixed top-0 left-0 z-20 h-[100dvh] ${isExpanded ? "w-48 md:w-64" : "w-12 md:w-16"
           } bg-background transition-all ease-in-out flex flex-col items-center p-2 border-r border-border`}
       >
-        <TextLogo isExpanded={isExpanded} />
+        <div className={`flex flex-col ${isExpanded ? "items-start w-full px-2 md:px-1" : "items-center"}`}>
+          <TextLogo
+            isExpanded={isExpanded}
+            className={`text-md md:text-2xl font-semibold`}
+          />
+          {isExpanded && (
+            <p className="text-primary/75 text-[12px] leading-tight transition-opacity duration-300">
+              Powered by{" "}
+              <a
+                href="https://ldflk.github.io/OpenGIN"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:underline"
+              >
+                OpenGIN
+              </a>
+            </p>
+          )}
+        </div>
 
-        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 flex-1 mt-4">
+        <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 flex-1 mt-8">
           <button
             className={`text-xs md:text-sm ${selectedTab === "organization"
               ? "bg-accent text-primary-foreground font-semibold"
@@ -186,18 +204,33 @@ export default function HomePage() {
 
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="px-3 py-1 absolute bottom-12 left-1/2 -translate-x-1/2 
+            className={`px-3 py-1 absolute ${isExpanded ? "bottom-17" : "bottom-12"} left-1/2 -translate-x-1/2 
              flex items-center rounded-md text-primary/80 hover:text-primary 
-             cursor-pointer"
+             cursor-pointer transition-all duration-300`}
           >
             {isExpanded ? <ChevronLeft /> : <ChevronRight />}
           </button>
-          <Link to={feedbackFormUrl} target="_blank" rel="noopener noreferrer">
-            <div className="flex text-xs md:text-sm absolute bottom-0 w-full gap-2 justify-center items-center md:px-3 px-1 py-1 md:py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border duration-1000 transition-all animation">
-              <MessageSquareHeart size={22} />
-              {isExpanded && <span>Share feedback</span>}
-            </div>
-          </Link>
+          <div className="absolute bottom-0 w-full flex flex-col items-center">
+            <Link to={feedbackFormUrl} target="_blank" rel="noopener noreferrer" className="w-full">
+              <div className="flex text-xs md:text-sm w-full gap-2 justify-center items-center md:px-3 px-1 py-1 md:py-2 rounded-md text-accent/95 hover:text-accent bg-accent/5 hover:bg-accent/10 border-accent/10 hover:border-accent/15 cursor-pointer border duration-1000 transition-all animation">
+                <MessageSquareHeart size={22} />
+                {isExpanded && <span>Share feedback</span>}
+              </div>
+            </Link>
+            {isExpanded && (
+              <p className="text-primary/75 text-[12px] mt-2 mb-0.5 text-center leading-tight">
+                Licensed under{" "}
+                <a
+                  href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  CC BY-NC-SA 4.0
+                </a>
+              </p>
+            )}
+          </div>
         </nav>
       </div>
 
