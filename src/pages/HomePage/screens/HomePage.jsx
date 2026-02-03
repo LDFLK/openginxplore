@@ -218,7 +218,7 @@ export default function HomePage() {
               </div>
             </Link>
             {isExpanded && (
-              <p className="text-primary/75 text-[12px] mt-2 mb-0.5 text-center leading-tight">
+              <p className="text-primary/75 text-[12px mt-2 mb-0.5 text-center leading-tight">
                 Licensed under{" "}
                 <a
                   href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
@@ -265,7 +265,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex md:hidden justify-center items-center text-yellow-500 bg-yellow-100/90 dark:bg-yellow-500/20 border-yellow-100/90 dark:border-yellow-500/20 border">
-          <p className="text-xs md:text-sm text-center p-2">Use desktop for better user experience!</p>
+          <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
         <TimeRangeSelector
           startYear={2019}
