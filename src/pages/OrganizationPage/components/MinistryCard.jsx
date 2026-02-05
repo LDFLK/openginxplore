@@ -61,7 +61,8 @@ const MinistryCard = ({ card, onClick }) => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center", // vertically centers content
+              alignItems: "flex-start",
+              justifyContent: "flex-start", // aligns content to top
               height: `calc(1.4em * 3)`, // fixed 4-line height
               overflow: "hidden",
             }}
@@ -69,10 +70,28 @@ const MinistryCard = ({ card, onClick }) => {
             <Typography
               variant="h7"
               sx={{
+                backgroundColor: `${selectedPresident.themeColorLight}85`,
+                color: "#fff",
+                fontSize: { xs: "0.4rem", md: "0.675rem" },
+                fontWeight: "semibold",
+                borderBottomLeftRadius: "5px",
+                borderBottomRightRadius: "5px",
+                px: 1,
+                py: "2px",
+                mb: "2px",
+                fontFamily: "poppins",
+                display: "inline-block",
+              }}
+            >
+              {card.type + " Minister"}
+            </Typography>
+            <Typography
+              variant="h7"
+              sx={{
                 color: "#ffffff",
                 fontWeight: 400,
                 display: "-webkit-box",
-                WebkitLineClamp: 3,
+                WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
                 textOverflow: "ellipsis",

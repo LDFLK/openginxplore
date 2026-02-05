@@ -58,7 +58,8 @@ const MinistryCardGrid = () => {
 
   const activeMinistryList = data?.portfolioList || [];
 
-  const activeMinistriesCount = data?.activeMinistries || 0;
+  const cabinetMinistriesCount = data?.NoOfCabinetMinistries || 0;
+  const stateMinistriesCount = data?.NoOfStateMinistries || 0;
   const newMinistriesCount = data?.newMinistries || 0;
   const newMinistersCount = data?.newMinisters || 0;
   const ministriesUnderPresident = data?.ministriesUnderPresident || 0;
@@ -426,8 +427,8 @@ const MinistryCardGrid = () => {
                 gap: 0.4,
               }}
             >
-              {/* Active Ministries */}
-              {activeMinistriesCount > 0 && (
+              {/* Cabinet Ministries */}
+              {cabinetMinistriesCount > 0 && (
                 <Box sx={{
                   display: "flex",
                   alignItems: "center",
@@ -456,9 +457,9 @@ const MinistryCardGrid = () => {
                         gap: 0.5
                       }}
                     >
-                      Active Ministries
+                      Cabinet Ministries
                       <InfoTooltip
-                        message="Number of ministry portfolios active on the selected date"
+                        message="Number of cabinet minister portfolios active on the selected date"
                         iconColor={colors.textPrimary}
                         iconSize={13}
                         placement="right"
@@ -472,7 +473,59 @@ const MinistryCardGrid = () => {
                         color: colors.textPrimary,
                       }}
                     >
-                      {activeMinistriesCount}
+                      {cabinetMinistriesCount}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {/* State Ministries */}
+              {stateMinistriesCount > 0 && (
+                <Box sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                }}>
+                  <AccountBalanceIcon
+                    sx={{ color: colors.textMuted, fontSize: 18 }}
+                  />
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      alignItems: { xs: "flex-start", sm: "center" },
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: "Poppins",
+                        fontWeight: 500,
+                        color: colors.textMuted,
+                        fontSize: { xs: 12, md: 15 },
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5
+                      }}
+                    >
+                      State Ministries
+                      <InfoTooltip
+                        message="Number of state ministry portfolios active on the selected date"
+                        iconColor={colors.textPrimary}
+                        iconSize={13}
+                        placement="right"
+                      />
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Poppins",
+                        fontSize: { xs: 14, md: 17 },
+                        fontWeight: 500,
+                        color: colors.textPrimary,
+                      }}
+                    >
+                      {stateMinistriesCount}
                     </Typography>
                   </Box>
                 </Box>
