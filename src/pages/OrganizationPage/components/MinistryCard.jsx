@@ -72,8 +72,8 @@ const MinistryCard = ({ card, onClick }) => {
               sx={{
                 backgroundColor: `${selectedPresident.themeColorLight}85`,
                 color: "#fff",
-                fontSize: { xs: "0.4rem", md: "0.675rem" },
-                fontWeight: "semibold",
+                fontSize: { xs: "0.6rem", md: "0.675rem" },
+                fontWeight: 500,
                 borderBottomLeftRadius: "5px",
                 borderBottomRightRadius: "5px",
                 px: 1,
