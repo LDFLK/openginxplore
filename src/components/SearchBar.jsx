@@ -172,6 +172,11 @@ export default function SearchBar() {
                             {result.year}
                           </span>
                         )}
+                        {result.type === "minister" && result.term_start && (
+                          <span className="text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
+                            Start: {result.term_start.split("T")[0]}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </button>

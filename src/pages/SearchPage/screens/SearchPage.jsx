@@ -220,6 +220,11 @@ export default function SearchPage() {
                         {result.year}
                       </span>
                     )}
+                    {result.type === "minister" && result.term_start && (
+                      <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary/70 rounded">
+                        Start: {result.term_start.split("T")[0]}
+                      </span>
+                    )}
                   </div>
                   <h3 className="text-sm md:text-base font-medium text-primary truncate">
                     {result.name}
