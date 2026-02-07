@@ -132,6 +132,7 @@ export default function HomePage() {
       params.delete("filterByType");
       params.delete("viewMode");
       params.delete("ministry");
+      params.delete("filterByName");
     }
     navigate({
       pathname: `/${tabName}`,

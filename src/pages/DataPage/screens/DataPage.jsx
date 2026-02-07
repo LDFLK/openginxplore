@@ -16,6 +16,15 @@ export default function DataPage({ setExternalDateRange }) {
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [loadingCardId, setLoadingCardId] = useState(null);
 
+  // Clean up URL parameters that don't belong in the data route
+  useEffect(() => {
+    if (searchParams.has("filterByName")) {
+      const params = new URLSearchParams(searchParams);
+      params.delete("filterByName");
+      navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    }
+  }, [searchParams, location.pathname, navigate]);
+
   // Decode categoryIds from URL as an array
   const categoryIdsParam = searchParams.get("categoryIds") || "";
   let categoryIds = [];

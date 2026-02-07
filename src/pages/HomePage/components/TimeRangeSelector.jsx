@@ -101,13 +101,14 @@ export default function TimeRangeSelector({
     const currentStart = params.get("startDate");
     const currentEnd = params.get("endDate");
 
-    // merge with existing URL params
+    // If change is due to navigation and the new URL already has dates,
+    // don't overwrite them yet; let the reader effect sync the state first.
+    if (currentStart === newStart && currentEnd === newEnd) return;
+
+    // Only update if current URL is missing dates or our state is fundamentally different
     params.set("startDate", newStart);
     params.set("endDate", newEnd);
-
-    if (currentStart !== newStart || currentEnd !== newEnd) {
-      window.history.replaceState({}, "", `${path}?${params.toString()}`);
-    }
+    window.history.replaceState({}, "", `${path}?${params.toString()}`);
   }, [startDate, endDate, location.pathname]);
 
   useEffect(() => {
@@ -160,7 +161,7 @@ export default function TimeRangeSelector({
     setTempStartDate(urlStart);
     setTempEndDate(urlEnd);
     setSelectedRange([urlStart.getUTCFullYear(), urlEnd.getUTCFullYear()]);
-  }, [latestPresStartDate]);
+  }, [latestPresStartDate, searchParams, location.key]);
 
   const presidents = useMemo(() => {
     if (!presidentsArray || !presidentRelationDict) return {};

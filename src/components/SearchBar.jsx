@@ -1,6 +1,56 @@
-import { useState } from "react";
-import { Search } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Search, Loader2 } from "lucide-react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useSearch } from "../hooks/useSearch";
+import { ENTITY_CONFIG } from "../constants/entityConfig";
+import { getDatasetCategories } from "../services/searchServices";
+import { handleResultNavigation } from "../utils/navigationUtils";
+
+/**
+ * Format category name from snake_case to Title Case
+ */
+const formatCategoryName = (name) => {
+  if (!name) return "";
+  return name
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+/**
+ * Build dataset navigation URL from categories response
+ */
+const buildDatasetUrl = (datasetName, categories) => {
+  // Filter to Category types only, reverse to get root → child order
+  const categoryChain = categories
+    .filter((c) => c.kind?.major === "Category")
+    .reverse();
+
+  if (categoryChain.length === 0) return "/data";
+
+  const lastCategoryId = categoryChain[categoryChain.length - 1].id;
+
+  // Build breadcrumb array
+  const breadcrumb = categoryChain.map((cat) => ({
+    label: formatCategoryName(cat.name),
+    path: `/data?categoryIds=${encodeURIComponent(JSON.stringify([cat.id]))}`,
+  }));
+
+  // Add dataset as final breadcrumb
+  breadcrumb.push({
+    label: datasetName,
+    path: `/data?datasetName=${encodeURIComponent(datasetName)}&categoryIds=${encodeURIComponent(JSON.stringify([lastCategoryId]))}`,
+  });
+
+  // Build final URL
+  const params = new URLSearchParams({
+    categoryIds: JSON.stringify([lastCategoryId]),
+    datasetName: datasetName,
+    breadcrumb: JSON.stringify(breadcrumb),
+  });
+
+  return `/data?${params.toString()}`;
+};
 
 /**
  * Search input component for the header
@@ -8,33 +58,139 @@ import { useNavigate, useSearchParams } from "react-router-dom";
  */
 export default function SearchBar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const [loadingDatasetId, setLoadingDatasetId] = useState(null);
 
+  const { data, isLoading } = useSearch(query);
+
+  useEffect(() => {
+    setQuery(searchParams.get("q") || "");
+  }, [searchParams]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  /**
+   * Handle search form submission
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmedQuery = query.trim();
     if (trimmedQuery.length >= 2) {
+      setIsOpen(false);
       navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
     }
   };
 
+  /**
+   * Handle result card click - navigate based on entity type
+   */
+  const handleResultClick = (result) => {
+    handleResultNavigation(result, {
+      navigate,
+      location,
+      setLoadingDatasetId,
+      buildDatasetUrl,
+      onComplete: () => setIsOpen(false),
+    });
+  };
+
+  const results = data?.results?.slice(0, 5) || [];
+
   return (
-    <form onSubmit={handleSubmit} className="flex-1 max-w-48 md:max-w-64 mx-2 md:mx-4">
-      <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search..."
-          className="w-full pl-8 pr-3 py-1.5 text-xs md:text-sm bg-background-dark border border-border rounded-md
-                     text-primary placeholder:text-primary/50
-                     focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent
-                     transition-colors"
-        />
-      </div>
-    </form>
+    <div ref={dropdownRef} className="flex-1 max-w-sm md:max-w-xl mx-2 md:mx-4 relative">
+      <form onSubmit={handleSubmit}>
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setIsOpen(true);
+            }}
+            onFocus={() => setIsOpen(true)}
+            placeholder="Search..."
+            className="w-full pl-8 pr-3 py-1.5 text-xs md:text-sm bg-background-dark border border-border rounded-md
+                       text-primary placeholder:text-primary/50
+                       focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent
+                       transition-colors"
+          />
+        </div>
+      </form>
+
+      {/* Search Results Dropdown */}
+      {isOpen && query.length >= 2 && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-xl z-[100] overflow-hidden">
+          {isLoading ? (
+            <div className="p-4 flex items-center justify-center">
+              <Loader2 className="w-5 h-5 text-accent animate-spin" />
+            </div>
+          ) : results.length > 0 ? (
+            <div className="py-1">
+              {results.map((result, index) => {
+                const config = ENTITY_CONFIG[result.type] || ENTITY_CONFIG.person;
+                const Icon = config.icon;
+                const isLoadingDataset = loadingDatasetId === result.id;
+
+                return (
+                  <button
+                    key={`${result.type}-${result.id}-${index}`}
+                    onClick={() => handleResultClick(result)}
+                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-accent/5 transition-colors text-left"
+                  >
+                    <div className={`p-1.5 rounded ${config.bgColor}`}>
+                      {isLoadingDataset ? (
+                        <Loader2 className={`w-3.5 h-3.5 ${config.textColor} animate-spin`} />
+                      ) : (
+                        <Icon className={`w-3.5 h-3.5 ${config.textColor}`} />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-primary truncate">
+                        {result.name}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] text-primary/50 uppercase tracking-wider">
+                          {config.label}
+                        </p>
+                        {result.year && (
+                          <span className="text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
+                            {result.year}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+              <button
+                onClick={handleSubmit}
+                className="w-full px-4 py-2 text-xs text-center border-t border-border text-accent hover:bg-accent/5 transition-colors"
+              >
+                View all results for "{query}"
+              </button>
+            </div>
+          ) : (
+            <div className="p-4 text-center">
+              <p className="text-xs text-primary/50">No results found</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

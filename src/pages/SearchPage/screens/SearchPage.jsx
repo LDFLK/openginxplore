@@ -1,49 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
-import { User, Building2, Landmark, Database, Search, Loader2, AlertCircle } from "lucide-react";
+import { Search, Loader2, AlertCircle } from "lucide-react";
 import { useSearch } from "../../../hooks/useSearch";
 import { getDatasetCategories } from "../../../services/searchServices";
+import { ENTITY_CONFIG } from "../../../constants/entityConfig";
+import { handleResultNavigation } from "../../../utils/navigationUtils";
 
-/**
- * Entity type configuration for styling and icons
- */
-const ENTITY_CONFIG = {
-  person: {
-    icon: User,
-    label: "Person",
-    bgColor: "bg-green-500/10",
-    textColor: "text-green-600",
-    borderColor: "border-green-500/20",
-  },
-  department: {
-    icon: Building2,
-    label: "Department",
-    bgColor: "bg-blue-500/10",
-    textColor: "text-blue-600",
-    borderColor: "border-blue-500/20",
-  },
-  ministry: {
-    icon: Landmark,
-    label: "Ministry",
-    bgColor: "bg-purple-500/10",
-    textColor: "text-purple-600",
-    borderColor: "border-purple-500/20",
-  },
-  minister: {
-    icon: Landmark,
-    label: "Minister",
-    bgColor: "bg-purple-500/10",
-    textColor: "text-purple-600",
-    borderColor: "border-purple-500/20",
-  },
-  dataset: {
-    icon: Database,
-    label: "Dataset",
-    bgColor: "bg-orange-500/10",
-    textColor: "text-orange-600",
-    borderColor: "border-orange-500/20",
-  },
-};
 
 /**
  * Format category name from snake_case to Title Case
@@ -102,12 +64,20 @@ export default function SearchPage() {
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
   const [localQuery, setLocalQuery] = useState(query);
 
+  useEffect(() => {
+    setLocalQuery(searchParams.get("q") || "");
+  }, [searchParams]);
+
   const { data, isLoading, isError, error } = useSearch(query);
 
-  // Sort results by match_score descending
-  const sortedResults = data?.results
-    ? [...data.results].sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
-    : [];
+  // Sort results by match_score descending - memoized to prevent re-sorting on every render
+  const sortedResults = useMemo(
+    () =>
+      data?.results
+        ? [...data.results].sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+        : [],
+    [data]
+  );
 
   /**
    * Handle search form submission
@@ -123,66 +93,13 @@ export default function SearchPage() {
   /**
    * Handle result card click - navigate based on entity type
    */
-  const handleResultClick = async (result) => {
-    const returnPath = location.pathname + location.search;
-
-    switch (result.type) {
-      case "person":
-        navigate(`/person-profile/${result.id}`, {
-          state: { from: returnPath },
-        });
-        break;
-
-      case "department":
-        navigate(`/department-profile/${result.id}`, {
-          state: { from: returnPath },
-        });
-        break;
-
-      case "ministry":
-      case "minister": {
-        // Build URL with proper date context for ministry/minister search
-        const params = new URLSearchParams();
-
-        // Use term_start date if available, otherwise use current date
-        const selectedDate = result.term_start
-          ? result.term_start.split("T")[0]
-          : new Date().toISOString().split("T")[0];
-
-        // Set date range (1 year before selected date to now)
-        const endDate = new Date().toISOString().split("T")[0];
-        const startDateObj = new Date(selectedDate);
-        startDateObj.setFullYear(startDateObj.getFullYear() - 1);
-        const startDate = startDateObj.toISOString().split("T")[0];
-
-        params.set("startDate", startDate);
-        params.set("endDate", endDate);
-        params.set("filterByType", "all");
-        params.set("viewMode", "Grid");
-        params.set("selectedDate", selectedDate);
-        params.set("filterByName", result.name);
-
-        navigate(`/organization?${params.toString()}`);
-        break;
-      }
-
-      case "dataset":
-        setLoadingDatasetId(result.id);
-        try {
-          const response = await getDatasetCategories({ datasetId: result.id });
-          const url = buildDatasetUrl(result.name, response.categories || []);
-          navigate(url);
-        } catch (err) {
-          console.error("Failed to fetch dataset categories:", err);
-          navigate("/data");
-        } finally {
-          setLoadingDatasetId(null);
-        }
-        break;
-
-      default:
-        break;
-    }
+  const handleResultClick = (result) => {
+    handleResultNavigation(result, {
+      navigate,
+      location,
+      setLoadingDatasetId,
+      buildDatasetUrl,
+    });
   };
 
   // Empty query state - show search prompt
