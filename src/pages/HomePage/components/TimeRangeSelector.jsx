@@ -12,7 +12,11 @@ export default function TimeRangeSelector({
   dates,
   latestPresStartDate,
   onDateChange,
-  externalRange
+  externalRange,
+  activePreset,
+  setActivePreset,
+  activePresident,
+  setActivePresident
 }) {
   const presidentsArray = useSelector(
     (state) => state.presidency.presidentDict
@@ -25,16 +29,31 @@ export default function TimeRangeSelector({
   const containerRef = useRef(null);
   const dragStartRef = useRef(null);
   const scrollWrapperRef = useRef(null);
-  const [startDate, setStartDate] = useState(latestPresStartDate);
-  const [endDate, setEndDate] = useState(new Date());
+  /* eslint-disable no-unused-vars */
+  const [searchParams] = useSearchParams();
+  /* eslint-enable no-unused-vars */
+
+  // Helper: safely parse YYYY-MM-DD → Date
+  const parseDate = (dateStr, fallback) => {
+    if (!dateStr) return fallback;
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? fallback : date;
+  };
+
+  const [startDate, setStartDate] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return parseDate(params.get("startDate"), latestPresStartDate);
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return parseDate(params.get("endDate"), new Date());
+  });
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(null);
   const [isMovingWindow, setIsMovingWindow] = useState(false);
   const [tempStartDate, setTempStartDate] = useState(startDate);
   const [tempEndDate, setTempEndDate] = useState(endDate);
   const [preciseMode, setPreciseMode] = useState(true);
-  const [activePreset, setActivePreset] = useState(null);
-  const [activePresident, setActivePresident] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [tooltip, setTooltip] = useState({
     show: false,
@@ -43,7 +62,6 @@ export default function TimeRangeSelector({
     content: "",
   });
   const [calendarRange, setCalendarRange] = useState(null);
-  const [searchParams] = useSearchParams();
   const [calendarStart, setCalendarStart] = useState(startDate);
   const [calendarEnd, setCalendarEnd] = useState(endDate);
 
@@ -58,13 +76,6 @@ export default function TimeRangeSelector({
     latestPresStartDate.getFullYear()
   );
   const initialEndYear = Math.min(endYear, new Date().getFullYear());
-
-  // Helper: safely parse YYYY-MM-DD → Date
-  const parseDate = (dateStr, fallback) => {
-    if (!dateStr) return fallback;
-    const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? fallback : date;
-  };
 
   const [selectedRange, setSelectedRange] = useState([
     initialStartYear,
@@ -86,9 +97,13 @@ export default function TimeRangeSelector({
         setTempStartDate(extStart);
         setTempEndDate(extEnd);
         setSelectedRange([extStart.getFullYear(), extEnd.getFullYear()]);
+
+        // Clear active states on external update
+        setActivePreset(null);
+        setActivePresident("");
       }
     }
-  }, [externalRange]);
+  }, [externalRange, startDate, endDate, setActivePreset, setActivePresident]);
 
   useEffect(() => {
     if (!startDate || !endDate) return;
@@ -98,12 +113,6 @@ export default function TimeRangeSelector({
 
     const newStart = startDate.toISOString().split("T")[0];
     const newEnd = endDate.toISOString().split("T")[0];
-    const currentStart = params.get("startDate");
-    const currentEnd = params.get("endDate");
-
-    // If change is due to navigation and the new URL already has dates,
-    // don't overwrite them yet; let the reader effect sync the state first.
-    if (currentStart === newStart && currentEnd === newEnd) return;
 
     // Only update if current URL is missing dates or our state is fundamentally different
     params.set("startDate", newStart);
@@ -112,20 +121,36 @@ export default function TimeRangeSelector({
   }, [startDate, endDate, location.pathname]);
 
   useEffect(() => {
-    const selectedDateParam = searchParams.get("selectedDate");
-    let urlStart = parseDate(
-      searchParams.get("startDate"),
-      latestPresStartDate
-    );
-    let urlEnd = parseDate(searchParams.get("endDate"), new Date());
+    // We use window.location.search directly to ensure we have the latest params
+    // regardless of the searchParams hook state or router updates.
+    const params = new URLSearchParams(window.location.search);
+    const startDateParam = params.get("startDate");
+    const endDateParam = params.get("endDate");
+    const selectedDateParam = params.get("selectedDate");
 
     const minDate = new Date(`${startYear}-01-01`);
     const maxDate = new Date();
 
+    // If params exist, we prioritize them over defaults/latestPresStartDate
+    let urlStart;
+    let urlEnd;
+
+    // 1. Try to parse from params
+    if (startDateParam && endDateParam) {
+      urlStart = parseDate(startDateParam, null);
+      urlEnd = parseDate(endDateParam, null);
+    }
+
+    // 2. If parsing failed or params missing, use fallback logic
+    if (!urlStart || !urlEnd) {
+      urlStart = parseDate(startDateParam, latestPresStartDate);
+      urlEnd = parseDate(endDateParam, new Date());
+    }
+
     if (selectedDateParam) {
       const targetDate = new Date(selectedDateParam);
 
-      // If outside current URL range, update it
+      // If outside calculated range, update it
       if (!(targetDate >= urlStart && targetDate <= urlEnd)) {
         // SelectedDate year is outside URL range but within available range → override range to full year
         if (targetDate >= minDate && targetDate <= maxDate) {
@@ -155,13 +180,26 @@ export default function TimeRangeSelector({
       }
     }
 
-    // Set state
-    setStartDate(urlStart);
-    setEndDate(urlEnd);
-    setTempStartDate(urlStart);
-    setTempEndDate(urlEnd);
-    setSelectedRange([urlStart.getUTCFullYear(), urlEnd.getUTCFullYear()]);
-  }, [latestPresStartDate, searchParams, location.key]);
+    // Only update state if different to prevent loops
+    // Compare using ISO strings (YYYY-MM-DD) to ignore time components
+    // (e.g., "today" with time vs "today" from URL at midnight)
+    const urlStartStr = urlStart.toISOString().split("T")[0];
+    const urlEndStr = urlEnd.toISOString().split("T")[0];
+    const stateStartStr = startDate.toISOString().split("T")[0];
+    const stateEndStr = endDate.toISOString().split("T")[0];
+
+    if (urlStartStr !== stateStartStr || urlEndStr !== stateEndStr) {
+      setStartDate(urlStart);
+      setEndDate(urlEnd);
+      setTempStartDate(urlStart);
+      setTempEndDate(urlEnd);
+      setSelectedRange([urlStart.getUTCFullYear(), urlEnd.getUTCFullYear()]);
+
+      // Clear active states on external/URL update
+      setActivePreset(null);
+      setActivePresident("");
+    }
+  }, [latestPresStartDate, location.key, location.search]);
 
   const presidents = useMemo(() => {
     if (!presidentsArray || !presidentRelationDict) return {};

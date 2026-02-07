@@ -40,12 +40,14 @@ export default function HomePage() {
   );
   const presidents = useSelector((state) => state.presidency.presidentDict);
 
-  const [latestPresStartDate, setLatestPresStartDate] = useState(new Date());
+  const [latestPresStartDate, setLatestPresStartDate] = useState(null);
   const [userSelectedDateRange, setUserSelectedDateRange] = useState([
     null,
     null,
   ]);
   const [externalDateRange, setExternalDateRange] = useState([null, null]);
+  const [activePreset, setActivePreset] = useState(null);
+  const [activePresident, setActivePresident] = useState("");
 
   const handleDateRangeChange = useCallback((dateRange) => {
     const [startDate, endDate] = dateRange;
@@ -119,7 +121,7 @@ export default function HomePage() {
   }, []);
 
   const handleTabChange = (tabName) => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
 
     if (tabName === "organization") {
       params.delete("categoryIds");
@@ -271,26 +273,29 @@ export default function HomePage() {
         <div className="flex md:hidden justify-center items-center text-yellow-500 bg-yellow-100/90 dark:bg-yellow-500/20 border-yellow-100/90 dark:border-yellow-500/20 border">
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
-        {selectedTab !== "search" && (
-          <TimeRangeSelector
-            startYear={2019}
-            dates={selectedTab === "organization" ? dates : []}
-            latestPresStartDate={latestPresStartDate}
-            onDateChange={handleDateRangeChange}
-            externalRange={externalDateRange}
-          />
-        )}
-        {selectedTab === "organization" ? (
-          <>
+        <div className="flex flex-col gap-4">
+          {latestPresStartDate && selectedTab !== "search" && (
+            <TimeRangeSelector
+              startYear={2019}
+              dates={dates}
+              latestPresStartDate={latestPresStartDate}
+              onDateChange={handleDateRangeChange}
+              externalRange={externalDateRange}
+              activePreset={activePreset}
+              setActivePreset={setActivePreset}
+              activePresident={activePresident}
+              setActivePresident={setActivePresident}
+            />
+          )}
+
+          {selectedTab === "organization" ? (
             <Organization dateRange={userSelectedDateRange} />
-          </>
-        ) : selectedTab === "data" ? (
-          <DataPage setExternalDateRange={setExternalDateRange} />
-        ) : selectedTab === "search" ? (
-          <SearchPage />
-        ) : (
-          <div className="text-primary p-8">Tab not found: {selectedTab}</div>
-        )}
+          ) : selectedTab === "data" ? (
+            <DataPage setExternalDateRange={setExternalDateRange} />
+          ) : selectedTab === "search" ? (
+            <SearchPage />
+          ) : null}
+        </div>
       </div>
     </div>
   );

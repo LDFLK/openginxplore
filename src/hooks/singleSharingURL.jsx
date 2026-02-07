@@ -14,16 +14,14 @@ export default function useUrlParamState(key, defaultValue = '') {
 
   const value = searchParams.get(key) ?? defaultValue;
 
-  const setValue = useCallback((newValue) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (newValue !== '' && newValue != null) {
-        next.set(key, newValue);
-      } else {
-        next.delete(key);
-      }
-      return next;
-    }, { replace: true });
+  const setValue = useCallback((newValue, options) => {
+    const currentParams = new URLSearchParams(window.location.search);
+    if (newValue !== '' && newValue != null) {
+      currentParams.set(key, newValue);
+    } else {
+      currentParams.delete(key);
+    }
+    setSearchParams(currentParams, { replace: true, ...options });
   }, [key, setSearchParams]);
 
   return [value, setValue];

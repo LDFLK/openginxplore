@@ -46,11 +46,12 @@ export const handleResultNavigation = async (result, {
                 ? result.term_start.split("T")[0]
                 : new Date().toISOString().split("T")[0];
 
-            // Set date range (1 year before selected date to now)
-            const endDate = new Date().toISOString().split("T")[0];
             const startDateObj = new Date(selectedDate);
-            startDateObj.setFullYear(startDateObj.getFullYear() - 1);
-            const startDate = startDateObj.toISOString().split("T")[0];
+            const year = startDateObj.getFullYear();
+
+            // Set range to the full calendar year of the term_start
+            const startDate = `${year}-01-01`;
+            const endDate = `${year}-12-31`;
 
             params.set("startDate", startDate);
             params.set("endDate", endDate);
