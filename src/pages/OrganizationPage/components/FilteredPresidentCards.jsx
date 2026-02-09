@@ -201,7 +201,9 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const [prevStart, prevEnd] = prevDateRangeRef.current;
     const [currStart, currEnd] = dateRange;
 
-    if (prevStart === null && prevEnd === null) {
+    // If current range is null, we can't filter yet.
+    // We don't skip the first non-null range update anymore.
+    if (currStart === null && currEnd === null) {
       prevDateRangeRef.current = dateRange;
       return;
     }
