@@ -74,14 +74,7 @@ export default function SearchPage() {
 
   const { data, isLoading, isError, error } = useSearch(query);
 
-  // Sort results by match_score descending - memoized to prevent re-sorting on every render
-  const sortedResults = useMemo(
-    () =>
-      data?.results
-        ? [...data.results].sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
-        : [],
-    [data]
-  );
+  const results = data?.results || [];
 
   /**
    * Handle search form submission
@@ -176,7 +169,7 @@ export default function SearchPage() {
       )}
 
       {/* Empty Results */}
-      {!isLoading && !isError && sortedResults.length === 0 && (
+      {!isLoading && !isError && results.length === 0 && (
         <div className="text-center py-12">
           <Search className="w-10 h-10 text-primary/20 mx-auto mb-3" />
           <p className="text-sm text-primary/60">No results found for "{query}"</p>
@@ -185,9 +178,9 @@ export default function SearchPage() {
       )}
 
       {/* Results List */}
-      {!isLoading && !isError && sortedResults.length > 0 && (
+      {!isLoading && !isError && results.length > 0 && (
         <div className="grid gap-2 md:gap-3">
-          {sortedResults.map((result, index) => {
+          {results.map((result, index) => {
             const config = ENTITY_CONFIG[result.type] || ENTITY_CONFIG.person;
             const Icon = config.icon;
             const isLoadingDataset = loadingDatasetId === result.id;
