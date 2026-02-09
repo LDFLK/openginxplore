@@ -40,19 +40,56 @@ export default function TimeRangeSelector({
     return isNaN(date.getTime()) ? fallback : date;
   };
 
-  const [startDate, setStartDate] = useState(() => {
+  // Consolidate URL parsing for initial state
+  const getInitialDates = () => {
     const params = new URLSearchParams(window.location.search);
-    return parseDate(params.get("startDate"), latestPresStartDate);
-  });
-  const [endDate, setEndDate] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return parseDate(params.get("endDate"), new Date());
-  });
+    const startDateParam = params.get("startDate");
+    const endDateParam = params.get("endDate");
+    const selectedDateParam = params.get("selectedDate");
+
+    const minDate = new Date(`${startYear}-01-01`);
+    const maxDate = new Date();
+
+    let urlStart = parseDate(startDateParam, null);
+    let urlEnd = parseDate(endDateParam, null);
+
+    if (!urlStart || !urlEnd) {
+      urlStart = parseDate(startDateParam, latestPresStartDate);
+      urlEnd = parseDate(endDateParam, new Date());
+    }
+
+    if (selectedDateParam) {
+      const targetDate = new Date(selectedDateParam);
+      if (!(targetDate >= urlStart && targetDate <= urlEnd)) {
+        if (targetDate >= minDate && targetDate <= maxDate) {
+          urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
+          urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
+        } else {
+          urlStart = minDate;
+          urlEnd = maxDate;
+        }
+      }
+    } else {
+      urlStart = urlStart < minDate ? minDate : urlStart;
+      urlEnd = urlEnd > maxDate ? maxDate : urlEnd;
+      if (urlEnd < urlStart) {
+        urlStart = minDate;
+        urlEnd = maxDate;
+      }
+    }
+
+    return { urlStart, urlEnd };
+  };
+
+  const { urlStart: initialStart, urlEnd: initialEnd } = getInitialDates();
+
+  const [startDate, setStartDate] = useState(initialStart);
+  const [endDate, setEndDate] = useState(initialEnd);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(null);
   const [isMovingWindow, setIsMovingWindow] = useState(false);
-  const [tempStartDate, setTempStartDate] = useState(startDate);
-  const [tempEndDate, setTempEndDate] = useState(endDate);
+  const [tempStartDate, setTempStartDate] = useState(initialStart);
+  const [tempEndDate, setTempEndDate] = useState(initialEnd);
   const [preciseMode, setPreciseMode] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [tooltip, setTooltip] = useState({
@@ -71,15 +108,9 @@ export default function TimeRangeSelector({
     (_, i) => startYear + i
   );
 
-  const initialStartYear = Math.max(
-    startYear,
-    latestPresStartDate.getFullYear()
-  );
-  const initialEndYear = Math.min(endYear, new Date().getFullYear());
-
   const [selectedRange, setSelectedRange] = useState([
-    initialStartYear,
-    initialEndYear,
+    initialStart.getUTCFullYear(),
+    initialEnd.getUTCFullYear(),
   ]);
   useEffect(() => {
     if (!externalRange) return;
