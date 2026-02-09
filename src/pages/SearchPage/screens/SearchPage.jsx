@@ -21,7 +21,7 @@ const formatCategoryName = (name) => {
 /**
  * Build dataset navigation URL from categories response
  */
-const buildDatasetUrl = (datasetName, categories) => {
+const buildDatasetUrl = (datasetName, categories, year) => {
   // Filter to Category types only, reverse to get root → child order
   const categoryChain = categories
     .filter((c) => c.kind?.major === "Category")
@@ -34,13 +34,12 @@ const buildDatasetUrl = (datasetName, categories) => {
   // Build breadcrumb array
   const breadcrumb = categoryChain.map((cat) => ({
     label: formatCategoryName(cat.name),
-    path: `/data?categoryIds=${encodeURIComponent(JSON.stringify([cat.id]))}`,
+    categoryIds: [cat.id],
   }));
 
-  // Add dataset as final breadcrumb
+  // Add dataset as final breadcrumb (leaf node, no redundant data)
   breadcrumb.push({
     label: datasetName,
-    path: `/data?datasetName=${encodeURIComponent(datasetName)}&categoryIds=${encodeURIComponent(JSON.stringify([lastCategoryId]))}`,
   });
 
   // Build final URL
@@ -49,6 +48,11 @@ const buildDatasetUrl = (datasetName, categories) => {
     datasetName: datasetName,
     breadcrumb: JSON.stringify(breadcrumb),
   });
+
+  if (year) {
+    params.set("startDate", `${year}-01-01`);
+    params.set("endDate", `${year}-12-31`);
+  }
 
   return `/data?${params.toString()}`;
 };

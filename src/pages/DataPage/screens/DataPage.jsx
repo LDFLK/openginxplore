@@ -94,14 +94,20 @@ export default function DataPage({ setExternalDateRange }) {
     if (!breadcrumbTrail.find((b) => b.label === categoryName)) {
       setLoadingCardId(cardId);
 
-      const breadcrumbParams = new URLSearchParams();
-      breadcrumbParams.set("categoryIds", JSON.stringify(categoryIdsArray));
+      // 1. Prepare parents: Ensure the previous leaf now has its navigation data
+      const updatedTrail = breadcrumbTrail.map((item, idx) => {
+        if (idx === breadcrumbTrail.length - 1) {
+          // This was the old leaf, now it needs its IDs before becoming a parent
+          return { ...item, categoryIds: categoryIds };
+        }
+        return item;
+      });
 
+      // 2. Add the new leaf (label only, no redundant IDs)
       const newBreadcrumb = [
-        ...breadcrumbTrail,
+        ...updatedTrail,
         {
           label: formatText({ name: categoryName }) || "Category",
-          path: `/data?${breadcrumbParams.toString()}`,
         },
       ];
 
@@ -125,15 +131,19 @@ export default function DataPage({ setExternalDateRange }) {
     if (!breadcrumbTrail.find((b) => b.label === datasetName)) {
       setLoadingCardId(datasetName);
 
-      const breadcrumbParams = new URLSearchParams();
-      breadcrumbParams.set("datasetName", datasetName);
-      breadcrumbParams.set("categoryIds", JSON.stringify(categoryIds));
+      // 1. Prepare parents: Ensure the previous leaf (the category) has its navigation data
+      const updatedTrail = breadcrumbTrail.map((item, idx) => {
+        if (idx === breadcrumbTrail.length - 1) {
+          return { ...item, categoryIds: categoryIds };
+        }
+        return item;
+      });
 
+      // 2. Add the new leaf (label only)
       const newBreadcrumb = [
-        ...breadcrumbTrail,
+        ...updatedTrail,
         {
           label: datasetName,
-          path: `/data?${breadcrumbParams.toString()}`,
         },
       ];
 
@@ -156,34 +166,39 @@ export default function DataPage({ setExternalDateRange }) {
       navigate("/data");
       return;
     }
-    const url = new URL(item.path, window.location.origin);
+
     const newTrail = breadcrumbTrail.slice(0, index + 1);
-    setBreadcrumbTrail(newTrail);
+    const selectedItem = newTrail[index];
 
     // Clear states when navigating back
     setSelectedDataset(null);
     setLoadingCardId(null);
 
     const params = new URLSearchParams(window.location.search);
-    const pidParam = url.searchParams.get("categoryIds");
-    const datasetName = url.searchParams.get("datasetName");
 
-    if (pidParam) {
-      try {
-        // pidParam is already decoded by URLSearchParams.get
-        const decodedPid = JSON.parse(pidParam);
-        params.set("categoryIds", JSON.stringify(decodedPid));
-      } catch {
-        params.set("categoryIds", pidParam);
-      }
+    if (selectedItem.categoryIds) {
+      params.set("categoryIds", JSON.stringify(selectedItem.categoryIds));
     } else {
       params.delete("categoryIds");
     }
 
-    if (datasetName) params.set("datasetName", datasetName);
-    else params.delete("datasetName");
+    if (selectedItem.datasetName) {
+      params.set("datasetName", selectedItem.datasetName);
+    } else {
+      params.delete("datasetName");
+    }
 
-    params.set("breadcrumb", JSON.stringify(newTrail));
+    // When we navigate TO an item, it becomes the new leaf. 
+    // We should strip its data for the URL version to keep it clean.
+    const trailForUrl = newTrail.map((item, i) => {
+      if (i === newTrail.length - 1) {
+        return { label: item.label };
+      }
+      return item;
+    });
+
+    setBreadcrumbTrail(newTrail);
+    params.set("breadcrumb", JSON.stringify(trailForUrl));
     navigate(`${location.pathname}?${params.toString()}`);
   };
 

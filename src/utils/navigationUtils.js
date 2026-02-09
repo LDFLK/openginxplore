@@ -19,18 +19,18 @@ export const handleResultNavigation = async (result, {
     buildDatasetUrl,
     onComplete
 }) => {
-    if (onComplete) onComplete();
-
     const returnPath = location.pathname + location.search;
 
     switch (result.type) {
         case "person":
+            if (onComplete) onComplete();
             navigate(`/person-profile/${result.id}`, {
                 state: { from: returnPath },
             });
             break;
 
         case "department":
+            if (onComplete) onComplete();
             navigate(`/department-profile/${result.id}`, {
                 state: { from: returnPath },
             });
@@ -60,6 +60,7 @@ export const handleResultNavigation = async (result, {
             params.set("selectedDate", selectedDate);
             params.set("filterByName", result.name);
 
+            if (onComplete) onComplete();
             navigate(`/organization?${params.toString()}`);
             break;
         }
@@ -68,12 +69,16 @@ export const handleResultNavigation = async (result, {
             if (setLoadingDatasetId) setLoadingDatasetId(result.id);
             try {
                 const response = await getDatasetCategories({ datasetId: result.id });
+                const year = result.year || (result.term_start ? new Date(result.term_start).getFullYear() : null);
                 const url = buildDatasetUrl
-                    ? buildDatasetUrl(result.name, response.categories || [])
+                    ? buildDatasetUrl(result.name, response.categories || [], year)
                     : "/data";
+
+                if (onComplete) onComplete();
                 navigate(url);
             } catch (err) {
                 console.error("Failed to fetch dataset categories:", err);
+                if (onComplete) onComplete();
                 navigate("/data");
             } finally {
                 if (setLoadingDatasetId) setLoadingDatasetId(null);
@@ -81,6 +86,7 @@ export const handleResultNavigation = async (result, {
             break;
 
         default:
+            if (onComplete) onComplete();
             break;
     }
 };
