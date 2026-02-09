@@ -171,14 +171,14 @@ export default function SearchBar() {
                         <p className="text-[10px] text-primary/50 uppercase tracking-wider">
                           {config.label}
                         </p>
-                        {result.year && (
+                        {result.created && result.type == "dataset" && (
                           <span className="text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
-                            {result.year}
+                            {new Date(result.created).getFullYear()}
                           </span>
                         )}
-                        {result.type === "minister" && result.term_start && (
+                        {result.type === "minister" && result.created && (
                           <span className="text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
-                            Start: {result.term_start.split("T")[0]}
+                            Start: {result.created.split("T")[0]}
                           </span>
                         )}
                       </div>

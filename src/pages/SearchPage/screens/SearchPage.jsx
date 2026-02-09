@@ -219,14 +219,14 @@ export default function SearchPage() {
                     <span className={`text-xs font-medium ${config.textColor}`}>
                       {config.label}
                     </span>
-                    {result.year && (
+                    {result.created && result.type == "dataset" && (
                       <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary/70 rounded">
-                        {result.year}
+                        {new Date(result.created).getFullYear()}
                       </span>
                     )}
-                    {result.type === "minister" && result.term_start && (
+                    {result.type === "minister" && result.created && (
                       <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary/70 rounded">
-                        Start: {result.term_start.split("T")[0]}
+                        Start: {result.created.split("T")[0]}
                       </span>
                     )}
                   </div>

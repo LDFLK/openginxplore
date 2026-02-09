@@ -42,8 +42,8 @@ export const handleResultNavigation = async (result, {
             const params = new URLSearchParams();
 
             // Use term_start date if available, otherwise use current date
-            const selectedDate = result.term_start
-                ? result.term_start.split("T")[0]
+            const selectedDate = result.created
+                ? result.created.split("T")[0]
                 : new Date().toISOString().split("T")[0];
 
             const startDateObj = new Date(selectedDate);
@@ -69,7 +69,7 @@ export const handleResultNavigation = async (result, {
             if (setLoadingDatasetId) setLoadingDatasetId(result.id);
             try {
                 const response = await getDatasetCategories({ datasetId: result.id });
-                const year = result.year || (result.term_start ? new Date(result.term_start).getFullYear() : null);
+                const year = result.year || (result.created ? new Date(result.created).getFullYear() : null);
                 const url = buildDatasetUrl
                     ? buildDatasetUrl(result.name, response.categories || [], year)
                     : "/data";
