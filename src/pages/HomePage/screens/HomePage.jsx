@@ -9,10 +9,10 @@ import {
 } from "lucide-react";
 import DataPage from "../../DataPage/screens/DataPage";
 import TimeRangeSelector from "../components/TimeRangeSelector";
-import { useSelector } from "react-redux";
-import Organization from "../../OrganizationPage/screens/Organization";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import TextLogo from "../../LandingPage/components/textLogo";
+import Organization from "../../OrganizationPage/screens/Organization";
 import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
@@ -27,6 +27,7 @@ const feedbackFormUrl = window?.configs?.feedbackFormUrl
 export default function HomePage() {
   const [isExpanded, setIsExpanded] = useState(window.innerWidth >= 768);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
   const { tab } = useParams();
 
@@ -123,6 +124,15 @@ export default function HomePage() {
   const handleTabChange = (tabName) => {
     const params = new URLSearchParams(window.location.search);
 
+    // Common resets for all tab changes to ensure a fresh start
+    params.delete("startDate");
+    params.delete("endDate");
+    params.delete("selectedDate");
+    params.delete("filterByName");
+    params.delete("filterByType");
+    params.delete("ministry");
+    params.delete("viewMode");
+
     if (tabName === "organization") {
       params.delete("categoryIds");
       params.delete("datasetId");
@@ -130,11 +140,7 @@ export default function HomePage() {
       params.delete("breadcrumb");
     }
     if (tabName === "data") {
-      params.delete("selectedDate");
-      params.delete("filterByType");
-      params.delete("viewMode");
-      params.delete("ministry");
-      params.delete("filterByName");
+      // Data-specific deletes (if any were not covered in common resets)
     }
     navigate({
       pathname: `/${tabName}`,
