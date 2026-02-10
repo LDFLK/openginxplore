@@ -70,7 +70,7 @@ export default function SearchBar() {
   const dropdownRef = useRef(null);
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
 
-  const debouncedQuery = useDebounce(query, 300);
+  const debouncedQuery = useDebounce(query, 1000);
   const { data, isLoading } = useSearch(debouncedQuery);
 
   useEffect(() => {
