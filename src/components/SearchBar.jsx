@@ -172,7 +172,7 @@ export default function SearchBar() {
                         <p className="text-[9px] md:text-[10px] text-primary/50 uppercase tracking-wider">
                           {config.label}
                         </p>
-                        {result.created && result.type == "dataset" && (
+                        {result.created && result.type === "dataset" && (
                           <span className="text-[9px] md:text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
                             {new Date(result.created).getFullYear()}
                           </span>
