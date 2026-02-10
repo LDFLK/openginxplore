@@ -212,7 +212,7 @@ export default function SearchPage() {
                     <span className={`text-[10px] md:text-xs font-medium ${config.textColor}`}>
                       {config.label}
                     </span>
-                    {result.created && result.type == "dataset" && (
+                    {result.created && result.type === "dataset" && (
                       <span className="text-[10px] md:text-xs px-1 md:px-1.5 py-0.2 bg-primary/10 text-primary/70 rounded">
                         {new Date(result.created).getFullYear()}
                       </span>
