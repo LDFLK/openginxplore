@@ -132,8 +132,29 @@ export default function SearchBar() {
             type="text"
             value={query}
             onChange={(e) => {
-              setQuery(e.target.value);
+              const val = e.target.value;
+              setQuery(val);
               setIsOpen(true);
+
+              // If user manually clears the search bar, remove search-related params from URL
+              if (val === "") {
+                const params = new URLSearchParams(window.location.search);
+                params.delete("q");
+                params.delete("filterByName");
+                params.delete("datasetName");
+                params.delete("selectedDate");
+
+                navigate(
+                  {
+                    pathname: location.pathname,
+                    search: params.toString() ? `?${params.toString()}` : "",
+                  },
+                  {
+                    replace: true,
+                    state: { ...location.state, searchResultName: undefined },
+                  }
+                );
+              }
             }}
             onFocus={() => setIsOpen(true)}
             placeholder="Search..."
