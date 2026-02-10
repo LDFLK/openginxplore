@@ -12,7 +12,7 @@ const DATA_URL = "/v1/data";
  * @returns {Promise<Object>} Search results (all matching results)
  */
 export const search = async ({ query, type, signal }) => {
-  const params = { q: query };
+  const params = { search_query: query };
   if (type) params.type = type;
 
   const { data } = await axios.get(SEARCH_URL, { params, signal });

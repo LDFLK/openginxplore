@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useSearch } from "../hooks/useSearch";
+import { useDebounce } from "../hooks/useDebounce";
 import { ENTITY_CONFIG } from "../constants/entityConfig";
-import { getDatasetCategories } from "../services/searchServices";
 import { handleResultNavigation } from "../utils/navigationUtils";
 
 /**
@@ -70,7 +70,8 @@ export default function SearchBar() {
   const dropdownRef = useRef(null);
   const [loadingDatasetId, setLoadingDatasetId] = useState(null);
 
-  const { data, isLoading } = useSearch(query);
+  const debouncedQuery = useDebounce(query, 300);
+  const { data, isLoading } = useSearch(debouncedQuery);
 
   useEffect(() => {
     setQuery(searchParams.get("q") || "");
@@ -138,7 +139,7 @@ export default function SearchBar() {
 
       {/* Search Results Dropdown */}
       {isOpen && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-xl z-[100] overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-xl z-[100] overflow-hidden max-h-[70vh] overflow-y-auto">
           {isLoading ? (
             <div className="p-4 flex items-center justify-center">
               <Loader2 className="w-5 h-5 text-accent animate-spin" />
@@ -154,31 +155,31 @@ export default function SearchBar() {
                   <button
                     key={`${result.type}-${result.id}-${index}`}
                     onClick={() => handleResultClick(result)}
-                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-accent/5 transition-colors text-left"
+                    className="w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 hover:bg-accent/5 transition-colors text-left"
                   >
-                    <div className={`p-1.5 rounded ${config.bgColor}`}>
+                    <div className={`p-1 md:p-1.5 rounded ${config.bgColor}`}>
                       {isLoadingDataset ? (
-                        <Loader2 className={`w-3.5 h-3.5 ${config.textColor} animate-spin`} />
+                        <Loader2 className={`w-3 h-3 md:w-3.5 md:h-3.5 ${config.textColor} animate-spin`} />
                       ) : (
-                        <Icon className={`w-3.5 h-3.5 ${config.textColor}`} />
+                        <Icon className={`w-3 h-3 md:w-3.5 md:h-3.5 ${config.textColor}`} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-primary truncate">
+                      <p className="text-xs md:text-sm font-medium text-primary truncate">
                         {result.name}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-[10px] text-primary/50 uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5 md:gap-2">
+                        <p className="text-[9px] md:text-[10px] text-primary/50 uppercase tracking-wider">
                           {config.label}
                         </p>
                         {result.created && result.type == "dataset" && (
-                          <span className="text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
+                          <span className="text-[9px] md:text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
                             {new Date(result.created).getFullYear()}
                           </span>
                         )}
                         {result.type === "minister" && result.created && (
-                          <span className="text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
-                            Start: {result.created.split("T")[0]}
+                          <span className="text-[9px] md:text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
+                            {result.created.split("T")[0]}
                           </span>
                         )}
                       </div>

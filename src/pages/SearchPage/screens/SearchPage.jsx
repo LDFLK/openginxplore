@@ -103,30 +103,30 @@ export default function SearchPage() {
   if (!query || query.length < 2) {
     return (
       <div className="p-4 md:p-8">
-        <div className="max-w-2xl mx-auto text-center py-12">
-          <Search className="w-12 h-12 text-primary/30 mx-auto mb-4" />
-          <h2 className="text-lg md:text-xl font-semibold text-primary mb-2">
+        <div className="max-w-2xl mx-auto text-center py-8 md:py-12">
+          <Search className="w-8 h-8 md:w-12 md:h-12 text-primary/30 mx-auto mb-4" />
+          <h2 className="text-base md:text-xl font-semibold text-primary mb-2">
             Search OpenGINXplore
           </h2>
-          <p className="text-sm text-primary/60 mb-6">
+          <p className="text-xs md:text-sm text-primary/60 mb-6">
             Find persons, departments, ministries, and datasets
           </p>
           <form onSubmit={handleSearchSubmit} className="max-w-md mx-auto">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/50" />
+              <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-primary/50" />
               <input
                 type="text"
                 value={localQuery}
                 onChange={(e) => setLocalQuery(e.target.value)}
                 placeholder="Enter at least 2 characters..."
-                className="w-full pl-12 pr-4 py-3 text-sm md:text-base bg-background border border-border rounded-lg
+                className="w-full pl-10 md:pl-12 pr-4 py-2 md:py-3 text-sm md:text-base bg-background border border-border rounded-lg
                            text-primary placeholder:text-primary/50
                            focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent
                            transition-colors"
                 autoFocus
               />
             </div>
-            <p className="text-xs text-primary/40 mt-2">Press Enter to search</p>
+            <p className="text-[10px] md:text-xs text-primary/40 mt-2">Press Enter to search</p>
           </form>
         </div>
       </div>
@@ -136,12 +136,12 @@ export default function SearchPage() {
   return (
     <div className="p-2 md:p-4 lg:p-6">
       {/* Header */}
-      <div className="mb-4 md:mb-6">
-        <h1 className="text-lg md:text-xl font-semibold text-primary">
+      <div className="mb-3 md:mb-6">
+        <h1 className="text-base md:text-xl font-semibold text-primary">
           Search results for "{query}"
         </h1>
         {data && (
-          <p className="text-xs md:text-sm text-primary/60 mt-1">
+          <p className="text-[10px] md:text-sm text-primary/60 mt-0.5 md:mt-1">
             Found {data.total || 0} result{data.total !== 1 ? "s" : ""}
           </p>
         )}
@@ -190,7 +190,7 @@ export default function SearchPage() {
                 key={`${result.type}-${result.id}-${index}`}
                 onClick={() => !isLoadingDataset && handleResultClick(result)}
                 className={`
-                  flex items-center gap-3 p-3 md:p-4
+                  flex items-center gap-2 md:gap-4 py-2 md:py-2.5 px-3 md:px-4
                   bg-background border border-border rounded-lg
                   hover:border-accent/50 hover:shadow-sm
                   transition-all cursor-pointer
@@ -198,47 +198,40 @@ export default function SearchPage() {
                 `}
               >
                 {/* Icon */}
-                <div className={`p-2 rounded-lg ${config.bgColor} flex-shrink-0`}>
+                <div className={`p-1.5 md:p-2 rounded-lg ${config.bgColor} flex-shrink-0`}>
                   {isLoadingDataset ? (
-                    <Loader2 className={`w-5 h-5 ${config.textColor} animate-spin`} />
+                    <Loader2 className={`w-4 h-4 md:w-5 md:h-5 ${config.textColor} animate-spin`} />
                   ) : (
-                    <Icon className={`w-5 h-5 ${config.textColor}`} />
+                    <Icon className={`w-4 h-4 md:w-5 md:h-5 ${config.textColor}`} />
                   )}
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className={`text-xs font-medium ${config.textColor}`}>
+                  <div className="flex items-center gap-1.5 md:gap-2 mb-0.5">
+                    <span className={`text-[10px] md:text-xs font-medium ${config.textColor}`}>
                       {config.label}
                     </span>
                     {result.created && result.type == "dataset" && (
-                      <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary/70 rounded">
+                      <span className="text-[10px] md:text-xs px-1 md:px-1.5 py-0.2 bg-primary/10 text-primary/70 rounded">
                         {new Date(result.created).getFullYear()}
                       </span>
                     )}
                     {result.type === "minister" && result.created && (
-                      <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary/70 rounded">
+                      <span className="text-[10px] md:text-xs px-1 md:px-1.5 py-0.2 bg-primary/10 text-primary/70 rounded">
                         Start: {result.created.split("T")[0]}
                       </span>
                     )}
                   </div>
-                  <h3 className="text-sm md:text-base font-medium text-primary truncate">
+                  <h3 className="text-sm md:text-base font-medium text-primary truncate leading-tight">
                     {result.name}
                   </h3>
                   {result.parent_portfolio && (
-                    <p className="text-xs text-primary/50 truncate mt-0.5">
+                    <p className="text-[11px] md:text-xs text-primary/50 truncate mt-0.5">
                       {result.parent_portfolio}
                     </p>
                   )}
                 </div>
-
-                {/* Match Score Badge */}
-                {result.match_score !== undefined && (
-                  <div className="hidden md:block text-xs text-primary/40 flex-shrink-0">
-                    {Math.round(result.match_score * 100)}% match
-                  </div>
-                )}
               </div>
             );
           })}
