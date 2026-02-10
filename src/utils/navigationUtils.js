@@ -25,14 +25,14 @@ export const handleResultNavigation = async (result, {
         case "person":
             if (onComplete) onComplete();
             navigate(`/person-profile/${result.id}`, {
-                state: { from: returnPath },
+                state: { from: returnPath, searchResultName: result.name },
             });
             break;
 
         case "department":
             if (onComplete) onComplete();
             navigate(`/department-profile/${result.id}`, {
-                state: { from: returnPath },
+                state: { from: returnPath, searchResultName: result.name },
             });
             break;
 
@@ -61,7 +61,9 @@ export const handleResultNavigation = async (result, {
             params.set("filterByName", result.name);
 
             if (onComplete) onComplete();
-            navigate(`/organization?${params.toString()}`);
+            navigate(`/organization?${params.toString()}`, {
+                state: { searchResultName: result.name },
+            });
             break;
         }
 
@@ -75,7 +77,9 @@ export const handleResultNavigation = async (result, {
                     : "/data";
 
                 if (onComplete) onComplete();
-                navigate(url);
+                navigate(url, {
+                    state: { searchResultName: result.name },
+                });
             } catch (err) {
                 console.error("Failed to fetch dataset categories:", err);
                 if (onComplete) onComplete();

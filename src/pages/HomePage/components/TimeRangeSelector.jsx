@@ -139,17 +139,26 @@ export default function TimeRangeSelector({
   useEffect(() => {
     if (!startDate || !endDate) return;
 
-    const path = location.pathname;
     const params = new URLSearchParams(window.location.search);
-
     const newStart = startDate.toISOString().split("T")[0];
     const newEnd = endDate.toISOString().split("T")[0];
 
-    // Only update if current URL is missing dates or our state is fundamentally different
+    // Check if URL already matches. Use ISO string comparison to match UTC dates.
+    const urlStart = params.get("startDate");
+    const urlEnd = params.get("endDate");
+
+    if (urlStart === newStart && urlEnd === newEnd) return;
+
+    // Only update if current URL is missing dates OR if the change seems to be 
+    // internal (i.e. path hasn't changed, but dates did)
+    // Actually, if we are transitioning to a NEW path, we should let that path's 
+    // initial parameters win.
     params.set("startDate", newStart);
     params.set("endDate", newEnd);
+
+    const path = location.pathname;
     window.history.replaceState({}, "", `${path}?${params.toString()}`);
-  }, [startDate, endDate, location.pathname]);
+  }, [startDate, endDate]); // Remove location.pathname from deps to avoid overwriting on navigation
 
   useEffect(() => {
     // We use window.location.search directly to ensure we have the latest params

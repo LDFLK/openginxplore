@@ -74,8 +74,16 @@ export default function SearchBar() {
   const { data, isLoading } = useSearch(debouncedQuery);
 
   useEffect(() => {
-    setQuery(searchParams.get("q") || "");
-  }, [searchParams]);
+    const params = new URLSearchParams(location.search);
+    const q = params.get("q");
+    const filterByName = params.get("filterByName");
+    const datasetName = params.get("datasetName");
+    const resultName = location.state?.searchResultName;
+
+    // Priority: URL query -> nav state result name -> entity name params -> empty
+    const newQuery = q || resultName || filterByName || datasetName || "";
+    setQuery(newQuery);
+  }, [location.search, location.state]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
