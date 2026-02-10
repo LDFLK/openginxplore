@@ -125,8 +125,8 @@ export default function HomePage() {
     const params = new URLSearchParams(window.location.search);
 
     // Common resets for all tab changes to ensure a fresh start
-    params.delete("startDate");
-    params.delete("endDate");
+    // params.delete("startDate");
+    // params.delete("endDate");
     params.delete("selectedDate");
     params.delete("filterByName");
     params.delete("filterByType");
