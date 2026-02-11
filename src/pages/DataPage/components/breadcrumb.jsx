@@ -15,7 +15,7 @@ export function Breadcrumb({ items, onItemClick, setSelectedDatasets }) {
   };
 
   return (
-    <div className="container">
+    <div className="container -mt-4 mb-6">
       <ol className="flex items-center gap-2 text-xs md:text-sm overflow-x-auto text-primary/75 no-scrollbar">
         <li>
           <button
