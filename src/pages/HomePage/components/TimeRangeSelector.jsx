@@ -24,14 +24,10 @@ export default function TimeRangeSelector({
   const presidentRelationDict = useSelector(
     (state) => state.presidency.presidentRelationDict
   );
-  const navigate = useNavigate();
   const location = useLocation();
   const containerRef = useRef(null);
   const dragStartRef = useRef(null);
   const scrollWrapperRef = useRef(null);
-  /* eslint-disable no-unused-vars */
-  const [searchParams] = useSearchParams();
-  /* eslint-enable no-unused-vars */
 
   // Helper: safely parse YYYY-MM-DD → Date
   const parseDate = (dateStr, fallback) => {

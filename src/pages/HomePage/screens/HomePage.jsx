@@ -27,8 +27,6 @@ const feedbackFormUrl = window?.configs?.feedbackFormUrl
 export default function HomePage() {
   const [isExpanded, setIsExpanded] = useState(window.innerWidth >= 768);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const location = useLocation();
   const { tab } = useParams();
 
   const selectedTab = tab || "organization";
