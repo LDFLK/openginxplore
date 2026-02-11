@@ -74,16 +74,13 @@ export default function SearchBar() {
   const { data, isLoading } = useSearch(debouncedQuery);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const q = params.get("q");
-    const filterByName = params.get("filterByName");
-    const datasetName = params.get("datasetName");
+    const q = searchParams.get("q");
     const resultName = location.state?.searchResultName;
 
-    // Priority: URL query -> nav state result name -> entity name params -> empty
-    const newQuery = q || resultName || filterByName || datasetName || "";
+    // Only sync from URL query or nav state result name
+    const newQuery = q || resultName || "";
     setQuery(newQuery);
-  }, [location.search, location.state]);
+  }, [searchParams, location.state]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
