@@ -121,10 +121,10 @@ export default function SearchBar() {
     });
   };
 
-  const results = data?.results?.slice(0, 5) || [];
+  const results = data?.results?.slice(0, 20) || [];
 
   return (
-    <div ref={dropdownRef} className="flex-1 max-w-sm md:max-w-xl mx-2 md:mx-4 relative">
+    <div ref={dropdownRef} className="flex-1 max-w-none md:max-w-xl ml-5 mr-1 md:mx-4 relative">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
@@ -168,7 +168,8 @@ export default function SearchBar() {
 
       {/* Search Results Dropdown */}
       {isOpen && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-xl z-[100] overflow-hidden max-h-[70vh] overflow-y-auto">
+        <div className="absolute top-full left-1/2 -translate-x-1/3 md:translate-x-0 md:left-0 md:right-0 mt-2 bg-background border border-border rounded-lg shadow-xl z-[100] overflow-hidden max-h-[70vh] overflow-y-auto
+                        w-[calc(100vw-10rem)] sm:w-[calc(100vw-10rem)] md:w-full min-w-[220px] max-w-[280px] md:max-w-none">
           {isLoading ? (
             <div className="p-4 flex items-center justify-center">
               <Loader2 className="w-5 h-5 text-accent animate-spin" />

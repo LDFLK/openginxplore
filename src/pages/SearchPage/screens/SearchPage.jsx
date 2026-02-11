@@ -134,7 +134,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="p-2 md:p-4 lg:p-6">
+    <div className="p-2 md:p-4 lg:p-6 overflow-x-hidden">
       {/* Header */}
       <div className="mb-3 md:mb-6">
         <h1 className="text-base md:text-xl font-semibold text-primary">
@@ -190,7 +190,7 @@ export default function SearchPage() {
                 key={`${result.type}-${result.id}-${index}`}
                 onClick={() => !isLoadingDataset && handleResultClick(result)}
                 className={`
-                  flex items-center gap-2 md:gap-4 py-2 md:py-2.5 px-3 md:px-4
+                  flex items-start gap-2 md:gap-4 py-1.5 md:py-2.5 px-2 md:px-4
                   bg-background border border-border rounded-lg
                   hover:border-accent/50 hover:shadow-sm
                   transition-all cursor-pointer
@@ -198,17 +198,17 @@ export default function SearchPage() {
                 `}
               >
                 {/* Icon */}
-                <div className={`p-1.5 md:p-2 rounded-lg ${config.bgColor} flex-shrink-0`}>
+                <div className={`p-1 md:p-2 rounded-lg ${config.bgColor} flex-shrink-0 mt-0.5 md:mt-0`}>
                   {isLoadingDataset ? (
-                    <Loader2 className={`w-4 h-4 md:w-5 md:h-5 ${config.textColor} animate-spin`} />
+                    <Loader2 className={`w-3.5 h-3.5 md:w-5 md:h-5 ${config.textColor} animate-spin`} />
                   ) : (
-                    <Icon className={`w-4 h-4 md:w-5 md:h-5 ${config.textColor}`} />
+                    <Icon className={`w-3.5 h-3.5 md:w-5 md:h-5 ${config.textColor}`} />
                   )}
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 md:gap-2 mb-0.5">
+                  <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mb-0.5">
                     <span className={`text-[10px] md:text-xs font-medium ${config.textColor}`}>
                       {config.label}
                     </span>
@@ -223,11 +223,11 @@ export default function SearchPage() {
                       </span>
                     )}
                   </div>
-                  <h3 className="text-sm md:text-base font-medium text-primary truncate leading-tight">
+                  <h3 className="text-sm md:text-base font-medium text-primary leading-tight break-words">
                     {result.name}
                   </h3>
                   {result.parent_portfolio && (
-                    <p className="text-[11px] md:text-xs text-primary/50 truncate mt-0.5">
+                    <p className="text-[10px] md:text-xs text-primary/50 mt-0.5 break-words">
                       {result.parent_portfolio}
                     </p>
                   )}
