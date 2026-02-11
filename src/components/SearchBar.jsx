@@ -184,7 +184,7 @@ export default function SearchBar() {
                   <button
                     key={`${result.type}-${result.id}-${index}`}
                     onClick={() => handleResultClick(result)}
-                    className="w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 hover:bg-accent/5 transition-colors text-left"
+                    className="w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 hover:bg-accent/5 cursor-pointer transition-colors text-left"
                   >
                     <div className={`p-1 md:p-1.5 rounded ${config.bgColor}`}>
                       {isLoadingDataset ? (
