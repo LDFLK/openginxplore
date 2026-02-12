@@ -23,6 +23,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const [initializedFromUrl, setInitializedFromUrl] = useState(false);
   const [urlInitComplete, setUrlInitComplete] = useState(false);
   const prevDateRangeRef = useRef([null, null]);
+  const lastProcessedUrlRef = useRef("");
 
   const location = useLocation()
 
@@ -59,6 +60,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         );
       });
   }, [presidents, presidentRelationDict, dateRange, searchTerm]);
+
 
   const selectPresidentAndDates = (
     president,
@@ -107,6 +109,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
     dispatch(setSelectedDate(selectedDateValue));
   };
+
 
   useEffect(() => {
     if (initializedFromUrl) return;
@@ -198,7 +201,9 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const [prevStart, prevEnd] = prevDateRangeRef.current;
     const [currStart, currEnd] = dateRange;
 
-    if (prevStart === null && prevEnd === null) {
+    // If current range is null, we can't filter yet.
+    // We don't skip the first non-null range update anymore.
+    if (currStart === null && currEnd === null) {
       prevDateRangeRef.current = dateRange;
       return;
     }
@@ -207,6 +212,31 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
     if (urlInitComplete) {
       setUrlInitComplete(false);
+      prevDateRangeRef.current = dateRange;
+      return;
+    }
+
+    // Check if this date range change matches the URL we just processed
+    const currentUrlSearch = location.search;
+    const params = new URLSearchParams(currentUrlSearch);
+    const urlStartDate = params.get("startDate");
+    const urlEndDate = params.get("endDate");
+    const hasFilterByName = params.get("filterByName");
+
+    const dateRangeMatchesUrl =
+      currStart && currEnd &&
+      urlStartDate && urlEndDate &&
+      currStart.toISOString().split("T")[0] === urlStartDate &&
+      currEnd.toISOString().split("T")[0] === urlEndDate;
+
+    // If date range doesn't match URL AND it's not a minister search navigation, 
+    // this is a manual change - clear the processed URL
+    if (!dateRangeMatchesUrl && !hasFilterByName) {
+      lastProcessedUrlRef.current = "";
+    }
+
+    // Don't auto-select if we just processed a URL change AND the date range matches that URL
+    if (lastProcessedUrlRef.current === currentUrlSearch && dateRangeMatchesUrl && currentUrlSearch.includes('selectedDate')) {
       prevDateRangeRef.current = dateRange;
       return;
     }
@@ -227,6 +257,69 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     url.searchParams.set("selectedDate", selectedDate.date);
     window.history.replaceState({}, "", url.toString());
   }, [selectedDate]);
+
+  // Monitor URL parameter changes when already on /organization route
+  useEffect(() => {
+    // Only run after initial URL initialization is complete
+    if (!initializedFromUrl) return;
+
+    // Don't run if we don't have the required data yet
+    if (
+      !presidents ||
+      (Array.isArray(presidents)
+        ? presidents.length === 0
+        : Object.keys(presidents).length === 0)
+    )
+      return;
+    if (
+      !presidentRelationDict ||
+      Object.keys(presidentRelationDict).length === 0
+    )
+      return;
+    if (!gazetteDateClassic || gazetteDateClassic.length === 0) return;
+
+    const currentUrlSearch = location.search;
+    const params = new URLSearchParams(currentUrlSearch);
+    const urlSelectedDate = params.get("selectedDate");
+    const urlStartDate = params.get("startDate");
+    const urlEndDate = params.get("endDate");
+
+    // If no URL params, don't do anything
+    if (!urlSelectedDate || !urlStartDate || !urlEndDate) return;
+
+    // Check if we've already processed this exact URL
+    // BUT always process if it's a minister search (has filterByName parameter)
+    const hasFilterByName = params.get("filterByName");
+    if (lastProcessedUrlRef.current === currentUrlSearch && !hasFilterByName) return;
+
+    // Find the president for the selected date
+    const allPresidents = Array.isArray(presidents)
+      ? presidents
+      : Object.values(presidents);
+
+    const presidentForDate = allPresidents.find((p) => {
+      const rel = presidentRelationDict[p.id];
+      if (!rel || !rel.startTime) return false;
+
+      const start = new Date(rel.startTime.split("T")[0]);
+      const end = rel.endTime
+        ? new Date(rel.endTime.split("T")[0])
+        : new Date();
+
+      const matches =
+        new Date(urlSelectedDate) >= start &&
+        new Date(urlSelectedDate) <= end;
+      return matches;
+    });
+
+    if (presidentForDate) {
+      const urlRange = [new Date(urlStartDate), new Date(urlEndDate)];
+      selectPresidentAndDates(presidentForDate, urlRange, urlSelectedDate);
+      // Mark this URL as processed after successful update
+      lastProcessedUrlRef.current = currentUrlSearch;
+    }
+  }, [location.search, location.key, initializedFromUrl, presidents, presidentRelationDict, gazetteDateClassic]);
+
 
   return (
     <div className="rounded-lg w-full">

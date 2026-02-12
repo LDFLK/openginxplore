@@ -21,9 +21,9 @@ const Organization = ({ dateRange }) => {
       if (Object.prototype.hasOwnProperty.call(newState, "president")) {
         delete newState.president;
       }
-      navigate(location.pathname, { replace: true, state: newState });
+      navigate(`${location.pathname}${location.search}`, { replace: true, state: newState });
     }
-  }, [president, navigate, location.pathname]);
+  }, [president, navigate, location.pathname, location.search]);
 
   return (
     <div>

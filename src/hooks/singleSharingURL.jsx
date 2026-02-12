@@ -1,31 +1,28 @@
-import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useCallback } from "react";
 
+/**
+ * Hook to synchronize a state variable with a URL search parameter.
+ * Uses React Router's useSearchParams for cross-component synchronization.
+ * 
+ * @param {string} key - The search parameter key
+ * @param {string} defaultValue - The default value if the parameter is missing
+ * @returns {[string, Function]} - The current value and a setter function
+ */
 export default function useUrlParamState(key, defaultValue = '') {
-  const [value, setValue] = useState(() => {
-    const param = new URLSearchParams(window.location.search).get(key);
-    return param ?? defaultValue;
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Update URL when state changes
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    if (value !== '' && value != null) {
-      url.searchParams.set(key, value);
+  const value = searchParams.get(key) ?? defaultValue;
+
+  const setValue = useCallback((newValue, options) => {
+    const currentParams = new URLSearchParams(window.location.search);
+    if (newValue !== '' && newValue != null) {
+      currentParams.set(key, newValue);
     } else {
-      url.searchParams.delete(key);
+      currentParams.delete(key);
     }
-    window.history.replaceState({}, '', url.toString());
-  }, [key, value]);
-
-  // Update state on back/forward navigation
-  useEffect(() => {
-    const handler = () => {
-      const param = new URLSearchParams(window.location.search).get(key);
-      setValue(param ?? defaultValue);
-    };
-    window.addEventListener("popstate", handler);
-    return () => window.removeEventListener("popstate", handler);
-  }, [key, defaultValue]);
+    setSearchParams(currentParams, { replace: true, ...options });
+  }, [key, setSearchParams]);
 
   return [value, setValue];
 }
