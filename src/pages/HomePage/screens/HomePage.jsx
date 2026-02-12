@@ -51,6 +51,7 @@ export default function HomePage() {
   const handleDateRangeChange = useCallback((dateRange) => {
     const [startDate, endDate] = dateRange;
     setUserSelectedDateRange([startDate, endDate]);
+    setExternalDateRange([null, null]);
   }, []);
 
   useEffect(() => {
