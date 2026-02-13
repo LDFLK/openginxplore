@@ -36,9 +36,9 @@ export const handleResultNavigation = async (result, {
             });
             break;
 
-        case "ministry":
-        case "minister": {
-            // Build URL with proper date context for ministry/minister search
+        case "cabinetMinister":
+        case "stateMinister": {
+            // Build URL with proper date context for cabinet ministry/state minister search
             const params = new URLSearchParams();
 
             // Use term_start date if available, otherwise use current date
