@@ -83,7 +83,7 @@ const MinistryCard = ({ card, onClick }) => {
                 display: "inline-block",
               }}
             >
-              {card.type + " Minister"}
+              {card.type === "cabinetMinister" ? "Cabinet Minister" : "State Minister"}
             </Typography>
             <Typography
               variant="h7"
