@@ -25,9 +25,16 @@ export const ENTITY_CONFIG = {
         textColor: "text-purple-600",
         borderColor: "border-purple-500/20",
     },
-    minister: {
+    cabinetMinister: {
         icon: Landmark,
-        label: "Minister",
+        label: "Cabinet Minister",
+        bgColor: "bg-purple-500/10",
+        textColor: "text-purple-600",
+        borderColor: "border-purple-500/20",
+    },
+    stateMinister: {
+        icon: Landmark,
+        label: "State Minister",
         bgColor: "bg-purple-500/10",
         textColor: "text-purple-600",
         borderColor: "border-purple-500/20",

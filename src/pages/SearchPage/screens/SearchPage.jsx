@@ -217,7 +217,7 @@ export default function SearchPage() {
                         {new Date(result.created).getFullYear()}
                       </span>
                     )}
-                    {result.type === "minister" && result.created && (
+                    {(result.type === "stateMinister" || result.type === "cabinetMinister") && result.created && (
                       <span className="text-[10px] md:text-xs px-1 md:px-1.5 py-0.2 bg-primary/10 text-primary/70 rounded">
                         Start: {result.created.split("T")[0]}
                       </span>
