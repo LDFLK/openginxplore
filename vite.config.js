@@ -11,14 +11,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // server: {
-  //   proxy: {
-  //     '/v1': {
-  //       target: 'http://localhost:8081',
-  //       changeOrigin: true,
-  //       secure: false,
-  //       rewrite: (path) => path.replace(/^\/v1/, '/v1'),
-  //     },
-  //   },
-  // },
+  server: {
+    proxy: {
+      '/v1': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

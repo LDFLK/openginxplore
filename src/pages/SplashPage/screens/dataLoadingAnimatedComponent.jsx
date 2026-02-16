@@ -144,10 +144,23 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   const fetchAllMinistryData = async () => {
     try {
-      const response = await api.fetchAllMinistries();
-      const ministryList = await response.json();
-      const ministryDict = listToDict(ministryList.body);
-      dispatch(setAllMinistryData(ministryDict));
+      const [stateRes, cabinetRes] = await Promise.all([
+        api.fetchAllStateMinistries(),
+        api.fetchAllCabinetMinistries(),
+      ]);
+
+      const stateData = await stateRes.json();
+      const cabinetData = await cabinetRes.json();
+
+      const stateDict = listToDict(stateData.body);
+      const cabinetDict = listToDict(cabinetData.body);
+
+      const combined = {
+        ...stateDict,
+        ...cabinetDict,
+      };
+      console.log(combined);
+      dispatch(setAllMinistryData(combined));
     } catch (e) {
       setShowServerError(true);
       console.log(`Error fetching ministry data : ${e.message}`);

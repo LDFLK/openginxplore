@@ -73,7 +73,7 @@ export default function Drawer({
   useEffect(() => {
     if (!parentNode) {
       setDrawerContentList(ministryDic || {});
-    } else if (parentNode.type === "minister") {
+    } else if (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") {
       if (selectedTab === "departments") {
         setDrawerContentList(departmentDic || {});
       } else if (selectedTab === "persons") {
@@ -111,7 +111,6 @@ export default function Drawer({
           >
             <CiCircleChevLeft />
           </button>
-          {/* <p className="text-xl text-primary">Xplore more...</p> */}
         </div>
       )}
 
@@ -124,9 +123,13 @@ export default function Drawer({
               {selectedNode && (
                 <div className="w-full mb-2 p-3 md:p-4 bg-background border border-border rounded-sm shadow-sm dark:bg-gray-800 dark:border-gray-700">
                   <a>
-                    {selectedNode.type == "minister" ? (
+                    {selectedNode.type == "cabinetMinister" ? (
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
-                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Ministry</span>
+                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Cabinet Minister</span>
+                      </div>
+                    ) : selectedNode.type == "stateMinister" ? (
+                      <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
+                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">State Minister</span>
                       </div>
                     ) : selectedNode.type == "department" ? (
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
@@ -137,7 +140,7 @@ export default function Drawer({
                         <User className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Person</span>
                       </div>
                     ) : null}
-                    <p className="text-base md:text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-300">
+                    <p className="text-base md:text-md font-semibold tracking-tight text-gray-900 dark:text-gray-300">
                       {selectedNode ? selectedNode.name : ""}
                     </p>
                   </a>
@@ -183,7 +186,7 @@ export default function Drawer({
               {!(selectedNode && (selectedNode.type === "department" || selectedNode.type === "person")) && (
                 <>
                   {/* Tabs for ministers */}
-                  {parentNode && parentNode.type === "minister" && (
+                  {parentNode && (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") && (
                     <div className="flex justify-center mt-2 md:mt-4 border border-border p-0.5 md:p-1 rounded-sm bg-background">
                       <button
                         className={`hover:cursor-pointer w-1/2 py-2 md:py-3 font-normal text-base md:text-lg transition-colors duration-300 transform rounded-l-xs inline-flex items-center justify-center space-x-1 md:space-x-2
@@ -217,19 +220,15 @@ export default function Drawer({
                       Loading...
                     </h2>
                   ) : (
-                    <h2 className="text-sm md:text-md font-normal text-primary mt-2 md:mt-4 mb-2 shrink-0">
-                      {Object.keys(drawerContentList).length}
-                      {`${parentNode &&
-                        parentNode.type === "minister" &&
-                        selectedTab === "departments"
-                        ? " Departments"
-                        : parentNode &&
-                          parentNode.type === "minister" &&
-                          selectedTab === "persons"
-                          ? " People"
-                          : " Ministries"
-                        }`}
-                    </h2>
+                    parentNode &&
+                      (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") &&
+                      selectedTab === "departments"
+                      ? <h2 className="text-sm md:text-md font-normal text-primary mt-2 md:mt-4 mb-2 shrink-0"> {Object.keys(drawerContentList).length} Departments</h2>
+                      : parentNode &&
+                        (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") &&
+                        selectedTab === "persons"
+                        ? <h2 className="text-sm md:text-md font-normal text-primary mt-2 md:mt-4 mb-2 shrink-0">{Object.keys(drawerContentList).length} People</h2>
+                        : ""
                   )}
 
                   {/* Scrollable content */}

@@ -68,9 +68,19 @@ npm install
 
 Create a `config.js` file in the `public` directory
 ```
+// for production update the config.js file in deployment pipeline
 window.configs = {
-  apiUrl: "<OPENGIN_READ_URL>",
-  apiUrlData: "<GI_SERVICE_BASE_URL>",
+    apiUrl: "<opengin_service>",
+    apiUrlData: "<bff_service>",
+    feedbackFormUrl: "<feedback_form_url>",
+    version: "<version>",
+    dataSources: "<data_sources>"
+};
+
+// for development
+window.configs = {
+  apiUrl: "",
+  apiUrlData: "/api",
 };
 ```
 
@@ -105,14 +115,19 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '/v1': {
-               target: 'http://localhost:8081',
-               changeOrigin: true,
-               secure: false,
-               rewrite: (path) => path.replace(/^\/v1/, '/v1'),
-            },
+        '/v1': {
+            target: 'http://localhost:8081',
+            changeOrigin: true,
+            secure: false,
         },
-    },
+        '/api': {
+            target: 'http://localhost:8000',
+            changeOrigin: true,
+            secure: false,
+            rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+        },
+  },
 })
 ```
 
