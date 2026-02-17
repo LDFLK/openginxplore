@@ -120,7 +120,7 @@ export default function Drawer({
           {drawerContentList && (
             <>
               {/* Case 1: Show selected node info */}
-              {selectedNode && (
+              {selectedNode && selectedNode.type !== "government" && (
                 <div className="w-full mb-2 p-3 md:p-4 bg-background border border-border rounded-sm shadow-sm dark:bg-gray-800 dark:border-gray-700">
                   <a>
                     {selectedNode.type == "cabinetMinister" ? (
