@@ -1,7 +1,7 @@
 import utils from "../utils/utils";
 import axios from "@/lib/axios";
 
-const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "/"
+const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : ""
 // const apiUrl = "";
 
 const GI_SERVICE_URL = "/v1/organisation";
@@ -10,14 +10,16 @@ export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/active-portfolio-list`,
     { date },
-    { params: { presidentId }, 
-    signal }
+    {
+      params: { presidentId },
+      signal
+    }
   );
 
   return data;
 };
 
-export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal,}) => {
+export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) => {
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/departments-by-portfolio/${portfolioId}`,
     { date },
@@ -27,7 +29,7 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal,}) =
   return data;
 };
 
-export const getPrimeMinister = async ({ date, signal}) => {
+export const getPrimeMinister = async ({ date, signal }) => {
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/prime-minister`,
     { date },
@@ -298,8 +300,8 @@ const fetchAllDepartments = async () => {
   return response;
 };
 
-const fetchAllMinistries = async () => {
-  // Fetch all ministries protobuf data
+const fetchAllStateMinistries = async () => {
+  // Fetch all state ministries protobuf data
   const response = await fetch(`${apiUrl}/v1/entities/search`, {
     method: "POST",
     headers: {
@@ -308,10 +310,36 @@ const fetchAllMinistries = async () => {
     body: JSON.stringify({
       kind: {
         major: "Organisation",
-        minor: "minister",
+        minor: "stateMinister",
       },
     }),
   });
+
+  console.log(response.body);
+
+  if (!response.ok) {
+    throw new Error(`API error: ${response.statusText}`);
+  }
+
+  return response;
+};
+
+const fetchAllCabinetMinistries = async () => {
+  // Fetch all cabinet ministries protobuf data
+  const response = await fetch(`${apiUrl}/v1/entities/search`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      kind: {
+        major: "Organisation",
+        minor: "cabinetMinister",
+      },
+    }),
+  });
+
+  console.log(response);
 
   if (!response.ok) {
     throw new Error(`API error: ${response.statusText}`);
@@ -495,7 +523,8 @@ export default {
   fetchActiveMinistries,
   fetchAllPersons,
   fetchActiveRelationsForMinistry,
-  fetchAllMinistries,
+  fetchAllStateMinistries,
+  fetchAllCabinetMinistries,
   fetchAllDepartments,
   fetchPresidentsData,
   chatbotApiCall,

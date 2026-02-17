@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: window?.configs?.apiUrlData ? window.configs.apiUrlData : "/",
+  baseURL: window?.configs?.apiUrlData ? window.configs.apiUrlData : "",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

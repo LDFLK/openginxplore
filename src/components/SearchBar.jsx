@@ -178,6 +178,8 @@ export default function SearchBar() {
                 const Icon = config.icon;
                 const isLoadingDataset = loadingDatasetId === result.id;
 
+                console.log(result.type)
+
                 return (
                   <button
                     key={`${result.type}-${result.id}-${index}`}
@@ -204,7 +206,7 @@ export default function SearchBar() {
                             {new Date(result.created).getFullYear()}
                           </span>
                         )}
-                        {result.type === "minister" && result.created && (
+                        {(result.type === "cabinetMinister" || result.type === "stateMinister") && result.created && (
                           <span className="text-[9px] md:text-[10px] px-1 bg-primary/10 text-primary/70 rounded">
                             {result.created.split("T")[0]}
                           </span>

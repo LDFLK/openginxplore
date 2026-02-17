@@ -159,14 +159,15 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         const personLinks = [];
 
         activeMinistries.forEach((ministry) => {
+
           // Ministry node
           ministryDic[ministry.id] = {
             id: ministry.id,
             name: ministry.name,
             created: ministry.startTime,
             group: 2,
-            color: "#D3AF37",
-            type: "minister",
+            color: ministry.type == "stateMinister" ? "#e77f18ff" : "#D3AF37",
+            type: ministry.type,
           };
 
           // Link to government
@@ -253,7 +254,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           ...Object.values(personDic),
         ]);
         setRelations([...ministryToGovLinks, ...personLinks]);
-      } else if (parentNode.type === "minister") {
+      } else if (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") {
         const response = await api.fetchAllRelationsForMinistry({
           ministryId: parentNode.id,
           name: "AS_DEPARTMENT",
@@ -376,6 +377,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     const selectedMinistry = params.get("ministry");
 
     if (selectedMinistry) {
+      console.log("Selected ministry:", allMinistryData[selectedMinistry]);
       const ministryParent = {
         id: allMinistryData[selectedMinistry].id,
         name: utils.extractNameFromProtobuf(
@@ -384,7 +386,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         created: allMinistryData[selectedMinistry].startTime,
         group: 2,
         color: "#D3AF37",
-        type: "minister",
+        type: allMinistryData[selectedMinistry].kind.minor,
       };
       buildGraph(ministryParent);
     } else if (selectedDate && selectedPresident) {
@@ -497,13 +499,12 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const handleNodeClick = useCallback(
     async (node) => {
       setSelectedNode(node);
-
-      if (node?.type === "minister") {
+      if (node?.type === "cabinetMinister" || node?.type === "stateMinister") {
         setNodeLoading(true);
       }
 
       if (
-        node?.type === "minister" &&
+        (node?.type === "cabinetMinister" || node?.type === "stateMinister") &&
         graphParent &&
         graphParent.id === node.id
       ) {
@@ -518,7 +519,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
       }
 
       if (previousClickedNodeRef.current === node?.id) {
-        if (node.type === "minister") {
+        if (node.type === "cabinetMinister" || node?.type === "stateMinister") {
           await buildGraph();
         }
         previousClickedNodeRef.current = null;
@@ -572,7 +573,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         }
       } catch (err) { console.error("Error during node click handling:", err); }
 
-      if (node.type === "minister") {
+      if (node.type === "cabinetMinister" || node?.type === "stateMinister") {
         const params = new URLSearchParams(location.search);
         params.set("ministry", node.id);
         const newUrl = `${location.pathname}?${params.toString()}`;
