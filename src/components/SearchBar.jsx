@@ -178,8 +178,6 @@ export default function SearchBar() {
                 const Icon = config.icon;
                 const isLoadingDataset = loadingDatasetId === result.id;
 
-                console.log(result.type)
-
                 return (
                   <button
                     key={`${result.type}-${result.id}-${index}`}
