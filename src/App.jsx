@@ -1,9 +1,24 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Error404 from "./pages/ErrorBoundaries/screens/404Error";
 import { useThemeContext } from "./context/themeContext";
-import LandingPage from "./pages/LandingPage/screens/LandingPage";
 import DataLoadingAnimatedComponent from "./pages/SplashPage/screens/dataLoadingAnimatedComponent";
 import DocsPage from "./pages/DocsPage/screens/DocsPage";
+import { usePageTracking } from "./hooks/usePageTracking";
+
+const AppRoutes = () => {
+  usePageTracking();
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/organization" replace />} />
+      <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
+      <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
+      <Route path="/docs" element={<DocsPage />} />
+      <Route path="/:tab" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
+      <Route path="*" element={<Error404 />} />
+    </Routes>
+  );
+};
 
 const App = () => {
   const { isDark } = useThemeContext();
@@ -11,14 +26,7 @@ const App = () => {
   return (
     <div className={isDark ? "dark" : ""}>
       <Router>
-        <Routes>
-          <Route path="/" element={<Navigate to="/organization" replace />} />
-          <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
-          <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
-          <Route path="/docs" element={<DocsPage />} />
-          <Route path="/:tab" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
-          <Route path="*" element={<Error404 />} />
-        </Routes>
+        <AppRoutes />
       </Router>
     </div>
   );

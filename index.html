@@ -6,6 +6,37 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="/config.js"></script>
+
+  <!-- Google Analytics -->
+  <script>
+    (function () {
+      // Skip if running on localhost
+      const hostname = location.hostname;
+      if (hostname == 'localhost' || hostname === '127.0.0.1') {
+        console.log('[Dev] Google Analytics not loaded - running on ' + hostname);
+        return;
+      }
+
+      // Skip if measurement ID is not configured
+      const measurementId = window.configs && window.configs.gaMeasurementId;
+      if (!measurementId || measurementId == "") {
+        console.log('[Dev] Google Analytics not loaded - no measurement ID configured');
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
+      document.head.appendChild(script);
+
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('config', measurementId);
+    })();
+  </script>
+
+  <!-- favicon -->
   <link rel="icon" type="image/png" href="/openginexplore.ico" />
 
   <title>OpenginXplore</title>

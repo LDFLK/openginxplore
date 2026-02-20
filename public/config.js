@@ -7,7 +7,8 @@
 //     apiUrlData: "<bff_service>",
 //     feedbackFormUrl: "<feedback_form_url>",
 //     version: "<version>",
-//     dataSources: "<data_sources>"
+//     dataSources: "<data_sources>",
+//     gaMeasurementId: "<google_analytics_measurement_id>"
 // };
 
 // for development
@@ -16,7 +17,8 @@ window.configs = {
     apiUrlData: "/api", // keep '/api' for local development, otherwise this redirects to the BFF service
     feedbackFormUrl: "",
     version: "ALPHA",
-    dataSources: "https://data.gov.lk/"
+    dataSources: "https://data.gov.lk/",
+    gaMeasurementId: ""
 };
 
 // get the data to the relevant component using,
