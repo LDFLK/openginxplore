@@ -159,7 +159,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
         ...stateDict,
         ...cabinetDict,
       };
-      console.log(combined);
+
       dispatch(setAllMinistryData(combined));
     } catch (e) {
       setShowServerError(true);
