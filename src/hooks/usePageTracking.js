@@ -5,11 +5,11 @@ export const usePageTracking = () => {
     const location = useLocation();
 
     useEffect(() => {
-        const pagePath = location.pathname + location.search;
+        const pagePath = location.pathname + location.search + location.hash;
 
         // Skip tracking if measurement ID is not configured in config.js
         const measurementId = window.configs && window.configs.gaMeasurementId;
-        if (!measurementId || measurementId == "") {
+        if (!measurementId) {
             console.warn("⚠️ Measurement ID is not available");
             return;
         }

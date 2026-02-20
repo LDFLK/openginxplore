@@ -7,7 +7,7 @@
 //     apiUrlData: "<bff_service>",
 //     feedbackFormUrl: "<feedback_form_url>",
 //     version: "<version>",
-//     dataSources: "<data_sources>"
+//     dataSources: "<data_sources>",
 //     gaMeasurementId: "<google_analytics_measurement_id>"
 // };
 

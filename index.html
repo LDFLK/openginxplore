@@ -11,20 +11,20 @@
   <script>
     (function () {
       // Skip if running on localhost
-      var hostname = location.hostname;
+      const hostname = location.hostname;
       if (hostname == 'localhost' || hostname === '127.0.0.1') {
         console.log('[Dev] Google Analytics not loaded - running on ' + hostname);
         return;
       }
 
       // Skip if measurement ID is not configured
-      var measurementId = window.configs && window.configs.gaMeasurementId;
+      const measurementId = window.configs && window.configs.gaMeasurementId;
       if (!measurementId || measurementId == "") {
         console.log('[Dev] Google Analytics not loaded - no measurement ID configured');
         return;
       }
 
-      var script = document.createElement('script');
+      const script = document.createElement('script');
       script.async = true;
       script.src = 'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
       document.head.appendChild(script);
