@@ -338,7 +338,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
           No president information found for the selected date range.
         </div>
       ) : (
-        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 pb-2 md:pb-0 no-scrollbar">
+        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-3 gap-2 md:gap-3 pb-2 md:pb-0 no-scrollbar">
           {filteredPresidents.map((president) => {
             const isSelected = selectedPresident?.id === president.id;
             const nameText = utils.extractNameFromProtobuf(president.name);
@@ -348,6 +348,12 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
               ? new Date(rel.endTime).getFullYear()
               : "Present";
             const term = startYear ? `${startYear} - ${endYear}` : "";
+            const startDate = rel?.startTime.split("T")[0];
+            const endDate = rel?.endTime
+              ? new Date(new Date(rel.endTime).setDate(new Date(rel.endTime).getDate() - 1))
+                  .toISOString()
+                  .split("T")[0]
+              : new Date().toISOString().split("T")[0];
 
             return (
               <button
@@ -374,14 +380,29 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                   <p className="text-xs md:text-sm text-primary/50 break-words whitespace-normal">
                     {term}
                   </p>
-                  <Link
-                    to={`/person-profile/${president?.id}`}
-                    state={{ mode: "back", from: location.pathname + location.search }}
-                    className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
-                  >
-                    <EyeIcon size={16} className="mr-1" />
-                    <p>View Profile</p>
-                  </Link>
+                  <div className="flex flex-nowrap gap-3 mt-1">
+                    <Link
+                      to={`/person-profile/${president?.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      state={{ mode: "back", from: location.pathname + location.search }}
+                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
+                    >
+                      <EyeIcon size={16} className="mr-1" />
+                      <p>View Profile</p>
+                    </Link>
+                    <Link
+                      to={{
+                        pathname: `/cabinet-flow/${president?.id}`,
+                        search: `?startDate=${startDate}&endDate=${endDate}`
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      state={{ mode: "back", from: location.pathname + location.search }}
+                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
+                    >
+                      <EyeIcon size={16} className="mr-1" />
+                      <p>View Cabinet Flow</p>
+                    </Link>
+                  </div>
                 </div>
               </button>
             );

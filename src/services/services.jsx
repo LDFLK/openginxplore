@@ -28,6 +28,16 @@ export const getPersonProfile = async (personId) => {
   return data;
 };
 
+export const getCabinetFlow = async ({ presidentId, dates }) => {
+    console.log(dates);
+    const { data } = await axios.post(
+        `${GI_SERVICE_URL}/cabinet-flow/${presidentId}`,
+        dates
+    );
+
+    return data;
+}
+
 export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) => {
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/departments-by-portfolio/${portfolioId}`,
