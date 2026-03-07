@@ -318,7 +318,7 @@ const PersonsTab = ({ selectedDate }) => {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-start",
-                    gap: { xs: 0.5, sm: 0.5 },
+                    gap: { xs: 0.4, sm: 0.4 },
                     width: "100%",
                   }}
                 >
@@ -345,13 +345,14 @@ const PersonsTab = ({ selectedDate }) => {
                       <Typography
                         variant="subtitle2"
                         sx={{
-                          px: 1,
-                          py: 0.3,
-                          borderRadius: "5px",
+                          px: 0.8,
+                          py: 0.2,
+                          borderRadius: "4px",
                           color: selectedPresident.themeColorLight,
                           border: `1px solid ${selectedPresident.themeColorLight}`,
                           fontFamily: "poppins",
                           fontWeight: 600,
+                          fontSize: { xs: "0.55rem", md: "0.75rem" },
                         }}
                       >
                         President
@@ -361,14 +362,15 @@ const PersonsTab = ({ selectedDate }) => {
                       <Typography
                         variant="caption"
                         sx={{
-                          px: 1,
+                          px: 0.8,
                           py: 0.2,
-                          borderRadius: "6px",
+                          borderRadius: "4px",
                           backgroundColor: selectedPresident.themeColorLight,
                           color: colors.white,
                           fontFamily: "Poppins, sans-serif",
                           fontWeight: 600,
                           letterSpacing: "0.3px",
+                          fontSize: { xs: "0.55rem", md: "0.7rem" },
                         }}
                       >
                         New
@@ -382,21 +384,22 @@ const PersonsTab = ({ selectedDate }) => {
                     state={{ mode: "back", from: location.pathname + location.search }}
                     style={{
                       textDecoration: "none",
-                      color: selectedPresident.themeColorLight,
-                      fontFamily: "Poppins, sans-serif",
-                      fontWeight: 500,
-                      fontSize: { xs: "0.5rem", md: "0.8rem" },
-                      borderRadius: "8px",
-                      transition: "all 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.textDecoration = "underline";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.textDecoration = "none";
                     }}
                   >
-                    View Profile
+                    <Typography
+                      sx={{
+                        color: selectedPresident.themeColorLight,
+                        fontFamily: "Poppins, sans-serif",
+                        fontWeight: 500,
+                        fontSize: { xs: "0.65rem", md: "0.8rem" },
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      View Profile
+                    </Typography>
                   </Link>
                 </Box>
               </Box>
@@ -424,7 +427,7 @@ const PersonsTab = ({ selectedDate }) => {
                       fontFamily: "Poppins, sans-serif",
                       color: colors.textMuted,
                       fontWeight: 500,
-                      fontSize: { xs: "0.8rem", md: "1rem" },
+                      fontSize: { xs: "0.75rem", md: "1rem" },
                     }}
                   >
                     {utils.extractNameFromProtobuf(person.name)}
@@ -440,6 +443,7 @@ const PersonsTab = ({ selectedDate }) => {
                         border: `1px solid ${selectedPresident.themeColorLight}`,
                         fontFamily: "poppins",
                         fontWeight: 600,
+                        fontSize: { xs: "0.6rem", md: "0.75rem" },
                       }}
                     >
                       President
@@ -457,6 +461,7 @@ const PersonsTab = ({ selectedDate }) => {
                         fontFamily: "Poppins, sans-serif",
                         fontWeight: 600,
                         letterSpacing: "0.3px",
+                        fontSize: { xs: "0.6rem", md: "0.7rem" },
                       }}
                     >
                       New
@@ -469,21 +474,22 @@ const PersonsTab = ({ selectedDate }) => {
                   state={{ mode: "back", from: location.pathname + location.search }}
                   style={{
                     textDecoration: "none",
-                    color: selectedPresident.themeColorLight,
-                    fontFamily: "Poppins, sans-serif",
-                    fontWeight: 500,
-                    fontSize: { xs: "0.5rem", md: "0.8rem" },
-                    borderRadius: "8px",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.textDecoration = "underline";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.textDecoration = "none";
                   }}
                 >
-                  View Profile
+                  <Typography
+                    sx={{
+                      color: selectedPresident.themeColorLight,
+                      fontFamily: "Poppins, sans-serif",
+                      fontWeight: 500,
+                      fontSize: { xs: "0.65rem", md: "0.8rem" },
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
+                  >
+                    View Profile
+                  </Typography>
                 </Link>
               </Box>
             </Box>
