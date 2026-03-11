@@ -177,9 +177,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           let personName = null;
 
           if (
-            filterType === "newPerson" &&
-            ministry.ministers.length > 0 &&
-            ministry.ministers[0].isNew
+            filterType === "newPerson"
           ) {
             showPerson = true;
             personId = ministry.ministers[0].id;
