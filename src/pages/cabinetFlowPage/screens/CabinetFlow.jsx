@@ -4,136 +4,9 @@ import { useSelector } from "react-redux";
 import utils from "../../../utils/utils";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Calendar, BarChart2, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, Calendar, BarChart2, CheckCircle2 } from "lucide-react";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SankeyChart from "../components/SankyChart";
-
-// const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates = 3, collapsed = false }) => {
-//     if (!startDate || !endDate) return null;
-
-//     const allDates = [];
-//     const current = new Date(startDate);
-//     const end = new Date(endDate);
-
-//     while (current <= end) {
-//         allDates.push(current.toISOString().split("T")[0]);
-//         current.setDate(current.getDate() + 1);
-//     }
-
-//     const isSelected = (d) => selectedDates.includes(d);
-//     const isDisabled = (d) => !isSelected(d) && selectedDates.length >= maxDates;
-//     const isEdge = (d) => d === startDate || d === endDate;
-
-//     // Group by year-month for display
-//     const grouped = allDates.reduce((acc, d) => {
-//         const [year, month] = d.split("-");
-//         const key = `${year}-${month}`;
-//         if (!acc[key]) acc[key] = [];
-//         acc[key].push(d);
-//         return acc;
-//     }, {});
-
-//     const monthLabel = (key) => {
-//         const [year, month] = key.split("-");
-//         return new Date(year, parseInt(month) - 1, 1).toLocaleString("default", {
-//             month: "long",
-//             year: "numeric",
-//         });
-//     };
-
-//     const dayLabel = (d) => {
-//         const [, , day] = d.split("-");
-//         return parseInt(day, 10);
-//     };
-
-//     return (
-//         <div className="w-full space-y-4">
-//             <div className="flex items-center justify-between gap-2">
-//                 <p className="text-sm text-gray-500 dark:text-gray-400">
-//                     Select up to <span className="font-semibold text-accent">{maxDates} dates</span> to compare
-//                     &nbsp;·&nbsp;
-//                     <span className="font-semibold text-accent">{selectedDates.length}</span> selected
-//                 </p>
-//                 <div className="flex items-center gap-3">
-//                     {selectedDates.length > 0 && (
-//                         <button
-//                             onClick={() => selectedDates.forEach((d) => onToggle(d))}
-//                             className="text-xs text-gray-400 hover:text-red-400 transition-colors underline underline-offset-2"
-//                         >
-//                             Clear all
-//                         </button>
-//                     )}
-//                 </div>
-//             </div>
-
-//             {!collapsed && (
-//                 <div className="max-h-72 overflow-y-auto pr-1 space-y-5 custom-scroll">
-//                     {Object.entries(grouped).map(([key, days]) => (
-//                         <div key={key}>
-//                             <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
-//                                 {monthLabel(key)}
-//                             </p>
-//                             <div className="flex flex-wrap gap-2">
-//                                 {days.map((d) => {
-//                                     const selected = isSelected(d);
-//                                     const disabled = isDisabled(d);
-//                                     const edge = isEdge(d);
-
-//                                     return (
-//                                         <button
-//                                             key={d}
-//                                             onClick={() => !disabled && onToggle(d)}
-//                                             disabled={disabled}
-//                                             title={d}
-//                                             className={`
-//                                                 relative w-9 h-9 rounded-lg text-sm font-medium transition-all duration-150
-//                                                 flex items-center justify-center
-//                                                 ${selected
-//                                                     ? "bg-accent text-white shadow-md shadow-accent/30 ring-2 ring-accent/40"
-//                                                     : disabled
-//                                                         ? "bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed"
-//                                                         : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent cursor-pointer"
-//                                                 }
-//                                                 ${edge && !selected ? "ring-1 ring-accent/40" : ""}
-//                                             `}
-//                                         >
-//                                             {dayLabel(d)}
-//                                             {edge && (
-//                                                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent/70" />
-//                                             )}
-//                                         </button>
-//                                     );
-//                                 })}
-//                             </div>
-//                         </div>
-//                     ))}
-//                 </div>
-//             )}
-
-//             {/* Selected dates summary */}
-//             {selectedDates.length > 0 && (
-//                 <div className="flex flex-wrap gap-2 pt-1 border-t border-border">
-//                     {selectedDates.map((d) => (
-//                         <span
-//                             key={d}
-//                             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium mt-1"
-//                         >
-//                             <Calendar size={11} />
-//                             {d}
-//                             <button
-//                                 onClick={() => onToggle(d)}
-//                                 className="ml-1 hover:text-red-400 transition-colors"
-//                             >
-//                                 ×
-//                             </button>
-//                         </span>
-//                     ))}
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
-
 
 const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates = 3 }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -331,7 +204,7 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
 
     if (error || !cabinetFlow) {
         return (
-            <div className="w-full flex flex-col items-center justify-center py-20 gap-3">
+            <div className="w-full rounded-xl border border-dashed border-border flex flex-col items-center justify-center py-20 gap-3">
                 <BarChart2 size={36} className="text-gray-300 dark:text-gray-600" />
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Could not load cabinet flow
@@ -348,9 +221,9 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
     const hasLinks = Array.isArray(cabinetFlow?.links) && cabinetFlow.links.length > 0;
 
     return (
-        <div className="w-full mt-2 inline-block rounded border border-slate-200 shadow bg-white">
+        <div className="w-full mt-2">
             {noDataDates.length > 0 && (
-                <div className="m-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+                <div className="mt-4 mb-4 ms-0 me-0 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
                     <p className="text-sm font-medium">
                         Some selected dates don’t have active departments data.
                     </p>
@@ -363,9 +236,9 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
                 </div>
             )}
             {hasLinks ? (
-                <SankeyChart data={cabinetFlow} width={700} height={400} />
+                <SankeyChart data={cabinetFlow} width={1200} height={1500} />
             ) : (
-                <div className="m-4 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-10 px-6 text-center">
+                <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-10 px-6 text-center">
                     <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         No data available for this comparison
@@ -382,7 +255,6 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
         </div>
     );
 };
-
 
 const CabinetFlow = () => {
     const navigate = useNavigate();
@@ -475,31 +347,14 @@ const CabinetFlow = () => {
                                 <li>Hover over a flow to view details about the departments involved.</li>
                             </ul>
                         </div>
-                        {/* <div className="mt-5">
+                        <div className="mt-5">
                 {committedDates && (
                         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
                             <CheckCircle2 size={13} className="text-green-500" />
                             Showing flow for: {committedDates.join(", ")}
                         </p>
                     )}
-                </div> */}
-
-                        {/* <div className="mt-4">
-                            <button
-                                onClick={handleViewFlow}
-                                disabled={selectedDates.length === 0}
-                                className="
-                            inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
-                            text-sm font-medium text-white bg-accent
-                            hover:opacity-90 active:scale-95 transition-all duration-150
-                            disabled:opacity-40 disabled:cursor-not-allowed
-                            shadow-md shadow-accent/20
-                        "
-                            >
-                                <BarChart2 size={15} />
-                                View Cabinet Flow
-                            </button>
-                        </div> */}
+                </div>
                     </div>
                     
                     <div>
@@ -551,9 +406,22 @@ const CabinetFlow = () => {
                 </div>
             </div>
 
-            {committedDates && (
+            {committedDates ? (
                 <CabinetFlowPanel presidentId={presidentId} dates={committedDates} />
+            ): (
+                <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
+                    <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Select up to 3 dates to compare
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 max-w-md">
+                        Start date and the End date of the Presidency is selected by default. But you can select whatever the 3 dates in between the Presidency
+                    </p>
+                </div>
+              
             )}
+
+            
         </div>
     );
 };

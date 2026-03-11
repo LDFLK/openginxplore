@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width = 700, height = 400 }) {
+export default function SankeyChart({ data, width, height}) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -53,12 +53,12 @@ export default function SankeyChart({ data, width = 700, height = 400 }) {
     linkGradients
       .append("stop")
       .attr("offset", "0%")
-      .attr("stop-color", (d) => color(d.source.name));
+      .attr("stop-color", (d) => color(d.source.id));
 
     linkGradients
       .append("stop")
       .attr("offset", "100%")
-      .attr("stop-color", (d) => color(d.target.name));
+      .attr("stop-color", (d) => color(d.target.id));
 
     // Create tooltip appended to containerRef
     const tooltip = container
@@ -174,9 +174,9 @@ export default function SankeyChart({ data, width = 700, height = 400 }) {
       .attr("y", (d) => d.y0)
       .attr("height", (d) => d.y1 - d.y0)
       .attr("width", (d) => d.x1 - d.x0)
-      .attr("fill", (d) => color(d.name))
+      .attr("fill", (d) => color(d.id))
       .append("title")
-      .text((d) => `${d.name}\n${d.value} total`);
+      .text((d) => `${d.id}\n${d.value} total`);
 
     // Add node labels
     svg
