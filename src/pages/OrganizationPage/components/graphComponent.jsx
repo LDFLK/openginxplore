@@ -90,9 +90,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
   );
-  const allMinistryData = useSelector(
-    (state) => state.allMinistryData.allMinistryData
-  );
   const allPersonData = useSelector((state) => state.allPerson.allPerson);
 
   useEffect(() => {
@@ -320,15 +317,18 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     const selectedMinistry = params.get("ministry");
 
     if (selectedMinistry) {
+      const portfolioItem = activeMinistries?.find(
+        (m) => m.id === selectedMinistry
+      );
+
+      if (!portfolioItem) return;
+
       const ministryParent = {
-        id: allMinistryData[selectedMinistry].id,
-        name: utils.extractNameFromProtobuf(
-          allMinistryData[selectedMinistry].name
-        ),
-        created: allMinistryData[selectedMinistry].startTime,
+        id: portfolioItem.id,
+        name: portfolioItem.name,
         group: 2,
         color: "#D3AF37",
-        type: allMinistryData[selectedMinistry].kind.minor,
+        type: portfolioItem.type,
       };
       buildGraph(ministryParent);
     } else if (selectedDate && selectedPresident) {
