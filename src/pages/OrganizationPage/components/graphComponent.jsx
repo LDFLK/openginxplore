@@ -90,8 +90,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
   );
-  const allPersonData = useSelector((state) => state.allPerson.allPerson);
-
   useEffect(() => {
     const checkWebGL = () => {
       const webglAvailable = isWebGLAvailable();
