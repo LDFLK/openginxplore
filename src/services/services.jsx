@@ -48,6 +48,15 @@ export const getPrimeMinister = async ({ date, signal }) => {
   return data;
 };
 
+export const getDepartmentHistory = async ({ departmentId, signal }) => {
+  const { data } = await axios.get(
+    `${GI_SERVICE_URL}/department-history/${departmentId}`,
+    { signal }
+  );
+
+  return data;
+};
+
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
   try {
