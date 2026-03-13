@@ -171,7 +171,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
         const matches =
           new Date(validSelectedDate) >= start &&
-          new Date(validSelectedDate) <= end;
+          new Date(validSelectedDate) < end;
         return matches;
       });
 
@@ -308,7 +308,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
       const matches =
         new Date(urlSelectedDate) >= start &&
-        new Date(urlSelectedDate) <= end;
+        new Date(urlSelectedDate) < end;
       return matches;
     });
 
