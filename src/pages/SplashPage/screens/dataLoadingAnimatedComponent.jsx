@@ -17,7 +17,6 @@ import Error500 from "../../ErrorBoundaries/screens/500Error";
 import DepartmentProfile from "../../DepartmentPage/screens/DepartmentProfile";
 import SplashPage from "../components/splash_page";
 import HomePage from "../../HomePage/screens/HomePage";
-import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow";
 
 export default function DataLoadingAnimatedComponent({ mode }) {
   const [loading, setLoading] = useState(false);
@@ -191,9 +190,6 @@ export default function DataLoadingAnimatedComponent({ mode }) {
           ) : Object.keys(presidentDict).length > 0 &&
             mode === "person-profile" ? (
             <PersonProfile />
-          ) : Object.keys(presidentDict).length > 0 &&
-            mode === "cabinet-flow" ? (
-            <CabinetFlow />
           ) : (
             Object.keys(presidentDict).length > 0 &&
             mode === "department-profile" && <DepartmentProfile />

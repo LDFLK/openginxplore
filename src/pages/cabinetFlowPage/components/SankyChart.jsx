@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height}) {
+export default function SankeyChart({ data, width, height }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -71,7 +71,10 @@ export default function SankeyChart({ data, width, height}) {
       .style("border-radius", "4px")
       .style("font-size", "12px")
       .style("pointer-events", "none")
-      .style("opacity", 0);
+      .style("opacity", 0)
+      .style("max-width", "500px")      
+      .style("word-wrap", "break-word") 
+      .style("line-height", "1.5"); 
 
     // Draw links
     svg
@@ -95,15 +98,34 @@ export default function SankeyChart({ data, width, height}) {
           .html(`
             <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
             Departments moved: ${d.value}
-          `)
+        `)
           .transition()
           .duration(200)
           .style("opacity", 1);
       })
       .on("mousemove", (event) => {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const tooltipNode = tooltip.node();
+        const tooltipWidth = tooltipNode.offsetWidth;
+        const tooltipHeight = tooltipNode.offsetHeight;
+
+        // Position relative to container
+        let x = event.clientX - containerRect.left + 12;
+        let y = event.clientY - containerRect.top - tooltipHeight - 8;
+
+        // Flip horizontally if overflowing right edge
+        if (x + tooltipWidth > containerRect.width) {
+          x = event.clientX - containerRect.left - tooltipWidth - 12;
+        }
+
+        // Flip vertically if overflowing top edge
+        if (y < 0) {
+          y = event.clientY - containerRect.top + 12;
+        }
+
         tooltip
-          .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY - 20 + "px");
+          .style("left", `${x}px`)
+          .style("top", `${y}px`);
       })
       .on("mouseout", (event) => {
         d3.select(event.target)

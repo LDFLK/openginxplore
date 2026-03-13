@@ -1,15 +1,29 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useCabinetFlow } from "../../../hooks/useCabinetFlow";
 import { useSelector } from "react-redux";
-import utils from "../../../utils/utils";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { ChevronLeft, Calendar, BarChart2, CheckCircle2 } from "lucide-react";
-import ShareLinkButton from "../../../components/ShareLinkButton";
 import SankeyChart from "../components/SankyChart";
 
 const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates = 3 }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    const datePickerRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (datePickerRef.current && !datePickerRef.current.contains(e.target)) {
+                setIsOpen(false);
+            }
+        };
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
+
+
     const [viewMonth, setViewMonth] = useState(() => {
         if (startDate) {
             const [year, month] = startDate.split("-");
@@ -67,17 +81,17 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
 
     const triggerLabel =
         selectedDates.length === 0
-            ? "Select 3 dates"
+            ? "Select up to 3 dates"
             : selectedDates.length === 1
                 ? selectedDates[0]
                 : `${selectedDates.length} dates selected`;
 
     return (
-        <div className="relative inline-block">
+        <div className="relative inline-block" ref={datePickerRef}>
             {/* Trigger button */}
             <button
                 onClick={() => setIsOpen((o) => !o)}
-                className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg border border-border bg-white dark:bg-gray-900 text-sm text-gray-700 dark:text-gray-300 hover:border-accent/60 transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg border border-border bg-white dark:bg-gray-900 text-sm text-gray-700 dark:text-gray-300 hover:border-accent/60 transition-colors shadow-sm hover:cursor-pointer"
             >
                 <Calendar size={14} className="text-accent" />
                 <span>{triggerLabel}</span>
@@ -88,7 +102,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                 )}
                 <ChevronLeft
                     size={13}
-                    className={`text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-90" : "-rotate-90"}`}
+                    className={`text-gray-400 transition-transform duration-200 hover:text-accent ${isOpen ? "rotate-90" : "-rotate-90"}`}
                 />
             </button>
 
@@ -99,7 +113,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                     <div className="flex items-center justify-between mb-3">
                         <button
                             onClick={prevMonth}
-                            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors hover:cursor-pointer"
                         >
                             <ChevronLeft size={15} />
                         </button>
@@ -108,7 +122,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                         </span>
                         <button
                             onClick={nextMonth}
-                            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors hover:cursor-pointer"
                         >
                             <ChevronLeft size={15} className="rotate-180" />
                         </button>
@@ -143,12 +157,12 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                                         relative mx-auto w-8 h-8 rounded-lg text-xs font-medium transition-all duration-100
                                         flex items-center justify-center
                                         ${selected
-                                            ? "bg-accent text-white shadow-sm shadow-accent/30"
+                                            ? "bg-accent text-white shadow-sm shadow-accent/30 hover:cursor-pointer"
                                             : !inRange
-                                                ? "text-gray-200 dark:text-gray-700 cursor-default"
+                                                ? "text-gray-200 dark:text-gray-700 hover:cursor-not-allowed"
                                                 : disabled
-                                                    ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                                                    : "text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent cursor-pointer"
+                                                    ? "text-gray-300 dark:text-gray-600 hover:cursor-not-allowed"
+                                                    : "text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent hover:cursor-pointer"
                                         }
                                         ${edge && inRange && !selected ? "ring-1 ring-accent/50" : ""}
                                     `}
@@ -171,14 +185,14 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                             {selectedDates.length > 0 && (
                                 <button
                                     onClick={() => selectedDates.forEach((d) => onToggle(d))}
-                                    className="text-xs text-gray-400 hover:text-red-400 transition-colors"
+                                    className="text-xs text-gray-400 hover:text-red-400 transition-colors hover:cursor-pointer"
                                 >
                                     Clear
                                 </button>
                             )}
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="text-xs font-medium text-accent hover:opacity-70 transition-opacity"
+                                className="text-xs font-medium text-accent hover:opacity-70 transition-opacity hover:cursor-pointer"
                             >
                                 Done
                             </button>
@@ -191,7 +205,26 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
 };
 
 const CabinetFlowPanel = ({ presidentId, dates }) => {
+    const containerRef = useRef(null);
+    const [containerWidth, setContainerWidth] = useState(0);
     const { data: cabinetFlow, isLoading, error } = useCabinetFlow(presidentId, dates);
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+        const observer = new ResizeObserver(([entry]) => {
+            setContainerWidth(entry.contentRect.width);
+        });
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    const calculateHeight = (data) => {
+        if (!data) return 600;
+        const nodeCount = data.nodes?.length ?? 0;
+        const minHeight = 600;
+        const heightPerNode = 40;
+        return Math.max(minHeight, nodeCount * heightPerNode);
+    };
 
     if (isLoading) {
         return (
@@ -221,7 +254,7 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
     const hasLinks = Array.isArray(cabinetFlow?.links) && cabinetFlow.links.length > 0;
 
     return (
-        <div className="w-full mt-2">
+        <div ref={containerRef} className="w-full mt-2">
             {noDataDates.length > 0 && (
                 <div className="mt-4 mb-4 ms-0 me-0 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
                     <p className="text-sm font-medium">
@@ -236,7 +269,7 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
                 </div>
             )}
             {hasLinks ? (
-                <SankeyChart data={cabinetFlow} width={1200} height={1500} />
+                <SankeyChart data={cabinetFlow} width={containerWidth} height={calculateHeight(cabinetFlow)}/>
             ) : (
                 <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-10 px-6 text-center">
                     <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
@@ -256,17 +289,21 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
     );
 };
 
-const CabinetFlow = () => {
-    const navigate = useNavigate();
-    const { presidentId } = useParams();
-    const [searchParams] = useSearchParams();
-    const location = useLocation();
-    const state = location.state || {};
-    const presidents = useSelector((s) => s.presidency.presidentDict);
+const CabinetFlow = ({ presidentId }) => {
+    const presidentRelationDict = useSelector(
+        (s) => s.presidency.presidentRelationDict
+    );
+    const presidentRelation = presidentRelationDict[presidentId];
+    const startDate = presidentRelation?.startTime?.split("T")[0];
+    let endDate = presidentRelation?.endTime;
 
-    const currentpresident = presidents.find((p) => p.id === presidentId);
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
+    if (!endDate) {
+        endDate = new Date().toISOString().split("T")[0];
+    } else {
+        const d = new Date(endDate);
+        d.setDate(d.getDate() - 1);
+        endDate = d.toISOString().split("T")[0];
+    }
 
     const [selectedDates, setSelectedDates] = useState(() => {
         const init = [];
@@ -275,45 +312,16 @@ const CabinetFlow = () => {
         return init;
     });
 
-    const [committedDates, setCommittedDates] = useState(null);
-
     const handleToggleDate = useCallback((date) => {
         setSelectedDates((prev) =>
             prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date]
         );
     }, []);
 
-    const handleViewFlow = () => {
-        if (selectedDates.length === 0) return;
-        setCommittedDates([...selectedDates].sort());
-    };
+    const sortedDates = [...selectedDates].sort();
 
     return (
-        <div className="px-4 py-6 md:px-12 md:py-10 lg:px-20 xl:px-28 2xl:px-40 w-full bg-background min-h-screen">
-
-            {/* ── Top bar ── */}
-            <div className="flex items-center justify-between mb-8">
-                <button
-                    onClick={() =>
-                        state.from && state.from !== ""
-                            ? navigate(state.from, {
-                                state: {
-                                    from: state.callback === true && state.callbackLink,
-                                },
-                            })
-                            : navigate("/")
-                    }
-                    className="flex items-center gap-1 text-accent hover:text-accent/70 cursor-pointer transition-colors"
-                >
-                    <ChevronLeft size={18} />
-                    <span className="text-sm font-medium">
-                        {state.from && state.from !== "" ? "Back" : "Go to OpenGINXplore"}
-                    </span>
-                </button>
-
-                <ShareLinkButton />
-            </div>
-
+        <div className="px-4 py-6 md:px-12 md:py-10 lg:px-10 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border-solid border-gray-300 border-1">
             {/* ── Header ── */}
             <div className="w-full mb-6">
                 <div className="flex items-center gap-2 mb-5">
@@ -323,44 +331,28 @@ const CabinetFlow = () => {
                 </div>
                 <div className="flex items-center justify-between gap-2">
                     <div>
-                        <div className="flex items-center gap-3 mb-4">
-                            {currentpresident && (
-                                <img
-                                    src={currentpresident.imageUrl || ""}
-                                    alt={utils.extractNameFromProtobuf(currentpresident.name)}
-                                    className="md:w-14 w-10 md:h-14 h-10 object-cover rounded-full border border-border flex-shrink-0"
-                                />
-                            )}
-                            <div>
-                                {currentpresident && (
-                                    <h1 className="text-xl text-gray-500 dark:text-gray-400">
-                                        {utils.extractNameFromProtobuf(currentpresident.name)}
-                                    </h1>
-                                )}
-                            </div>
-                        </div>
-
                         <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
                             <p>This chart visualizes how ministries and departments evolved during the president's tenure.</p>
                             <ul className="list-disc list-inside space-y-0.5 pl-1">
                                 <li>Each column represents a gazette date when one or more changes occurred.</li>
                                 <li>Hover over a flow to view details about the departments involved.</li>
+                                <li>You can select up to 3 dates to compare.</li>
                             </ul>
                         </div>
                         <div className="mt-5">
-                {committedDates && (
-                        <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
-                            <CheckCircle2 size={13} className="text-green-500" />
-                            Showing flow for: {committedDates.join(", ")}
-                        </p>
-                    )}
-                </div>
+                            {selectedDates.length > 0 && (
+                                <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                                    <CheckCircle2 size={13} className="text-green-500" />
+                                    Showing flow for: {sortedDates.join(", ")}
+                                </p>
+                            )}
+                        </div>
                     </div>
-                    
+
                     <div>
-                    {selectedDates && (
+                        {selectedDates.length > 0 && (
                             <div className="flex flex-wrap gap-2 justify-end pt-1 mb-3">
-                                {selectedDates.map((d) => (
+                                {sortedDates.map((d) => (
                                     <span
                                         key={d}
                                         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium mt-1"
@@ -369,7 +361,7 @@ const CabinetFlow = () => {
                                         {d}
                                         <button
                                             onClick={() => handleToggleDate(d)}
-                                            className="ml-1 hover:text-red-400 transition-colors"
+                                            className="ml-1 hover:text-red-400 transition-colors hover:cursor-pointer"
                                         >
                                             ×
                                         </button>
@@ -378,50 +370,36 @@ const CabinetFlow = () => {
                             </div>
                         )}
                         <div className="flex justify-end gap-2">
-                        <DateRangePicker
-                            startDate={startDate}
-                            endDate={endDate}
-                            selectedDates={selectedDates}
-                            onToggle={handleToggleDate}
-                            maxDates={3}
-                        />
-                        <div>
-                            <button
-                                onClick={handleViewFlow}
-                                disabled={selectedDates.length === 0}
-                                className="
-                            inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
-                            text-sm font-medium text-white bg-accent
-                            hover:opacity-90 active:scale-95 transition-all duration-150
-                            disabled:opacity-40 disabled:cursor-not-allowed
-                            shadow-md shadow-accent/20
-                        "
-                            >
-                                <BarChart2 size={15} />
-                                View Cabinet Flow
-                            </button>
-                        </div>
+                            <DateRangePicker
+                                startDate={startDate}
+                                endDate={endDate}
+                                selectedDates={selectedDates}
+                                onToggle={handleToggleDate}
+                                maxDates={3}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {committedDates ? (
-                <CabinetFlowPanel presidentId={presidentId} dates={committedDates} />
-            ): (
+            {selectedDates.length > 1 ? (
+                <CabinetFlowPanel presidentId={presidentId} dates={sortedDates} />
+            ) : (
                 <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
                     <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Select up to 3 dates to compare
+                        {selectedDates.length === 1 ? "Select at least 2 dates to compare" : "Select up to 3 dates to compare"}
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 max-w-md">
-                        Start date and the End date of the Presidency is selected by default. But you can select whatever the 3 dates in between the Presidency
+                        {selectedDates.length === 1
+                            ? "You have selected 1 date. Please select one more date to view the cabinet flow."
+                            : "Start date and the End date of the Presidency is selected by default. But you can select whatever the 3 dates in between the Presidency"}
                     </p>
                 </div>
-              
+
             )}
 
-            
+
         </div>
     );
 };

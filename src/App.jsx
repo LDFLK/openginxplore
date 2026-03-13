@@ -12,7 +12,6 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/organization" replace />} />
       <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
-      <Route path="/cabinet-flow/:presidentId" element={<DataLoadingAnimatedComponent mode="cabinet-flow" />} />
       <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
       <Route path="/docs" element={<DocsPage />} />
       <Route path="/:tab" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
