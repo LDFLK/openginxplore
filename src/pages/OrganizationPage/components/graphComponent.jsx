@@ -31,7 +31,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const [ministryDictionary, setMinistryDictionary] = useState({});
   const [departmentDictionary, setDepartmentDictionary] = useState({});
   const [personDictionary, setPersonDictionary] = useState({});
-  const [ministerToDepartments, setMinisterToDepartment] = useState({});
+  const [, setMinisterToDepartment] = useState({});
   const [graphParent, setGraphParent] = useState(null);
   const [nodeLoading, setNodeLoading] = useState(false);
 
@@ -226,24 +226,11 @@ export default function GraphComponent({ activeMinistries, filterType }) {
 
         const departmentList = responseDepartment?.departmentList || [];
 
-        const responsePerson = await api.fetchAllRelationsForMinistry({
-          ministryId: parentNode.id,
-          name: "AS_APPOINTED",
-          activeAt: selectedDate.date,
-        });
-
         const departmentLinks = departmentList.map((department) => ({
           source: parentNode.id,
           target: department.id,
           value: 2,
           type: "level2",
-        }));
-
-        const personLinks = responsePerson.map((person) => ({
-          source: parentNode.id,
-          target: person.relatedEntityId,
-          value: 3,
-          type: "level3",
         }));
 
         const departmentDic = departmentList.reduce((acc, dep) => {
@@ -256,16 +243,25 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           return acc;
         }, {});
 
-        const personDic = personLinks
-          .map((rel) => allPersonData[rel.target])
-          .filter(Boolean)
-          .reduce((acc, person) => {
-            acc[person.id] = {
-              id: person.id,
-              name: utils.extractNameFromProtobuf(person.name),
-              created: person.created,
-              kind: person.kind,
-              terminated: person.terminated,
+        // person data directly from activeMinistries
+        const ministryItem = activeMinistries?.find((m) => m.id === parentNode.id);
+        const ministers = ministryItem?.ministers || [];
+
+        const personLinks = ministers
+          .filter((minister) => minister.id)
+          .map((minister) => ({
+            source: parentNode.id,
+            target: minister.id,
+            value: 3,
+            type: "level3",
+          }));
+
+        const personDic = ministers
+          .filter((minister) => minister.id)
+          .reduce((acc, minister) => {
+            acc[minister.id] = {
+              id: minister.id,
+              name: minister.name,
               group: 4,
               type: "person",
             };
