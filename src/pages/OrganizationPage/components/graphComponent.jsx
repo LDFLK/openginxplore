@@ -726,6 +726,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           ministryDic={ministryDictionary}
           departmentDic={departmentDictionary}
           loading={nodeLoading}
+          activeMinistries={activeMinistries}
         />
       </div>
       <WebGLChecker />
