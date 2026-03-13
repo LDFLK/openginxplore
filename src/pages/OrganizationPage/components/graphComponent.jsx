@@ -18,6 +18,8 @@ import LoadingComponent from "../../../components/loading_component";
 import { useThemeContext } from "../../../context/themeContext";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { STALE_TIME, GC_TIME } from "../../../constants/constants";
 
 export default function GraphComponent({ activeMinistries, filterType }) {
   const [loading, setLoading] = useState(true);
@@ -86,6 +88,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const focusRef = useRef();
   const cameraAnimTimeoutRef = useRef();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const selectedDate = useSelector((state) => state.presidency.selectedDate);
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
@@ -217,9 +220,16 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         ]);
         setRelations([...ministryToGovLinks, ...personLinks]);
       } else if (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") {
-        const responseDepartment = await api.getDepartmentsByPortfolio({
-          portfolioId: parentNode.id,
-          date: selectedDate?.date
+        const responseDepartment = await queryClient.fetchQuery({
+          queryKey: ["departmentsByPortfolio", parentNode.id, selectedDate?.date],
+          queryFn: ({ signal }) =>
+            api.getDepartmentsByPortfolio({
+              portfolioId: parentNode.id,
+              date: selectedDate?.date,
+              signal,
+            }),
+          staleTime: STALE_TIME,
+          gcTime: GC_TIME,
         });
 
         const departmentList = responseDepartment?.departmentList || [];
