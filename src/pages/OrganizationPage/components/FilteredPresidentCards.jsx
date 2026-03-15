@@ -348,13 +348,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
               ? new Date(rel.endTime).getFullYear()
               : "Present";
             const term = startYear ? `${startYear} - ${endYear}` : "";
-            const startDate = rel?.startTime.split("T")[0];
-            const endDate = rel?.endTime
-              ? new Date(new Date(rel.endTime).setDate(new Date(rel.endTime).getDate() - 1))
-                  .toISOString()
-                  .split("T")[0]
-              : new Date().toISOString().split("T")[0];
-
             return (
               <button
                 key={president.id}
@@ -389,18 +382,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                     >
                       <EyeIcon size={16} className="mr-1" />
                       <p>View Profile</p>
-                    </Link>
-                    <Link
-                      to={{
-                        pathname: `/cabinet-flow/${president?.id}`,
-                        search: `?startDate=${startDate}&endDate=${endDate}`
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      state={{ mode: "back", from: location.pathname + location.search }}
-                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
-                    >
-                      <EyeIcon size={16} className="mr-1" />
-                      <p>View Cabinet Flow</p>
                     </Link>
                   </div>
                 </div>
