@@ -292,7 +292,8 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
     );
 };
 
-const CabinetFlow = ({ presidentId, gazetteData }) => {
+const CabinetFlow = ({ presidentId }) => {
+    const { gazetteData } = useSelector((state) => state.gazettes);
     const gazetteDates = gazetteData.map(item => item.date);
     const presidentRelationDict = useSelector(
         (s) => s.presidency.presidentRelationDict

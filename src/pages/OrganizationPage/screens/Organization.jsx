@@ -11,8 +11,6 @@ const Organization = ({ dateRange }) => {
     (state) => state.presidency
   );
 
-  const { gazetteData } = useSelector((state) => state.gazettes);
-
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -77,7 +75,7 @@ const Organization = ({ dateRange }) => {
           {selectedPresident && <>{selectedDate != null && <MinistryCardGrid />}</>}
         </>
       ) : (
-        <CabinetFlow key={selectedPresident?.id} presidentId={selectedPresident?.id} gazetteData={gazetteData} />
+        <CabinetFlow key={selectedPresident?.id} presidentId={selectedPresident?.id}/>
       )}
     </div>
   );
