@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { ChevronLeft, Calendar, BarChart2, CheckCircle2 } from "lucide-react";
 import SankeyChart from "../components/SankyChart";
 
-const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates = 3 }) => {
+const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates = 3, gazetteDates }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const datePickerRef = useRef(null);
@@ -146,6 +146,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                             const selected = isSelected(dateStr);
                             const disabled = !inRange || isDisabled(dateStr);
                             const edge = isEdge(dateStr);
+                            const hasGazette = gazetteDates.includes(dateStr);
 
                             return (
                                 <button
@@ -157,12 +158,14 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                                         relative mx-auto w-8 h-8 rounded-lg text-xs font-medium transition-all duration-100
                                         flex items-center justify-center
                                         ${selected
-                                            ? "bg-accent text-white shadow-sm shadow-accent/30 hover:cursor-pointer"
-                                            : !inRange
-                                                ? "text-gray-200 dark:text-gray-700 hover:cursor-not-allowed"
-                                                : disabled
-                                                    ? "text-gray-300 dark:text-gray-600 hover:cursor-not-allowed"
-                                                    : "text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent hover:cursor-pointer"
+                                            ? "bg-accent text-white shadow-sm shadow-accent/30 hover:cursor-pointer" // selected
+                                            : hasGazette
+                                                ? "border-2 border-accent/50 text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent hover:cursor-pointer" // gazette date
+                                                : !inRange
+                                                    ? "text-gray-200 dark:text-gray-700 hover:cursor-not-allowed"
+                                                    : disabled
+                                                        ? "text-gray-300 dark:text-gray-600 hover:cursor-not-allowed"
+                                                        : "text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent hover:cursor-pointer"
                                         }
                                         ${edge && inRange && !selected ? "ring-1 ring-accent/50" : ""}
                                     `}
@@ -269,7 +272,7 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
                 </div>
             )}
             {hasLinks ? (
-                <SankeyChart data={cabinetFlow} width={containerWidth} height={calculateHeight(cabinetFlow)}/>
+                <SankeyChart data={cabinetFlow} width={containerWidth} height={calculateHeight(cabinetFlow)} />
             ) : (
                 <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-10 px-6 text-center">
                     <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
@@ -289,7 +292,8 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
     );
 };
 
-const CabinetFlow = ({ presidentId }) => {
+const CabinetFlow = ({ presidentId, gazetteData }) => {
+    const gazetteDates = gazetteData.map(item => item.date);
     const presidentRelationDict = useSelector(
         (s) => s.presidency.presidentRelationDict
     );
@@ -363,6 +367,7 @@ const CabinetFlow = ({ presidentId }) => {
                                 selectedDates={selectedDates}
                                 onToggle={handleToggleDate}
                                 maxDates={3}
+                                gazetteDates={gazetteDates}
                             />
                         </div>
                     </div>
