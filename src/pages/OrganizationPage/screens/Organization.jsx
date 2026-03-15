@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
+import LandscapeRequired from "../../../components/landscapeRequired";
 
 const Organization = ({ dateRange }) => {
   const { selectedDate, selectedPresident } = useSelector(
@@ -75,7 +76,9 @@ const Organization = ({ dateRange }) => {
           {selectedPresident && <>{selectedDate != null && <MinistryCardGrid />}</>}
         </>
       ) : (
-        <CabinetFlow key={selectedPresident?.id} presidentId={selectedPresident?.id}/>
+        <LandscapeRequired onBack={() => toggleView("structure")}>
+          <CabinetFlow key={selectedPresident?.id} presidentId={selectedPresident?.id}/>
+        </LandscapeRequired>
       )}
     </div>
   );
