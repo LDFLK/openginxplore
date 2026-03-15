@@ -216,7 +216,7 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
         });
         observer.observe(containerRef.current);
         return () => observer.disconnect();
-    }, []);
+    }, [cabinetFlow]);
 
     const calculateHeight = (data) => {
         if (!data) return 600;
@@ -324,11 +324,6 @@ const CabinetFlow = ({ presidentId }) => {
         <div className="px-4 py-6 md:px-12 md:py-10 lg:px-10 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border-solid border-gray-300 border-1">
             {/* ── Header ── */}
             <div className="w-full mb-6">
-                <div className="flex items-center gap-2 mb-5">
-                    <h1 className="text-2xl text-gray-900 dark:text-white">
-                        Cabinet Flow
-                    </h1>
-                </div>
                 <div className="flex items-center justify-between gap-2">
                     <div>
                         <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
@@ -338,14 +333,6 @@ const CabinetFlow = ({ presidentId }) => {
                                 <li>Hover over a flow to view details about the departments involved.</li>
                                 <li>You can select up to 3 dates to compare.</li>
                             </ul>
-                        </div>
-                        <div className="mt-5">
-                            {selectedDates.length > 0 && (
-                                <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
-                                    <CheckCircle2 size={13} className="text-green-500" />
-                                    Showing flow for: {sortedDates.join(", ")}
-                                </p>
-                            )}
                         </div>
                     </div>
 
