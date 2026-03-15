@@ -2,7 +2,7 @@ import GazetteTimeline from "../components/GazetteTimeline";
 import MinistryCardGrid from "../components/MinistryCardGrid";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
 
@@ -10,9 +10,18 @@ const Organization = ({ dateRange }) => {
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );
-  const [activeView, setActiveView] = useState("structure");
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeView, setActiveView] = useState(searchParams.get('view'));
+
+  const toggleView = (viewName) => {
+    setActiveView(viewName);
+    const currentParams = new URLSearchParams(window.location.search);
+    currentParams.set("view", viewName);
+    setSearchParams(currentParams);
+  };
+  
   const { president } = location.state || {};
   useEffect(() => {
     if (president) {
@@ -38,19 +47,19 @@ const Organization = ({ dateRange }) => {
       <div className="flex items-center justify-center my-3 md:my-4">
         <div className="flex items-center bg-gray-100 rounded-full p-1 gap-2">
           <button
-            onClick={() => setActiveView("structure")}
+            onClick={() => toggleView("structure")}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 hover:cursor-pointer w-32 ${activeView === "structure"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
               }`}
           >
             Structure
           </button>
           <button
-            onClick={() => setActiveView("cabinet")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 hover:cursor-pointer w-32 ${activeView === "cabinet"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
+            onClick={() => toggleView("cabinet-flow")}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 hover:cursor-pointer w-32 ${activeView === "cabinet-flow"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
               }`}
           >
             Cabinet Flow
