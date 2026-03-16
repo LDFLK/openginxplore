@@ -19,7 +19,7 @@ import { useThemeContext } from "../../../context/themeContext";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { STALE_TIME, GC_TIME } from "../../../constants/constants";
+import { departmentsByPortfolioQueryOptions } from "../../../hooks/useDepartmentsByPortfolio";
 
 export default function GraphComponent({ activeMinistries, filterType }) {
   const [loading, setLoading] = useState(true);
@@ -215,17 +215,9 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         ]);
         setRelations([...ministryToGovLinks, ...personLinks]);
       } else if (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") {
-        const responseDepartment = await queryClient.fetchQuery({
-          queryKey: ["departmentsByPortfolio", parentNode.id, selectedDate?.date],
-          queryFn: ({ signal }) =>
-            api.getDepartmentsByPortfolio({
-              portfolioId: parentNode.id,
-              date: selectedDate?.date,
-              signal,
-            }),
-          staleTime: STALE_TIME,
-          gcTime: GC_TIME,
-        });
+        const responseDepartment = await queryClient.fetchQuery(
+          departmentsByPortfolioQueryOptions(parentNode.id, selectedDate?.date)
+        );
 
         const departmentList = responseDepartment?.departmentList || [];
 
