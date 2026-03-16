@@ -168,7 +168,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           });
 
           // To show person in level 3
-          let showPerson = false;
           let personId = null;
           let personName = null;
 
@@ -176,11 +175,10 @@ export default function GraphComponent({ activeMinistries, filterType }) {
             (filterType === "newPerson" || filterType === "presidentAsMinister") &&
             ministry.ministers?.length > 0
           ) {
-            showPerson = true;
             personId = ministry.ministers[0].id;
             personName = ministry.ministers[0].name;
 
-             personDic[personId] = {
+            personDic[personId] = {
               id: personId,
               name: personName,
               group: 3,
