@@ -38,7 +38,7 @@ const CabinetFlow = ({ presidentId }) => {
     const sortedDates = [...selectedDates].sort();
 
     return (
-        <div className="px-4 py-6 md:px-12 md:py-10 lg:px-10 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border-solid border-gray-300 border-1">
+        <div className="px-4 py-6 md:px-8 md:py-10 lg:px-12 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border border-gray-300">
             {/* ── Header ── */}
             <div className="w-full mb-6">
                 <div className="flex items-center justify-between gap-2">
