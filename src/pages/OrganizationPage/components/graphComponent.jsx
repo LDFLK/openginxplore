@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { Box, Alert, AlertTitle } from "@mui/material";
 import ForceGraph3D from "react-force-graph-3d";
-import api from "../../../services/services";
 import utils from "../../../utils/utils";
 import { useSelector } from "react-redux";
 
@@ -180,17 +179,14 @@ export default function GraphComponent({ activeMinistries, filterType }) {
             showPerson = true;
             personId = ministry.ministers[0].id;
             personName = ministry.ministers[0].name;
-          }
 
-          if (showPerson && personId) {
-            personDic[personId] = {
+             personDic[personId] = {
               id: personId,
               name: personName,
               group: 3,
               color: "#4287f5",
               type: "person",
             };
-
             personLinks.push({
               source: ministry.id,
               target: personId,
