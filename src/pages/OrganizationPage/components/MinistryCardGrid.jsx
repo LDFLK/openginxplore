@@ -287,15 +287,15 @@ const MinistryCardGrid = () => {
                 }}>
                   <Typography
                     sx={{
-                      fontSize: 12,
+                      fontSize: { xs: 10, md: 12 },
                       color: colors.white,
                       fontWeight: 500,
                       backgroundColor: `${selectedPresident.themeColorLight}99`,
                       py: 0.25,
-                      px: 1,
+                      px: 0.8,
                       borderRadius: 1,
-                      width: "102px",
-                      mb: 0.5,
+                      width: "fit-content",
+                      mb: 0.2,
                     }}
                   >
                     Prime Minister
@@ -317,11 +317,11 @@ const MinistryCardGrid = () => {
                         sx={{
                           border: `1px solid ${colors.green}`,
                           color: colors.green,
-                          fontSize: { xs: 10, md: 12 },
+                          fontSize: { xs: 9, md: 12 },
                           fontWeight: 600,
                           borderRadius: "4px",
-                          px: 1,
-                          py: 0.5,
+                          px: 0.6,
+                          py: 0.2,
                           fontFamily: "poppins",
                           display: "inline-flex",
                           alignItems: "center",
@@ -357,9 +357,10 @@ const MinistryCardGrid = () => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        fontSize: 13,
+                        fontSize: { xs: 10, md: 13 },
                         color: "#6491DA",
                         transition: "color 0.3s, text-decoration 0.3s",
+                        mt: 0.5,
                         ":hover": {
                           textDecoration: "underline",
                           color: selectedPresident.themeColorLight,
