@@ -33,7 +33,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const [ministryDictionary, setMinistryDictionary] = useState({});
   const [departmentDictionary, setDepartmentDictionary] = useState({});
   const [personDictionary, setPersonDictionary] = useState({});
-  const [, setMinisterToDepartment] = useState({});
   const [graphParent, setGraphParent] = useState(null);
   const [nodeLoading, setNodeLoading] = useState(false);
 
@@ -175,15 +174,12 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           let personName = null;
 
           if (
-            filterType === "newPerson"
+            (filterType === "newPerson" || filterType === "presidentAsMinister") &&
+            ministry.ministers?.length > 0
           ) {
             showPerson = true;
             personId = ministry.ministers[0].id;
             personName = ministry.ministers[0].name;
-          } else if (filterType === "presidentAsMinister") {
-            showPerson = true;
-            personId = ministry.ministers[0].id;
-            personName = ministry.ministers[0].name
           }
 
           if (showPerson && personId) {
@@ -211,7 +207,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         setMinistryDictionary(ministryDic);
         setPersonDictionary(personDic);
         setDepartmentDictionary({});
-        setMinisterToDepartment({});
 
         setAllNodes([
           govNode,
@@ -276,29 +271,12 @@ export default function GraphComponent({ activeMinistries, filterType }) {
             return acc;
           }, {});
 
-        const ministerToDepartments = {};
-        departmentLinks.forEach((rel) => {
-          if (!ministerToDepartments[rel.source]) {
-            ministerToDepartments[rel.source] = [];
-          }
-          ministerToDepartments[rel.source].push(rel);
-        });
-
-        const ministerToPerson = {};
-        personLinks.forEach((rel) => {
-          if (!ministerToPerson[rel.source]) {
-            ministerToPerson[rel.source] = [];
-          }
-          ministerToPerson[rel.source].push(rel);
-        });
-
         if (focusRef.current) {
           focusRef.current.stopAnimation?.();
         }
 
         setDepartmentDictionary(departmentDic);
         setPersonDictionary(personDic);
-        setMinisterToDepartment(ministerToDepartments);
 
         setAllNodes([
           parentNode,
