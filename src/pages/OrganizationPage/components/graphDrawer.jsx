@@ -34,7 +34,7 @@ export default function Drawer({
   const [urlMinistry, setUrlMinistry] = useState(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const ministryParam = params.get("ministry");
 
     if (!ministryParam) {
@@ -49,7 +49,7 @@ export default function Drawer({
     } else {
       setUrlMinistry(null);
     }
-  }, [window.location.search, activeMinistries]);
+  }, [location.search, activeMinistries]);
 
 
   useEffect(() => {
