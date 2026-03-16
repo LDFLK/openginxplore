@@ -338,7 +338,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
           No president information found for the selected date range.
         </div>
       ) : (
-        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-3 gap-2 md:gap-3 pb-2 md:pb-0 no-scrollbar">
+        <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 pb-2 md:pb-0 no-scrollbar">
           {filteredPresidents.map((president) => {
             const isSelected = selectedPresident?.id === president.id;
             const nameText = utils.extractNameFromProtobuf(president.name);

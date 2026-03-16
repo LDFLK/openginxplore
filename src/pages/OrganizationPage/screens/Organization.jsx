@@ -40,17 +40,17 @@ const Organization = ({ dateRange }) => {
     <div>
       {/* FilteredPresidentCards Component */}
       {dateRange[0] && dateRange[1] && (
-        <div className="mb-1 md:mb-6 px-2 md:px-4 mt-2 md:mt-3">
+        <div className="mb-1 md:mb-6 px-2 md:px-4">
           <FilteredPresidentCards dateRange={dateRange} />
         </div>
       )}
 
       {/* View Toggle */}
       <div className="flex items-center justify-center my-3 md:my-4">
-        <div className="flex items-center bg-gray-100 rounded-full p-1 gap-2">
+        <div className="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
           <button
             onClick={() => toggleView("structure")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 hover:cursor-pointer w-32 ${activeView === "structure"
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 hover:cursor-pointer w-32 ${activeView === "structure"
               ? "bg-white text-gray-900 shadow-sm"
               : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
               }`}
@@ -59,7 +59,7 @@ const Organization = ({ dateRange }) => {
           </button>
           <button
             onClick={() => toggleView("cabinet-flow")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 hover:cursor-pointer w-32 ${activeView === "cabinet-flow"
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 hover:cursor-pointer w-32 ${activeView === "cabinet-flow"
               ? "bg-white text-gray-900 shadow-sm"
               : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
               }`}

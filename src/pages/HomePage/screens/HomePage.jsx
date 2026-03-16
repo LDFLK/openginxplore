@@ -278,7 +278,7 @@ export default function HomePage() {
         <div className="flex md:hidden justify-center items-center text-yellow-500 bg-yellow-100/90 dark:bg-yellow-500/20 border-yellow-100/90 dark:border-yellow-500/20 border">
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2 md:gap-4">
           {latestPresStartDate && selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}

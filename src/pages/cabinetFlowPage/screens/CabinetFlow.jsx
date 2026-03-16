@@ -158,9 +158,9 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                                         relative mx-auto w-8 h-8 rounded-lg text-xs font-medium transition-all duration-100
                                         flex items-center justify-center
                                         ${selected
-                                            ? "bg-accent text-white shadow-sm shadow-accent/30 hover:cursor-pointer" // selected
+                                            ? "bg-accent text-white shadow-sm shadow-accent/30 hover:cursor-pointer" 
                                             : hasGazette
-                                                ? "border-2 border-accent/50 text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent hover:cursor-pointer" // gazette date
+                                                ? "border-2 border-accent/50 text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent hover:cursor-pointer"
                                                 : !inRange
                                                     ? "text-gray-200 dark:text-gray-700 hover:cursor-not-allowed"
                                                     : disabled
@@ -171,6 +171,9 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                                     `}
                                 >
                                     {day}
+                                    {hasGazette && !selected && (
+                                        <span className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-accent/70" />
+                                    )}
                                     {edge && inRange && (
                                         <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-accent/70" />
                                     )}
