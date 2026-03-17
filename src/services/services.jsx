@@ -535,5 +535,7 @@ export default {
   chatbotApiCall,
   getDepartmentRenamedInfo,
   getMinistriesByPerson,
-  getPersonProfile
+  getPersonProfile,
+  getDepartmentsByPortfolio,
+  getPrimeMinister
 };

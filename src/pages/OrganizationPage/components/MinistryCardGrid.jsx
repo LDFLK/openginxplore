@@ -4,7 +4,7 @@ import {
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useThemeContext } from "../../../context/themeContext";
 import useUrlParamState from "../../../hooks/singleSharingURL";
@@ -50,6 +50,7 @@ const MinistryCardGrid = () => {
   const [selectedCard, setSelectedCard] = useState(null);
   const { colors } = useThemeContext();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { data, isLoading, error } = useActivePortfolioList(
     selectedPresident?.id,
@@ -175,26 +176,34 @@ const MinistryCardGrid = () => {
         params.delete("ministry");
 
         const newUrl = `${window.location.pathname}?${params.toString()}`;
-        window.history.pushState({}, "", newUrl);
+        navigate(newUrl);
       }
 
       return newStep;
     });
   };
 
+  const prevDateRef = useRef(selectedDate?.date);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      prevDateRef.current = selectedDate?.date;
       return;
     }
-    const params = new URLSearchParams(window.location.search);
-    params.delete("ministry");
-    setActiveStep(0);
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.pushState({}, "", newUrl);
-  }, [selectedDate]);
+
+    // Only reset if the date has actually changed to a new value
+    if (selectedDate?.date && prevDateRef.current && selectedDate.date !== prevDateRef.current) {
+      const params = new URLSearchParams(window.location.search);
+      params.delete("ministry");
+      setActiveStep(0);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      navigate(newUrl);
+    }
+
+    prevDateRef.current = selectedDate?.date;
+  }, [selectedDate?.date]);
 
   const handleCardClick = async (card) => {
     // dispatch(setSelectedMinistry(card.id));
@@ -204,7 +213,7 @@ const MinistryCardGrid = () => {
     const params = new URLSearchParams(window.location.search);
     params.set("ministry", card.id);
     const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.pushState({}, "", newUrl);
+    navigate(newUrl);
   };
 
   return (
@@ -730,7 +739,7 @@ const MinistryCardGrid = () => {
               justifyContent: "flex-end",
             }}
           >
-            {steps[activeStep]?.label !== "Departments & People" && (
+            {steps[activeStep]?.label !== "Departments & People" && !new URLSearchParams(location.search).has("ministry") && (
               <>
                 {/* Search Bar */}
                 <Box
