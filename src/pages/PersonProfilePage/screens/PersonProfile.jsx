@@ -260,8 +260,6 @@ const PersonProfile = () => {
           {activeTab === "history" && (
             <PersonHistoryTimeline
               selectedPerson={selectedPerson}
-              onTimelineUpdate={setTimelineData}
-              presidentRelationDict={presidentRelationDict}
             />
           )}
           {activeTab === "qualifications" && !isQualificationsDisabled && (
