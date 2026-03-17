@@ -91,6 +91,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
   );
+
   useEffect(() => {
     const checkWebGL = () => {
       const webglAvailable = isWebGLAvailable();
@@ -393,6 +394,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     },
     [colors.textPrimary]
   );
+
   const handleBackClick = useCallback(async () => {
     await buildGraph();
     previousClickedNodeRef.current = null;
