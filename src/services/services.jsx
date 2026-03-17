@@ -29,12 +29,12 @@ export const getPersonProfile = async (personId) => {
 };
 
 export const getCabinetFlow = async ({ presidentId, dates }) => {
-    const { data } = await axios.post(
-        `${GI_SERVICE_URL}/cabinet-flow/${presidentId}`,
-        dates
-    );
+  const { data } = await axios.post(
+    `${GI_SERVICE_URL}/cabinet-flow/${presidentId}`,
+    dates
+  );
 
-    return data;
+  return data;
 }
 
 export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) => {
@@ -60,6 +60,15 @@ export const getPrimeMinister = async ({ date, signal }) => {
 export const getDepartmentHistory = async ({ departmentId, signal }) => {
   const { data } = await axios.get(
     `${GI_SERVICE_URL}/department-history/${departmentId}`,
+    { signal }
+  );
+
+  return data;
+};
+
+export const getPersonHistory = async ({ personId, signal }) => {
+  const { data } = await axios.get(
+    `${GI_SERVICE_URL_PERSON}/person-history/${personId}`,
     { signal }
   );
 

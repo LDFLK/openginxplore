@@ -1,94 +1,35 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useThemeContext } from "../../../context/themeContext";
 import { ClipLoader } from "react-spinners";
-import utils from "../../../utils/utils";
-import api from "../../../services/services";
+
 import {
   VerticalTimeline,
   VerticalTimelineElement,
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
 import { Landmark } from "lucide-react";
+import { usePersonHistory } from "../../../hooks/usePersonHistory";
 
 const PersonHistoryTimeline = ({
   selectedPerson,
-  onTimelineUpdate,
-  presidentRelationDict,
 }) => {
-  const [timelineData, setTimelineData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const allMinistryData = useSelector(
-    (state) => state.allMinistryData.allMinistryData
-  );
   const { colors, isDark } = useThemeContext();
 
-  useEffect(() => {
-    const fetchPersonHistory = async () => {
-      if (!selectedPerson?.id) return;
-      setLoading(true);
-      try {
-        const res = await api.getMinistriesByPerson(selectedPerson.id);
-        const data = await res.json();
+  const { data: personHistory, isLoading } = usePersonHistory(selectedPerson?.id);
+  const ministryHistory = personHistory?.ministry_history || [];
 
-        const enriched = data
-          .filter((d) => d.startTime !== d.endTime)
-          .map((d) => {
-            const ministry = allMinistryData[d.relatedEntityId];
-            return {
-              ...d,
-              ministryName: ministry
-                ? utils.extractNameFromProtobuf(ministry.name)
-                : "Unknown Ministry",
-              startTime: d.startTime,
-              endTime: d.endTime,
-            };
-          })
-          .sort((a, b) => {
-            if (!a.endTime && !b.endTime) return 0;
-            if (!a.endTime) return -1;
-            if (!b.endTime) return 1;
-            return new Date(b.endTime) - new Date(a.endTime);
-          });
-
-
-        setTimelineData(enriched);
-        onTimelineUpdate?.(enriched);
-      } catch (err) {
-        console.error("Error fetching person history:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPersonHistory();
-  }, [selectedPerson, allMinistryData, onTimelineUpdate]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-20">
-        <ClipLoader color={colors.primary} loading={loading} size={25} />
+        <ClipLoader color={colors.accent} loading={isLoading} size={25} />
       </div>
     );
   }
 
-  if (!timelineData.length) {
+  if (!ministryHistory.length) {
     return (
       <h4 className="mt-2 text-primary">No timeline history available.</h4>
     );
   }
-  const isPresidentDuring = (ministryStart, ministryEnd) => {
-    return Object.values(presidentRelationDict).some((rel) => {
-      if (rel.id !== selectedPerson?.id) return false;
-      const presStart = new Date(rel.startTime);
-      const presEnd = rel.endTime ? new Date(rel.endTime) : null;
-
-      const mStart = new Date(ministryStart);
-      const mEnd = ministryEnd ? new Date(ministryEnd) : null;
-
-      return (!presEnd || mStart <= presEnd) && (!mEnd || mEnd >= presStart);
-    });
-  };
 
   return (
     <div className=" rounded-md p-6  dark:bg-gray-800 bg-white overflow-x-hidden">
@@ -97,15 +38,10 @@ const PersonHistoryTimeline = ({
         layout="2-columns"
         lineColor={isDark ? "#364153" : "#dbdbdb"}
       >
-        {timelineData.map((entry, idx, arr) => {
-          const wasPresident = isPresidentDuring(
-            entry.startTime,
-            entry.endTime
-          );
-
+        {ministryHistory.map((entry, idx, arr) => {
           return (
             <VerticalTimelineElement
-            key={idx}
+              key={idx}
               icon={<Landmark />}
               iconStyle={{
                 background: isDark ? "#101828" : "#f8f8f8",
@@ -127,26 +63,18 @@ const PersonHistoryTimeline = ({
                 borderRight: `7px solid  ${isDark ? "#364153" : "#dbdbdb"}`,
               }}
               date={
-                entry.startTime
-                  ? `${new Date(entry.startTime)
-                      .toISOString()
-                      .slice(0, 10)} - ${
-                      entry.endTime
-                        ? new Date(entry.endTime).toISOString().slice(0, 10)
-                        : "Present"
-                    }`
-                  : ""
+                entry.term
               }
               dateClassName={"text-primary/65"}
             >
-              {wasPresident && (
+              {entry.isPresident && (
                 <div className="-mt-4">
                   <p className="px-2 bg-blue-500/15 text-accent text-center rounded-md py-1 inline-block mt-0">
                     President
                   </p>
                 </div>
               )}
-              <h3 className="mt-1">{entry.ministryName.split(":")[0]}</h3>
+              <h3 className="mt-1">{entry.name}</h3>
             </VerticalTimelineElement>
           );
         })}
