@@ -8,7 +8,7 @@ export default function MinistryViewModeToggleButton({ viewMode, setViewMode }) 
 
   return (
     <div className="flex justify-end w-full sm:w-auto landscape:w-auto portrait:w-auto">
-      <div
+      <div 
         className="relative flex bg-transparent rounded-sm w-20 md:w-38 h-10 select-none"
         style={{ border: `1px solid ${colors.textMuted}` }}>
         <div
