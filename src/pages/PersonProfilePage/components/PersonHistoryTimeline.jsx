@@ -10,17 +10,17 @@ import { Landmark } from "lucide-react";
 import { usePersonHistory } from "../../../hooks/usePersonHistory";
 
 const PersonHistoryTimeline = ({
-  selectedPerson,
+  personId,
 }) => {
   const { colors, isDark } = useThemeContext();
 
-  const { data: personHistory, isLoading } = usePersonHistory(selectedPerson?.id);
+  const { data: personHistory, isLoading } = usePersonHistory(personId);
   const ministryHistory = personHistory?.ministry_history || [];
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-20">
-        <ClipLoader color={colors.accent} loading={isLoading} size={25} />
+        <ClipLoader color={colors.primary} loading={isLoading} size={25} />
       </div>
     );
   }
