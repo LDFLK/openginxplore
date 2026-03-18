@@ -67,7 +67,7 @@ const PersonHistoryTimeline = ({
               }
               dateClassName={"text-primary/65"}
             >
-              {entry.isPresident && (
+              {entry.is_president && (
                 <div className="-mt-4">
                   <p className="px-2 bg-blue-500/15 text-accent text-center rounded-md py-1 inline-block mt-0">
                     President
