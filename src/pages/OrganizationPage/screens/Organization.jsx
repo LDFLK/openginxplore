@@ -15,7 +15,7 @@ const Organization = ({ dateRange }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeView, setActiveView] = useState(searchParams.get('view'));
+  const [activeView, setActiveView] = useState(searchParams.get('view') || 'structure');
 
   const toggleView = (viewName) => {
     setActiveView(viewName);

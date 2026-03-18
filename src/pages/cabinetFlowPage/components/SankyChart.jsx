@@ -72,9 +72,9 @@ export default function SankeyChart({ data, width, height }) {
       .style("font-size", "12px")
       .style("pointer-events", "none")
       .style("opacity", 0)
-      .style("max-width", "500px")      
-      .style("word-wrap", "break-word") 
-      .style("line-height", "1.5"); 
+      .style("max-width", "500px")
+      .style("word-wrap", "break-word")
+      .style("line-height", "1.5");
 
     // Draw links
     svg
@@ -201,6 +201,7 @@ export default function SankeyChart({ data, width, height }) {
       .text((d) => `${d.id}\n${d.value} total`);
 
     // Add node labels
+
     svg
       .append("g")
       .style("font", "12px sans-serif")
@@ -211,7 +212,10 @@ export default function SankeyChart({ data, width, height }) {
       .attr("y", (d) => (d.y1 + d.y0) / 2)
       .attr("dy", "0.35em")
       .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
-      .text((d) => d.name);
+      .text((d) => {
+        const limit = d.layer === 0 ? 100 : 40;
+        return d.name.length > limit ? d.name.substring(0, limit) + "..." : d.name;
+      })
 
     return () => {
       tooltip.remove();

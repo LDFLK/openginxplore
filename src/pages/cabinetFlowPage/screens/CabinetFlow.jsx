@@ -6,7 +6,7 @@ import CabinetFlowPanel from "../components/CabinetFlowPanel";
 
 const CabinetFlow = ({ presidentId }) => {
     const { gazetteData } = useSelector((state) => state.gazettes);
-    const gazetteDates = gazetteData.map(item => item.date);
+    const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
     const presidentRelationDict = useSelector(
         (s) => s.presidency.presidentRelationDict
     );
