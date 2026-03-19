@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import PersonHistoryTimeline from "../components/PersonHistoryTimeline";
 import PersonQualifications from "../components/PersonQualifications";
