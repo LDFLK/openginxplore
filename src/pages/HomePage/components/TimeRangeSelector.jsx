@@ -766,7 +766,7 @@ export default function TimeRangeSelector({
   };
 
   return (
-    <div className="bg-background border-b border-border p-2 md:p-4 w-full mx-auto ">
+    <div className="bg-background border-b border-border p-2 md:p-4 w-full mx-auto">
       {/* Presets and calendar */}
       <div className="hidden md:block pb-2 md:pb-4 px-1 text-primary text-center md:text-left md:px-0 text-xs md:text-sm font-medium md:font-semibold">
         Select a date range

@@ -98,7 +98,7 @@ const CabinetFlow = ({ presidentId }) => {
                     <p className="text-xs text-gray-400 dark:text-gray-500 max-w-md">
                         {selectedDates.length === 1
                             ? "You have selected 1 date. Please select one more date to view the cabinet flow."
-                            : "Start date and the End date of the Presidency is selected by default. But you can select whatever the 3 dates in between the Presidency"}
+                            : "Start date and the End date of the Presidency is selected by default."}
                     </p>
                 </div>
 

@@ -97,7 +97,7 @@ export default function SankeyChart({ data, width, height }) {
           .style("opacity", 0)
           .html(`
             <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
-            Departments moved: ${d.value}
+            ${d.value} Departments moved
         `)
           .transition()
           .duration(200)
