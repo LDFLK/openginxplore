@@ -24,10 +24,14 @@ export default function SankeyChart({ data, width, height }) {
       .select(svgRef.current)
       .attr("width", width)
       .attr("height", height);
+    
+    const dateToLayer = {};
+    data.dates.forEach((d, i) => { dateToLayer[d.date] = i; });
 
     const { nodes, links } = sankey()
       .nodeWidth(20)
       .nodePadding(15)
+      .nodeAlign((node) => dateToLayer[node.time] ?? 0)
       .extent([
         [1, topMargin],
         [width - 1, height - bottomMargin],
