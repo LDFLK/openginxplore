@@ -25,15 +25,23 @@ const PersonHistoryTimeline = ({
     );
   }
 
-  if (error || !ministryHistory.length) {
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center bg-background px-6 py-20">
         <div className="text-center max-w-md">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Portfolio History Not Available
-          </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-            Could not load portfolio history. It may not exist or something went wrong.
+            Something went wrong. Couldn't load portfolio history.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  if (!ministryHistory.length) {
+    return (
+      <div className="flex flex-col items-center justify-center bg-background px-6 py-20">
+        <div className="text-center max-w-md">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            No portfolio history available.
           </p>
         </div>
       </div>
