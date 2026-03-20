@@ -24,7 +24,7 @@ export default function SankeyChart({ data, width, height }) {
       .select(svgRef.current)
       .attr("width", width)
       .attr("height", height);
-    
+
     const dateToLayer = {};
     data.dates.forEach((d, i) => { dateToLayer[d.date] = i; });
 
@@ -40,10 +40,55 @@ export default function SankeyChart({ data, width, height }) {
         links: data.links.map((d) => Object.assign({}, d)),
       });
 
-    // Defines a color scale.
+    // ─── Responsive label truncation ────────────────────────────────────────
+    // Determine how much horizontal space is available for labels on each side.
+    // First-column labels render to the RIGHT of their node (node.x1 → next column or edge).
+    // Last-column labels render to the LEFT of their node (0 → node.x0).
+    // Middle-column labels: whichever side they're on, use half the inter-column gap.
+    const CHAR_WIDTH_PX = 7;
+    const LABEL_PADDING = 6; // gap between node edge and label start
+
+    const layerBounds = {};
+    nodes.forEach((n) => {
+      const l = n.layer;
+      if (!layerBounds[l]) layerBounds[l] = { x0: n.x0, x1: n.x1 };
+      else {
+        layerBounds[l].x0 = Math.min(layerBounds[l].x0, n.x0);
+        layerBounds[l].x1 = Math.max(layerBounds[l].x1, n.x1);
+      }
+    });
+
+    const totalLayers = data.dates.length;
+
+    function labelCharLimit(node) {
+      const layer = node.layer;
+      let availablePx;
+
+      if (totalLayers === 2) {
+        // 2 column layout: split the single gap 50/50 between both columns
+        const gap = layerBounds[1].x0 - layerBounds[0].x1;
+        availablePx = gap / 2 - LABEL_PADDING;
+      } else {
+        // 3 column layout:
+        // for col 1 -> full gaap to col 2
+        // for col 2 to col 3 -> split the gap by 50/50 and use for both col 2 and col 3
+        if (layer === 0) {
+          const nextX0 = layerBounds[1]?.x0 ?? width;
+          availablePx = nextX0 - layerBounds[0].x1 - LABEL_PADDING;
+        } else {
+          const prevX1 = layerBounds[layer - 1]?.x1 ?? 0;
+          const gap = layerBounds[layer].x0 - prevX1;
+          availablePx = gap / 2 - LABEL_PADDING;
+        }
+      }
+
+      return Math.max(8, Math.floor(availablePx / CHAR_WIDTH_PX));
+    }
+
+    // ─── Color scale ─────────────────────────────────────────────────────────
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    // Create gradient defs
+    // ─── Gradient defs ───────────────────────────────────────────────────────
     const defs = svg.append("defs");
     const linkGradients = defs
       .selectAll("linearGradient")
@@ -64,7 +109,7 @@ export default function SankeyChart({ data, width, height }) {
       .attr("offset", "100%")
       .attr("stop-color", (d) => color(d.target.id));
 
-    // Create tooltip appended to containerRef
+    // ─── Tooltip ─────────────────────────────────────────────────────────────
     const tooltip = container
       .append("div")
       .attr("class", "sankey-tooltip")
@@ -76,11 +121,53 @@ export default function SankeyChart({ data, width, height }) {
       .style("font-size", "12px")
       .style("pointer-events", "none")
       .style("opacity", 0)
-      .style("max-width", "500px")
+      // FIX: constrain width so it never exceeds the container
+      .style("max-width", "min(260px, 80%)")
       .style("word-wrap", "break-word")
-      .style("line-height", "1.5");
+      .style("white-space", "normal")
+      .style("line-height", "1.5")
+      // Prevent the tooltip itself from causing the container to grow
+      .style("box-sizing", "border-box");
 
-    // Draw links
+    // ─── Tooltip positioning helper ──────────────────────────────────────────
+    // Keeps the tooltip fully inside the container on all four sides.
+    function positionTooltip(event) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const tooltipNode = tooltip.node();
+      const tooltipWidth = tooltipNode.offsetWidth;
+      const tooltipHeight = tooltipNode.offsetHeight;
+      const MARGIN = 8; // breathing room from container edges
+
+      // Preferred: above-right of cursor
+      let x = event.clientX - containerRect.left + 12;
+      let y = event.clientY - containerRect.top - tooltipHeight - 8;
+
+      // Overflow right → flip to left of cursor
+      if (x + tooltipWidth + MARGIN > containerRect.width) {
+        x = event.clientX - containerRect.left - tooltipWidth - 12;
+      }
+
+      // Overflow left → clamp to left edge
+      if (x < MARGIN) {
+        x = MARGIN;
+      }
+
+      // Overflow top → flip to below cursor
+      if (y < MARGIN) {
+        y = event.clientY - containerRect.top + 12;
+      }
+
+      // Overflow bottom → clamp to bottom edge
+      if (y + tooltipHeight + MARGIN > containerRect.height) {
+        y = containerRect.height - tooltipHeight - MARGIN;
+      }
+
+      tooltip
+        .style("left", `${x}px`)
+        .style("top", `${y}px`);
+    }
+
+    // ─── Links ───────────────────────────────────────────────────────────────
     svg
       .append("g")
       .attr("fill", "none")
@@ -95,6 +182,7 @@ export default function SankeyChart({ data, width, height }) {
         d3.select(event.target)
           .transition()
           .duration(300)
+          .style("cursor", "pointer")
           .attr("stroke-opacity", 0.8);
 
         tooltip
@@ -102,34 +190,13 @@ export default function SankeyChart({ data, width, height }) {
           .html(`
             <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
             ${d.value} Departments moved
-        `)
+          `)
           .transition()
           .duration(200)
           .style("opacity", 1);
       })
       .on("mousemove", (event) => {
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const tooltipNode = tooltip.node();
-        const tooltipWidth = tooltipNode.offsetWidth;
-        const tooltipHeight = tooltipNode.offsetHeight;
-
-        // Position relative to container
-        let x = event.clientX - containerRect.left + 12;
-        let y = event.clientY - containerRect.top - tooltipHeight - 8;
-
-        // Flip horizontally if overflowing right edge
-        if (x + tooltipWidth > containerRect.width) {
-          x = event.clientX - containerRect.left - tooltipWidth - 12;
-        }
-
-        // Flip vertically if overflowing top edge
-        if (y < 0) {
-          y = event.clientY - containerRect.top + 12;
-        }
-
-        tooltip
-          .style("left", `${x}px`)
-          .style("top", `${y}px`);
+        positionTooltip(event);
       })
       .on("mouseout", (event) => {
         d3.select(event.target)
@@ -143,9 +210,7 @@ export default function SankeyChart({ data, width, height }) {
           .style("opacity", 0);
       });
 
-    // Add column labels (dates).
-    // Important: use the authoritative payload `data.dates` instead of guessing from node metadata,
-    // otherwise labels can be duplicated/wrong when nodes don't carry unique date info.
+    // ─── Column date labels ───────────────────────────────────────────────────
     const columnData = d3
       .groups(nodes, (d) => d.layer)
       .map(([layer, nodesInLayer]) => {
@@ -190,7 +255,7 @@ export default function SankeyChart({ data, width, height }) {
       .attr("x", (d) => d.x)
       .text((d) => d.displayLabel);
 
-    // Draw nodes
+    // ─── Nodes ───────────────────────────────────────────────────────────────
     svg
       .append("g")
       .selectAll("rect")
@@ -204,31 +269,32 @@ export default function SankeyChart({ data, width, height }) {
       .append("title")
       .text((d) => `${d.id}\n${d.value} total`);
 
-    // Add node labels
-
+    // ─── Node labels ─────────────────────────────────────────────────────────
     svg
       .append("g")
       .style("font", "12px sans-serif")
       .selectAll("text")
       .data(nodes)
       .join("text")
-      .attr("x", (d) => (d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6))
+      .attr("x", (d) => (d.x0 < width / 2 ? d.x1 + LABEL_PADDING : d.x0 - LABEL_PADDING))
       .attr("y", (d) => (d.y1 + d.y0) / 2)
       .attr("dy", "0.35em")
       .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
       .text((d) => {
-        const limit = d.layer === 0 ? 100 : 40;
-        return d.name.length > limit ? d.name.substring(0, limit) + "..." : d.name;
-      })
+        // compute limit dynamically based on available space for EVERY column
+        const limit = labelCharLimit(d);
+        return d.name.length > limit
+          ? d.name.substring(0, limit) + "…"
+          : d.name;
+      });
 
     return () => {
       tooltip.remove();
     };
   }, [data, width, height]);
 
-  // Wrap SVG inside a div for tooltip positioning
   return (
-    <div ref={containerRef} style={{ position: "relative" }}>
+    <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>
       <svg ref={svgRef}></svg>
     </div>
   );
