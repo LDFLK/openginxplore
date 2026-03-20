@@ -35,11 +35,7 @@ export default function HomePage() {
     (state) => state.gazettes.gazetteDataClassic
   );
 
-  const [defaultStartDate,] = useState(() => {
-    const date = new Date();
-    date.setFullYear(date.getFullYear() - 5);
-    return date;
-  });
+
   const [userSelectedDateRange, setUserSelectedDateRange] = useState([
     null,
     null,
@@ -264,11 +260,10 @@ export default function HomePage() {
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
         <div className="flex flex-col gap-4">
-          {defaultStartDate && selectedTab !== "search" && (
+          {selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}
               dates={selectedTab === "organization" ? dates : []}
-              defaultStartDate={defaultStartDate}
               onDateChange={handleDateRangeChange}
               externalRange={externalDateRange}
               activePreset={activePreset}
