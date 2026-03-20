@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import PersonHistoryTimeline from "../components/PersonHistoryTimeline";
 import PersonQualifications from "../components/PersonQualifications";
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import InfoTooltip from "../../../components/InfoToolTip";
 import { usePersonProfile } from "../../../hooks/usePersonProfile";
+import { usePersonHistory } from "../../../hooks/usePersonHistory";
 
 const fieldConfig = [
   { key: "date_of_birth", label: "Date of Birth", icon: Cake },
@@ -36,20 +36,13 @@ const PersonProfile = () => {
   const state = location.state || {};
 
   const [activeTab, setActiveTab] = useState("history");
-  const [timelineData, setTimelineData] = useState([]);
-  const presidentRelationDict = useSelector(
-    (state) => state.presidency.presidentRelationDict
-  );
-  const { allPerson } = useSelector((state) => state.allPerson);
 
-  const selectedPerson = allPerson[personId];
-
-  const workedMinistries = timelineData.length || 0;
-  const workedAsPresident = Object.values(presidentRelationDict).filter(
-    (rel) => rel.id === selectedPerson?.id
-  ).length;
 
   const { data: personProfile, isLoading: isLoadingPersonProfile, error } = usePersonProfile(personId);
+  const { data: personHistory } = usePersonHistory(personId);
+
+  const workedMinistries = personHistory?.ministries_worked_at || 0;
+  const workedAsPresident = personHistory?.worked_as_president || 0;
 
   const isQualificationsDisabled =
     !personProfile?.education_qualifications &&
@@ -259,9 +252,7 @@ const PersonProfile = () => {
         <div className="min-h-[500px] max-h-[680px] overflow-y-auto">
           {activeTab === "history" && (
             <PersonHistoryTimeline
-              selectedPerson={selectedPerson}
-              onTimelineUpdate={setTimelineData}
-              presidentRelationDict={presidentRelationDict}
+              personId={personId}
             />
           )}
           {activeTab === "qualifications" && !isQualificationsDisabled && (
