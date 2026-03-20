@@ -11,7 +11,7 @@ import DataPage from "../../DataPage/screens/DataPage";
 import TimeRangeSelector from "../components/TimeRangeSelector";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import TextLogo from "../../LandingPage/components/textLogo";
+import TextLogo from "../components/textLogo";
 import Organization from "../../OrganizationPage/screens/Organization";
 import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
@@ -34,12 +34,8 @@ export default function HomePage() {
   const gazetteDateClassic = useSelector(
     (state) => state.gazettes.gazetteDataClassic
   );
-  const presidentRelationDict = useSelector(
-    (state) => state.presidency.presidentRelationDict
-  );
-  const presidents = useSelector((state) => state.presidency.presidentDict);
 
-  const [latestPresStartDate, setLatestPresStartDate] = useState(null);
+
   const [userSelectedDateRange, setUserSelectedDateRange] = useState([
     null,
     null,
@@ -53,21 +49,6 @@ export default function HomePage() {
     setUserSelectedDateRange([startDate, endDate]);
     setExternalDateRange([null, null]);
   }, []);
-
-  useEffect(() => {
-    if (!presidents || presidents.length === 0 || !presidentRelationDict)
-      return;
-
-    const relationEntries = Object.entries(presidentRelationDict);
-    if (relationEntries.length === 0) return;
-
-    const [lastPresId, lastRelation] =
-      relationEntries[relationEntries.length - 1];
-
-    if (lastPresId && lastRelation?.startTime) {
-      setLatestPresStartDate(new Date(lastRelation.startTime.split("T")[0]));
-    }
-  }, [presidents, presidentRelationDict]);
 
   const dates =
     gazetteDateClassic && gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
@@ -122,7 +103,7 @@ export default function HomePage() {
 
   const handleTabChange = (tabName) => {
     const params = new URLSearchParams(window.location.search);
-  
+
     // Common resets for all tab changes to ensure a fresh start
     // params.delete("startDate");
     // params.delete("endDate");
@@ -278,12 +259,11 @@ export default function HomePage() {
         <div className="flex md:hidden justify-center items-center text-yellow-500 bg-yellow-100/90 dark:bg-yellow-500/20 border-yellow-100/90 dark:border-yellow-500/20 border">
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
-        <div className="flex flex-col gap-2 md:gap-4">
-          {latestPresStartDate && selectedTab !== "search" && (
+        <div className="flex flex-col gap-4">
+          {selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}
               dates={selectedTab === "organization" ? dates : []}
-              latestPresStartDate={latestPresStartDate}
               onDateChange={handleDateRangeChange}
               externalRange={externalDateRange}
               activePreset={activePreset}
@@ -294,7 +274,7 @@ export default function HomePage() {
           )}
 
           {selectedTab === "organization" ? (
-            <Organization dateRange={userSelectedDateRange}/>
+            <Organization dateRange={userSelectedDateRange} />
           ) : selectedTab === "data" ? (
             <DataPage setExternalDateRange={setExternalDateRange} />
           ) : selectedTab === "search" ? (
