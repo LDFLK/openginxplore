@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 export default function SankeyChart({ data, width, height, isDarkMode }) {
   const containerRef = useRef();
   const svgRef = useRef();
-  console.log(isDarkMode)
 
   useEffect(() => {
     if (!data) return;
