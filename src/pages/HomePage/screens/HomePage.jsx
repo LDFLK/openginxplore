@@ -9,15 +9,15 @@ import {
 } from "lucide-react";
 import DataPage from "../../DataPage/screens/DataPage";
 import TimeRangeSelector from "../components/TimeRangeSelector";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import TextLogo from "../../LandingPage/components/textLogo";
 import Organization from "../../OrganizationPage/screens/Organization";
 import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
@@ -122,7 +122,7 @@ export default function HomePage() {
 
   const handleTabChange = (tabName) => {
     const params = new URLSearchParams(window.location.search);
-
+  
     // Common resets for all tab changes to ensure a fresh start
     // params.delete("startDate");
     // params.delete("endDate");
@@ -278,7 +278,7 @@ export default function HomePage() {
         <div className="flex md:hidden justify-center items-center text-yellow-500 bg-yellow-100/90 dark:bg-yellow-500/20 border-yellow-100/90 dark:border-yellow-500/20 border">
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2 md:gap-4">
           {latestPresStartDate && selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}
@@ -294,7 +294,7 @@ export default function HomePage() {
           )}
 
           {selectedTab === "organization" ? (
-            <Organization dateRange={userSelectedDateRange} />
+            <Organization dateRange={userSelectedDateRange}/>
           ) : selectedTab === "data" ? (
             <DataPage setExternalDateRange={setExternalDateRange} />
           ) : selectedTab === "search" ? (
