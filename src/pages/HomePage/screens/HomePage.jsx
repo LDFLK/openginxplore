@@ -39,7 +39,7 @@ export default function HomePage() {
   );
   const presidents = useSelector((state) => state.presidency.presidentDict);
 
-  const [latestPresStartDate, setLatestPresStartDate] = useState(null);
+  const [defaultStartDate, setDefaultStartDate] = useState(null);
   const [userSelectedDateRange, setUserSelectedDateRange] = useState([
     null,
     null,
@@ -55,19 +55,10 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (!presidents || presidents.length === 0 || !presidentRelationDict)
-      return;
-
-    const relationEntries = Object.entries(presidentRelationDict);
-    if (relationEntries.length === 0) return;
-
-    const [lastPresId, lastRelation] =
-      relationEntries[relationEntries.length - 1];
-
-    if (lastPresId && lastRelation?.startTime) {
-      setLatestPresStartDate(new Date(lastRelation.startTime.split("T")[0]));
-    }
-  }, [presidents, presidentRelationDict]);
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 5);
+    setDefaultStartDate(date);
+  }, []);
 
   const dates =
     gazetteDateClassic && gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
@@ -279,11 +270,11 @@ export default function HomePage() {
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
         <div className="flex flex-col gap-4">
-          {latestPresStartDate && selectedTab !== "search" && (
+          {defaultStartDate && selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}
               dates={selectedTab === "organization" ? dates : []}
-              latestPresStartDate={latestPresStartDate}
+              defaultStartDate={defaultStartDate}
               onDateChange={handleDateRangeChange}
               externalRange={externalDateRange}
               activePreset={activePreset}
