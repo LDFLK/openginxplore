@@ -10,7 +10,6 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 export default function TimeRangeSelector({
   startYear,
   dates,
-  defaultStartDate,
   onDateChange,
   externalRange,
   activePreset,
@@ -18,6 +17,11 @@ export default function TimeRangeSelector({
   activePresident,
   setActivePresident
 }) {
+  const [defaultStartDate] = useState(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 5);
+    return date;
+  });
   const presidentsArray = useSelector(
     (state) => state.presidency.presidentDict
   );
