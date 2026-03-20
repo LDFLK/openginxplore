@@ -43,7 +43,7 @@ const CabinetFlow = ({ presidentId }) => {
             <div className="w-full mb-6">
                 <div className="flex items-center justify-between gap-2">
                     <div>
-                        <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
+                        <div className="space-y-1 text-xs md:text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
                             <p>This chart visualizes how ministries and departments evolved during the president's tenure.</p>
                             <ul className="list-disc list-inside space-y-0.5 pl-1">
                                 <li>Each column represents a gazette date when one or more changes occurred.</li>
