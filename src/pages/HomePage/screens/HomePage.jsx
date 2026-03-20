@@ -34,12 +34,12 @@ export default function HomePage() {
   const gazetteDateClassic = useSelector(
     (state) => state.gazettes.gazetteDataClassic
   );
-  const presidentRelationDict = useSelector(
-    (state) => state.presidency.presidentRelationDict
-  );
-  const presidents = useSelector((state) => state.presidency.presidentDict);
 
-  const [defaultStartDate, setDefaultStartDate] = useState(null);
+  const [defaultStartDate,] = useState(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 5);
+    return date;
+  });
   const [userSelectedDateRange, setUserSelectedDateRange] = useState([
     null,
     null,
@@ -52,12 +52,6 @@ export default function HomePage() {
     const [startDate, endDate] = dateRange;
     setUserSelectedDateRange([startDate, endDate]);
     setExternalDateRange([null, null]);
-  }, []);
-
-  useEffect(() => {
-    const date = new Date();
-    date.setFullYear(date.getFullYear() - 5);
-    setDefaultStartDate(date);
   }, []);
 
   const dates =
