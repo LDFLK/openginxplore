@@ -10,7 +10,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/organization?view=structure" replace />} />
+      <Route path="/" element={<Navigate to="/organization?view=cabinet-structure" replace />} />
       <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
       <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
       <Route path="/docs" element={<DocsPage />} />

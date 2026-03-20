@@ -2,9 +2,10 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height }) {
+export default function SankeyChart({ data, width, height, isDarkMode }) {
   const containerRef = useRef();
   const svgRef = useRef();
+  console.log(isDarkMode)
 
   useEffect(() => {
     if (!data) return;
@@ -189,7 +190,7 @@ export default function SankeyChart({ data, width, height }) {
           .style("opacity", 0)
           .html(`
             <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
-            ${d.value} Departments moved
+            ${d.value} department${d.value > 1 ? "s" : ""} moved
           `)
           .transition()
           .duration(200)
@@ -247,7 +248,7 @@ export default function SankeyChart({ data, width, height }) {
       .attr("transform", `translate(0, ${topMargin - 24})`)
       .style("font", "12px sans-serif")
       .style("font-weight", "600")
-      .style("fill", "#1f2933")
+      .style("fill", !isDarkMode ? "#1f2933" : "#fff") 
       .attr("text-anchor", "middle")
       .selectAll("text")
       .data(columnData)
@@ -272,7 +273,8 @@ export default function SankeyChart({ data, width, height }) {
     // Node labels 
     svg
       .append("g")
-      .style("font", "12px sans-serif")
+      .style("font", "12px poppins")
+      .style("fill", !isDarkMode ? "#1f2933" : "#fff") 
       .selectAll("text")
       .data(nodes)
       .join("text")
@@ -291,7 +293,7 @@ export default function SankeyChart({ data, width, height }) {
     return () => {
       tooltip.remove();
     };
-  }, [data, width, height]);
+  }, [data, width, height, isDarkMode]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>

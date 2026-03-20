@@ -156,9 +156,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                                         flex items-center justify-center
                                         ${selected
                                             ? "bg-accent text-white shadow-sm shadow-accent/30 hover:cursor-pointer"
-                                            : hasGazette
-                                                ? "text-gray-700 dark:text-gray-300 hover:bg-accent/10 hover:text-accent hover:cursor-pointer"
-                                                : !inRange
+                                            : !inRange
                                                     ? "text-gray-200 dark:text-gray-700 hover:cursor-not-allowed"
                                                     : disabled
                                                         ? "text-gray-300 dark:text-gray-600 hover:cursor-not-allowed"

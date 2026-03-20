@@ -38,7 +38,7 @@ const CabinetFlow = ({ presidentId }) => {
     const sortedDates = [...selectedDates].sort();
 
     return (
-        <div className="px-4 py-6 md:px-8 md:py-10 lg:px-12 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border border-gray-300">
+        <div className="px-4 py-6 md:px-8 md:py-10 lg:px-12 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border border-border">
             {/* ── Header ── */}
             <div className="w-full mb-6">
                 <div className="flex items-center justify-between gap-2">
@@ -46,7 +46,7 @@ const CabinetFlow = ({ presidentId }) => {
                         <div className="space-y-1 text-xs md:text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
                             <p>This chart visualizes how ministries and departments evolved during the president's tenure.</p>
                             <ul className="list-disc list-inside space-y-0.5 pl-1">
-                                <li>Each column represents a gazette date when one or more changes occurred.</li>
+                                <li>Each column represents a date when one or more changes may have occurred.</li>
                                 <li>Hover over a flow to view details about the departments involved.</li>
                                 <li>You can select up to 3 dates to compare.</li>
                             </ul>
@@ -97,8 +97,8 @@ const CabinetFlow = ({ presidentId }) => {
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 max-w-md">
                         {selectedDates.length === 1
-                            ? "You have selected 1 date. Please select one more date to view the cabinet flow."
-                            : "Start date and the End date of the Presidency is selected by default."}
+                            ? "You have selected 1 date. Please select one more date to view the department flow."
+                            : "The start and end dates of the presidency are selected by default."}
                     </p>
                 </div>
 
