@@ -40,7 +40,7 @@ export default function SankeyChart({ data, width, height }) {
         links: data.links.map((d) => Object.assign({}, d)),
       });
 
-    // ─── Responsive label truncation ────────────────────────────────────────
+    // Responsive label truncation
     // Determine how much horizontal space is available for labels on each side.
     // First-column labels render to the RIGHT of their node (node.x1 → next column or edge).
     // Last-column labels render to the LEFT of their node (0 → node.x0).
@@ -85,10 +85,10 @@ export default function SankeyChart({ data, width, height }) {
       return Math.max(8, Math.floor(availablePx / CHAR_WIDTH_PX));
     }
 
-    // ─── Color scale ─────────────────────────────────────────────────────────
+    // Color scale
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    // ─── Gradient defs ───────────────────────────────────────────────────────
+    // Gradient defs
     const defs = svg.append("defs");
     const linkGradients = defs
       .selectAll("linearGradient")
@@ -109,7 +109,7 @@ export default function SankeyChart({ data, width, height }) {
       .attr("offset", "100%")
       .attr("stop-color", (d) => color(d.target.id));
 
-    // ─── Tooltip ─────────────────────────────────────────────────────────────
+    // Tooltip
     const tooltip = container
       .append("div")
       .attr("class", "sankey-tooltip")
@@ -129,7 +129,7 @@ export default function SankeyChart({ data, width, height }) {
       // Prevent the tooltip itself from causing the container to grow
       .style("box-sizing", "border-box");
 
-    // ─── Tooltip positioning helper ──────────────────────────────────────────
+    // Tooltip positioning helper
     // Keeps the tooltip fully inside the container on all four sides.
     function positionTooltip(event) {
       const containerRect = containerRef.current.getBoundingClientRect();
@@ -167,7 +167,7 @@ export default function SankeyChart({ data, width, height }) {
         .style("top", `${y}px`);
     }
 
-    // ─── Links ───────────────────────────────────────────────────────────────
+    // Links
     svg
       .append("g")
       .attr("fill", "none")
@@ -210,7 +210,7 @@ export default function SankeyChart({ data, width, height }) {
           .style("opacity", 0);
       });
 
-    // ─── Column date labels ───────────────────────────────────────────────────
+    // Column date labels
     const columnData = d3
       .groups(nodes, (d) => d.layer)
       .map(([layer, nodesInLayer]) => {
@@ -255,7 +255,7 @@ export default function SankeyChart({ data, width, height }) {
       .attr("x", (d) => d.x)
       .text((d) => d.displayLabel);
 
-    // ─── Nodes ───────────────────────────────────────────────────────────────
+    // Nodes
     svg
       .append("g")
       .selectAll("rect")
@@ -269,7 +269,7 @@ export default function SankeyChart({ data, width, height }) {
       .append("title")
       .text((d) => `${d.id}\n${d.value} total`);
 
-    // ─── Node labels ─────────────────────────────────────────────────────────
+    // Node labels 
     svg
       .append("g")
       .style("font", "12px sans-serif")
