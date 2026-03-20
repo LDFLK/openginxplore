@@ -27,11 +27,8 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
       ) : error ? (
         <div className="flex flex-col items-center justify-center bg-transparent px-6 py-20">
           <div className="text-center max-w-md">
-            <h2 className="text-md font-semibold text-gray-900 dark:text-white mb-2">
-              Department History Not Available
-            </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 border-none mb-6">
-              Couldn't load department history. It may not exist or something went wrong.
+              Something went wrong. Couldn't load department history.
             </p>
           </div>
         </div>
