@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../../services/services";
 import utils from "../../../utils/utils";
+import useNetworkStatus from "../../../hooks/useNetworkStatus";
 import { setAllMinistryData } from "../../../store/allMinistryData";
 import { setAllDepartmentData } from "../../../store/allDepartmentData";
 import presidentDetails from "../../../assets/personImages.json";
@@ -25,6 +26,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
     (state) => state.presidency
   );
   const dispatch = useDispatch();
+  const isOnline = useNetworkStatus();
 
   const totalSteps = 4;
   const [completedSteps, setCompletedSteps] = useState(0);
@@ -37,8 +39,13 @@ export default function DataLoadingAnimatedComponent({ mode }) {
   useEffect(() => {
     const initialFetchData = async () => {
       if (Object.keys(presidentDict).length !== 0) return;
+      if (!isOnline) {
+        setShowServerError(false);
+        return;
+      }
 
       setLoading(true);
+      setShowServerError(false);
       setCompletedSteps(0);
 
       const track = async (promise) => {
@@ -62,7 +69,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
     };
 
     initialFetchData();
-  }, [presidentDict]);
+  }, [presidentDict, isOnline]);
 
   const listToDict = (list) => {
     return list.reduce((acc, item) => {
