@@ -38,6 +38,9 @@ import {
 } from "@mui/icons-material";
 
 
+const HIGHLIGHTS_LOAD_ERROR =
+  "Failed to load highlights. Please check your connection and try again.";
+
 const MinistryCardGrid = () => {
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
@@ -694,7 +697,7 @@ const MinistryCardGrid = () => {
                 fontSize: { xs: 12, md: 15 },
               }}
             >
-              Failed to load highlights. Please check your connection and try again.
+              {HIGHLIGHTS_LOAD_ERROR}
             </Typography>
           ) : (
             <Typography
