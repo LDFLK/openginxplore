@@ -685,6 +685,17 @@ const MinistryCardGrid = () => {
                 </Box>
               )}
             </Box>
+          ) : error ? (
+            <Typography
+              sx={{
+                fontStyle: "italic",
+                color: "error.main",
+                textAlign: "left",
+                fontSize: { xs: 12, md: 15 },
+              }}
+            >
+              Failed to load highlights. Please check your connection and try again.
+            </Typography>
           ) : (
             <Typography
               sx={{
