@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { Box, Alert, AlertTitle } from "@mui/material";
 import ForceGraph3D from "react-force-graph-3d";
-import api from "../../../services/services";
 import utils from "../../../utils/utils";
 import { useSelector } from "react-redux";
 
@@ -18,6 +17,8 @@ import LoadingComponent from "../../../components/loading_component";
 import { useThemeContext } from "../../../context/themeContext";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { departmentsByPortfolioQueryOptions } from "../../../hooks/useDepartmentsByPortfolio";
 
 export default function GraphComponent({ activeMinistries, filterType }) {
   const [loading, setLoading] = useState(true);
@@ -31,10 +32,8 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const [ministryDictionary, setMinistryDictionary] = useState({});
   const [departmentDictionary, setDepartmentDictionary] = useState({});
   const [personDictionary, setPersonDictionary] = useState({});
-  const [ministerToDepartments, setMinisterToDepartment] = useState({});
   const [graphParent, setGraphParent] = useState(null);
   const [nodeLoading, setNodeLoading] = useState(false);
-  const [isDateTaken, setIsDateTake] = useState(false);
 
   const { colors, isDark } = useThemeContext();
 
@@ -87,20 +86,11 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const focusRef = useRef();
   const cameraAnimTimeoutRef = useRef();
   const navigate = useNavigate();
-
-  const presidents = useSelector((state) => state.presidency.presidentList);
+  const queryClient = useQueryClient();
   const selectedDate = useSelector((state) => state.presidency.selectedDate);
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
   );
-  const gazetteDataClassic = useSelector((state) => state.gazettes.gazetteData);
-  const allMinistryData = useSelector(
-    (state) => state.allMinistryData.allMinistryData
-  );
-  const allDepartmentData = useSelector(
-    (state) => state.allDepartmentData.allDepartmentData
-  );
-  const allPersonData = useSelector((state) => state.allPerson.allPerson);
 
   useEffect(() => {
     const checkWebGL = () => {
@@ -179,49 +169,16 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           });
 
           // To show person in level 3
-          let showPerson = false;
           let personId = null;
           let personName = null;
 
           if (
-            filterType === "newPerson" &&
-            ministry.newPerson &&
-            ministry.headMinisterId
+            (filterType === "newPerson" || filterType === "presidentAsMinister") &&
+            ministry.ministers?.length > 0
           ) {
-            showPerson = true;
-            personId = ministry.headMinisterId;
-            personName = utils.extractNameFromProtobuf(
-              ministry.headMinisterName
-            );
-          } else if (filterType === "presidentAsMinister") {
-            const headName = ministry.headMinisterName
-              ? utils
-                .extractNameFromProtobuf(ministry.headMinisterName)
-                .split(":")[0]
-                .toLowerCase()
-                .trim()
-              : null;
-            const presidentName = selectedPresident
-              ? utils
-                .extractNameFromProtobuf(selectedPresident.name)
-                .split(":")[0]
-                .toLowerCase()
-                .trim()
-              : null;
+            personId = ministry.ministers[0].id;
+            personName = ministry.ministers[0].name;
 
-            if (
-              (!ministry.headMinisterId && selectedPresident) ||
-              (headName && presidentName && headName === presidentName)
-            ) {
-              showPerson = true;
-              personId = selectedPresident.id;
-              personName = utils.extractNameFromProtobuf(
-                selectedPresident.name
-              );
-            }
-          }
-
-          if (showPerson && personId) {
             personDic[personId] = {
               id: personId,
               name: personName,
@@ -229,7 +186,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
               color: "#4287f5",
               type: "person",
             };
-
             personLinks.push({
               source: ministry.id,
               target: personId,
@@ -246,7 +202,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         setMinistryDictionary(ministryDic);
         setPersonDictionary(personDic);
         setDepartmentDictionary({});
-        setMinisterToDepartment({});
 
         setAllNodes([
           govNode,
@@ -255,98 +210,53 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         ]);
         setRelations([...ministryToGovLinks, ...personLinks]);
       } else if (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") {
-        const response = await api.fetchAllRelationsForMinistry({
-          ministryId: parentNode.id,
-          name: "AS_DEPARTMENT",
-          activeAt: selectedDate.date,
-        });
-        const responsePerson = await api.fetchAllRelationsForMinistry({
-          ministryId: parentNode.id,
-          name: "AS_APPOINTED",
-          activeAt: selectedDate.date,
-        });
+        const responseDepartment = await queryClient.fetchQuery(
+          departmentsByPortfolioQueryOptions(parentNode.id, selectedDate?.date)
+        );
 
-        const departmentLinks = response.map((department) => ({
+        const departmentList = responseDepartment?.departmentList || [];
+
+        const departmentLinks = departmentList.map((department) => ({
           source: parentNode.id,
-          target: department.relatedEntityId,
+          target: department.id,
           value: 2,
           type: "level2",
         }));
 
-        const personLinks = responsePerson.map((person) => ({
-          source: parentNode.id,
-          target: person.relatedEntityId,
-          value: 3,
-          type: "level3",
-        }));
+        const departmentDic = departmentList.reduce((acc, dep) => {
+          acc[dep.id] = {
+            id: dep.id,
+            name: dep.name,
+            group: 3,
+            type: "department",
+          };
+          return acc;
+        }, {});
 
-        const departmentDic = departmentLinks
-          .map((rel) => allDepartmentData[rel.target])
-          .filter(Boolean)
-          .reduce((acc, department) => {
-            acc[department.id] = {
-              id: department.id,
-              name: utils.extractNameFromProtobuf(department.name),
-              created: department.created,
-              kind: department.kind,
-              terminated: department.terminated,
-              group: 3,
-              type: "department",
-            };
-            return acc;
-          }, {});
+        // person data directly from activeMinistries
+        const ministryItem = activeMinistries?.find((m) => m.id === parentNode.id);
+        const ministers = ministryItem?.ministers || [];
 
-        const personDic = personLinks
-          .map((rel) => allPersonData[rel.target])
-          .filter(Boolean)
-          .reduce((acc, person) => {
-            acc[person.id] = {
-              id: person.id,
-              name: utils.extractNameFromProtobuf(person.name),
-              created: person.created,
-              kind: person.kind,
-              terminated: person.terminated,
+        const personLinks = ministers
+          .filter((minister) => minister.id)
+          .map((minister) => ({
+            source: parentNode.id,
+            target: minister.id,
+            value: 3,
+            type: "level3",
+          }));
+
+        const personDic = ministers
+          .filter((minister) => minister.id)
+          .reduce((acc, minister) => {
+            acc[minister.id] = {
+              id: minister.id,
+              name: minister.name,
               group: 4,
               type: "person",
             };
             return acc;
           }, {});
-
-        // FALLBACK: If no AS_APPOINTED person found, add the presid
-        if (personLinks.length === 0 && selectedPresident) {
-          personDic[selectedPresident.id] = {
-            id: selectedPresident.id,
-            name: utils.extractNameFromProtobuf(selectedPresident.name),
-            created: selectedPresident.created,
-            kind: selectedPresident.kind,
-            terminated: selectedPresident.terminated,
-            group: 4,
-            type: "person",
-          };
-
-          personLinks.push({
-            source: parentNode.id,
-            target: selectedPresident.id,
-            value: 3,
-            type: "level3",
-          });
-        }
-
-        const ministerToDepartments = {};
-        departmentLinks.forEach((rel) => {
-          if (!ministerToDepartments[rel.source]) {
-            ministerToDepartments[rel.source] = [];
-          }
-          ministerToDepartments[rel.source].push(rel);
-        });
-
-        const ministerToPerson = {};
-        personLinks.forEach((rel) => {
-          if (!ministerToPerson[rel.source]) {
-            ministerToPerson[rel.source] = [];
-          }
-          ministerToPerson[rel.source].push(rel);
-        });
 
         if (focusRef.current) {
           focusRef.current.stopAnimation?.();
@@ -354,7 +264,6 @@ export default function GraphComponent({ activeMinistries, filterType }) {
 
         setDepartmentDictionary(departmentDic);
         setPersonDictionary(personDic);
-        setMinisterToDepartment(ministerToDepartments);
 
         setAllNodes([
           parentNode,
@@ -377,16 +286,18 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     const selectedMinistry = params.get("ministry");
 
     if (selectedMinistry) {
-      console.log("Selected ministry:", allMinistryData[selectedMinistry]);
+      const portfolioItem = activeMinistries?.find(
+        (m) => m.id === selectedMinistry
+      );
+
+      if (!portfolioItem) return;
+
       const ministryParent = {
-        id: allMinistryData[selectedMinistry].id,
-        name: utils.extractNameFromProtobuf(
-          allMinistryData[selectedMinistry].name
-        ),
-        created: allMinistryData[selectedMinistry].startTime,
+        id: portfolioItem.id,
+        name: portfolioItem.name,
         group: 2,
         color: "#D3AF37",
-        type: allMinistryData[selectedMinistry].kind.minor,
+        type: portfolioItem.type,
       };
       buildGraph(ministryParent);
     } else if (selectedDate && selectedPresident) {
@@ -483,6 +394,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     },
     [colors.textPrimary]
   );
+
   const handleBackClick = useCallback(async () => {
     await buildGraph();
     previousClickedNodeRef.current = null;
@@ -490,7 +402,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     const params = new URLSearchParams(location.search);
     params.delete("ministry");
     const newUrl = `${location.pathname}?${params.toString()}`;
-    window.history.pushState({}, "", newUrl);
+    navigate(newUrl);
   }, [buildGraph]);
   // store previous clicked node id
   const previousClickedNodeRef = useRef(null);
@@ -514,7 +426,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         const params = new URLSearchParams(location.search);
         params.delete("ministry");
         const newUrl = `${location.pathname}?${params.toString()}`;
-        window.history.pushState({}, "", newUrl);
+        navigate(newUrl);
         return;
       }
 
@@ -577,7 +489,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         const params = new URLSearchParams(location.search);
         params.set("ministry", node.id);
         const newUrl = `${location.pathname}?${params.toString()}`;
-        window.history.pushState({}, "", newUrl);
+        navigate(newUrl);
         await buildGraph(node);
       }
     },
@@ -784,6 +696,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           ministryDic={ministryDictionary}
           departmentDic={departmentDictionary}
           loading={nodeLoading}
+          activeMinistries={activeMinistries}
         />
       </div>
       <WebGLChecker />

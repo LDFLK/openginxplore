@@ -32,17 +32,28 @@ export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
   return data;
 };
 
-export const getPersonProfile = async (personId) => {
+export const getPersonProfile = async ({ personId, signal }) => {
   if (!network.isOnline()) {
     throw new Error("OFFLINE_NETWORK_ERROR");
   }
 
   const { data } = await axios.get(
     `${GI_SERVICE_URL_PERSON}/person-profile/${personId}`,
+    { signal }
   );
 
   return data;
 };
+
+
+export const getCabinetFlow = async ({ presidentId, dates }) => {
+  const { data } = await axios.post(
+    `${GI_SERVICE_URL}/cabinet-flow/${presidentId}`,
+    dates
+  );
+
+  return data;
+}
 
 export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) => {
   if (!network.isOnline()) {
@@ -66,6 +77,24 @@ export const getPrimeMinister = async ({ date, signal }) => {
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/prime-minister`,
     { date },
+    { signal }
+  );
+
+  return data;
+};
+
+export const getDepartmentHistory = async ({ departmentId, signal }) => {
+  const { data } = await axios.get(
+    `${GI_SERVICE_URL}/department-history/${departmentId}`,
+    { signal }
+  );
+
+  return data;
+};
+
+export const getPersonHistory = async ({ personId, signal }) => {
+  const { data } = await axios.get(
+    `${GI_SERVICE_URL_PERSON}/person-history/${personId}`,
     { signal }
   );
 
@@ -559,5 +588,7 @@ export default {
   chatbotApiCall,
   getDepartmentRenamedInfo,
   getMinistriesByPerson,
-  getPersonProfile
+  getPersonProfile,
+  getDepartmentsByPortfolio,
+  getPrimeMinister
 };

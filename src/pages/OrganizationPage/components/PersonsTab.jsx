@@ -277,148 +277,43 @@ const PersonsTab = ({ selectedDate }) => {
               key={idx}
               sx={{
                 display: "flex",
-                flexDirection: "column",
+                alignItems: "center",
                 p: { xs: 0, sm: 0, md: "12px 16px" },
-                gap: { xs: 1.5, sm: 1.5, md: 0 },
+                gap: 2,
                 marginBottom: "12px",
                 transition: "all 0.3s ease",
                 cursor: "pointer",
                 borderBottom: `1px solid ${colors.backgroundWhite}`,
               }}
             >
-              {/* Sma;ll screens (xs/sm): icon column + content column */}
+              <PersonIcon
+                fontSize="small"
+                sx={{
+                  color: selectedPresident?.themeColorLight,
+                  flexShrink: 0,
+                  mt: { xs: 0.5, sm: 0 }
+                }}
+              />
+
               <Box
                 sx={{
-                  display: { xs: "flex", sm: "flex", md: "none" },
-                  flexDirection: "row",
-                  alignItems: "flex-start",
-                  gap: 1.5,
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  alignItems: { xs: "flex-start", sm: "center" },
+                  justifyContent: "space-between",
+                  gap: { xs: 0.5, sm: 2 }
                 }}
               >
-                {/* Icon column */}
+                {/* Name + badges */}
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    width: { xs: "36px", sm: "36px" },
-                    mt: { xs: 2, sm: 2 },
-                    flexShrink: 0,
+                    gap: 1,
+                    flexWrap: "wrap",
                   }}
                 >
-                  <PersonIcon
-                    fontSize="small"
-                    sx={{ color: selectedPresident?.themeColorLight }}
-                  />
-                </Box>
-
-                {/* Content column */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    gap: { xs: 0.5, sm: 0.5 },
-                    width: "100%",
-                  }}
-                >
-                  {/* Name + badges */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        color: colors.textMuted,
-                        fontWeight: 500,
-                        fontSize: { xs: "0.8rem", md: "1rem" },
-                      }}
-                    >
-                      {utils.extractNameFromProtobuf(person.name)}
-                    </Typography>
-                    {person.isPresident && (
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          px: 1,
-                          py: 0.3,
-                          borderRadius: "5px",
-                          color: selectedPresident.themeColorLight,
-                          border: `1px solid ${selectedPresident.themeColorLight}`,
-                          fontFamily: "poppins",
-                          fontWeight: 600,
-                        }}
-                      >
-                        President
-                      </Typography>
-                    )}
-                    {person.isNew && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          px: 1,
-                          py: 0.2,
-                          borderRadius: "6px",
-                          backgroundColor: selectedPresident.themeColorLight,
-                          color: colors.white,
-                          fontFamily: "Poppins, sans-serif",
-                          fontWeight: 600,
-                          letterSpacing: "0.3px",
-                        }}
-                      >
-                        New
-                      </Typography>
-                    )}
-                  </Box>
-
-                  {/* View profile link */}
-                  <Link
-                    to={`/person-profile/${person.id}`}
-                    state={{ mode: "back", from: location.pathname + location.search }}
-                    style={{
-                      textDecoration: "none",
-                      color: selectedPresident.themeColorLight,
-                      fontFamily: "Poppins, sans-serif",
-                      fontWeight: 500,
-                      fontSize: { xs: "0.5rem", md: "0.8rem" },
-                      borderRadius: "8px",
-                      transition: "all 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.textDecoration = "underline";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.textDecoration = "none";
-                    }}
-                  >
-                    View Profile
-                  </Link>
-                </Box>
-              </Box>
-
-              {/* Large screens (md+): original layout */}
-              <Box
-                sx={{
-                  display: { xs: "none", sm: "none", md: "flex" },
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 2,
-                  width: "100%",
-                  mt: 0,
-                }}
-              >
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}
-                >
-                  <PersonIcon
-                    fontSize="small"
-                    sx={{ color: selectedPresident?.themeColorLight }}
-                  />
                   <Typography
                     sx={{
                       fontFamily: "Poppins, sans-serif",
@@ -433,13 +328,14 @@ const PersonsTab = ({ selectedDate }) => {
                     <Typography
                       variant="subtitle2"
                       sx={{
-                        px: 1,
-                        py: 0.3,
-                        borderRadius: "5px",
+                        px: 0.8,
+                        py: 0.2,
+                        borderRadius: "4px",
                         color: selectedPresident.themeColorLight,
                         border: `1px solid ${selectedPresident.themeColorLight}`,
                         fontFamily: "poppins",
                         fontWeight: 600,
+                        fontSize: { xs: "0.55rem", md: "0.75rem" },
                       }}
                     >
                       President
@@ -449,14 +345,15 @@ const PersonsTab = ({ selectedDate }) => {
                     <Typography
                       variant="caption"
                       sx={{
-                        px: 1,
+                        px: 0.8,
                         py: 0.2,
-                        borderRadius: "6px",
+                        borderRadius: "4px",
                         backgroundColor: selectedPresident.themeColorLight,
                         color: colors.white,
                         fontFamily: "Poppins, sans-serif",
                         fontWeight: 600,
                         letterSpacing: "0.3px",
+                        fontSize: { xs: "0.55rem", md: "0.7rem" },
                       }}
                     >
                       New
@@ -464,26 +361,28 @@ const PersonsTab = ({ selectedDate }) => {
                   )}
                 </Box>
 
+                {/* View profile link */}
                 <Link
                   to={`/person-profile/${person.id}`}
                   state={{ mode: "back", from: location.pathname + location.search }}
                   style={{
                     textDecoration: "none",
-                    color: selectedPresident.themeColorLight,
-                    fontFamily: "Poppins, sans-serif",
-                    fontWeight: 500,
-                    fontSize: { xs: "0.5rem", md: "0.8rem" },
-                    borderRadius: "8px",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.textDecoration = "underline";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.textDecoration = "none";
                   }}
                 >
-                  View Profile
+                  <Typography
+                    sx={{
+                      color: selectedPresident.themeColorLight,
+                      fontFamily: "Poppins, sans-serif",
+                      fontWeight: 500,
+                      fontSize: { xs: "0.65rem", md: "0.8rem" },
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
+                  >
+                    View Profile
+                  </Typography>
                 </Link>
               </Box>
             </Box>

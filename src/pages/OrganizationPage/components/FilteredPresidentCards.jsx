@@ -173,7 +173,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
         const matches =
           new Date(validSelectedDate) >= start &&
-          new Date(validSelectedDate) <= end;
+          new Date(validSelectedDate) < end;
         return matches;
       });
 
@@ -310,7 +310,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
       const matches =
         new Date(urlSelectedDate) >= start &&
-        new Date(urlSelectedDate) <= end;
+        new Date(urlSelectedDate) < end;
       return matches;
     });
 
@@ -350,7 +350,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
               ? new Date(rel.endTime).getFullYear()
               : "Present";
             const term = startYear ? `${startYear} - ${endYear}` : "";
-
             return (
               <button
                 key={president.id}
@@ -382,14 +381,17 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                   <p className="text-xs md:text-sm text-primary/50 break-words whitespace-normal">
                     {term}
                   </p>
-                  <Link
-                    to={`/person-profile/${president?.id}`}
-                    state={{ mode: "back", from: location.pathname + location.search }}
-                    className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
-                  >
-                    <EyeIcon size={16} className="mr-1" />
-                    <p>View Profile</p>
-                  </Link>
+                  <div className="flex flex-nowrap gap-3 mt-1">
+                    <Link
+                      to={`/person-profile/${president?.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      state={{ mode: "back", from: location.pathname + location.search }}
+                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
+                    >
+                      <EyeIcon size={16} className="mr-1" />
+                      <p>View Profile</p>
+                    </Link>
+                  </div>
                 </div>
               </button>
             );

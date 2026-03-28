@@ -10,7 +10,6 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 export default function TimeRangeSelector({
   startYear,
   dates,
-  latestPresStartDate,
   onDateChange,
   externalRange,
   activePreset,
@@ -18,6 +17,11 @@ export default function TimeRangeSelector({
   activePresident,
   setActivePresident
 }) {
+  const [defaultStartDate] = useState(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 5);
+    return date;
+  });
   const presidentsArray = useSelector(
     (state) => state.presidency.presidentDict
   );
@@ -50,7 +54,7 @@ export default function TimeRangeSelector({
     let urlEnd = parseDate(endDateParam, null);
 
     if (!urlStart || !urlEnd) {
-      urlStart = parseDate(startDateParam, latestPresStartDate);
+      urlStart = parseDate(startDateParam, defaultStartDate);
       urlEnd = parseDate(endDateParam, new Date());
     }
 
@@ -179,7 +183,7 @@ export default function TimeRangeSelector({
 
     // 2. If parsing failed or params missing, use fallback logic
     if (!urlStart || !urlEnd) {
-      urlStart = parseDate(startDateParam, latestPresStartDate);
+      urlStart = parseDate(startDateParam, defaultStartDate);
       urlEnd = parseDate(endDateParam, new Date());
     }
 
@@ -235,7 +239,7 @@ export default function TimeRangeSelector({
       setActivePreset(null);
       setActivePresident("");
     }
-  }, [latestPresStartDate, location.key, location.search]);
+  }, [defaultStartDate, location.key, location.search]);
 
   const presidents = useMemo(() => {
     if (!presidentsArray || !presidentRelationDict) return {};

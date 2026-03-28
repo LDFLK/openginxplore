@@ -4,7 +4,7 @@ import {
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useThemeContext } from "../../../context/themeContext";
 import useUrlParamState from "../../../hooks/singleSharingURL";
@@ -52,6 +52,7 @@ const MinistryCardGrid = () => {
   const [selectedCard, setSelectedCard] = useState(null);
   const { colors } = useThemeContext();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { data, isLoading, error } = useActivePortfolioList(
     selectedPresident?.id,
@@ -177,26 +178,34 @@ const MinistryCardGrid = () => {
         params.delete("ministry");
 
         const newUrl = `${window.location.pathname}?${params.toString()}`;
-        window.history.pushState({}, "", newUrl);
+        navigate(newUrl);
       }
 
       return newStep;
     });
   };
 
+  const prevDateRef = useRef(selectedDate?.date);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      prevDateRef.current = selectedDate?.date;
       return;
     }
-    const params = new URLSearchParams(window.location.search);
-    params.delete("ministry");
-    setActiveStep(0);
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.pushState({}, "", newUrl);
-  }, [selectedDate]);
+
+    // Only reset if the date has actually changed to a new value
+    if (selectedDate?.date && prevDateRef.current && selectedDate.date !== prevDateRef.current) {
+      const params = new URLSearchParams(window.location.search);
+      params.delete("ministry");
+      setActiveStep(0);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      navigate(newUrl);
+    }
+
+    prevDateRef.current = selectedDate?.date;
+  }, [selectedDate?.date]);
 
   const handleCardClick = async (card) => {
     // dispatch(setSelectedMinistry(card.id));
@@ -206,7 +215,7 @@ const MinistryCardGrid = () => {
     const params = new URLSearchParams(window.location.search);
     params.set("ministry", card.id);
     const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.pushState({}, "", newUrl);
+    navigate(newUrl);
   };
 
   return (
@@ -289,15 +298,15 @@ const MinistryCardGrid = () => {
                 }}>
                   <Typography
                     sx={{
-                      fontSize: 12,
+                      fontSize: { xs: 10, md: 12 },
                       color: colors.white,
                       fontWeight: 500,
                       backgroundColor: `${selectedPresident.themeColorLight}99`,
                       py: 0.25,
-                      px: 1,
+                      px: 0.8,
                       borderRadius: 1,
-                      width: "102px",
-                      mb: 0.5,
+                      width: "fit-content",
+                      mb: 0.2,
                     }}
                   >
                     Prime Minister
@@ -319,11 +328,11 @@ const MinistryCardGrid = () => {
                         sx={{
                           border: `1px solid ${colors.green}`,
                           color: colors.green,
-                          fontSize: { xs: 10, md: 12 },
+                          fontSize: { xs: 9, md: 12 },
                           fontWeight: 600,
                           borderRadius: "4px",
-                          px: 1,
-                          py: 0.5,
+                          px: 0.6,
+                          py: 0.2,
                           fontFamily: "poppins",
                           display: "inline-flex",
                           alignItems: "center",
@@ -359,9 +368,10 @@ const MinistryCardGrid = () => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        fontSize: 13,
+                        fontSize: { xs: 10, md: 13 },
                         color: "#6491DA",
                         transition: "color 0.3s, text-decoration 0.3s",
+                        mt: 0.5,
                         ":hover": {
                           textDecoration: "underline",
                           color: selectedPresident.themeColorLight,
@@ -731,7 +741,7 @@ const MinistryCardGrid = () => {
               justifyContent: "flex-end",
             }}
           >
-            {steps[activeStep]?.label !== "Departments & People" && (
+            {steps[activeStep]?.label !== "Departments & People" && !new URLSearchParams(location.search).has("ministry") && (
               <>
                 {/* Search Bar */}
                 <Box

@@ -9,15 +9,15 @@ import {
 } from "lucide-react";
 import DataPage from "../../DataPage/screens/DataPage";
 import TimeRangeSelector from "../components/TimeRangeSelector";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import TextLogo from "../../LandingPage/components/textLogo";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import TextLogo from "../components/textLogo";
 import Organization from "../../OrganizationPage/screens/Organization";
 import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
@@ -34,12 +34,8 @@ export default function HomePage() {
   const gazetteDateClassic = useSelector(
     (state) => state.gazettes.gazetteDataClassic
   );
-  const presidentRelationDict = useSelector(
-    (state) => state.presidency.presidentRelationDict
-  );
-  const presidents = useSelector((state) => state.presidency.presidentDict);
 
-  const [latestPresStartDate, setLatestPresStartDate] = useState(null);
+
   const [userSelectedDateRange, setUserSelectedDateRange] = useState([
     null,
     null,
@@ -53,21 +49,6 @@ export default function HomePage() {
     setUserSelectedDateRange([startDate, endDate]);
     setExternalDateRange([null, null]);
   }, []);
-
-  useEffect(() => {
-    if (!presidents || presidents.length === 0 || !presidentRelationDict)
-      return;
-
-    const relationEntries = Object.entries(presidentRelationDict);
-    if (relationEntries.length === 0) return;
-
-    const [lastPresId, lastRelation] =
-      relationEntries[relationEntries.length - 1];
-
-    if (lastPresId && lastRelation?.startTime) {
-      setLatestPresStartDate(new Date(lastRelation.startTime.split("T")[0]));
-    }
-  }, [presidents, presidentRelationDict]);
 
   const dates =
     gazetteDateClassic && gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
@@ -279,11 +260,10 @@ export default function HomePage() {
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
         <div className="flex flex-col gap-4">
-          {latestPresStartDate && selectedTab !== "search" && (
+          {selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}
               dates={selectedTab === "organization" ? dates : []}
-              latestPresStartDate={latestPresStartDate}
               onDateChange={handleDateRangeChange}
               externalRange={externalDateRange}
               activePreset={activePreset}

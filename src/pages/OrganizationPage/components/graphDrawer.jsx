@@ -5,7 +5,6 @@ import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import { Building, History, UserRound, Building2, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import utils from "../../../utils/utils";
 
 export default function Drawer({
   expandDrawer,
@@ -17,6 +16,7 @@ export default function Drawer({
   ministryDic,
   departmentDic,
   loading,
+  activeMinistries,
 }) {
   const { colors, isDark } = useThemeContext();
   const [drawerContentList, setDrawerContentList] = useState({});
@@ -29,15 +29,12 @@ export default function Drawer({
   const selectedPresident = useSelector(
     (state) => state.presidency.selectedPresident
   );
-  const allMinistryData = useSelector(
-    (state) => state.allMinistryData.allMinistryData
-  );
 
   // ministry from URL when no selected node
   const [urlMinistry, setUrlMinistry] = useState(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const ministryParam = params.get("ministry");
 
     if (!ministryParam) {
@@ -45,24 +42,14 @@ export default function Drawer({
       return;
     }
 
-    let found = null;
-    if (allMinistryData && allMinistryData[ministryParam]) {
-      found = allMinistryData[ministryParam];
-    }
+    const found = activeMinistries?.find((m) => m.id === ministryParam);
 
     if (found) {
-      let name = "";
-      try {
-        name = utils.extractNameFromProtobuf(found.name);
-        if (!name) name = found.name || found.id;
-      } catch {
-        name = found.name || found.id;
-      }
-      setUrlMinistry({ id: found.id, name });
+      setUrlMinistry({ id: found.id, name: found.name });
     } else {
       setUrlMinistry(null);
     }
-  }, [window.location.search, allMinistryData]);
+  }, [location.search, activeMinistries]);
 
 
   useEffect(() => {
