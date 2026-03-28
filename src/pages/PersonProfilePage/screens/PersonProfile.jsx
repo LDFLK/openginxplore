@@ -13,8 +13,10 @@ import {
   Mail,
   Building2,
   Crown,
-  Cake
+  Cake,
+  User2,
 } from "lucide-react";
+import useNetworkStatus from "../../../hooks/useNetworkStatus";
 import InfoTooltip from "../../../components/InfoToolTip";
 import { usePersonProfile } from "../../../hooks/usePersonProfile";
 import { usePersonHistory } from "../../../hooks/usePersonHistory";
@@ -29,6 +31,7 @@ const fieldConfig = [
 ];
 
 const PersonProfile = () => {
+  const isOnline = useNetworkStatus();
   const { personId } = useParams();
   const imageStorageBaseUrl = window?.configs?.imageStorageBaseUrl ?? "";
   const navigate = useNavigate();
@@ -126,7 +129,7 @@ const PersonProfile = () => {
           {/* Avatar — small, clean, no ring */}
           <div className="flex-shrink-0">
             <div className="w-28 h-28 md:w-35 md:h-35 rounded-full bg-gray-100 shadow-sm" style={{ overflow: "hidden", flexShrink: 0 }}>
-              {personProfile.image_url != null ? (
+              {isOnline && personProfile.image_url != null ? (
                 <img
                   className="block"
                   style={{ width: "100%", height: "100%", objectFit: "contain" }}
@@ -134,8 +137,8 @@ const PersonProfile = () => {
                   alt={personProfile?.name}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <ImageOff className="text-gray-300 w-8 h-8" />
+                <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                  <User2 className="text-gray-300 w-10 h-10" />
                 </div>
               )}
             </div>

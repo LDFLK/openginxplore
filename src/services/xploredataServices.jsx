@@ -1,8 +1,13 @@
 import axios from "../lib/axios";
+import network from "../utils/network";
 
 const GI_SERVICE_URL = "/v1/data";
 
 export const getDataCatalog = async ({ categoryIds = [], signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   try {
     const { data } = await axios.post(
       `${GI_SERVICE_URL}/data-catalog`,
@@ -18,6 +23,10 @@ export const getDataCatalog = async ({ categoryIds = [], signal }) => {
 
 
 export const getAvailableYearsForDataset = async ({ datasetIds = [], signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   try {
     const { data } = await axios.post(
       `${GI_SERVICE_URL}/datasets/years`,
@@ -32,6 +41,10 @@ export const getAvailableYearsForDataset = async ({ datasetIds = [], signal }) =
 };
 
 export const getDatasetById = async ({ datasetId, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   try {
     const { data } = await axios.get(
       `${GI_SERVICE_URL}/datasets/${datasetId}/data`,
@@ -45,6 +58,10 @@ export const getDatasetById = async ({ datasetId, signal }) => {
 };
 
 export const getRootOrganization = async ({ datasetId, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   try {
     const { data } = await axios.get(
       `${GI_SERVICE_URL}/datasets/${datasetId}/root`,

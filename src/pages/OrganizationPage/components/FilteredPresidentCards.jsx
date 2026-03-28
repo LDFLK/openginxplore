@@ -7,7 +7,8 @@ import {
 } from "../../../store/presidencySlice";
 import { setGazetteData } from "../../../store/gazetteDate";
 import { Link, useLocation } from "react-router-dom";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, User2 } from "lucide-react";
+import useNetworkStatus from "../../../hooks/useNetworkStatus";
 
 export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const gazetteDateClassic = useSelector((s) => s.gazettes.gazetteDataClassic);
   const selectedPresident = useSelector((s) => s.presidency.selectedPresident);
   const selectedDate = useSelector((s) => s.presidency.selectedDate);
+  const isOnline = useNetworkStatus();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [initializedFromUrl, setInitializedFromUrl] = useState(false);
@@ -358,11 +360,17 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                     : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
                   }`}
               >
-                <img
-                  src={president.imageUrl || president.image || ""}
-                  alt={nameText}
-                  className="md:w-14 w-10 md:h-14 h-10 object-cover rounded-full mr-3 border border-border flex-shrink-0"
-                />
+                {isOnline && (president.imageUrl || president.image) ? (
+                  <img
+                    src={president.imageUrl || president.image}
+                    alt={nameText}
+                    className="md:w-14 w-10 md:h-14 h-10 object-cover rounded-full mr-3 border border-border flex-shrink-0"
+                  />
+                ) : (
+                  <div className="md:w-14 w-10 md:h-14 h-10 rounded-full mr-3 border border-border flex-shrink-0 flex items-center justify-center bg-foreground/10">
+                    <User2 className="text-primary/40 w-6 h-6" />
+                  </div>
+                )}
                 <div className="flex flex-col flex-1 text-left min-w-0">
                   <p
                     className={`font-medium text-xs md:text-sm break-words whitespace-normal ${isSelected ? "text-accent" : "text-primary"

@@ -1,5 +1,13 @@
 import utils from "../utils/utils";
 import axios from "@/lib/axios";
+import network from "../utils/network";
+
+const wrappedFetch = async (...args) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+  return fetch(...args);
+};
 
 const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : ""
 // const apiUrl = "";
@@ -8,6 +16,10 @@ const GI_SERVICE_URL = "/v1/organisation";
 const GI_SERVICE_URL_PERSON = "/v1/person";
 
 export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/active-portfolio-list`,
     { date },
@@ -21,6 +33,10 @@ export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
 };
 
 export const getPersonProfile = async ({ personId, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.get(
     `${GI_SERVICE_URL_PERSON}/person-profile/${personId}`,
     { signal }
@@ -28,6 +44,7 @@ export const getPersonProfile = async ({ personId, signal }) => {
 
   return data;
 };
+
 
 export const getCabinetFlow = async ({ presidentId, dates }) => {
   const { data } = await axios.post(
@@ -39,6 +56,10 @@ export const getCabinetFlow = async ({ presidentId, dates }) => {
 }
 
 export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/departments-by-portfolio/${portfolioId}`,
     { date },
@@ -49,6 +70,10 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) 
 };
 
 export const getPrimeMinister = async ({ date, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/prime-minister`,
     { date },
@@ -79,7 +104,7 @@ export const getPersonHistory = async ({ personId, signal }) => {
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
   try {
-    const response = await fetch(`${apiUrl}/v1/entities/search`, {
+    const response = await wrappedFetch(`${apiUrl}/v1/entities/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +117,7 @@ const fetchInitialGazetteData = async () => {
       }),
     });
 
-    const responseForPerson = await fetch(`${apiUrl}/v1/entities/search`, {
+    const responseForPerson = await wrappedFetch(`${apiUrl}/v1/entities/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -155,7 +180,7 @@ const fetchInitialGazetteData = async () => {
 
 const fetchPresidentsData = async (governmentNodeId = "gov_01") => {
   try {
-    const response = await fetch(
+    const response = await wrappedFetch(
       `${apiUrl}/v1/entities/${governmentNodeId}/relations`,
       {
         method: "POST",
@@ -181,7 +206,7 @@ const fetchActiveMinistries = async (
   selectedPresident
 ) => {
   try {
-    const response = await fetch(
+    const response = await wrappedFetch(
       `${apiUrl}/v1/entities/${selectedPresident.id}/relations`,
       {
         method: "POST",
@@ -254,7 +279,7 @@ const fetchActiveMinistries = async (
 
 const fetchAllPersons = async () => {
   try {
-    const response = await fetch(`${apiUrl}/v1/entities/search`, {
+    const response = await wrappedFetch(`${apiUrl}/v1/entities/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -287,7 +312,7 @@ const fetchActiveRelationsForMinistry = async (
   relationType
 ) => {
   try {
-    const response = await fetch(
+    const response = await wrappedFetch(
       `${apiUrl}/v1/entities/${ministryId}/relations`,
       {
         method: "POST",
@@ -317,7 +342,7 @@ const fetchActiveRelationsForMinistry = async (
 
 const fetchAllDepartments = async () => {
   // Fetch all department protobuf data
-  const response = await fetch(`${apiUrl}/v1/entities/search`, {
+  const response = await wrappedFetch(`${apiUrl}/v1/entities/search`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -339,7 +364,7 @@ const fetchAllDepartments = async () => {
 
 const fetchAllStateMinistries = async () => {
   // Fetch all state ministries protobuf data
-  const response = await fetch(`${apiUrl}/v1/entities/search`, {
+  const response = await wrappedFetch(`${apiUrl}/v1/entities/search`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -361,7 +386,7 @@ const fetchAllStateMinistries = async () => {
 
 const fetchAllCabinetMinistries = async () => {
   // Fetch all cabinet ministries protobuf data
-  const response = await fetch(`${apiUrl}/v1/entities/search`, {
+  const response = await wrappedFetch(`${apiUrl}/v1/entities/search`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -391,7 +416,7 @@ const fetchAllRelationsForMinistry = async ({
   activeAt = "",
 }) => {
   try {
-    const response = await fetch(
+    const response = await wrappedFetch(
       `${apiUrl}/v1/entities/${ministryId}/relations`,
       {
         method: "POST",
@@ -453,7 +478,7 @@ const createDepartmentHistoryDictionary = async (allMinistryData) => {
 const chatbotApiCall = async (question, session_id) => {
   try {
     console.log(`this is the question ${question}`);
-    const response = await fetch(`/chat`, {
+    const response = await wrappedFetch(`/chat`, {
       method: "POST",
       body: JSON.stringify({ question, session_id }),
       headers: {
@@ -475,7 +500,7 @@ const chatbotApiCall = async (question, session_id) => {
 
 const getMinistriesByDepartment = async (departmentId) => {
   try {
-    const response = await fetch(
+    const response = await wrappedFetch(
       `${apiUrl}/v1/entities/${departmentId}/relations`,
       {
         method: "POST",
@@ -500,7 +525,7 @@ const getMinistriesByDepartment = async (departmentId) => {
 
 const getDepartmentRenamedInfo = async (departmentId) => {
   try {
-    const response = await fetch(
+    const response = await wrappedFetch(
       `${apiUrl}/v1/entities/${departmentId}/relations`,
       {
         method: "POST",
@@ -525,7 +550,7 @@ const getDepartmentRenamedInfo = async (departmentId) => {
 
 const getMinistriesByPerson = async (personId) => {
   try {
-    const response = await fetch(
+    const response = await wrappedFetch(
       `${apiUrl}/v1/entities/${personId}/relations`,
       {
         method: "POST",
