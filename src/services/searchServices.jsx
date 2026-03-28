@@ -1,4 +1,5 @@
 import axios from "../lib/axios";
+import network from "../utils/network";
 
 const SEARCH_URL = "/v1/search";
 const DATA_URL = "/v1/data";
@@ -12,6 +13,10 @@ const DATA_URL = "/v1/data";
  * @returns {Promise<Object>} Search results (all matching results)
  */
 export const search = async ({ query, type, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const params = { search_query: query };
   if (type) params.type = type;
 
@@ -27,6 +32,10 @@ export const search = async ({ query, type, signal }) => {
  * @returns {Promise<Object>} Dataset info with category hierarchy
  */
 export const getDatasetCategories = async ({ datasetId, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.get(
     `${DATA_URL}/datasets/${datasetId}/categories`,
     { signal }

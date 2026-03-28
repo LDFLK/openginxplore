@@ -16,6 +16,10 @@ const GI_SERVICE_URL = "/v1/organisation";
 const GI_SERVICE_URL_PERSON = "/v1/person";
 
 export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/active-portfolio-list`,
     { date },
@@ -29,6 +33,10 @@ export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
 };
 
 export const getPersonProfile = async (personId) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.get(
     `${GI_SERVICE_URL_PERSON}/person-profile/${personId}`,
   );
@@ -37,6 +45,10 @@ export const getPersonProfile = async (personId) => {
 };
 
 export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/departments-by-portfolio/${portfolioId}`,
     { date },
@@ -47,6 +59,10 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) 
 };
 
 export const getPrimeMinister = async ({ date, signal }) => {
+  if (!network.isOnline()) {
+    throw new Error("OFFLINE_NETWORK_ERROR");
+  }
+
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/prime-minister`,
     { date },
