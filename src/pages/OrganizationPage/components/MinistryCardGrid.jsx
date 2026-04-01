@@ -688,7 +688,7 @@ const MinistryCardGrid = () => {
                 </Box>
               )}
             </Box>
-          ) : error ? (
+          ) : error || !isLoading ? (
             <Typography
               sx={{
                 fontStyle: "italic",
