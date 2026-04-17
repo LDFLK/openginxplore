@@ -20,7 +20,7 @@ const OfflineBanner = () => {
         >
           <div className="flex items-center justify-center gap-3 py-2 px-4 text-sm font-semibold">
             <WifiOff size={18} className="animate-pulse" />
-            <span>You are currently offline. Some features may not be available.</span>
+            <span>You're offline. Please connect to the internet to continue using the app.</span>
           </div>
         </motion.div>
       )}
