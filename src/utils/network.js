@@ -1,7 +1,5 @@
-/**
- * Non-React utility to check the current online status
- * @returns {boolean} True if the user is online, false otherwise
- */
+export const OFFLINE_ERROR = "OFFLINE_NETWORK_ERROR";
+
 const network = {
   isOnline: () => navigator.onLine,
 };

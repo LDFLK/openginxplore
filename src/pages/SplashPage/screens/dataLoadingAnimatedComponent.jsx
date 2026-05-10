@@ -12,6 +12,7 @@ import {
   setSelectedPresident,
 } from "../../../store/presidencySlice";
 import { useDispatch, useSelector } from "react-redux";
+import { OFFLINE_ERROR } from "../../../utils/network";
 import { setGazetteDataClassic } from "../../../store/gazetteDate";
 import PersonProfile from "../../PersonProfilePage/screens/PersonProfile";
 import Error500 from "../../ErrorBoundaries/screens/500Error";
@@ -132,7 +133,9 @@ export default function DataLoadingAnimatedComponent({ mode }) {
         dispatch(setSelectedPresident(selectedPre));
       }
     } catch (e) {
-      setShowServerError(true);
+      if (e.message !== OFFLINE_ERROR) {
+        setShowServerError(true);
+      }
       console.log(`Error fetching person data : ${e.message}`);
     }
   };
