@@ -8,6 +8,8 @@ import {
 import { setGazetteData } from "../../../store/gazetteDate";
 import { Link, useLocation } from "react-router-dom";
 import { EyeIcon } from "lucide-react";
+import useNetworkStatus from "../../../hooks/useNetworkStatus";
+import PersonAvatar from "../../../components/PersonAvatar";
 
 export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const dispatch = useDispatch();
@@ -18,6 +20,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const gazetteDateClassic = useSelector((s) => s.gazettes.gazetteDataClassic);
   const selectedPresident = useSelector((s) => s.presidency.selectedPresident);
   const selectedDate = useSelector((s) => s.presidency.selectedDate);
+  const isOnline = useNetworkStatus();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [initializedFromUrl, setInitializedFromUrl] = useState(false);
@@ -358,10 +361,12 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                     : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
                   }`}
               >
-                <img
-                  src={president.imageUrl || president.image || ""}
-                  alt={nameText}
-                  className="md:w-14 w-10 md:h-14 h-10 object-cover rounded-full mr-3 border border-border flex-shrink-0"
+                <PersonAvatar
+                  isOnline={isOnline}
+                  imageUrl={president.imageUrl}
+                  image={president.image}
+                  name={nameText}
+                  className="md:w-14 w-10 md:h-14 h-10 mr-3"
                 />
                 <div className="flex flex-col flex-1 text-left min-w-0">
                   <p

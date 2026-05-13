@@ -10,6 +10,7 @@ import { useThemeContext } from "../../../context/themeContext";
 import useUrlParamState from "../../../hooks/singleSharingURL";
 import { useActivePortfolioList } from "../../../hooks/useActivePortfolioList";
 import { usePrimeMinister } from "../../../hooks/usePrimeMinister";
+import useNetworkStatus from "../../../hooks/useNetworkStatus";
 
 import MinistryCard from "./MinistryCard";
 import MinistryViewModeToggleButton from "../../../components/ministryViewModeToggleButton";
@@ -42,6 +43,7 @@ const MinistryCardGrid = () => {
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );
+  const isOnline = useNetworkStatus();
   const [searchText, setSearchText] = useUrlParamState("filterByName", "");
   const [filterType, setFilterType] = useUrlParamState("filterByType", "all");
   const [viewMode, setViewMode] = useUrlParamState("viewMode", "Grid");
@@ -282,7 +284,7 @@ const MinistryCardGrid = () => {
                 }}
               >
                 <Avatar
-                  src={primeMinister?.imageUrl}
+                  src={isOnline ? primeMinister?.imageUrl : null}
                   alt={primeMinister?.name}
                   sx={{
                     width: { xs: 45, sm: 50, md: 55 },

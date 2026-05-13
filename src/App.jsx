@@ -3,6 +3,7 @@ import Error404 from "./pages/ErrorBoundaries/screens/404Error";
 import { useThemeContext } from "./context/themeContext";
 import DataLoadingAnimatedComponent from "./pages/SplashPage/screens/dataLoadingAnimatedComponent";
 import DocsPage from "./pages/DocsPage/screens/DocsPage";
+import OfflineBanner from "./components/OfflineBanner";
 import { usePageTracking } from "./hooks/usePageTracking";
 
 const AppRoutes = () => {
@@ -25,6 +26,7 @@ const App = () => {
 
   return (
     <div className={isDark ? "dark" : ""}>
+      <OfflineBanner />
       <Router>
         <AppRoutes />
       </Router>
