@@ -1,5 +1,5 @@
-import { useThemeContext } from "../../../context/themeContext";
-import Version from "../../../components/version";
+import { useThemeContext } from "../context/themeContext";
+import Version from "./version";
 
 export default function TextLogo({ isExpanded }) {
   const { isDark } = useThemeContext();
