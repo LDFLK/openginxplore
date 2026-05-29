@@ -9,7 +9,7 @@ export default function MeetingsTracker() {
             <div className="bg-white dark:bg-gray-800 p-2 lg:p-4 rounded-sm border border-border">
                 {/* title */}
                 <h3 className="text-sm lg:text-lg font-semibold text-primary">
-                    Meetings Tracker
+                    Governance Tracking initiative
                 </h3>
 
                 {/* key highlights */}

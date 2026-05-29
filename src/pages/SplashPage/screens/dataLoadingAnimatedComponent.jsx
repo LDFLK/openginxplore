@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import api from "../../../services/services";
 import utils from "../../../utils/utils";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
@@ -14,13 +15,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { OFFLINE_ERROR } from "../../../utils/network";
 import { setGazetteDataClassic } from "../../../store/gazetteDate";
-import PersonProfile from "../../PersonProfilePage/screens/PersonProfile";
 import Error500 from "../../ErrorBoundaries/screens/500Error";
-import DepartmentProfile from "../../DepartmentPage/screens/DepartmentProfile";
 import SplashPage from "../components/splash_page";
-import HomePage from "../../HomePage/screens/HomePage";
 
-export default function DataLoadingAnimatedComponent({ mode }) {
+export default function DataLoadingAnimatedComponent() {
   const [loading, setLoading] = useState(false);
   const [showServerError, setShowServerError] = useState(false);
   const { presidentDict, selectedPresident } = useSelector(
@@ -187,25 +185,8 @@ export default function DataLoadingAnimatedComponent({ mode }) {
     }
   };
 
-  return (
-    <>
-      {loading ? (
-        <SplashPage progress={progress} setProgress={setProgress} />
-      ) : showServerError ? (
-        <Error500 />
-      ) : (
-        <>
-          {Object.keys(presidentDict).length > 0 && mode === "orgchart" ? (
-            <HomePage />
-          ) : Object.keys(presidentDict).length > 0 &&
-            mode === "person-profile" ? (
-            <PersonProfile />
-          ) : (
-            Object.keys(presidentDict).length > 0 &&
-            mode === "department-profile" && <DepartmentProfile />
-          )}
-        </>
-      )}
-    </>
-  );
+  if (loading || Object.keys(presidentDict).length === 0) return <SplashPage progress={progress} setProgress={setProgress} />;
+  if (showServerError) return <Error500 />;
+
+  return <Outlet />;
 }

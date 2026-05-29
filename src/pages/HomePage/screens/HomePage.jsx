@@ -1,26 +1,21 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   BookOpenText
 } from "lucide-react";
-import DataPage from "../../DataPage/screens/DataPage";
 import TimeRangeSelector from "../components/TimeRangeSelector";
-import { Link, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Organization from "../../OrganizationPage/screens/Organization";
 import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
-import SearchPage from "../../SearchPage/screens/SearchPage";
 import SlFlag from "/sl_flag.png";
 import SideBarComponent from "../../../components/sidebar";
-import MeetingsTracker from "../../MeetingsTracker/screens/MeetingsTracker";
 
 export default function HomePage() {
   const [isExpanded, setIsExpanded] = useState(window.innerWidth >= 768);
 
-  const { tab } = useParams();
-
-  const selectedTab = tab || "organization";
+  const { pathname } = useLocation();
+  const selectedTab = pathname.slice(1) || "organization";
 
   const gazetteDateClassic = useSelector(
     (state) => state.gazettes.gazetteDataClassic
@@ -98,15 +93,7 @@ export default function HomePage() {
             />
           )}
 
-          {selectedTab === "organization" ? (
-            <Organization dateRange={userSelectedDateRange} />
-          ) : selectedTab === "data" ? (
-            <DataPage setExternalDateRange={setExternalDateRange} />
-          ) : selectedTab === "search" ? (
-            <SearchPage />
-          ) : selectedTab === "meetingsTracker" ? (
-            <MeetingsTracker />
-          ) : null}
+          <Outlet context={{ dateRange: userSelectedDateRange, setExternalDateRange }} />
         </div>
       </div>
     </div>

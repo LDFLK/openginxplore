@@ -2,12 +2,13 @@ import GazetteTimeline from "../components/GazetteTimeline";
 import MinistryCardGrid from "../components/MinistryCardGrid";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
 import LandscapeRequired from "../../../components/landscapeRequired";
 
-const Organization = ({ dateRange }) => {
+const Organization = () => {
+  const { dateRange } = useOutletContext();
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );

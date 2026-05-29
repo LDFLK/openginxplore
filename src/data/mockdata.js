@@ -84,7 +84,7 @@ export const meetings = [
         track: "2 Meeting bodies tracked",
     },
     {
-        title: "Ministry of Labor and Foreign Employment Ministry of Labor and Foreign Employment Ministry of Labor and Foreign Employment",
+        title: "Ministry of Labor and Foreign Employment",
         track: "5 Meeting bodies tracked",
     },
     {

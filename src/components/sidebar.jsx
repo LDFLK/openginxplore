@@ -5,7 +5,7 @@ import {
     ChevronRight,
     MessageSquareHeart,
     SquareLibrary,
-    Speech
+    CalendarRange
 } from "lucide-react";
 import TextLogo from "./textLogo"
 
@@ -18,29 +18,20 @@ export default function SideBarComponent({ isExpanded, setIsExpanded, selectedTa
     const navigate = useNavigate()
 
     const handleTabChange = (tabName) => {
-        const params = new URLSearchParams(window.location.search);
+        const currentParams = new URLSearchParams(window.location.search);
+        const newParams = new URLSearchParams();
 
-        // Common resets for all tab changes to ensure a fresh start
-        // params.delete("startDate");
-        // params.delete("endDate");
-        params.delete("selectedDate");
-        params.delete("filterByName");
-        params.delete("filterByType");
-        params.delete("ministry");
-        params.delete("viewMode");
+        // Define which tabs should inherit the global time range
+        const tabsWithTimeRange = ["organization", "data"];
 
-        if (tabName === "organization") {
-            params.delete("categoryIds");
-            params.delete("datasetId");
-            params.delete("datasetName");
-            params.delete("breadcrumb");
+        if (tabsWithTimeRange.includes(tabName) && currentParams.has("startDate") && currentParams.has("endDate")) {
+            newParams.set("startDate", currentParams.get("startDate"));
+            newParams.set("endDate", currentParams.get("endDate"));
         }
-        if (tabName === "data") {
-            // Data-specific deletes (if any were not covered in common resets)
-        }
+
         navigate({
             pathname: `/${tabName}`,
-            search: params.toString() ? `?${params.toString()}` : "",
+            search: newParams.toString() ? `?${newParams.toString()}` : "",
         });
     };
 
@@ -60,7 +51,6 @@ export default function SideBarComponent({ isExpanded, setIsExpanded, selectedTa
                         <a
                             href="https://ldflk.github.io/OpenGIN"
                             target="_blank"
-                            rel="noopener noreferrer"
                             className="text-accent hover:underline"
                         >
                             OpenGIN
@@ -97,7 +87,7 @@ export default function SideBarComponent({ isExpanded, setIsExpanded, selectedTa
                         } hover:cursor-pointer ${isExpanded ? "px-2 md:px-4" : "px-0"} py-2 md:py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
                     onClick={() => handleTabChange("meetingsTracker")}
                 >
-                    <Speech className={`${isExpanded ? "mr-2 md:mr-3" : "mx-auto"}`} />
+                    <CalendarRange className={`${isExpanded ? "mr-2 md:mr-3" : "mx-auto"}`} />
                     {isExpanded && "Meetings Tracker"}
                 </button>
 

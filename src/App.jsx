@@ -5,6 +5,13 @@ import DataLoadingAnimatedComponent from "./pages/SplashPage/screens/dataLoading
 import DocsPage from "./pages/DocsPage/screens/DocsPage";
 import OfflineBanner from "./components/OfflineBanner";
 import { usePageTracking } from "./hooks/usePageTracking";
+import HomePage from "./pages/HomePage/screens/HomePage";
+import PersonProfile from "./pages/PersonProfilePage/screens/PersonProfile";
+import DepartmentProfile from "./pages/DepartmentPage/screens/DepartmentProfile";
+import Organization from "./pages/OrganizationPage/screens/Organization";
+import DataPage from "./pages/DataPage/screens/DataPage";
+import SearchPage from "./pages/SearchPage/screens/SearchPage";
+import MeetingsTracker from "./pages/MeetingsTracker/screens/MeetingsTracker";
 
 const AppRoutes = () => {
   usePageTracking();
@@ -12,10 +19,23 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/organization?view=cabinet-structure" replace />} />
-      <Route path="/person-profile/:personId" element={<DataLoadingAnimatedComponent mode="person-profile" />} />
-      <Route path="/department-profile/:departmentId" element={<DataLoadingAnimatedComponent mode="department-profile" />} />
+
+      {/* Data loading layout: fetches all data, shows splash, then renders child via <Outlet /> */}
+      <Route element={<DataLoadingAnimatedComponent />}>
+
+        {/* App shell layout: sidebar + header, renders tab content via <Outlet /> */}
+        <Route element={<HomePage />}>
+          <Route path="/organization" element={<Organization />} />
+          <Route path="/data" element={<DataPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/meetingsTracker" element={<MeetingsTracker />} />
+        </Route>
+
+        <Route path="/person-profile/:personId" element={<PersonProfile />} />
+        <Route path="/department-profile/:departmentId" element={<DepartmentProfile />} />
+      </Route>
+
       <Route path="/docs" element={<DocsPage />} />
-      <Route path="/:tab" element={<DataLoadingAnimatedComponent mode="orgchart" />} />
       <Route path="*" element={<Error404 />} />
     </Routes>
   );
@@ -34,4 +54,4 @@ const App = () => {
   );
 }
 
-export default App
+export default App;

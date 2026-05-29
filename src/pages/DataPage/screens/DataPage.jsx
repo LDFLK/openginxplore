@@ -1,13 +1,14 @@
 import { AlertCircle, Folder, Loader2, TableProperties } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useNavigate, useOutletContext, useSearchParams, useLocation } from "react-router-dom";
 import { Breadcrumb } from "../components/breadcrumb";
 import formatText from "../../../utils/common_functions";
 import { DatasetView } from "../components/dataset-view";
 import { useDataCatalog } from "../../../hooks/useDataCatalog";
 
-export default function DataPage({ setExternalDateRange }) {
+export default function DataPage() {
+  const { setExternalDateRange } = useOutletContext();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();

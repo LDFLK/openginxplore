@@ -17,3 +17,20 @@ export default function formatText(name, options) {
 
   return `${capitalized} - ${year}`;
 }
+
+const colorList = [
+  "bg-red-400/80",
+  "bg-blue-400/80",
+  "bg-green-400/80",
+  "bg-yellow-400/80",
+  "bg-purple-400/80",
+  "bg-pink-400/80",
+  "bg-indigo-400/80",
+  "bg-teal-400/80",
+  "bg-orange-400/80",
+  "bg-cyan-400/80"
+];
+
+export const getEdgeColor = (index) => colorList[index % colorList.length];
+
+
