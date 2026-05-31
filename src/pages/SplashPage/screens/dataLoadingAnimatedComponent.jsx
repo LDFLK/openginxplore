@@ -81,8 +81,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   const fetchPersonData = async () => {
     try {
-      const personResponse = await api.fetchAllPersons();
-      const personList = await personResponse.json();
+      const personList = await api.fetchAllPersons();
       //dispatch(setAllPerson(personList.body));
       const personDict = listToDict(personList.body);
       dispatch(setAllPerson(personDict));
@@ -142,8 +141,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
 
   const fetchAllDepartmentData = async () => {
     try {
-      const response = await api.fetchAllDepartments();
-      const departmentList = await response.json();
+      const departmentList = await api.fetchAllDepartments();
       const departmentDict = listToDict(departmentList.body);
       dispatch(setAllDepartmentData(departmentDict));
     } catch (e) {
@@ -159,8 +157,8 @@ export default function DataLoadingAnimatedComponent({ mode }) {
         api.fetchAllCabinetMinistries(),
       ]);
 
-      const stateData = await stateRes.json();
-      const cabinetData = await cabinetRes.json();
+      const stateData = stateRes;
+      const cabinetData = cabinetRes;
 
       const stateDict = listToDict(stateData.body);
       const cabinetDict = listToDict(cabinetData.body);
