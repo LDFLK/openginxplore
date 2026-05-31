@@ -32,7 +32,7 @@ const PersonsTab = ({ selectedDate }) => {
           selectedDate,
           selectedMinistry,
           "AS_APPOINTED"
-        );
+        ) || [];
 
         const personMap = new Map();
         resPersons.forEach(

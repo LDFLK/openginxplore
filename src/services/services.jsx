@@ -241,10 +241,7 @@ const fetchAllPersons = async () => {
     return data;
   } catch (error) {
     console.error("Error fetching person data from API:", error);
-    return {
-      dates: [],
-      allMinistryData: [],
-    };
+    return { body: [] };
   }
 };
 
