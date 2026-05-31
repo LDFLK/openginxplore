@@ -28,12 +28,11 @@ const PersonsTab = ({ selectedDate }) => {
       try {
         setLoading(true);
 
-        const resPersonsResponse = await api.fetchActiveRelationsForMinistry(
+        const resPersons = await api.fetchActiveRelationsForMinistry(
           selectedDate,
           selectedMinistry,
           "AS_APPOINTED"
         );
-        const resPersons = await resPersonsResponse.json();
 
         const personMap = new Map();
         resPersons.forEach(
