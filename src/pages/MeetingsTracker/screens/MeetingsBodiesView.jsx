@@ -49,7 +49,7 @@ export function MeetingBodiesView() {
                         key={body.id}
                         body={body}
                         ministryId={ministry.id}
-                        onClick={() => navigate(`/details/${ministry.id}/${body.id}`)}
+                        onClick={() => navigate(`/meetingsTracker/ministry/${ministry.ministryId}/body/${body.id}`)}
                         index={index} />
 
                 )}
