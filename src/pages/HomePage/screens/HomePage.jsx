@@ -15,7 +15,7 @@ export default function HomePage() {
   const [isExpanded, setIsExpanded] = useState(window.innerWidth >= 768);
 
   const { pathname } = useLocation();
-  const selectedTab = pathname.slice(1) || "organization";
+  const selectedTab = pathname.split('/')[1] || "organization";
 
   const gazetteDateClassic = useSelector(
     (state) => state.gazettes.gazetteDataClassic
@@ -80,7 +80,7 @@ export default function HomePage() {
           <p className="text-xs md:text-sm text-center p-2">Use desktop for better experience!</p>
         </div>
         <div className="flex flex-col gap-4">
-          {selectedTab !== "search" && selectedTab !== "meetingsTracker" && (
+          {(selectedTab === "data" || selectedTab === "organization") && (
             <TimeRangeSelector
               startYear={2019}
               dates={selectedTab === "organization" ? dates : []}

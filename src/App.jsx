@@ -12,6 +12,8 @@ import Organization from "./pages/OrganizationPage/screens/Organization";
 import DataPage from "./pages/DataPage/screens/DataPage";
 import SearchPage from "./pages/SearchPage/screens/SearchPage";
 import MeetingsTracker from "./pages/MeetingsTracker/screens/MeetingsTracker";
+import { MeetingBodiesView } from "./pages/MeetingsTracker/screens/MeetingsBodiesView";
+import MeetingsGrid from "./pages/MeetingsTracker/components/meetingsGrid";
 
 const AppRoutes = () => {
   usePageTracking();
@@ -28,7 +30,10 @@ const AppRoutes = () => {
           <Route path="/organization" element={<Organization />} />
           <Route path="/data" element={<DataPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/meetingsTracker" element={<MeetingsTracker />} />
+          <Route path="/meetingsTracker" element={<MeetingsTracker />}>
+            <Route index element={<MeetingsGrid />} />
+            <Route path="ministry/:ministryId" element={<MeetingBodiesView />} />
+          </Route>
         </Route>
 
         <Route path="/person-profile/:personId" element={<PersonProfile />} />
