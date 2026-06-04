@@ -1,57 +1,48 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon } from 'lucide-react';
-import { meetingBodies } from '../../../data/mockdata';
 import { MeetingBodyTile } from '../components/meetingBodyTile';
+import BackButton from '../../../components/backButton';
+import { useMeetingsMinistryBodiesData, useMeetingsMinistryData } from '../../../hooks/useMeetingsTracker';
+import { Loader2 } from 'lucide-react';
 
 export function MeetingBodiesView() {
     const { ministryId } = useParams();
     const navigate = useNavigate();
-    const ministry = meetingBodies.find((m) => m.ministryId === ministryId);
-    if (!ministry) {
+
+    const { data: ministry, isLoading: isMeetingMinistryDataLoading } = useMeetingsMinistryData(ministryId);
+    const { data: ministryBodies, isLoading: isMeetingMinistryBodyDataLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useMeetingsMinistryBodiesData(ministryId, 20);
+    const bodies = ministryBodies?.pages?.flatMap((page) => page.data) ?? [];
+
+    if (isMeetingMinistryDataLoading || isMeetingMinistryBodyDataLoading) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <p className="text-slate-600">Ministry not found</p>
+            <div className="flex flex-col items-center justify-center min-h-[200px] mt-4">
+                <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
+                <p className="text-primary/70 text-sm md:text-md">Loading bodies...</p>
             </div>
         );
-
     }
+
     return (
         <>
-            <div
-                onClick={() => navigate('/meetingsTracker')}
-                className="flex items-center gap-1 text-slate-600 hover:text-slate-900 mb-2 transition-colors mt-4 cursor-pointer">
+            {/* Back button */}
+            <BackButton onClick={() => navigate('/meetingsTracker')} text="Back to Ministries" />
 
-                <ArrowLeftIcon className="w-3 h-3" />
-                <span className="font-medium text-xs">Back to Ministries</span>
-            </div>
-
-            <div className="mb-4">
-                <div className="flex items-center">
-                    <div
-                        className="w-1.5 h-12 rounded-full"
-                        style={{
-                            backgroundColor: ministry.color
-                        }} />
-
-                    <h2 className="text-xl font-semibold text-slate-900">
-                        {ministry.title || ministry.name}
-                    </h2>
-                </div>
-                <p className="text-sm text-slate-600 ml-2">
-                    {ministry.bodies.length} meeting{' '}
-                    {ministry.bodies.length === 1 ? 'body' : 'bodies'} tracked
+            <div className="mb-4 gap-4">
+                <h2 className="text-xl font-semibold text-foreground mb-1">
+                    {ministry?.data?.title}
+                </h2>
+                <p className="text-sm text-primary/70">
+                    {ministry?.data?.bodies?.length} meeting{' '}
+                    {ministry?.data?.bodies?.length === 1 ? 'body' : 'bodies'} tracked
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ministry.bodies.map((body, index) =>
+            <div className="grid rid-cols-2 md:grid-cols-3 gap-4">
+                {bodies && bodies.map((body) =>
                     <MeetingBodyTile
                         key={body.id}
                         body={body}
-                        ministryId={ministry.id}
-                        onClick={() => navigate(`/meetingsTracker/ministry/${ministry.ministryId}/body/${body.id}`)}
-                        index={index} />
-
+                        onClick={() => navigate(`/meetingsTracker/ministry/${ministryId}/body/${body.id}`)}
+                    />
                 )}
             </div>
         </>

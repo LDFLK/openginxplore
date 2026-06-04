@@ -13,8 +13,8 @@ import DataPage from "./pages/DataPage/screens/DataPage";
 import SearchPage from "./pages/SearchPage/screens/SearchPage";
 import MeetingsTracker from "./pages/MeetingsTracker/screens/MeetingsTracker";
 import { MeetingBodiesView } from "./pages/MeetingsTracker/screens/MeetingsBodiesView";
-import MeetingsGrid from "./pages/MeetingsTracker/components/meetingsGrid";
-import { BodyDetailPage } from "./pages/MeetingsTracker/components/MeetingBodyDetail";
+import { BodyDetailPage } from "./pages/MeetingsTracker/screens/MeetingBodyDetail";
+import MeetingsGridView from "./pages/MeetingsTracker/screens/MeetingsGridView";
 
 const AppRoutes = () => {
   usePageTracking();
@@ -32,7 +32,7 @@ const AppRoutes = () => {
           <Route path="/data" element={<DataPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/meetingsTracker" element={<MeetingsTracker />}>
-            <Route index element={<MeetingsGrid />} />
+            <Route index element={<MeetingsGridView />} />
             <Route path="ministry/:ministryId" element={<MeetingBodiesView />} />
             <Route path="ministry/:ministryId/body/:bodyId" element={<BodyDetailPage />} />
           </Route>

@@ -1,225 +1,22 @@
-export const meetings = [
-    {
-        "id": "min1",
-        "title": "Ministry of Defence",
-        "track": "3 Meeting bodies tracked"
-    },
-    {
-        "id": "min2",
-        "title": "Ministry of Finance",
-        "track": "5 Meeting bodies tracked"
-    },
-    {
-        "id": "min3",
-        "title": "Ministry of Health",
-        "track": "8 Meeting bodies tracked"
-    },
-    {
-        "id": "min4",
-        "title": "Ministry of Education",
-        "track": "10 Meeting bodies tracked"
-    },
-    {
-        "id": "min5",
-        "title": "Ministry of Foreign Affairs",
-        "track": "2 Meeting bodies tracked"
-    },
-    {
-        "id": "min6",
-        "title": "Ministry of Transport",
-        "track": "4 Meeting bodies tracked"
-    },
-    {
-        "id": "min7",
-        "title": "Ministry of Agriculture",
-        "track": "7 Meeting bodies tracked"
-    },
-    {
-        "id": "min8",
-        "title": "Ministry of Justice",
-        "track": "1 Meeting bodies tracked"
-    },
-    {
-        "id": "min9",
-        "title": "Ministry of Tourism",
-        "track": "6 Meeting bodies tracked"
-    },
-    {
-        "id": "min10",
-        "title": "Ministry of Power and Energy",
-        "track": "9 Meeting bodies tracked"
-    },
-    {
-        "id": "min11",
-        "title": "Ministry of Water Supply",
-        "track": "2 Meeting bodies tracked"
-    },
-    {
-        "id": "min12",
-        "title": "Ministry of Public Security",
-        "track": "3 Meeting bodies tracked"
-    },
-    {
-        "id": "min13",
-        "title": "Ministry of Trade",
-        "track": "5 Meeting bodies tracked"
-    },
-    {
-        "id": "min14",
-        "title": "Ministry of Environment",
-        "track": "4 Meeting bodies tracked"
-    },
-    {
-        "id": "min15",
-        "title": "Ministry of Ports and Aviation",
-        "track": "8 Meeting bodies tracked"
-    },
-    {
-        "id": "min16",
-        "title": "Ministry of Fisheries",
-        "track": "2 Meeting bodies tracked"
-    },
-    {
-        "id": "min17",
-        "title": "Ministry of Industries",
-        "track": "1 Meeting bodies tracked"
-    },
-    {
-        "id": "min18",
-        "title": "Ministry of Mass Media",
-        "track": "6 Meeting bodies tracked"
-    },
-    {
-        "id": "min19",
-        "title": "Ministry of Sports",
-        "track": "9 Meeting bodies tracked"
-    },
-    {
-        "id": "min20",
-        "title": "Ministry of Women and Child Affairs",
-        "track": "7 Meeting bodies tracked"
-    },
-    {
-        "id": "min21",
-        "title": "Ministry of Urban Development and Housing",
-        "track": "2 Meeting bodies tracked"
-    },
-    {
-        "id": "min22",
-        "title": "Ministry of Labor and Foreign Employment",
-        "track": "5 Meeting bodies tracked"
-    },
-    {
-        "id": "min23",
-        "title": "Ministry of Plantation Industries",
-        "track": "3 Meeting bodies tracked"
-    },
-    {
-        "id": "min24",
-        "title": "Ministry of Irrigation",
-        "track": "8 Meeting bodies tracked"
-    },
-    {
-        "id": "min25",
-        "title": "Ministry of Wildlife and Forest Resources",
-        "track": "6 Meeting bodies tracked"
-    },
-    {
-        "id": "min26",
-        "title": "Ministry of Buddhasasana, Religious and Cultural Affairs",
-        "track": "1 Meeting bodies tracked"
-    },
-    {
-        "id": "min27",
-        "title": "Ministry of Technology",
-        "track": "4 Meeting bodies tracked"
-    },
-    {
-        "id": "min28",
-        "title": "Ministry of Investment Promotion",
-        "track": "7 Meeting bodies tracked"
-    },
-    {
-        "id": "min29",
-        "title": "Ministry of Public Administration",
-        "track": "9 Meeting bodies tracked"
-    },
-    {
-        "id": "min30",
-        "title": "Ministry of Lands",
-        "track": "2 Meeting bodies tracked"
-    },
-    {
-        "id": "min31",
-        "title": "Ministry of Youth and Sports",
-        "track": "5 Meeting bodies tracked"
-    },
-    {
-        "id": "min32",
-        "title": "Ministry of Transport and Highways",
-        "track": "3 Meeting bodies tracked"
-    },
-    {
-        "id": "min33",
-        "title": "Ministry of Rural Development",
-        "track": "10 Meeting bodies tracked"
-    },
-    {
-        "id": "min34",
-        "title": "Ministry of Social Empowerment",
-        "track": "4 Meeting bodies tracked"
-    },
-    {
-        "id": "min35",
-        "title": "Ministry of Indigenous Medicine",
-        "track": "2 Meeting bodies tracked"
-    },
-    {
-        "id": "min36",
-        "title": "Ministry of Co-operatives",
-        "track": "1 Meeting bodies tracked"
-    },
-    {
-        "id": "min37",
-        "title": "Ministry of Disaster Management",
-        "track": "6 Meeting bodies tracked"
-    },
-    {
-        "id": "min38",
-        "title": "Ministry of Science and Technology",
-        "track": "8 Meeting bodies tracked"
-    },
-    {
-        "id": "min39",
-        "title": "Ministry of National Policies",
-        "track": "4 Meeting bodies tracked"
-    },
-    {
-        "id": "min40",
-        "title": "Ministry of Regional Development",
-        "track": "7 Meeting bodies tracked"
-    }
-];
-
 export const statItems = [
     {
         "label": "Ministries",
         "value": "17"
     },
     {
-        "label": "Meeting bodies tracked",
+        "label": "Meeting Bodies Tracked",
         "value": "67"
     },
     {
-        "label": "RTI Request sent",
+        "label": "RTI Requests Sent",
         "value": "35"
     },
     {
-        "label": "RTI Requests responded",
+        "label": "RTI Requests Responded",
         "value": "22"
     },
     {
-        "label": "Sets of minutes available",
+        "label": "Sets of Minutes Available",
         "value": "7"
     }
     // {
@@ -234,8 +31,7 @@ export const statItems = [
 
 export const meetingBodies = [
     {
-        "id": "1",
-        "ministryId": "min1",
+        "id": "min1",
         "title": "Ministry of Defence",
         "bodies": [
             {
@@ -352,8 +148,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "2",
-        "ministryId": "min2",
+        "id": "min2",
         "title": "Ministry of Finance",
         "bodies": [
             {
@@ -544,8 +339,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "3",
-        "ministryId": "min3",
+        "id": "min3",
         "title": "Ministry of Health",
         "bodies": [
             {
@@ -847,8 +641,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "4",
-        "ministryId": "min4",
+        "id": "min4",
         "title": "Ministry of Education",
         "bodies": [
             {
@@ -1224,8 +1017,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "5",
-        "ministryId": "min5",
+        "id": "min5",
         "title": "Ministry of Foreign Affairs",
         "bodies": [
             {
@@ -1305,8 +1097,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "6",
-        "ministryId": "min6",
+        "id": "min6",
         "title": "Ministry of Transport",
         "bodies": [
             {
@@ -1460,8 +1251,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "7",
-        "ministryId": "min7",
+        "id": "min7",
         "title": "Ministry of Agriculture",
         "bodies": [
             {
@@ -1726,8 +1516,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "8",
-        "ministryId": "min8",
+        "id": "min8",
         "title": "Ministry of Justice",
         "bodies": [
             {
@@ -1770,8 +1559,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "9",
-        "ministryId": "min9",
+        "id": "min9",
         "title": "Ministry of Tourism",
         "bodies": [
             {
@@ -1999,8 +1787,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "10",
-        "ministryId": "min10",
+        "id": "min10",
         "title": "Ministry of Power and Energy",
         "bodies": [
             {
@@ -2339,8 +2126,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "11",
-        "ministryId": "min11",
+        "id": "min11",
         "title": "Ministry of Water Supply",
         "bodies": [
             {
@@ -2420,8 +2206,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "12",
-        "ministryId": "min12",
+        "id": "min12",
         "title": "Ministry of Public Security",
         "bodies": [
             {
@@ -2538,8 +2323,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "13",
-        "ministryId": "min13",
+        "id": "min13",
         "title": "Ministry of Trade",
         "bodies": [
             {
@@ -2730,8 +2514,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "14",
-        "ministryId": "min14",
+        "id": "min14",
         "title": "Ministry of Environment",
         "bodies": [
             {
@@ -2885,8 +2668,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "15",
-        "ministryId": "min15",
+        "id": "min15",
         "title": "Ministry of Ports and Aviation",
         "bodies": [
             {
@@ -3188,8 +2970,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "16",
-        "ministryId": "min16",
+        "id": "min16",
         "title": "Ministry of Fisheries",
         "bodies": [
             {
@@ -3269,8 +3050,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "17",
-        "ministryId": "min17",
+        "id": "min17",
         "title": "Ministry of Industries",
         "bodies": [
             {
@@ -3313,8 +3093,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "18",
-        "ministryId": "min18",
+        "id": "min18",
         "title": "Ministry of Mass Media",
         "bodies": [
             {
@@ -3542,8 +3321,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "19",
-        "ministryId": "min19",
+        "id": "min19",
         "title": "Ministry of Sports",
         "bodies": [
             {
@@ -3882,8 +3660,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "20",
-        "ministryId": "min20",
+        "id": "min20",
         "title": "Ministry of Women and Child Affairs",
         "bodies": [
             {
@@ -4148,8 +3925,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "21",
-        "ministryId": "min21",
+        "id": "min21",
         "title": "Ministry of Urban Development and Housing",
         "bodies": [
             {
@@ -4229,8 +4005,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "22",
-        "ministryId": "min22",
+        "id": "min22",
         "title": "Ministry of Labor and Foreign Employment",
         "bodies": [
             {
@@ -4421,8 +4196,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "23",
-        "ministryId": "min23",
+        "id": "min23",
         "title": "Ministry of Plantation Industries",
         "bodies": [
             {
@@ -4539,8 +4313,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "24",
-        "ministryId": "min24",
+        "id": "min24",
         "title": "Ministry of Irrigation",
         "bodies": [
             {
@@ -4842,8 +4615,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "25",
-        "ministryId": "min25",
+        "id": "min25",
         "title": "Ministry of Wildlife and Forest Resources",
         "bodies": [
             {
@@ -5071,8 +4843,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "26",
-        "ministryId": "min26",
+        "id": "min26",
         "title": "Ministry of Buddhasasana, Religious and Cultural Affairs",
         "bodies": [
             {
@@ -5115,8 +4886,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "27",
-        "ministryId": "min27",
+        "id": "min27",
         "title": "Ministry of Technology",
         "bodies": [
             {
@@ -5270,8 +5040,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "28",
-        "ministryId": "min28",
+        "id": "min28",
         "title": "Ministry of Investment Promotion",
         "bodies": [
             {
@@ -5536,8 +5305,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "29",
-        "ministryId": "min29",
+        "id": "min29",
         "title": "Ministry of Public Administration",
         "bodies": [
             {
@@ -5876,8 +5644,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "30",
-        "ministryId": "min30",
+        "id": "min30",
         "title": "Ministry of Lands",
         "bodies": [
             {
@@ -5957,8 +5724,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "31",
-        "ministryId": "min31",
+        "id": "min31",
         "title": "Ministry of Youth and Sports",
         "bodies": [
             {
@@ -6149,8 +5915,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "32",
-        "ministryId": "min32",
+        "id": "min32",
         "title": "Ministry of Transport and Highways",
         "bodies": [
             {
@@ -6267,8 +6032,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "33",
-        "ministryId": "min33",
+        "id": "min33",
         "title": "Ministry of Rural Development",
         "bodies": [
             {
@@ -6644,8 +6408,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "34",
-        "ministryId": "min34",
+        "id": "min34",
         "title": "Ministry of Social Empowerment",
         "bodies": [
             {
@@ -6799,8 +6562,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "35",
-        "ministryId": "min35",
+        "id": "min35",
         "title": "Ministry of Indigenous Medicine",
         "bodies": [
             {
@@ -6880,8 +6642,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "36",
-        "ministryId": "min36",
+        "id": "min36",
         "title": "Ministry of Co-operatives",
         "bodies": [
             {
@@ -6924,8 +6685,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "37",
-        "ministryId": "min37",
+        "id": "min37",
         "title": "Ministry of Disaster Management",
         "bodies": [
             {
@@ -7153,8 +6913,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "38",
-        "ministryId": "min38",
+        "id": "min38",
         "title": "Ministry of Science and Technology",
         "bodies": [
             {
@@ -7456,8 +7215,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "39",
-        "ministryId": "min39",
+        "id": "min39",
         "title": "Ministry of National Policies",
         "bodies": [
             {
@@ -7611,8 +7369,7 @@ export const meetingBodies = [
         ]
     },
     {
-        "id": "40",
-        "ministryId": "min40",
+        "id": "min40",
         "title": "Ministry of Regional Development",
         "bodies": [
             {

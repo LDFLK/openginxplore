@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
-import { useMeetingsTrackerData } from "../../../hooks/useMeetingsTracker";
 import { Loader2, Search } from "lucide-react";
-import MeetingSectionHighlights from "./meetingSectionHighlights";
+import MeetingSectionHighlights from "../components/meetingSectionHighlights";
 import { useNavigate } from "react-router-dom";
-import MeetingStatCharts from "./MeetingStatCharts";
+import MeetingStatCharts from "../components/MeetingStatCharts";
+import { useMeetingsMinistriesData } from "../../../hooks/useMeetingsTracker";
 
-export default function MeetingsGrid() {
+export default function MeetingsGridView() {
 
     const {
         data,
@@ -13,13 +13,13 @@ export default function MeetingsGrid() {
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,
-    } = useMeetingsTrackerData(20);
+    } = useMeetingsMinistriesData(20);
 
     const navigate = useNavigate();
     const sentinelRef = useRef(null);
 
     // Flatten all pages into a single list
-    const meetings = data?.pages?.flatMap((page) => page.data) ?? [];
+    const ministries = data?.pages?.flatMap((page) => page.data) ?? [];
 
     // IntersectionObserver — fires fetchNextPage when sentinel scrolls into view
     useEffect(() => {
@@ -46,7 +46,7 @@ export default function MeetingsGrid() {
     return (
         <>
             {/* title */}
-            <h3 className="text-md lg:text-xl font-semibold mb-2 text-accent">
+            <h3 className="text-md lg:text-xl font-semibold mb-3 text-accent">
                 Governance Tracking Initiative
             </h3>
 
@@ -56,15 +56,16 @@ export default function MeetingsGrid() {
             {/* key highlights */}
             <MeetingSectionHighlights />
 
-            <div className="w-full p-3 bg-card border border-border mt-4 mb-4 rounded-md border-primary/10 transition-all">
+            <div className="w-full p-3 bg-card border border-border mt-6 mb-4 rounded-md border-primary/10 transition-all">
 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-4">
 
-                    <div className="text-md font-semibold text-accent">
+                    <div className="text-md font-semibold text-accent shrink-0">
                         Tracking Ministries
                     </div>
 
-                    <form onSubmit={() => { }} className="max-w-md">
+
+                    <form onSubmit={() => { }} className="w-full max-w-md">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/50" />
                             <input
@@ -73,9 +74,9 @@ export default function MeetingsGrid() {
                                 onChange={() => { }}
                                 placeholder="Enter at least 2 characters..."
                                 className="w-full pl-9 pr-3 py-1.5 md:py-2 text-xs md:text-sm bg-background border border-border rounded-md
-                           text-primary placeholder:text-primary/50
-                           focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent
-                           transition-colors"
+           text-primary placeholder:text-primary/50
+           focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent
+           transition-colors"
                             />
                         </div>
                     </form>
@@ -84,12 +85,12 @@ export default function MeetingsGrid() {
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center min-h-[200px] mt-4">
                         <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
-                        <p className="text-primary/70 text-sm md:text-md">Loading meetings...</p>
+                        <p className="text-primary/70 text-sm md:text-md">Loading ministries...</p>
                     </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
-                            {meetings.map((meeting, index) => (
+                            {ministries && ministries.map((meeting, index) => (
                                 <div
                                     key={`${meeting.id}-${index}`}
                                     onClick={() => handleTileClick(meeting.id)}
@@ -104,7 +105,7 @@ export default function MeetingsGrid() {
                                         </div>
                                         <div className="flex items-center justify-start mt-1">
                                             <p className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-sm">
-                                                {meeting.track}
+                                                {meeting.track} Meeting Bodies Tracked
                                             </p>
                                         </div>
                                     </div>
@@ -120,9 +121,9 @@ export default function MeetingsGrid() {
                                     Loading more...
                                 </div>
                             )}
-                            {!hasNextPage && meetings.length > 0 && (
+                            {!hasNextPage && ministries.length > 0 && (
                                 <p className="text-xs text-primary/40 py-2">
-                                    All {meetings.length} ministries loaded
+                                    All {ministries.length} ministries loaded
                                 </p>
                             )}
                         </div>
