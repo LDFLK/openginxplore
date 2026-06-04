@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { STALE_TIME, GC_TIME } from "../constants/constants";
-import { getMeetingMinistryBodies, getMeetingMinistryData, getMinistryMeetingHighlight, getMinistryMeetings } from "../services/meetingsTracker";
+import { getMeetingMinistryBodies, getMeetingMinistryBodyData, getMeetingMinistryData, getMinistryMeetingHighlight, getMinistryMeetings } from "../services/meetingsTracker";
 
 // meetings highlights data hook
 export const useMeetingsHighlightData = () => {
@@ -54,3 +54,14 @@ export const useMeetingsMinistryData = (ministryId) => {
     })
 }
 
+// meetings ministry body data
+export const useMeetingsMinistryBodyData = (ministryId, bodyId) => {
+    return useQuery({
+        queryKey: ["meetingsMinistryBody", ministryId, bodyId],
+        queryFn: async ({ signal }) => {
+            return await getMeetingMinistryBodyData({ ministryId, bodyId, signal })
+        },
+        staleTime: STALE_TIME,
+        gcTime: GC_TIME
+    })
+}

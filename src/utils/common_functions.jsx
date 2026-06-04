@@ -18,6 +18,7 @@ export default function formatText(name, options) {
   return `${capitalized} - ${year}`;
 }
 
+
 const colorList = [
   "bg-red-400/80",
   "bg-blue-400/80",

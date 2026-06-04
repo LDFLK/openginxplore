@@ -45,3 +45,10 @@ export const getMeetingMinistryData = async ({ ministryId, signal } = {}) => {
     const ministry = meetingBodies.find((m) => m.id === ministryId);
     return { data: ministry };
 }
+
+export const getMeetingMinistryBodyData = async ({ ministryId, bodyId, signal } = {}) => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    const ministry = meetingBodies.find((m) => m.id === ministryId);
+    const body = ministry.bodies.find((b) => b.id === bodyId);
+    return { data: body };
+}

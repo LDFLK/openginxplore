@@ -24,9 +24,10 @@ export function MeetingBodiesView() {
     return (
         <>
             {/* Back button */}
-            <BackButton onClick={() => navigate('/meetingsTracker')} text="Back to Ministries" />
+            <BackButton onClick={() => navigate('/meetingsTracker')} text="Go Back" />
 
-            <div className="mb-4 gap-4">
+            {/* Header */}
+            <div className="my-4 gap-4">
                 <h2 className="text-xl font-semibold text-foreground mb-1">
                     {ministry?.data?.title}
                 </h2>
