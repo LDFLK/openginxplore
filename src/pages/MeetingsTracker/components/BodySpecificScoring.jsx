@@ -2,7 +2,7 @@ import ScoreCircle from "../../../components/circularProgress";
 import InfoTooltip from "../../../components/InfoToolTip";
 
 
-export default function BodyScoring({ body }) {
+export default function BodyScoring({ body, score = 0 }) {
 
     const frequencyIsDefined = body?.frequency?.type.toLowerCase() === "defined";
 
@@ -25,7 +25,7 @@ export default function BodyScoring({ body }) {
 
                 <div className='flex flex-1 flex-col items-center justify-start gap-2'>
                     <p className='font-semibold text-sm whitespace-nowrap'>RTI Responsiveness</p>
-                    <ScoreCircle score={Math.floor(Math.random() * 101)} maxScore={100} size={40} strokeWidth={4} />
+                    <ScoreCircle score={score != 0 ? score : Math.floor(Math.random() * 101)} maxScore={100} size={40} strokeWidth={4} />
                 </div>
             </div >
         </>

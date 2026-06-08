@@ -53,7 +53,7 @@ export function BodyDetailPage() {
                     </div>
                     {/* Scoring Section */}
                     <div className="shrink-0">
-                        <BodyScoring body={body} />
+                        <BodyScoring body={body} score={25} />
                     </div>
                 </div>
 
