@@ -1,4 +1,4 @@
-import { ClockIcon, FileTextIcon, Info, Scale, ScaleIcon, Users, UsersIcon } from "lucide-react";
+import { ClockIcon, FileTextIcon, Info, ScaleIcon, Users, UsersIcon } from "lucide-react";
 
 export default function MeetingBodyInformation({ body }) {
 

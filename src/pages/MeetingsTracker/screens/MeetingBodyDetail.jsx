@@ -6,6 +6,7 @@ import BackButton from '../../../components/backButton';
 import { useMeetingsMinistryBodyData, useMeetingsMinistryData } from '../../../hooks/useMeetingsTracker';
 import MeetingBodyInformation from '../components/MeetingBodyInformation';
 import RTIRequestCarousel from '../components/RTIRequestHistoryCarousel';
+import BodyScoring from '../components/BodySpecificScoring';
 
 const TABS = [
     { id: 'information', label: 'Information', icon: Info },
@@ -39,20 +40,25 @@ export function BodyDetailPage() {
             <BackButton onClick={() => navigate(`/meetingsTracker/ministry/${ministryId}`)} text={`Go Back`} />
 
             <div className="space-y-4 my-4">
-
-                {/* Header */}
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="w-1 h-10 rounded-full bg-accent" />
-                    <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-                            {body.fullName || body.name}
-                        </h1>
-                        <p className="text-xs text-primary/70 mt-0.5">{ministry.title || ministry.name}</p>
+                <div className='block md:flex justify-between items-center gap-4'>
+                    {/* Header */}
+                    <div className="flex items-center gap-3 mb-2 min-w-0">
+                        <div className="w-1 h-10 rounded-full bg-accent shrink-0" />
+                        <div className="min-w-0">
+                            <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                                {body.fullName || body.name}
+                            </h1>
+                            <p className="text-xs text-primary/70 mt-0.5 truncate">{ministry.title || ministry.name}</p>
+                        </div>
+                    </div>
+                    {/* Scoring Section */}
+                    <div className="shrink-0">
+                        <BodyScoring body={body} />
                     </div>
                 </div>
 
                 {/* Tab Switcher */}
-                <div className="flex items-center gap-1 border-b border-border mt-4">
+                <div className="flex items-center gap-1 border-b border-border">
                     {TABS.map(({ id, label, icon: Icon }) => (
                         <button
                             key={id}

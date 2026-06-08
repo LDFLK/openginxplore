@@ -74,7 +74,7 @@ export default function MeetingStatCharts() {
                             </ResponsiveContainer>
                         </div>
                         <div className="text-xs text-primary/60 mt-2">
-                            <p className="text-accent font-normal hover:underline">How calculated?</p>
+                            <p className="text-accent font-normal hover:underline">How is this calculated?</p>
                         </div>
                     </div>
 
@@ -140,7 +140,7 @@ export default function MeetingStatCharts() {
                             </ResponsiveContainer>
                         </div>
                         <div className="text-xs text-primary/60 mt-2">
-                            <p className="text-accent font-normal hover:underline">How calculated?</p>
+                            <p className="text-accent font-normal hover:underline">How is this calculated?</p>
                         </div>
                     </div>
 

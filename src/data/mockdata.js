@@ -37,7 +37,7 @@ export const meetingBodies = [
                 composition:
                     "The Chairman of the Commission shall preside at all meetings of the Commission. In the absence of the Chairman, the Vice Chairman shall preside.",
                 frequency: {
-                    type: "defined",
+                    type: "Not Defined",
                     interval: "Monthly",
                 },
                 mandate: [
@@ -93,7 +93,7 @@ export const meetingBodies = [
                 composition:
                     "The Chairman shall preside at every meeting of the Commission. In the absence of the Chairman, members present elect one of themselves to preside.",
                 frequency: {
-                    type: "discretionary",
+                    type: "Defined",
                     interval: "Decided by the Commission",
                 },
                 mandate: [

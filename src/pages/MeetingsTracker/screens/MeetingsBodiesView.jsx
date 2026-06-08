@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { MeetingBodyTile } from '../components/meetingBodyTile';
 import BackButton from '../../../components/backButton';
 import { useMeetingsMinistryBodiesData, useMeetingsMinistryData } from '../../../hooks/useMeetingsTracker';
 import { Loader2 } from 'lucide-react';
+import { MeetingBodyTile } from '../components/MeetingBodyTile';
 
 export function MeetingBodiesView() {
     const { ministryId } = useParams();
@@ -37,7 +37,7 @@ export function MeetingBodiesView() {
                 </p>
             </div>
 
-            <div className="grid rid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 {bodies && bodies.map((body) =>
                     <MeetingBodyTile
                         key={body.id}
