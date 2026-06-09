@@ -1,9 +1,7 @@
 import {
     FileTextIcon,
-    Users
+    Component
 } from 'lucide-react';
-import ScoreCircle from '../../../components/circularProgress';
-import InfoTooltip from '../../../components/InfoToolTip';
 import BodyScoring from './BodySpecificScoring';
 
 export function MeetingBodyTile({
@@ -51,8 +49,7 @@ export function MeetingBodyTile({
                         <div className="flex flex-wrap items-center gap-2">
                             <div
                                 className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-emerald-200 bg-emerald-50`}>
-                                <span className={`inline-flex items-center gap-1 text-xs font-medium text-emerald-700`}>
-                                    <Users className="w-3 h-3" />
+                                <Component className="w-3.5 h-3.5 text-slate-500" /><span className={`inline-flex items-center gap-1 text-xs font-medium text-emerald-700`}>
                                     {meetingsCount} Meetings
                                 </span>
                             </div>

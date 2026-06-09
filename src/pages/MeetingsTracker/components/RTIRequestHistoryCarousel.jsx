@@ -56,7 +56,7 @@ export default function RTIRequestCarousel({ body }) {
                             disabled={currentRtiIndex === 0}
                             className="p-1 rounded-full hover:bg-accent/10 text-foreground disabled:text-primary/30 disabled:cursor-not-allowed transition-colors"
                         >
-                            <ChevronLeftIcon className="w-5 h-5" />
+                            <ChevronLeftIcon className="w-5 h-5 cursor-pointer" />
                         </button>
                         <span className="text-xs text-primary/60 font-medium w-12 text-center">
                             {currentRtiIndex + 1} / {body.rtiHistory.length}
@@ -66,7 +66,7 @@ export default function RTIRequestCarousel({ body }) {
                             disabled={currentRtiIndex === body.rtiHistory.length - 1}
                             className="p-1 rounded-full hover:bg-accent/10 text-foreground disabled:text-primary/30 disabled:cursor-not-allowed transition-colors"
                         >
-                            <ChevronRightIcon className="w-5 h-5" />
+                            <ChevronRightIcon className="w-5 h-5 cursor-pointer" />
                         </button>
                     </div>
                 )}
@@ -94,10 +94,10 @@ export default function RTIRequestCarousel({ body }) {
                                                 </span>
                                             }
                                         </h6>
-                                        <div className={`flex items-center gap-1.5 text-xs font-medium ${roundConfig.color}`}>
+                                        {/* <div className={`flex items-center gap-1.5 text-xs font-medium ${roundConfig.color}`}>
                                             <RoundIcon className="w-3.5 h-3.5" />
                                             {roundConfig.label}
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-3 mb-3 text-xs">

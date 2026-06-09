@@ -13,11 +13,11 @@ export default function MeetingStatCharts() {
     ];
 
     const pieData = [
-        { name: '0-4', value: 15, fill: '#EF4444' },   // Vibrant Red (Lowest)
-        { name: '5-8', value: 20, fill: '#F87171' },   // Medium Coral Red
-        { name: '9-12', value: 35, fill: '#FBBF24' },  // Amber/Yellow (Middle Tier)
-        { name: '13-16', value: 25, fill: '#4ADE80' }, // Vibrant Light Green
         { name: '17-20', value: 15, fill: '#22C55E' }, // Deep Emerald Green (Highest)
+        { name: '13-16', value: 25, fill: '#4ADE80' }, // Vibrant Light Green
+        { name: '9-12', value: 35, fill: '#FBBF24' },  // Amber/Yellow (Middle Tier)
+        { name: '5-8', value: 20, fill: '#F87171' },   // Medium Coral Red
+        { name: '0-4', value: 15, fill: '#EF4444' },   // Vibrant Red (Lowest)
     ];
 
     const flipTransition = { duration: 0.6, type: "spring", stiffness: 200, damping: 20 };
@@ -86,8 +86,9 @@ export default function MeetingStatCharts() {
                     >
                         <h3 className="text-lg font-semibold text-primary mb-4 text-center">Meetings Score Calculation</h3>
                         <p className="text-sm text-primary/80 text-center leading-relaxed">
-                            This score evaluates how consistently each ministry meets its scheduled baseline.
-                            "Consistently Met" indicates strict adherence to schedules, while "Not Met" highlights missed commitments.
+                            This score evaluates how consistently each ministry fulfils its legal meetings mandate.
+                            "Consistently Met" indicates meetings held within their mandate, "Rarely Met" indicates meetings partially meeting their mandate,
+                            while "Not Met" indicates meetings not held within their mandate.
                         </p>
                         <p className="text-xs text-accent mt-6 hover:underline">Go back</p>
                     </div>
@@ -122,6 +123,8 @@ export default function MeetingStatCharts() {
                                         outerRadius={75}
                                         stroke="var(--card)"
                                         strokeWidth={2}
+                                        startAngle={90}
+                                        endAngle={-270}
                                         isAnimationActive={true}
                                     >
                                         {pieData.map((entry, index) => (
@@ -131,13 +134,17 @@ export default function MeetingStatCharts() {
                                     <Tooltip
                                         contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--card)' }}
                                     />
-                                    <Legend
-                                        verticalAlign="bottom"
-                                        height={10}
-                                        wrapperStyle={{ fontSize: '12px', fontWeight: 600, color: 'var(--primary)' }}
-                                    />
                                 </PieChart>
                             </ResponsiveContainer>
+                        </div>
+                        {/* Custom legend in correct low→high order */}
+                        <div className="flex flex-wrap justify-center gap-x-3">
+                            {[...pieData].reverse().map((entry) => (
+                                <div key={entry.name} className="flex items-center gap-1">
+                                    <span className="w-2.5 h-2.5 rounded-sm inline-block shrink-0" style={{ backgroundColor: entry.fill }} />
+                                    <span className="text-xs" style={{ color: 'var(--primary)' }}>{entry.name}</span>
+                                </div>
+                            ))}
                         </div>
                         <div className="text-xs text-primary/60 mt-2">
                             <p className="text-accent font-normal hover:underline">How is this calculated?</p>
@@ -152,7 +159,8 @@ export default function MeetingStatCharts() {
                     >
                         <h3 className="text-lg font-semibold text-primary mb-4 text-center">RTI Responsiveness Calculation</h3>
                         <p className="text-sm text-primary/80 text-center leading-relaxed">
-                            This metric measures the speed and accuracy of responses to Right to Information (RTI) requests.
+                            This score evaluates the digital readiness and responsiveness of the bodies of which each RTI request was sent to,
+                            in accordance with the RTI Act.
                             A higher score (17-20) reflects exceptional transparency and timely disclosures.
                         </p>
                         <p className="text-xs text-accent mt-6 hover:underline">Go back</p>

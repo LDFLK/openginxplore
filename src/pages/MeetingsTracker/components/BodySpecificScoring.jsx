@@ -15,7 +15,7 @@ export default function BodyScoring({ body, score = 0 }) {
                     <div className='flex gap-1 items-center'>
                         <p className={`text-xs text-foreground/70 whitespace-nowrap`}>{frequencyIsDefined ? 'Meeting Compliancy' : 'Meeting Frequency'}</p>
                         <div onClick={(e) => e.stopPropagation()} className="cursor-pointer">
-                            <InfoTooltip message={frequencyIsDefined ? "Explanation of meeting compliancy" : "Explanation of meeting frequency"} />
+                            <InfoTooltip message={frequencyIsDefined ? "This score evaluates if the body adhered to its mandated meeting frequency." : "In the event there is no mandated meeting frequency, this score evaluates how frequently the body met."} />
                         </div>
                     </div>
                     <div className={`w-12 h-6 rounded ${frequencyIsDefined ? 'bg-green-500' : 'bg-red-500'}`} />
