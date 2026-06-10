@@ -13,11 +13,11 @@ export default function MeetingStatCharts() {
     ];
 
     const pieData = [
-        { name: '17-20', value: 15, fill: '#22C55E' }, // Deep Emerald Green (Highest)
-        { name: '13-16', value: 25, fill: '#4ADE80' }, // Vibrant Light Green
-        { name: '9-12', value: 35, fill: '#FBBF24' },  // Amber/Yellow (Middle Tier)
-        { name: '5-8', value: 20, fill: '#F87171' },   // Medium Coral Red
-        { name: '0-4', value: 15, fill: '#EF4444' },   // Vibrant Red (Lowest)
+        { name: '80%-100%', value: 15, fill: '#22C55E' }, // Deep Emerald Green (Highest)
+        { name: '61%-80%', value: 25, fill: '#4ADE80' }, // Vibrant Light Green
+        { name: '41%-60%', value: 35, fill: '#FBBF24' },  // Amber/Yellow (Middle Tier)
+        { name: '21%-40%', value: 20, fill: '#F87171' },   // Medium Coral Red
+        { name: '0%-20%', value: 15, fill: '#EF4444' },   // Vibrant Red (Lowest)
     ];
 
     const flipTransition = { duration: 0.6, type: "spring", stiffness: 200, damping: 20 };
@@ -161,7 +161,7 @@ export default function MeetingStatCharts() {
                         <p className="text-sm text-primary/80 text-center leading-relaxed">
                             This score evaluates the digital readiness and responsiveness of the bodies of which each RTI request was sent to,
                             in accordance with the RTI Act.
-                            A higher score (17-20) reflects exceptional transparency and timely disclosures.
+                            A higher score (80%-100%) reflects exceptional transparency and timely disclosures.
                         </p>
                         <p className="text-xs text-accent mt-6 hover:underline">Go back</p>
                     </div>

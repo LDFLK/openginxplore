@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, Info, CalendarDays, FileSearch } from 'lucide-react';
+import { Loader2, Info, CalendarDays, FileSearch, ChartScatter } from 'lucide-react';
 import { useState } from 'react';
 import { MeetingsTable } from '../components/MeetingsTable';
 import BackButton from '../../../components/backButton';
@@ -7,11 +7,13 @@ import { useMeetingsMinistryBodyData, useMeetingsMinistryData } from '../../../h
 import MeetingBodyInformation from '../components/MeetingBodyInformation';
 import RTIRequestCarousel from '../components/RTIRequestHistoryCarousel';
 import BodyScoring from '../components/BodySpecificScoring';
+import BodyPerformanceCharts from '../components/BodyPerformanceChart';
 
 const TABS = [
     { id: 'information', label: 'Information', icon: Info },
     { id: 'meetings', label: 'Meetings', icon: CalendarDays },
     { id: 'rti', label: 'RTI Requests', icon: FileSearch },
+    { id: 'performance', label: 'Performance', icon: ChartScatter }
 ];
 
 export function BodyDetailPage() {
@@ -82,6 +84,7 @@ export function BodyDetailPage() {
                 {activeTab === 'information' && <MeetingBodyInformation body={body} />}
                 {activeTab === 'meetings' && <MeetingsTable body={body} />}
                 {activeTab === 'rti' && <RTIRequestCarousel body={body} />}
+                {activeTab === 'performance' && <BodyPerformanceCharts body={body} />}
             </div>
         </>
     );
