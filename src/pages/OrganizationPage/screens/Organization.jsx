@@ -1,16 +1,14 @@
 import GazetteTimeline from "../components/GazetteTimeline";
 import MinistryCardGrid from "../components/MinistryCardGrid";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
 import LandscapeRequired from "../../../components/landscapeRequired";
-import { setSelectedDate } from "../../../store/presidencySlice";
 import { resolveGazetteDate } from "../../../utils/gazetteDateUtils";
 
 const Organization = ({ dateRange }) => {
-  const dispatch = useDispatch();
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );
@@ -29,10 +27,9 @@ const Organization = ({ dateRange }) => {
       const params = new URLSearchParams(searchParams);
       params.delete("selectedDate");
       params.delete("ministry");
-      dispatch(setSelectedDate(null));
       setSearchParams(params, { replace: true });
     }
-  }, [searchParams, dispatch, setSearchParams]);
+  }, [searchParams, setSearchParams]);
 
   const handleMinistryNodeClick = useCallback((node) => {
     const resolvedDate = resolveGazetteDate(node.time, gazetteData);
@@ -51,7 +48,6 @@ const Organization = ({ dateRange }) => {
     if (viewName === "department-flow") {
       params.delete("selectedDate");
       params.delete("ministry");
-      dispatch(setSelectedDate(null));
     }
     setSearchParams(params);
   };
