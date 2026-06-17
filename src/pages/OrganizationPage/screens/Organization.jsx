@@ -1,16 +1,20 @@
 import GazetteTimeline from "../components/GazetteTimeline";
 import MinistryCardGrid from "../components/MinistryCardGrid";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
 import LandscapeRequired from "../../../components/landscapeRequired";
+import { setSelectedDate } from "../../../store/presidencySlice";
+import { resolveGazetteDate } from "../../../utils/gazetteDateUtils";
 
 const Organization = ({ dateRange }) => {
+  const dispatch = useDispatch();
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );
+  const gazetteData = useSelector((state) => state.gazettes.gazetteData);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,23 +22,38 @@ const Organization = ({ dateRange }) => {
   const [activeView, setActiveView] = useState(searchParams.get('view') || 'cabinet-structure');
 
   useEffect(() => {
-    setActiveView(searchParams.get("view") || "cabinet-structure");
-  }, [searchParams]);
+    const view = searchParams.get("view") || "cabinet-structure";
+    setActiveView(view);
+
+    if (view === "department-flow" && (searchParams.has("selectedDate") || searchParams.has("ministry"))) {
+      const params = new URLSearchParams(searchParams);
+      params.delete("selectedDate");
+      params.delete("ministry");
+      dispatch(setSelectedDate(null));
+      setSearchParams(params, { replace: true });
+    }
+  }, [searchParams, dispatch, setSearchParams]);
 
   const handleMinistryNodeClick = useCallback((node) => {
+    const resolvedDate = resolveGazetteDate(node.time, gazetteData);
     const params = new URLSearchParams(window.location.search);
     params.set("view", "cabinet-structure");
-    params.set("selectedDate", node.time);
+    params.set("selectedDate", resolvedDate);
     params.set("ministry", node.id);
     setSearchParams(params);
     setActiveView("cabinet-structure");
-  }, [setSearchParams]);
+  }, [setSearchParams, gazetteData]);
 
   const toggleView = (viewName) => {
     setActiveView(viewName);
-    const currentParams = new URLSearchParams(window.location.search);
-    currentParams.set("view", viewName);
-    setSearchParams(currentParams);
+    const params = new URLSearchParams(window.location.search);
+    params.set("view", viewName);
+    if (viewName === "department-flow") {
+      params.delete("selectedDate");
+      params.delete("ministry");
+      dispatch(setSelectedDate(null));
+    }
+    setSearchParams(params);
   };
   
   const { president } = location.state || {};

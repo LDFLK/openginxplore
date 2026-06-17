@@ -85,6 +85,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                                 <li>Each column represents a date when one or more changes may have occurred.</li>
                                 <li>Hover over a flow to view details about the departments involved.</li>
                                 <li>You can select up to 3 dates to compare.</li>
+                                <li>Click a ministry to view its departments and people.</li>
                             </ul>
                         </div>
                     </div>
