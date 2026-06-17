@@ -1,33 +1,69 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Calendar, BarChart2 } from "lucide-react";
 import DateRangePicker from "../components/DateRangePicker";
 import CabinetFlowPanel from "../components/CabinetFlowPanel";
 
-const CabinetFlow = ({ presidentId }) => {
+const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
+    if (!hasPresidentEndTime) {
+        return finalEnd.toISOString().split("T")[0];
+    }
+    const d = new Date(finalEnd);
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().split("T")[0];
+};
+
+const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
     const { gazetteData } = useSelector((state) => state.gazettes);
     const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
     const presidentRelationDict = useSelector(
         (s) => s.presidency.presidentRelationDict
     );
     const presidentRelation = presidentRelationDict[presidentId];
-    const startDate = presidentRelation?.startTime?.split("T")[0];
-    let endDate = presidentRelation?.endTime;
 
-    if (!endDate) {
-        endDate = new Date().toISOString().split("T")[0];
-    } else {
-        const d = new Date(endDate);
-        d.setDate(d.getDate() - 1);
-        endDate = d.toISOString().split("T")[0];
-    }
+    const [rangeStart, rangeEnd] = dateRange;
 
-    const [selectedDates, setSelectedDates] = useState(() => {
-        const init = [];
-        if (startDate) init.push(startDate);
-        if (endDate && endDate !== startDate) init.push(endDate);
-        return init;
-    });
+    const { startDate, endDate } = useMemo(() => {
+        if (!presidentRelation?.startTime) {
+            return { startDate: null, endDate: null };
+        }
+
+        const presStart = new Date(presidentRelation.startTime.split("T")[0]);
+        const hasPresidentEndTime = !!presidentRelation.endTime;
+        const presEnd = hasPresidentEndTime
+            ? new Date(presidentRelation.endTime.split("T")[0])
+            : new Date();
+
+        const finalStart = rangeStart
+            ? new Date(Math.max(presStart.getTime(), rangeStart.getTime()))
+            : presStart;
+        const finalEnd = rangeEnd
+            ? new Date(Math.min(presEnd.getTime(), rangeEnd.getTime()))
+            : presEnd;
+
+        const start = finalStart.toISOString().split("T")[0];
+        let end = formatEndDateForPicker(finalEnd, hasPresidentEndTime);
+
+        if (start > end) {
+            end = start;
+        }
+
+        return { startDate: start, endDate: end };
+    }, [presidentRelation, rangeStart, rangeEnd]);
+
+    const [selectedDates, setSelectedDates] = useState([]);
+
+    useEffect(() => {
+        if (!startDate) {
+            setSelectedDates([]);
+            return;
+        }
+        const init = [startDate];
+        if (endDate && endDate !== startDate) {
+            init.push(endDate);
+        }
+        setSelectedDates(init);
+    }, [startDate, endDate, presidentId]);
 
     const handleToggleDate = useCallback((date) => {
         setSelectedDates((prev) =>

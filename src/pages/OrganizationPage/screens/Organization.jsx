@@ -77,7 +77,11 @@ const Organization = ({ dateRange }) => {
         </>
       ) : (
         <LandscapeRequired onBack={() => toggleView("cabinet-structure")}>
-          <CabinetFlow key={selectedPresident?.id} presidentId={selectedPresident?.id}/>
+          <CabinetFlow
+            key={selectedPresident?.id}
+            presidentId={selectedPresident?.id}
+            dateRange={dateRange}
+          />
         </LandscapeRequired>
       )}
     </div>
