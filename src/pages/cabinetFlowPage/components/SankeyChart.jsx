@@ -28,7 +28,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     const svg = d3
       .select(svgRef.current)
       .attr("width", width)
-      .attr("height", height);
+      .attr("height", height)
+      .style("cursor", "default");
 
     const dateToLayer = {};
     data.dates.forEach((d, i) => { dateToLayer[d.date] = i; });
@@ -187,7 +188,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         d3.select(event.target)
           .transition()
           .duration(300)
-          .style("cursor", "pointer")
           .attr("stroke-opacity", 0.8);
 
         tooltip
@@ -271,7 +271,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("height", (d) => d.y1 - d.y0)
       .attr("width", (d) => d.x1 - d.x0)
       .attr("fill", (d) => color(d.id))
-      .style("cursor", onNodeClick ? "pointer" : null)
+      .style("cursor", onNodeClick ? "pointer" : "default")
       .on("click", handleNodeClick)
       .append("title")
       .text((d) => `${d.id}\n${d.value} total`);
@@ -295,8 +295,15 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           ? d.name.substring(0, limit) + "…"
           : d.name;
       })
-      .style("cursor", onNodeClick ? "pointer" : null)
-      .on("click", handleNodeClick);
+      .style("cursor", onNodeClick ? "pointer" : "default")
+      .on("click", handleNodeClick)
+      .on("mouseenter", function () {
+        if (!onNodeClick) return;
+        d3.select(this).style("text-decoration", "underline");
+      })
+      .on("mouseleave", function () {
+        d3.select(this).style("text-decoration", null);
+      });
 
     return () => {
       tooltip.remove();
