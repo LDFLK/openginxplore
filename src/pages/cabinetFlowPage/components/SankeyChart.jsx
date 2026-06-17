@@ -2,12 +2,17 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
   useEffect(() => {
     if (!data) return;
+
+    const handleNodeClick = (event, d) => {
+      event.stopPropagation();
+      onNodeClick?.(d);
+    };
 
     const topMargin = 48;
     const bottomMargin = 24;
@@ -266,6 +271,8 @@ export default function SankeyChart({ data, width, height, isDarkMode }) {
       .attr("height", (d) => d.y1 - d.y0)
       .attr("width", (d) => d.x1 - d.x0)
       .attr("fill", (d) => color(d.id))
+      .style("cursor", onNodeClick ? "pointer" : null)
+      .on("click", handleNodeClick)
       .append("title")
       .text((d) => `${d.id}\n${d.value} total`);
 
@@ -287,12 +294,14 @@ export default function SankeyChart({ data, width, height, isDarkMode }) {
         return d.name.length > limit
           ? d.name.substring(0, limit) + "…"
           : d.name;
-      });
+      })
+      .style("cursor", onNodeClick ? "pointer" : null)
+      .on("click", handleNodeClick);
 
     return () => {
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode]);
+  }, [data, width, height, isDarkMode, onNodeClick]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>

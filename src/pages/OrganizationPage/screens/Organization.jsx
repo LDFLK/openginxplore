@@ -1,7 +1,7 @@
 import GazetteTimeline from "../components/GazetteTimeline";
 import MinistryCardGrid from "../components/MinistryCardGrid";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
@@ -16,6 +16,19 @@ const Organization = ({ dateRange }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeView, setActiveView] = useState(searchParams.get('view') || 'cabinet-structure');
+
+  useEffect(() => {
+    setActiveView(searchParams.get("view") || "cabinet-structure");
+  }, [searchParams]);
+
+  const handleMinistryNodeClick = useCallback((node) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("view", "cabinet-structure");
+    params.set("selectedDate", node.time);
+    params.set("ministry", node.id);
+    setSearchParams(params);
+    setActiveView("cabinet-structure");
+  }, [setSearchParams]);
 
   const toggleView = (viewName) => {
     setActiveView(viewName);
@@ -81,6 +94,7 @@ const Organization = ({ dateRange }) => {
             key={selectedPresident?.id}
             presidentId={selectedPresident?.id}
             dateRange={dateRange}
+            onMinistryNodeClick={handleMinistryNodeClick}
           />
         </LandscapeRequired>
       )}

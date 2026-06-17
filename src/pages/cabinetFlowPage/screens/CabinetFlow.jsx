@@ -13,7 +13,7 @@ const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
     return d.toISOString().split("T")[0];
 };
 
-const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
+const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClick }) => {
     const { gazetteData } = useSelector((state) => state.gazettes);
     const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
     const presidentRelationDict = useSelector(
@@ -124,7 +124,11 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
             </div>
 
             {selectedDates.length > 1 ? (
-                <CabinetFlowPanel presidentId={presidentId} dates={sortedDates} />
+                <CabinetFlowPanel
+                    presidentId={presidentId}
+                    dates={sortedDates}
+                    onMinistryNodeClick={onMinistryNodeClick}
+                />
             ) : (
                 <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
                     <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
