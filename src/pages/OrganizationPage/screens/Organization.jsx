@@ -1,14 +1,16 @@
 import GazetteTimeline from "../components/GazetteTimeline";
 import MinistryCardGrid from "../components/MinistryCardGrid";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
 import LandscapeRequired from "../../../components/landscapeRequired";
+import { setSelectedDate } from "../../../store/presidencySlice";
 import { resolveGazetteDate } from "../../../utils/gazetteDateUtils";
 
 const Organization = ({ dateRange }) => {
+  const dispatch = useDispatch();
   const { selectedDate, selectedPresident } = useSelector(
     (state) => state.presidency
   );
@@ -33,13 +35,14 @@ const Organization = ({ dateRange }) => {
 
   const handleMinistryNodeClick = useCallback((node) => {
     const resolvedDate = resolveGazetteDate(node.time, gazetteData);
+    dispatch(setSelectedDate({ date: resolvedDate }));
     const params = new URLSearchParams(window.location.search);
     params.set("view", "cabinet-structure");
     params.set("selectedDate", resolvedDate);
     params.set("ministry", node.id);
     setSearchParams(params);
     setActiveView("cabinet-structure");
-  }, [setSearchParams, gazetteData]);
+  }, [dispatch, setSearchParams, gazetteData]);
 
   const toggleView = (viewName) => {
     setActiveView(viewName);
