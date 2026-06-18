@@ -36,17 +36,17 @@ const Organization = ({ dateRange }) => {
   const handleMinistryNodeClick = useCallback((node) => {
     const resolvedDate = resolveGazetteDate(node.time, gazetteData);
     dispatch(setSelectedDate({ date: resolvedDate }));
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams);
     params.set("view", "cabinet-structure");
     params.set("selectedDate", resolvedDate);
     params.set("ministry", node.id);
     setSearchParams(params);
     setActiveView("cabinet-structure");
-  }, [dispatch, setSearchParams, gazetteData]);
+  }, [dispatch, searchParams, setSearchParams, gazetteData]);
 
   const toggleView = (viewName) => {
     setActiveView(viewName);
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams);
     params.set("view", viewName);
     if (viewName === "department-flow") {
       params.delete("selectedDate");
