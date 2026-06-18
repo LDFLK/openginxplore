@@ -195,17 +195,16 @@ const MinistryCardGrid = () => {
       return;
     }
 
-    // Only reset if the date has actually changed to a new value
     if (selectedDate?.date && prevDateRef.current && selectedDate.date !== prevDateRef.current) {
       const params = new URLSearchParams(window.location.search);
-      const urlSelectedDate = params.get("selectedDate");
-      const isMatchingMinistryDeepLink =
-        params.get("ministry") && urlSelectedDate === selectedDate.date;
-      if (!isMatchingMinistryDeepLink) {
+      if (params.has("ministry")) {
         params.delete("ministry");
         setActiveStep(0);
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-        navigate(newUrl);
+        setSelectedCard(null);
+        navigate(`${window.location.pathname}?${params.toString()}`);
+      } else {
+        setActiveStep(0);
+        setSelectedCard(null);
       }
     }
 
