@@ -14,7 +14,7 @@ for (const viewport of VIEWPORTS) {
 
     // 1. Go to organization page
     await page.goto(
-      'http://localhost:5173/organization?view=cabinet-structure&startDate=2021-06-22&endDate=2026-06-22&selectedDate=2026-04-21',
+      '/organization?view=cabinet-structure&startDate=2021-06-22&endDate=2026-06-22&selectedDate=2026-04-21',
       { waitUntil: 'domcontentloaded', timeout: 30000 }
     );
 
