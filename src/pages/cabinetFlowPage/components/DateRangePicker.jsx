@@ -173,6 +173,11 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                         })}
                     </div>
 
+                    <div className="mt-2 flex items-center justify-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent/70 shrink-0" aria-hidden="true" />
+                        <span className="text-xs text-gray-600 dark:text-gray-300">Gazette publication date</span>
+                    </div>
+
                     {/* Footer */}
                     <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
                         <p className="text-xs text-gray-400">
