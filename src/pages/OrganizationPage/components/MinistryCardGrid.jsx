@@ -197,15 +197,14 @@ const MinistryCardGrid = () => {
 
     if (selectedDate?.date && prevDateRef.current && selectedDate.date !== prevDateRef.current) {
       const params = new URLSearchParams(window.location.search);
+
       if (params.has("ministry")) {
         params.delete("ministry");
-        setActiveStep(0);
-        setSelectedCard(null);
         navigate(`${window.location.pathname}?${params.toString()}`);
-      } else {
-        setActiveStep(0);
-        setSelectedCard(null);
-      }
+      } 
+
+      setActiveStep(0);
+      setSelectedCard(null);
     }
 
     prevDateRef.current = selectedDate?.date;

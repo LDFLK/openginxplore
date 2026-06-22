@@ -26,7 +26,7 @@ const Organization = ({ dateRange }) => {
     setActiveView(view);
 
     if (view === "department-flow" && (searchParams.has("selectedDate") || searchParams.has("ministry"))) {
-      const params = new URLSearchParams(searchParams);
+      const params = new URLSearchParams(window.location.search);
       params.delete("selectedDate");
       params.delete("ministry");
       setSearchParams(params, { replace: true });
@@ -36,17 +36,17 @@ const Organization = ({ dateRange }) => {
   const handleMinistryNodeClick = useCallback((node) => {
     const resolvedDate = resolveGazetteDate(node.time, gazetteData);
     dispatch(setSelectedDate({ date: resolvedDate }));
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(window.location.search);
     params.set("view", "cabinet-structure");
     params.set("selectedDate", resolvedDate);
     params.set("ministry", node.id);
     setSearchParams(params);
     setActiveView("cabinet-structure");
-  }, [dispatch, searchParams, setSearchParams, gazetteData]);
+  }, [dispatch, setSearchParams, gazetteData]);
 
   const toggleView = (viewName) => {
     setActiveView(viewName);
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(window.location.search);
     params.set("view", viewName);
     if (viewName === "department-flow") {
       params.delete("selectedDate");

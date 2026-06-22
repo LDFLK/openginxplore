@@ -69,7 +69,7 @@ const CabinetFlowPanel = ({ presidentId, dates, onMinistryNodeClick }) => {
                     </p>
                 </div>
             )}
-            {hasLinks ? (
+            {hasLinks && containerWidth > 0 ? (
                 <SankeyChart
                     data={cabinetFlow}
                     width={containerWidth}
