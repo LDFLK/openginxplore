@@ -31,13 +31,19 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("height", height)
       .style("cursor", "default");
 
+    const normalizeDate = (d) => (typeof d === "string" ? d.split("T")[0] : d);
+    const chartDates = (data.dates || []).filter((d) => d.status === "ok");
+    if (chartDates.length < 2) return;
+
     const dateToLayer = {};
-    data.dates.forEach((d, i) => { dateToLayer[d.date] = i; });
+    chartDates.forEach((d, i) => {
+      dateToLayer[normalizeDate(d.date)] = i;
+    });
 
     const { nodes, links } = sankey()
       .nodeWidth(20)
       .nodePadding(15)
-      .nodeAlign((node) => dateToLayer[node.time] ?? 0)
+      .nodeAlign((node) => dateToLayer[normalizeDate(node.time)] ?? 0)
       .extent([
         [1, topMargin],
         [width - 1, height - bottomMargin],
@@ -64,7 +70,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       }
     });
 
-    const totalLayers = data.dates.length;
+    const totalLayers = chartDates.length;
 
     function labelCharLimit(node) {
       const layer = node.layer;
@@ -222,7 +228,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         const numericLayer = Number(layer);
         const x = d3.mean(nodesInLayer, (node) => (node.x0 + node.x1) / 2);
 
-        const payloadDate = data?.dates?.[numericLayer]?.date;
+        const payloadDate = chartDates[numericLayer]?.date;
         const representative = nodesInLayer[0];
         const rawLabel =
           payloadDate ??
