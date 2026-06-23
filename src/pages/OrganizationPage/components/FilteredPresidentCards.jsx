@@ -256,10 +256,16 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
   useEffect(() => {
     if (!selectedDate?.date) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("view") === "department-flow") return;
+    const prevSelectedDate = params.get("selectedDate");
     const url = new URL(window.location.href);
     url.searchParams.set("selectedDate", selectedDate.date);
+    if (prevSelectedDate && prevSelectedDate !== selectedDate.date) {
+      url.searchParams.delete("ministry");
+    }
     window.history.replaceState({}, "", url.toString());
-  }, [selectedDate]);
+  }, [selectedDate, location.search]);
 
   // Monitor URL parameter changes when already on /organization route
   useEffect(() => {

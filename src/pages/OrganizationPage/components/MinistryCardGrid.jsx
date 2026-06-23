@@ -195,13 +195,16 @@ const MinistryCardGrid = () => {
       return;
     }
 
-    // Only reset if the date has actually changed to a new value
     if (selectedDate?.date && prevDateRef.current && selectedDate.date !== prevDateRef.current) {
       const params = new URLSearchParams(window.location.search);
-      params.delete("ministry");
+
+      if (params.has("ministry")) {
+        params.delete("ministry");
+        navigate(`${window.location.pathname}?${params.toString()}`);
+      } 
+
       setActiveStep(0);
-      const newUrl = `${window.location.pathname}?${params.toString()}`;
-      navigate(newUrl);
+      setSelectedCard(null);
     }
 
     prevDateRef.current = selectedDate?.date;

@@ -4,7 +4,7 @@ import SankeyChart from "./SankeyChart";
 import { BarChart2 } from "lucide-react";
 import { useThemeContext } from "../../../context/themeContext";
 
-const CabinetFlowPanel = ({ presidentId, dates }) => {
+const CabinetFlowPanel = ({ presidentId, dates, onMinistryNodeClick }) => {
     const { isDark } = useThemeContext();
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -69,8 +69,14 @@ const CabinetFlowPanel = ({ presidentId, dates }) => {
                     </p>
                 </div>
             )}
-            {hasLinks ? (
-                <SankeyChart data={cabinetFlow} width={containerWidth} height={calculateHeight(cabinetFlow)} isDarkMode={isDark} />
+            {hasLinks && containerWidth > 0 ? (
+                <SankeyChart
+                    data={cabinetFlow}
+                    width={containerWidth}
+                    height={calculateHeight(cabinetFlow)}
+                    isDarkMode={isDark}
+                    onNodeClick={onMinistryNodeClick}
+                />
             ) : (
                 <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-10 px-6 text-center">
                     <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
