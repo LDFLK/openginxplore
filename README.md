@@ -179,7 +179,7 @@ npx playwright test --project=webkit
 
 ### Run a Specific Test File
 ```bash
-npx playwright test tests/view-profile.spec.js
+npx playwright test tests/view-profile.spec.ts
 ```
 
 ### View HTML Test Report

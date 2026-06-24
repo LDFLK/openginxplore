@@ -32,7 +32,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
   },
 
-  workers: 1,
+  workers: process.env.CI ? 1 : undefined,
 
   projects: [
     {
