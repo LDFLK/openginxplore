@@ -26,28 +26,6 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Start dev server
-        run: npm run dev &
-
-      - name: Wait for dev server
-        run: npx wait-on http://localhost:5173 --timeout 60000
-
-      - name: Debug - screenshot what CI sees
-        run: |
-          npx playwright screenshot \
-            --browser=chromium \
-            "http://localhost:5173/organization?view=cabinet-structure&startDate=2021-06-22&endDate=2026-06-22&selectedDate=2026-04-21" \
-            ci-debug.png \
-            --full-page \
-            --wait-for-timeout=8000
-
-      - name: Upload debug screenshot
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-debug
-          path: ci-debug.png
-
       - name: Run Playwright tests
         run: npx playwright test --project=chromium
 
