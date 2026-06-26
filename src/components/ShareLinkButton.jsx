@@ -1,29 +1,15 @@
-import { useEffect, useState } from "react";
 import { Share2, Check } from "lucide-react";
+import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 
 const ShareLinkButton = () => {
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (copied) {
-      const timerId = setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-
-      return () => clearTimeout(timerId);
-    }
-  }, [copied]);
+  const { copied, error, copy } = useCopyToClipboard(2000);
 
   const copyLink = () => {
     const currentUrl = window.location.href;
-    navigator.clipboard
-      .writeText(currentUrl)
-      .then(() => {
-        setCopied(true);
-      })
-      .catch(() => {
-        alert("Failed to copy link.");
-      });
+    copy(currentUrl);
+    if (error) {
+      alert("Failed to copy link.");
+    }
   };
 
   return (

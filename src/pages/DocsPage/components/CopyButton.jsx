@@ -1,17 +1,11 @@
 import { Link2 } from "lucide-react";
-import { useState } from "react";
+import { useCopyToClipboard } from "../../../hooks/useCopyToClipboard";
 
 export const CopyButton = ({ link }) => {
-    const [copied, setCopied] = useState(false);
+    const { copied, copy } = useCopyToClipboard(1500);
 
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(link);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-        } catch (err) {
-            console.error("Failed to copy:", err);
-        }
+    const handleCopy = () => {
+        copy(link);
     };
 
     return (
