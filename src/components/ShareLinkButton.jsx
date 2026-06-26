@@ -2,12 +2,12 @@ import { Share2, Check } from "lucide-react";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 
 const ShareLinkButton = () => {
-  const { copied, error, copy } = useCopyToClipboard(2000);
+  const { copied, copy } = useCopyToClipboard(2000);
 
-  const copyLink = () => {
+  const copyLink = async () => {
     const currentUrl = window.location.href;
-    copy(currentUrl);
-    if (error) {
+    const success = await copy(currentUrl);
+    if (!success) {
       alert("Failed to copy link.");
     }
   };
