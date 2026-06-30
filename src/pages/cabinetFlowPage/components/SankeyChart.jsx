@@ -111,6 +111,17 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       !!selectedNode && (d.source.id === selectedNode.id || d.target.id === selectedNode.id);
     const isHighlighted = (d) => isSelectedLink(d) || isLinkedToSelectedNode(d);
     const hasActiveSelection = !!selectedKey || !!selectedNode;
+
+    const relevantNodeIds = new Set();
+    if (selectedNode) relevantNodeIds.add(selectedNode.id);
+    links.forEach((d) => {
+      if (isHighlighted(d)) {
+        relevantNodeIds.add(d.source.id);
+        relevantNodeIds.add(d.target.id);
+      }
+    });
+    const isRelevantNode = (d) => !hasActiveSelection || relevantNodeIds.has(d.id);
+
     const greyColor = isDarkMode ? "#4b5563" : "#64748b";
     const restingOpacity = (d) => {
       if (!hasActiveSelection) return 0.4;
@@ -328,6 +339,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("height", (d) => d.y1 - d.y0)
       .attr("width", (d) => d.x1 - d.x0)
       .attr("fill", (d) => color(d.id))
+      .attr("fill-opacity", (d) => (isRelevantNode(d) ? 1 : 0.25))
       .attr("stroke", (d) => (selectedNode?.id === d.id ? (isDarkMode ? "#fff" : "#1f2933") : "none"))
       .attr("stroke-width", (d) => (selectedNode?.id === d.id ? 0 : 0))
       .style("cursor", onNodeClick ? "pointer" : "default")
@@ -339,7 +351,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     svg
       .append("g")
       .style("font", "12px poppins")
-      .style("fill", !isDarkMode ? "#1f2933" : "#fff") 
+      .style("fill", !isDarkMode ? "#1f2933" : "#fff")
       .selectAll("text")
       .data(nodes)
       .join("text")
@@ -347,6 +359,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("y", (d) => (d.y1 + d.y0) / 2)
       .attr("dy", "0.35em")
       .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
+      .attr("fill-opacity", (d) => (isRelevantNode(d) ? 1 : 0.35))
       .text((d) => {
         // compute limit dynamically based on available space for EVERY column
         const limit = labelCharLimit(d);
