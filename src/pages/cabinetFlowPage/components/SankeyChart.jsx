@@ -145,34 +145,33 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     let hideTimer = null;
     let activeLinkData = null;
 
-    // Anchors the tooltip beside the hovered link's nodes (its position is
-    // fixed to that link's geometry, not the cursor, so it doesn't jitter).
-    const positionTooltipForLink = (d) => {
+    // Pins the tooltip right where the cursor entered the link, once — it
+    // does NOT track mousemove afterwards, so it stays put under the cursor
+    // instead of requiring the user to travel to find it.
+    const positionTooltipAtCursor = (event) => {
       const containerRect = containerRef.current.getBoundingClientRect();
       const tooltipNode = tooltip.node();
       const tooltipWidth = tooltipNode.offsetWidth;
       const tooltipHeight = tooltipNode.offsetHeight;
       const MARGIN = 8;
 
-      const linkMidY = (d.y0 + d.y1) / 2;
-      const linkMidX = (d.source.x1 + d.target.x0) / 2;
+      let x = event.clientX - containerRect.left + 12;
+      let y = event.clientY - containerRect.top + 12;
 
-      let x = linkMidX - tooltipWidth / 2;
-      let y = linkMidY - tooltipHeight - 12;
-
-      if (x < MARGIN) x = MARGIN;
       if (x + tooltipWidth + MARGIN > containerRect.width) {
-        x = containerRect.width - tooltipWidth - MARGIN;
+        x = event.clientX - containerRect.left - tooltipWidth - 12;
       }
-      if (y < MARGIN) y = linkMidY + 12;
+      if (x < MARGIN) x = MARGIN;
+
       if (y + tooltipHeight + MARGIN > containerRect.height) {
-        y = containerRect.height - tooltipHeight - MARGIN;
+        y = event.clientY - containerRect.top - tooltipHeight - 12;
       }
+      if (y < MARGIN) y = MARGIN;
 
       tooltip.style("left", `${x}px`).style("top", `${y}px`);
     };
 
-    const showTooltip = (d) => {
+    const showTooltip = (d, event) => {
       if (hideTimer) {
         clearTimeout(hideTimer);
         hideTimer = null;
@@ -191,7 +190,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           }
         `);
 
-      positionTooltipForLink(d);
+      positionTooltipAtCursor(event);
 
       tooltip.transition().duration(200).style("opacity", 1);
     };
@@ -237,7 +236,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           .duration(300)
           .attr("stroke-opacity", 0.8);
 
-        showTooltip(d);
+        showTooltip(d, event);
       })
       .on("mouseout", (event) => {
         d3.select(event.target)
