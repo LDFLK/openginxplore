@@ -4,6 +4,7 @@ import { Calendar, BarChart2, Building2 } from "lucide-react";
 import DateRangePicker from "../components/DateRangePicker";
 import CabinetFlowPanel from "../components/CabinetFlowPanel";
 import RightSidePanel from "../../../components/RightSidePanel";
+import { useEntityNames } from "../../../hooks/useEntityNames";
 
 const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
     if (!hasPresidentEndTime) {
@@ -81,6 +82,10 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
     const handleClosePanel = useCallback(() => {
         setSelectedLink(null);
     }, []);
+
+    const { data: departmentNames, isLoading: departmentNamesLoading } = useEntityNames(
+        selectedLink?.departmentIds
+    );
 
     return (
         <div className="px-4 py-6 md:px-8 md:py-10 lg:px-12 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border border-border">
@@ -173,12 +178,23 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                                 {selectedLink.value} department{selectedLink.value > 1 ? "s" : ""} moved
                             </p>
 
-                            <div className="mt-2 rounded-lg border border-dashed border-border p-4 flex flex-col items-center justify-center gap-2 text-center">
-                                <Building2 size={24} className="text-gray-300 dark:text-gray-600" />
-                                <p className="text-xs text-gray-400 dark:text-gray-500">
-                                    Department list will be loaded here.
-                                </p>
-                            </div>
+                            {departmentNamesLoading ? (
+                                <div className="flex items-center justify-center py-6">
+                                    <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            ) : (
+                                <ul className="flex flex-col gap-1.5">
+                                    {(selectedLink.departmentIds || []).map((id) => (
+                                        <li
+                                            key={id}
+                                            className="flex items-center gap-2 text-sm text-foreground/90 dark:text-white/90 bg-background/60 border border-border rounded-sm px-2.5 py-1.5"
+                                        >
+                                            <Building2 size={14} className="text-gray-400 shrink-0" />
+                                            <span className="break-words">{departmentNames?.[id] ?? id}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                     )}
                 </RightSidePanel>

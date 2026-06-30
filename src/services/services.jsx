@@ -59,6 +59,16 @@ export const getPrimeMinister = async ({ date, signal }) => {
   return data;
 };
 
+export const getEntityNames = async ({ entityIds, signal }) => {
+  const { data } = await axios.post(
+    `${GI_SERVICE_URL}/entity-names`,
+    entityIds,
+    { signal }
+  );
+
+  return data;
+};
+
 export const getDepartmentHistory = async ({ departmentId, signal }) => {
   const { data } = await axios.get(
     `${GI_SERVICE_URL}/department-history/${departmentId}`,
@@ -566,5 +576,6 @@ export default {
   getMinistriesByPerson,
   getPersonProfile,
   getDepartmentsByPortfolio,
-  getPrimeMinister
+  getPrimeMinister,
+  getEntityNames
 };
