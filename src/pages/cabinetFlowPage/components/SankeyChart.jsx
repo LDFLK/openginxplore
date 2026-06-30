@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onLinkClick }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -121,14 +121,14 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("offset", "100%")
       .attr("stop-color", (d) => color(d.target.id));
 
-    // Tooltip
+    // Tooltip — pinned next to the hovered link's nodes, not the cursor
     const tooltip = container
       .append("div")
       .attr("class", "sankey-tooltip")
       .style("position", "absolute")
-      .style("background", "rgba(0, 0, 0, 0.7)")
+      .style("background", "rgba(0, 0, 0, 0.85)")
       .style("color", "#fff")
-      .style("padding", "6px 10px")
+      .style("padding", "8px 10px")
       .style("border-radius", "4px")
       .style("font-size", "12px")
       .style("pointer-events", "none")
@@ -141,43 +141,84 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       // Prevent the tooltip itself from causing the container to grow
       .style("box-sizing", "border-box");
 
-    // Tooltip positioning helper
-    // Keeps the tooltip fully inside the container on all four sides.
-    function positionTooltip(event) {
+    // Hovering the link or the tooltip itself keeps it open; leaving both hides it
+    let hideTimer = null;
+    let activeLinkData = null;
+
+    // Anchors the tooltip beside the hovered link's nodes (its position is
+    // fixed to that link's geometry, not the cursor, so it doesn't jitter).
+    const positionTooltipForLink = (d) => {
       const containerRect = containerRef.current.getBoundingClientRect();
       const tooltipNode = tooltip.node();
       const tooltipWidth = tooltipNode.offsetWidth;
       const tooltipHeight = tooltipNode.offsetHeight;
-      const MARGIN = 8; // breathing room from container edges
+      const MARGIN = 8;
 
-      // Preferred: above-right of cursor
-      let x = event.clientX - containerRect.left + 12;
-      let y = event.clientY - containerRect.top - tooltipHeight - 8;
+      const linkMidY = (d.y0 + d.y1) / 2;
+      const linkMidX = (d.source.x1 + d.target.x0) / 2;
 
-      // Overflow right → flip to left of cursor
+      let x = linkMidX - tooltipWidth / 2;
+      let y = linkMidY - tooltipHeight - 12;
+
+      if (x < MARGIN) x = MARGIN;
       if (x + tooltipWidth + MARGIN > containerRect.width) {
-        x = event.clientX - containerRect.left - tooltipWidth - 12;
+        x = containerRect.width - tooltipWidth - MARGIN;
       }
-
-      // Overflow left → clamp to left edge
-      if (x < MARGIN) {
-        x = MARGIN;
-      }
-
-      // Overflow top → flip to below cursor
-      if (y < MARGIN) {
-        y = event.clientY - containerRect.top + 12;
-      }
-
-      // Overflow bottom → clamp to bottom edge
+      if (y < MARGIN) y = linkMidY + 12;
       if (y + tooltipHeight + MARGIN > containerRect.height) {
         y = containerRect.height - tooltipHeight - MARGIN;
       }
 
+      tooltip.style("left", `${x}px`).style("top", `${y}px`);
+    };
+
+    const showTooltip = (d) => {
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+      activeLinkData = d;
       tooltip
-        .style("left", `${x}px`)
-        .style("top", `${y}px`);
-    }
+        .style("pointer-events", "auto")
+        .html(`
+          <div>
+            <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
+            ${d.value} department${d.value > 1 ? "s" : ""} moved
+          </div>
+          ${onLinkClick
+            ? `<button type="button" class="sankey-tooltip-link text-accent" style="margin-top:6px;display:inline-block;background:none;border:none;padding:0;font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;">View departments moved</button>`
+            : ""
+          }
+        `);
+
+      positionTooltipForLink(d);
+
+      tooltip.transition().duration(200).style("opacity", 1);
+    };
+
+    const hideTooltipDelayed = () => {
+      hideTimer = setTimeout(() => {
+        tooltip
+          .transition()
+          .duration(200)
+          .style("opacity", 0)
+          .on("end", () => tooltip.style("pointer-events", "none"));
+      }, 150);
+    };
+
+    tooltip
+      .on("mouseenter", () => {
+        if (hideTimer) {
+          clearTimeout(hideTimer);
+          hideTimer = null;
+        }
+      })
+      .on("mouseleave", hideTooltipDelayed)
+      .on("click", (event) => {
+        if (event.target.closest(".sankey-tooltip-link") && activeLinkData) {
+          onLinkClick?.(activeLinkData);
+        }
+      });
 
     // Links
     svg
@@ -196,18 +237,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           .duration(300)
           .attr("stroke-opacity", 0.8);
 
-        tooltip
-          .style("opacity", 0)
-          .html(`
-            <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
-            ${d.value} department${d.value > 1 ? "s" : ""} moved
-          `)
-          .transition()
-          .duration(200)
-          .style("opacity", 1);
-      })
-      .on("mousemove", (event) => {
-        positionTooltip(event);
+        showTooltip(d);
       })
       .on("mouseout", (event) => {
         d3.select(event.target)
@@ -215,10 +245,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           .duration(300)
           .attr("stroke-opacity", 0.4);
 
-        tooltip
-          .transition()
-          .duration(200)
-          .style("opacity", 0);
+        hideTooltipDelayed();
       });
 
     // Column date labels
@@ -314,7 +341,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     return () => {
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode, onNodeClick]);
+  }, [data, width, height, isDarkMode, onNodeClick, onLinkClick]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>

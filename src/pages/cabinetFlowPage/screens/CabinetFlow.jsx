@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Calendar, BarChart2 } from "lucide-react";
+import { Calendar, BarChart2, Building2 } from "lucide-react";
 import DateRangePicker from "../components/DateRangePicker";
 import CabinetFlowPanel from "../components/CabinetFlowPanel";
+import RightSidePanel from "../../../components/RightSidePanel";
 
 const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
     if (!hasPresidentEndTime) {
@@ -73,6 +74,14 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
 
     const sortedDates = [...selectedDates].sort();
 
+    const [selectedLink, setSelectedLink] = useState(null);
+    const handleLinkClick = useCallback((link) => {
+        setSelectedLink(link);
+    }, []);
+    const handleClosePanel = useCallback(() => {
+        setSelectedLink(null);
+    }, []);
+
     return (
         <div className="px-4 py-6 md:px-8 md:py-10 lg:px-12 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border border-border">
             {/* ── Header ── */}
@@ -124,28 +133,56 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                 </div>
             </div>
 
-            {selectedDates.length > 1 ? (
-                <CabinetFlowPanel
-                    presidentId={presidentId}
-                    dates={sortedDates}
-                    onMinistryNodeClick={onMinistryNodeClick}
-                />
-            ) : (
-                <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
-                    <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {selectedDates.length === 1 ? "Select at least 2 dates to compare" : "Select up to 3 dates to compare"}
-                    </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 max-w-md">
-                        {selectedDates.length === 1
-                            ? "You have selected 1 date. Please select one more date to view the department flow."
-                            : "The start and end dates of the presidency are selected by default."}
-                    </p>
+            <div className="flex items-stretch gap-0">
+                <div className="flex-1 min-w-0">
+                    {selectedDates.length > 1 ? (
+                        <CabinetFlowPanel
+                            presidentId={presidentId}
+                            dates={sortedDates}
+                            onMinistryNodeClick={onMinistryNodeClick}
+                            onLinkClick={handleLinkClick}
+                        />
+                    ) : (
+                        <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
+                            <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {selectedDates.length === 1 ? "Select at least 2 dates to compare" : "Select up to 3 dates to compare"}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 max-w-md">
+                                {selectedDates.length === 1
+                                    ? "You have selected 1 date. Please select one more date to view the department flow."
+                                    : "The start and end dates of the presidency are selected by default."}
+                            </p>
+                        </div>
+                    )}
                 </div>
 
-            )}
+                <RightSidePanel
+                    isOpen={!!selectedLink}
+                    onClose={handleClosePanel}
+                    title="Department Changes"
+                >
+                    {selectedLink && (
+                        <div className="flex flex-col gap-3">
+                            <div className="text-sm text-foreground/80 dark:text-white/80">
+                                <span className="font-medium">{selectedLink.source?.name}</span>
+                                {" → "}
+                                <span className="font-medium">{selectedLink.target?.name}</span>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {selectedLink.value} department{selectedLink.value > 1 ? "s" : ""} moved
+                            </p>
 
-
+                            <div className="mt-2 rounded-lg border border-dashed border-border p-4 flex flex-col items-center justify-center gap-2 text-center">
+                                <Building2 size={24} className="text-gray-300 dark:text-gray-600" />
+                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                    Department list will be loaded here.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </RightSidePanel>
+            </div>
         </div>
     );
 };
