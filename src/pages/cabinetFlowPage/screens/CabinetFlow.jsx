@@ -138,7 +138,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                 </div>
             </div>
 
-            <div className="flex items-stretch gap-0">
+            <div className={`flex items-stretch ${selectedLink ? "gap-4" : "gap-0"}`}>
                 <div className="flex-1 min-w-0">
                     {selectedDates.length > 1 ? (
                         <CabinetFlowPanel
