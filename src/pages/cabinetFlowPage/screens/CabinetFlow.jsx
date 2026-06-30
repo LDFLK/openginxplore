@@ -152,6 +152,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
                             dates={sortedDates}
                             onNodeClick={handleNodeClick}
                             onLinkClick={handleLinkClick}
+                            onLinkDoubleClick={handleNodeClick}
                             selectedLink={selectedLink}
                             selectedNode={selectedNode}
                         />

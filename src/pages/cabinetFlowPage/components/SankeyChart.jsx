@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onLinkClick, selectedLink, selectedNode }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onLinkClick, onLinkDoubleClick, selectedLink, selectedNode }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -266,6 +266,10 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           .attr("stroke-opacity", restingOpacity(d));
 
         hideTooltipDelayed();
+      })
+      .on("dblclick", (event, d) => {
+        event.stopPropagation();
+        onLinkDoubleClick?.(d.source);
       });
 
     // Column date labels
@@ -363,7 +367,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     return () => {
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode, onNodeClick, onLinkClick, selectedLink, selectedNode]);
+  }, [data, width, height, isDarkMode, onNodeClick, onLinkClick, onLinkDoubleClick, selectedLink, selectedNode]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>
