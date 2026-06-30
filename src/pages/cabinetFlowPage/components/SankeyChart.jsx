@@ -187,18 +187,27 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       const tooltipHeight = tooltipNode.offsetHeight;
       const MARGIN = 8;
 
+      // The chart container can be taller/wider than the actual browser
+      // viewport (e.g. a tall chart with many nodes), so clamp against
+      // both the container's own box AND the visible viewport — in
+      // container-local coordinates — and use whichever is tighter.
+      const minX = Math.max(0, -containerRect.left) + MARGIN;
+      const maxX = Math.min(containerRect.width, window.innerWidth - containerRect.left) - tooltipWidth - MARGIN;
+      const minY = Math.max(0, -containerRect.top) + MARGIN;
+      const maxY = Math.min(containerRect.height, window.innerHeight - containerRect.top) - tooltipHeight - MARGIN;
+
       let x = event.clientX - containerRect.left + 12;
       let y = event.clientY - containerRect.top + 12;
 
-      if (x + tooltipWidth + MARGIN > containerRect.width) {
+      if (x > maxX) {
         x = event.clientX - containerRect.left - tooltipWidth - 12;
       }
-      if (x < MARGIN) x = MARGIN;
+      x = Math.min(Math.max(x, minX), maxX);
 
-      if (y + tooltipHeight + MARGIN > containerRect.height) {
+      if (y > maxY) {
         y = event.clientY - containerRect.top - tooltipHeight - 12;
       }
-      if (y < MARGIN) y = MARGIN;
+      y = Math.min(Math.max(y, minY), maxY);
 
       tooltip.style("left", `${x}px`).style("top", `${y}px`);
     };
