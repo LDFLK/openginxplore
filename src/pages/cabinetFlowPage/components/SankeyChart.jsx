@@ -387,6 +387,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       });
 
     return () => {
+      if (hideTimer) clearTimeout(hideTimer);
       tooltip.remove();
     };
   }, [data, width, height, isDarkMode, onNodeClick, onLinkClick, onLinkDoubleClick, selectedLink, selectedNode]);

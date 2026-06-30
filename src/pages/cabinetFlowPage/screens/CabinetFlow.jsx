@@ -77,6 +77,12 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
 
     const [selectedLink, setSelectedLink] = useState(null);
     const [selectedNode, setSelectedNode] = useState(null);
+
+    useEffect(() => {
+        setSelectedLink(null);
+        setSelectedNode(null);
+    }, [selectedDates, presidentId]);
+
     const handleLinkClick = useCallback((link) => {
         setSelectedNode(null);
         setSelectedLink(link);
