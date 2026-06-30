@@ -15,7 +15,7 @@ const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
     return d.toISOString().split("T")[0];
 };
 
-const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClick }) => {
+const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
     const { gazetteData } = useSelector((state) => state.gazettes);
     const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
     const presidentRelationDict = useSelector(
@@ -76,8 +76,14 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
     const sortedDates = [...selectedDates].sort();
 
     const [selectedLink, setSelectedLink] = useState(null);
+    const [selectedNode, setSelectedNode] = useState(null);
     const handleLinkClick = useCallback((link) => {
+        setSelectedNode(null);
         setSelectedLink(link);
+    }, []);
+    const handleNodeClick = useCallback((node) => {
+        setSelectedLink(null);
+        setSelectedNode((prev) => (prev?.id === node.id ? null : node));
     }, []);
     const handleClosePanel = useCallback(() => {
         setSelectedLink(null);
@@ -144,9 +150,10 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                         <CabinetFlowPanel
                             presidentId={presidentId}
                             dates={sortedDates}
-                            onMinistryNodeClick={onMinistryNodeClick}
+                            onNodeClick={handleNodeClick}
                             onLinkClick={handleLinkClick}
                             selectedLink={selectedLink}
+                            selectedNode={selectedNode}
                         />
                     ) : (
                         <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">

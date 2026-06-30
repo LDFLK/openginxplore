@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onLinkClick, selectedLink }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onLinkClick, selectedLink, selectedNode }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -107,14 +107,18 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       ? `${selectedLink.source?.id ?? selectedLink.source}->${selectedLink.target?.id ?? selectedLink.target}`
       : null;
     const isSelectedLink = (d) => !!selectedKey && linkKey(d) === selectedKey;
+    const isLinkedToSelectedNode = (d) =>
+      !!selectedNode && (d.source.id === selectedNode.id || d.target.id === selectedNode.id);
+    const isHighlighted = (d) => isSelectedLink(d) || isLinkedToSelectedNode(d);
+    const hasActiveSelection = !!selectedKey || !!selectedNode;
     const greyColor = isDarkMode ? "#4b5563" : "#64748b";
     const restingOpacity = (d) => {
-      if (!selectedKey) return 0.4;
-      return isSelectedLink(d) ? 0.85 : 0.12;
+      if (!hasActiveSelection) return 0.4;
+      return isHighlighted(d) ? 0.85 : 0.12;
     };
     const hoverOpacity = (d) => {
-      if (!selectedKey) return 0.8;
-      return isSelectedLink(d) ? 0.95 : 0.25;
+      if (!hasActiveSelection) return 0.8;
+      return isHighlighted(d) ? 0.95 : 0.25;
     };
 
     // Gradient defs
@@ -244,7 +248,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .data(links)
       .join("path")
       .attr("d", sankeyLinkHorizontal())
-      .attr("stroke", (d, i) => (isSelectedLink(d) || !selectedKey ? `url(#gradient-${i})` : greyColor))
+      .attr("stroke", (d, i) => (isHighlighted(d) || !hasActiveSelection ? `url(#gradient-${i})` : greyColor))
       .attr("stroke-opacity", restingOpacity)
       .attr("stroke-width", (d) => Math.max(1, d.width))
       .on("mouseover", (event, d) => {
@@ -320,6 +324,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("height", (d) => d.y1 - d.y0)
       .attr("width", (d) => d.x1 - d.x0)
       .attr("fill", (d) => color(d.id))
+      .attr("stroke", (d) => (selectedNode?.id === d.id ? (isDarkMode ? "#fff" : "#1f2933") : "none"))
+      .attr("stroke-width", (d) => (selectedNode?.id === d.id ? 0 : 0))
       .style("cursor", onNodeClick ? "pointer" : "default")
       .on("click", handleNodeClick)
       .append("title")
@@ -357,7 +363,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     return () => {
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode, onNodeClick, onLinkClick, selectedLink]);
+  }, [data, width, height, isDarkMode, onNodeClick, onLinkClick, selectedLink, selectedNode]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>
