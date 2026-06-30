@@ -146,6 +146,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                             dates={sortedDates}
                             onMinistryNodeClick={onMinistryNodeClick}
                             onLinkClick={handleLinkClick}
+                            selectedLink={selectedLink}
                         />
                     ) : (
                         <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
