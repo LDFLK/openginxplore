@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Calendar, BarChart2, Building2 } from "lucide-react";
+import { Calendar, BarChart2, Building2, ArrowRight } from "lucide-react";
 import DateRangePicker from "../components/DateRangePicker";
 import CabinetFlowPanel from "../components/CabinetFlowPanel";
 import RightSidePanel from "../../../components/RightSidePanel";
@@ -125,7 +125,6 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                                 <li>Each column represents a date when one or more changes may have occurred.</li>
                                 <li>Hover over a flow to view details about the departments involved.</li>
                                 <li>You can select up to 3 dates to compare.</li>
-                                <li>Click a ministry to view its information.</li>
                             </ul>
                         </div>
                     </div>
@@ -200,10 +199,24 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                 >
                     {selectedLink && (
                         <div className="flex flex-col gap-3">
-                            <div className="text-sm text-foreground/80 dark:text-white/80">
-                                <span className="font-medium">{selectedLink.source?.name}</span>
-                                {" → "}
-                                <span className="font-medium">{selectedLink.target?.name}</span>
+                            <div className="flex items-center gap-2 rounded-md border border-border bg-background/60 px-3 py-2">
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-0.5">
+                                        From
+                                    </p>
+                                    <p className="text-xs font-medium text-foreground dark:text-white break-words">
+                                        {selectedLink.source?.name}
+                                    </p>
+                                </div>
+                                <ArrowRight size={25} className="text-accent shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-0.5">
+                                        To
+                                    </p>
+                                    <p className="text-xs font-medium text-foreground dark:text-white break-words">
+                                        {selectedLink.target?.name}
+                                    </p>
+                                </div>
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {selectedLink.value} department{selectedLink.value > 1 ? "s" : ""} moved
@@ -218,7 +231,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                                     {(selectedLink.departmentIds || []).map((id) => (
                                         <li
                                             key={id}
-                                            className="flex items-center gap-2 text-sm text-foreground/90 dark:text-white/90 bg-background/60 border border-border rounded-sm px-2.5 py-1.5"
+                                            className="flex items-center gap-2 text-xs text-foreground/90 dark:text-white/90 bg-background/60 border border-border rounded-sm px-2.5 py-1.5"
                                         >
                                             <Building2 size={14} className="text-gray-400 shrink-0" />
                                             <span className="break-words">{departmentNames?.[id] ?? id}</span>
