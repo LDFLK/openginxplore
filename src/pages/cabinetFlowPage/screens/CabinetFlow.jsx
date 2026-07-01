@@ -100,7 +100,11 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
     }, []);
 
     useEffect(() => {
-        const onDocumentClick = () => handleClearSelection();
+        const onDocumentClick = (event) => {
+            if (window.getSelection()?.toString()) return;
+            if (event.target.closest("[data-right-panel]")) return;
+            handleClearSelection();
+        };
         document.addEventListener("click", onDocumentClick);
         return () => document.removeEventListener("click", onDocumentClick);
     }, [handleClearSelection]);
