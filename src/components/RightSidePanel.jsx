@@ -20,7 +20,6 @@ export default function RightSidePanel({
   footer,
   width = "w-full md:w-1/2 lg:w-1/3",
 }) {
-  const { isDark } = useThemeContext();
 
   return (
     <>
