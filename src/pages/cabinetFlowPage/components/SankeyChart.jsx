@@ -271,19 +271,9 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("stroke-width", (d) => Math.max(1, d.width))
       .style("cursor", onLinkSingleClick ? "pointer" : "default")
       .on("mouseover", (event, d) => {
-        const hoveredKey = linkKey(d);
-        svg.selectAll(".sankey-link")
-          .transition().duration(200)
-          .attr("stroke-opacity", (ld) => {
-            if (linkKey(ld) === hoveredKey) return 0.9;
-            return isHighlighted(ld) ? 0.6 : 0.08;
-          });
         showTooltip(d, event);
       })
       .on("mouseout", () => {
-        svg.selectAll(".sankey-link")
-          .transition().duration(200)
-          .attr("stroke-opacity", restingOpacity);
         hideTooltipDelayed();
       })
       .on("click", (event, d) => {
