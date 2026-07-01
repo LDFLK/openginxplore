@@ -124,6 +124,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     const isRelevantNode = (d) => !hasActiveSelection || relevantNodeIds.has(d.id);
 
     const greyColor = isDarkMode ? "#4b5563" : "#64748b";
+    const greyColorHover = isDarkMode ? "#6b7280" : "#c0c7d1";
     const restingOpacity = (d) => {
       if (!hasActiveSelection) return 0.4;
       return isHighlighted(d) ? 0.85 : 0.12;
@@ -271,9 +272,17 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("stroke-width", (d) => Math.max(1, d.width))
       .style("cursor", onLinkSingleClick ? "pointer" : "default")
       .on("mouseover", (event, d) => {
+        const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", 0.9);
+        if (!isHighlighted(d) && hasActiveSelection) {
+          link.attr("stroke", greyColorHover);
+        }
         showTooltip(d, event);
       })
-      .on("mouseout", () => {
+      .on("mouseout", (event, d) => {
+        const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", restingOpacity(d));
+        if (!isHighlighted(d) && hasActiveSelection) {
+          link.attr("stroke", greyColor);
+        }
         hideTooltipDelayed();
       })
       .on("click", (event, d) => {
