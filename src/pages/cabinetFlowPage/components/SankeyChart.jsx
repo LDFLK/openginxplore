@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -29,7 +29,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .select(svgRef.current)
       .attr("width", width)
       .attr("height", height)
-      .style("cursor", "default");
+      .style("cursor", "default")
+      .on("click", () => onClearSelection?.());
 
     const normalizeDate = (d) => (typeof d === "string" ? d.split("T")[0] : d);
     const chartDates = (data.dates || []).filter((d) => d.status === "ok");
@@ -100,6 +101,34 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     // Color scale
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
+    // Identifies a link by its source/target node ids — links are rebuilt
+    // fresh on every render, so we can't compare object references.
+    const linkKey = (d) => `${d.source.id ?? d.source}->${d.target.id ?? d.target}`;
+    const selectedKey = selectedLink
+      ? `${selectedLink.source?.id ?? selectedLink.source}->${selectedLink.target?.id ?? selectedLink.target}`
+      : null;
+    const isSelectedLink = (d) => !!selectedKey && linkKey(d) === selectedKey;
+    const isLinkedToSelectedNode = (d) =>
+      !!selectedNode && (d.source.id === selectedNode.id || d.target.id === selectedNode.id);
+    const isHighlighted = (d) => isSelectedLink(d) || isLinkedToSelectedNode(d);
+    const hasActiveSelection = !!selectedKey || !!selectedNode;
+
+    const relevantNodeIds = new Set();
+    if (selectedNode) relevantNodeIds.add(selectedNode.id);
+    links.forEach((d) => {
+      if (isHighlighted(d)) {
+        relevantNodeIds.add(d.source.id);
+        relevantNodeIds.add(d.target.id);
+      }
+    });
+    const isRelevantNode = (d) => !hasActiveSelection || relevantNodeIds.has(d.id);
+
+    const greyColor = isDarkMode ? "#4b5563" : "#64748b";
+    const greyColorHover = isDarkMode ? "#6b7280" : "#c0c7d1";
+    const restingOpacity = (d) => {
+      if (!hasActiveSelection) return 0.4;
+      return isHighlighted(d) ? 0.85 : 0.12;
+    };
     // Gradient defs
     const defs = svg.append("defs");
     const linkGradients = defs
@@ -121,14 +150,14 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("offset", "100%")
       .attr("stop-color", (d) => color(d.target.id));
 
-    // Tooltip
+    // Tooltip — pinned next to the hovered link's nodes, not the cursor
     const tooltip = container
       .append("div")
       .attr("class", "sankey-tooltip")
       .style("position", "absolute")
-      .style("background", "rgba(0, 0, 0, 0.7)")
+      .style("background", "rgba(0, 0, 0, 0.85)")
       .style("color", "#fff")
-      .style("padding", "6px 10px")
+      .style("padding", "8px 10px")
       .style("border-radius", "4px")
       .style("font-size", "12px")
       .style("pointer-events", "none")
@@ -141,84 +170,124 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       // Prevent the tooltip itself from causing the container to grow
       .style("box-sizing", "border-box");
 
-    // Tooltip positioning helper
-    // Keeps the tooltip fully inside the container on all four sides.
-    function positionTooltip(event) {
+    // Hovering the link or the tooltip itself keeps it open; leaving both hides it
+    let hideTimer = null;
+    let activeLinkData = null;
+
+    // Pins the tooltip right where the cursor entered the link, once — it
+    // does NOT track mousemove afterwards, so it stays put under the cursor
+    // instead of requiring the user to travel to find it.
+    const positionTooltipAtCursor = (event) => {
       const containerRect = containerRef.current.getBoundingClientRect();
       const tooltipNode = tooltip.node();
       const tooltipWidth = tooltipNode.offsetWidth;
       const tooltipHeight = tooltipNode.offsetHeight;
-      const MARGIN = 8; // breathing room from container edges
+      const MARGIN = 8;
 
-      // Preferred: above-right of cursor
+      // The chart container can be taller/wider than the actual browser
+      // viewport (e.g. a tall chart with many nodes), so clamp against
+      // both the container's own box AND the visible viewport — in
+      // container-local coordinates — and use whichever is tighter.
+      const minX = Math.max(0, -containerRect.left) + MARGIN;
+      const maxX = Math.min(containerRect.width, window.innerWidth - containerRect.left) - tooltipWidth - MARGIN;
+      const minY = Math.max(0, -containerRect.top) + MARGIN;
+      const maxY = Math.min(containerRect.height, window.innerHeight - containerRect.top) - tooltipHeight - MARGIN;
+
       let x = event.clientX - containerRect.left + 12;
-      let y = event.clientY - containerRect.top - tooltipHeight - 8;
+      let y = event.clientY - containerRect.top + 12;
 
-      // Overflow right → flip to left of cursor
-      if (x + tooltipWidth + MARGIN > containerRect.width) {
+      if (x > maxX) {
         x = event.clientX - containerRect.left - tooltipWidth - 12;
       }
+      x = Math.min(Math.max(x, minX), maxX);
 
-      // Overflow left → clamp to left edge
-      if (x < MARGIN) {
-        x = MARGIN;
+      if (y > maxY) {
+        y = event.clientY - containerRect.top - tooltipHeight - 12;
       }
+      y = Math.min(Math.max(y, minY), maxY);
 
-      // Overflow top → flip to below cursor
-      if (y < MARGIN) {
-        y = event.clientY - containerRect.top + 12;
+      tooltip.style("left", `${x}px`).style("top", `${y}px`);
+    };
+
+    const showTooltip = (d, event) => {
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
       }
-
-      // Overflow bottom → clamp to bottom edge
-      if (y + tooltipHeight + MARGIN > containerRect.height) {
-        y = containerRect.height - tooltipHeight - MARGIN;
-      }
-
+      activeLinkData = d;
       tooltip
-        .style("left", `${x}px`)
-        .style("top", `${y}px`);
-    }
+        .style("pointer-events", "auto")
+        .html(`
+          <div>
+            <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
+            ${d.value} department${d.value > 1 ? "s" : ""} moved
+          </div>
+          ${onLinkClick
+            ? `<button type="button" class="sankey-tooltip-link text-accent" style="margin-top:6px;display:inline-block;background:none;border:none;padding:0;font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;">View departments moved</button>`
+            : ""
+          }
+        `);
+
+      positionTooltipAtCursor(event);
+
+      tooltip.transition().duration(200).style("opacity", 1);
+    };
+
+    const hideTooltipDelayed = () => {
+      hideTimer = setTimeout(() => {
+        tooltip
+          .transition()
+          .duration(200)
+          .style("opacity", 0)
+          .on("end", () => tooltip.style("pointer-events", "none"));
+      }, 150);
+    };
+
+    tooltip
+      .on("mouseenter", () => {
+        if (hideTimer) {
+          clearTimeout(hideTimer);
+          hideTimer = null;
+        }
+      })
+      .on("mouseleave", hideTooltipDelayed)
+      .on("click", (event) => {
+        event.stopPropagation();
+        if (event.target.closest(".sankey-tooltip-link") && activeLinkData) {
+          onLinkClick?.(activeLinkData);
+        }
+      });
 
     // Links
     svg
       .append("g")
       .attr("fill", "none")
-      .attr("stroke-opacity", 0.4)
       .selectAll("path")
       .data(links)
       .join("path")
+      .attr("class", "sankey-link")
       .attr("d", sankeyLinkHorizontal())
-      .attr("stroke", (d, i) => `url(#gradient-${i})`)
+      .attr("stroke", (d, i) => (isHighlighted(d) || !hasActiveSelection ? `url(#gradient-${i})` : greyColor))
+      .attr("stroke-opacity", restingOpacity)
       .attr("stroke-width", (d) => Math.max(1, d.width))
+      .style("cursor", onLinkSingleClick ? "pointer" : "default")
       .on("mouseover", (event, d) => {
-        d3.select(event.target)
-          .transition()
-          .duration(300)
-          .attr("stroke-opacity", 0.8);
-
-        tooltip
-          .style("opacity", 0)
-          .html(`
-            <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
-            ${d.value} department${d.value > 1 ? "s" : ""} moved
-          `)
-          .transition()
-          .duration(200)
-          .style("opacity", 1);
+        const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", 0.9);
+        if (!isHighlighted(d) && hasActiveSelection) {
+          link.attr("stroke", greyColorHover);
+        }
+        showTooltip(d, event);
       })
-      .on("mousemove", (event) => {
-        positionTooltip(event);
+      .on("mouseout", (event, d) => {
+        const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", restingOpacity(d));
+        if (!isHighlighted(d) && hasActiveSelection) {
+          link.attr("stroke", greyColor);
+        }
+        hideTooltipDelayed();
       })
-      .on("mouseout", (event) => {
-        d3.select(event.target)
-          .transition()
-          .duration(300)
-          .attr("stroke-opacity", 0.4);
-
-        tooltip
-          .transition()
-          .duration(200)
-          .style("opacity", 0);
+      .on("click", (event, d) => {
+        event.stopPropagation();
+        onLinkSingleClick?.(d.source);
       });
 
     // Column date labels
@@ -277,6 +346,9 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("height", (d) => d.y1 - d.y0)
       .attr("width", (d) => d.x1 - d.x0)
       .attr("fill", (d) => color(d.id))
+      .attr("fill-opacity", (d) => (isRelevantNode(d) ? 1 : 0.25))
+      .attr("stroke", (d) => (selectedNode?.id === d.id ? (isDarkMode ? "#fff" : "#1f2933") : "none"))
+      .attr("stroke-width", (d) => (selectedNode?.id === d.id ? 0 : 0))
       .style("cursor", onNodeClick ? "pointer" : "default")
       .on("click", handleNodeClick)
       .append("title")
@@ -286,7 +358,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     svg
       .append("g")
       .style("font", "12px poppins")
-      .style("fill", !isDarkMode ? "#1f2933" : "#fff") 
+      .style("fill", !isDarkMode ? "#1f2933" : "#fff")
       .selectAll("text")
       .data(nodes)
       .join("text")
@@ -294,6 +366,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("y", (d) => (d.y1 + d.y0) / 2)
       .attr("dy", "0.35em")
       .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
+      .attr("fill-opacity", (d) => (isRelevantNode(d) ? 1 : 0.35))
       .text((d) => {
         // compute limit dynamically based on available space for EVERY column
         const limit = labelCharLimit(d);
@@ -301,10 +374,13 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           ? d.name.substring(0, limit) + "…"
           : d.name;
       })
-      .style("cursor", onNodeClick ? "pointer" : "default")
-      .on("click", handleNodeClick)
+      .style("cursor", onNodeNavigate ? "pointer" : "default")
+      .on("click", (event, d) => {
+        event.stopPropagation();
+        onNodeNavigate?.(d);
+      })
       .on("mouseenter", function () {
-        if (!onNodeClick) return;
+        if (!onNodeNavigate) return;
         d3.select(this).style("text-decoration", "underline");
       })
       .on("mouseleave", function () {
@@ -312,9 +388,10 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       });
 
     return () => {
+      if (hideTimer) clearTimeout(hideTimer);
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode, onNodeClick]);
+  }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>
