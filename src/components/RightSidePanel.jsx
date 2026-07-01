@@ -34,7 +34,7 @@ export default function RightSidePanel({
 
       <div
         className={`${isOpen ? `${width} p-3 md:p-4 border-border md:border-l` : "w-0 p-0"
-          } transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0 bg-background-dark fixed md:sticky right-0 top-0 md:top-4 h-full md:h-[calc(100vh-2rem)] z-50 md:z-auto shadow-2xl md:shadow-none`}
+          } transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0 bg-background-dark fixed md:sticky right-0 top-0 md:top-4 h-full md:h-[calc(100vh-2rem)] z-50 md:z-auto shadow-2xl md:shadow-none rounded-sm`}
       >
         {isOpen && (
           <div className="flex flex-col h-full min-w-[260px]">

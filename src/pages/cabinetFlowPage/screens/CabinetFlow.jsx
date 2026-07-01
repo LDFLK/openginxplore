@@ -94,6 +94,16 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
     const handleClosePanel = useCallback(() => {
         setSelectedLink(null);
     }, []);
+    const handleClearSelection = useCallback(() => {
+        setSelectedLink(null);
+        setSelectedNode(null);
+    }, []);
+
+    useEffect(() => {
+        const onDocumentClick = () => handleClearSelection();
+        document.addEventListener("click", onDocumentClick);
+        return () => document.removeEventListener("click", onDocumentClick);
+    }, [handleClearSelection]);
 
     const { data: departmentNames, isLoading: departmentNamesLoading } = useEntityNames(
         selectedLink?.departmentIds
@@ -159,7 +169,8 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                             onNodeClick={handleNodeClick}
                             onNodeNavigate={onMinistryNodeClick}
                             onLinkClick={handleLinkClick}
-                            onLinkDoubleClick={handleNodeClick}
+                            onLinkSingleClick={handleNodeClick}
+                            onClearSelection={handleClearSelection}
                             selectedLink={selectedLink}
                             selectedNode={selectedNode}
                         />

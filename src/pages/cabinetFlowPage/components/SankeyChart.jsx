@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkDoubleClick, selectedLink, selectedNode }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -29,7 +29,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .select(svgRef.current)
       .attr("width", width)
       .attr("height", height)
-      .style("cursor", "default");
+      .style("cursor", "default")
+      .on("click", () => onClearSelection?.());
 
     const normalizeDate = (d) => (typeof d === "string" ? d.split("T")[0] : d);
     const chartDates = (data.dates || []).filter((d) => d.status === "ok");
@@ -250,6 +251,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       })
       .on("mouseleave", hideTooltipDelayed)
       .on("click", (event) => {
+        event.stopPropagation();
         if (event.target.closest(".sankey-tooltip-link") && activeLinkData) {
           onLinkClick?.(activeLinkData);
         }
@@ -285,7 +287,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       })
       .on("click", (event, d) => {
         event.stopPropagation();
-        onLinkDoubleClick?.(d.source);
+        onLinkSingleClick?.(d.source);
       });
 
     // Column date labels
@@ -389,7 +391,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       if (hideTimer) clearTimeout(hideTimer);
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkDoubleClick, selectedLink, selectedNode]);
+  }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>
