@@ -15,7 +15,7 @@ const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
     return d.toISOString().split("T")[0];
 };
 
-const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
+const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClick }) => {
     const { gazetteData } = useSelector((state) => state.gazettes);
     const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
     const presidentRelationDict = useSelector(
@@ -157,6 +157,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null] }) => {
                             presidentId={presidentId}
                             dates={sortedDates}
                             onNodeClick={handleNodeClick}
+                            onNodeNavigate={onMinistryNodeClick}
                             onLinkClick={handleLinkClick}
                             onLinkDoubleClick={handleNodeClick}
                             selectedLink={selectedLink}

@@ -59,12 +59,6 @@ export default function RightSidePanel({
               {children}
             </div>
 
-            {/* Optional footer */}
-            {footer && (
-              <div className="shrink-0 pt-2 md:pt-3 mt-2 border-t border-border">
-                {footer}
-              </div>
-            )}
           </div>
         )}
       </div>
