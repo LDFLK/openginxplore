@@ -192,7 +192,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                 <RightSidePanel
                     isOpen={!!selectedLink}
                     onClose={handleClosePanel}
-                    title="Department Changes"
+                    title="Departments Moved"
                 >
                     {selectedLink && (
                         <div className="flex flex-col gap-3">

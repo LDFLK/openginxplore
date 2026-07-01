@@ -269,6 +269,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("stroke", (d, i) => (isHighlighted(d) || !hasActiveSelection ? `url(#gradient-${i})` : greyColor))
       .attr("stroke-opacity", restingOpacity)
       .attr("stroke-width", (d) => Math.max(1, d.width))
+      .style("cursor", onLinkSingleClick ? "pointer" : "default")
       .on("mouseover", (event, d) => {
         const hoveredKey = linkKey(d);
         svg.selectAll(".sankey-link")
