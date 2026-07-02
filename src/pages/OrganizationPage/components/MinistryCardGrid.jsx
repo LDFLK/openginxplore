@@ -54,7 +54,7 @@ const MinistryCardGrid = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { data, isLoading, error } = useActivePortfolioList(
+  const { data, isLoading, _ } = useActivePortfolioList(
     selectedPresident?.id,
     selectedDate?.date
   );
@@ -903,7 +903,7 @@ const MinistryCardGrid = () => {
                     }}
                     orientation="vertical"
                   >
-                    {steps.map((step, index) => {
+                    {steps.map((step) => {
                       // Hide "Departments & People" step if it's not clickable
                       if (
                         step.label == "Departments & People" &&

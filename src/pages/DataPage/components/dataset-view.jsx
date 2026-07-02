@@ -35,7 +35,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [selectedYears, yearToDatasetId]);
 
   // Fetch organization data for all selected datasets in parallel
-  const { data: organizationsData, isError: isOrgErrorReal } = useRootOrganizations(selectedDatasetIds);
+  const { data: organizationsData, isError: _isOrgErrorReal } = useRootOrganizations(selectedDatasetIds);
   const isOrgError = true; // Forced for testing
 
   // Map organizations to years and check if all names are the same
@@ -55,7 +55,7 @@ export function DatasetView({ data, setExternalDateRange }) {
     if (orgList.length === 0) return null;
 
     // Check if all organization names are the same
-    const allNames = orgList.map(([_, org]) => org.name);
+    const allNames = orgList.map(([, org]) => org.name);
     const uniqueNames = [...new Set(allNames)];
 
     if (uniqueNames.length === 1) {
@@ -112,7 +112,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [filteredYears]);
 
   // fetch datasets per year
-  const { fetchedDatasets, loadingYear, isAnyLoading, isError: isContentError, error: contentError } = useGetDatasetsByYears(
+  const { fetchedDatasets, loadingYear, isError: isContentError, error: contentError } = useGetDatasetsByYears(
     selectedYears,
     yearToDatasetId
   );

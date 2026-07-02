@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Box, Avatar, Typography, IconButton, Divider } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -31,7 +31,7 @@ export default function GazetteTimeline() {
   const [lineStyle, setLineStyle] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [latestPresidentId, setLatestPresidentId] = useState(null);
+  const [latestPresidentId, _setLatestPresidentId] = useState(null);
 
   const { colors } = useThemeContext();
 

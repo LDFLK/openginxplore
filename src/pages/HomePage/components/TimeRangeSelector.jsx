@@ -3,8 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import utils from "../../../utils/utils";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import Tooltip from "@mui/material/Tooltip";
+import { useLocation } from "react-router-dom";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 export default function TimeRangeSelector({
@@ -92,12 +91,6 @@ export default function TimeRangeSelector({
   const [tempEndDate, setTempEndDate] = useState(initialEnd);
   const [preciseMode, setPreciseMode] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [tooltip, setTooltip] = useState({
-    show: false,
-    x: 0,
-    y: 0,
-    content: "",
-  });
   const [calendarRange, setCalendarRange] = useState(null);
   const [calendarStart, setCalendarStart] = useState(startDate);
   const [calendarEnd, setCalendarEnd] = useState(endDate);

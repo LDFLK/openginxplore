@@ -18,7 +18,7 @@ export default function Drawer({
   loading,
   activeMinistries,
 }) {
-  const { colors, isDark } = useThemeContext();
+  const { isDark } = useThemeContext();
   const [drawerContentList, setDrawerContentList] = useState({});
   const BATCH_SIZE = 20;
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);

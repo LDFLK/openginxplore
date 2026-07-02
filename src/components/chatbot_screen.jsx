@@ -3,26 +3,19 @@ import remarkGfm from "remark-gfm";
 import Markdown from "react-markdown";
 import api from "./../services/services";
 import { ClipLoader } from "react-spinners";
-import { useThemeContext } from "../themeContext";
 import { TbMessageChatbot } from "react-icons/tb";
 import { IoResizeOutline } from "react-icons/io5";
 import ReactMarkdown from "react-markdown";
 
 function ChatbotComponent() {
   const [isChatboxOpen, setIsChatboxOpen] = useState(false);
-  const [isResized, setIsResized] = useState(false);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatboxRef = useRef(null);
-  const { colors } = useThemeContext();
 
   const handleToggleChatbox = () => {
     setIsChatboxOpen((prev) => !prev);
-  };
-
-  const handleResizeChatbox = () => {
-    setIsResized((prev) => !prev);
   };
 
   const callchatbot = async () => {
@@ -54,12 +47,6 @@ function ChatbotComponent() {
     } catch (e) {
       console.log(`Error fetching chat message data : ${e.message}`);
       setLoading(false);
-    }
-  };
-
-  const handleKeyUp = (e) => {
-    if (e.key === "Enter") {
-      handleSendMessage();
     }
   };
 
@@ -173,7 +160,6 @@ function ChatbotComponent() {
                 type="text"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                onKeyUp={handleKeyUp}
                 placeholder="Type a message"
                 className="w-full px-3 py-3 rounded-l-md focus:outline-none appearance-none bg-gray-100 text-gray-700"
               />
