@@ -75,7 +75,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   useEffect(() => {
     if (allAvailableYears.length === 0) return;
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const startDate = params.get("startDate");
     const endDate = params.get("endDate");
 
@@ -98,7 +98,7 @@ export function DatasetView({ data, setExternalDateRange }) {
     if (yearsInRange.length === 0) {
       setSelectedYears([]);
     }
-  }, [allAvailableYears, window.location.search]);
+  }, [allAvailableYears, location.search]);
 
   const multiYearMode = filteredYears.length > 1;
 

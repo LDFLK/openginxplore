@@ -99,7 +99,7 @@ export function ChartVisualization({ columns, rows, yearlyData }) {
     setSelectedYColumns((prev) =>
       prev.filter((col) => columns.includes(col))
     );
-  }, [columns, normalizedYearlyData]);
+  }, [columns, normalizedYearlyData, xAxis]);
 
   const normalizeString = (str) => {
     if (str === null || str === undefined) return "";
