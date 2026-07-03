@@ -161,7 +161,7 @@ export default function DataPage({ setExternalDateRange }) {
     setSelectedDataset(dataset);
   };
 
-  const handleBreadcrumbClick = (index, item) => {
+  const handleBreadcrumbClick = (index) => {
     if (index === -1) {
       navigate("/data");
       return;
