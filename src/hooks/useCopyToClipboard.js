@@ -20,14 +20,13 @@ export const useCopyToClipboard = (resetDelay = 2000) => {
   }, []);
 
   useEffect(() => {
-    if (!copied) {
-      return undefined;
-    }
-    const timerId = setTimeout(() => {
-      setCopied(false);
-    }, resetDelay);
+    if (copied) {
+      const timerId = setTimeout(() => {
+        setCopied(false);
+      }, resetDelay);
 
-    return () => clearTimeout(timerId);
+      return () => clearTimeout(timerId);
+    }
   }, [copied, resetDelay]);
 
   const copy = useCallback(
