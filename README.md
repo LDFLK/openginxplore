@@ -160,7 +160,7 @@ npx playwright install
 ```
 
 ### Start the Dev Server
-The dev server must be running before executing tests:
+Always start the development server before running tests so they can interact with a live application environment.
 ```bash
 npm run dev
 ```
@@ -182,20 +182,18 @@ npx playwright test --project=webkit
 npx playwright test tests/view-profile.spec.ts
 ```
 
-### View HTML Test Report
-```bash
-npx playwright show-report
-```
-
-### View Coverage Report
-After running tests, open the coverage report:
+### View HTML Test Report (Monocart)
+After running tests, open the Monocart report (includes test results + code coverage):
 ```bash
 # macOS
-open coverage/index.html
+open test-results/report.html
 
 # Linux
-xdg-open coverage/index.html
-```
+xdg-open test-results/report.html
+
+# Windows
+start test-results/report.html
+
 
 ## Contributing
 
