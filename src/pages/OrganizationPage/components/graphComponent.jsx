@@ -494,7 +494,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         await buildGraph(node);
       }
     },
-    [buildGraph, graphParent, navigate]
+    [buildGraph, graphParent, navigate, location]
   );
 
   // Configure forces

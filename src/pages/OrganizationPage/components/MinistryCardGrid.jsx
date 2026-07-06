@@ -54,7 +54,7 @@ const MinistryCardGrid = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { data, isLoading, _ } = useActivePortfolioList(
+  const { data, isLoading } = useActivePortfolioList(
     selectedPresident?.id,
     selectedDate?.date
   );
