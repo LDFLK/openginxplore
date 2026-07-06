@@ -35,8 +35,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [selectedYears, yearToDatasetId]);
 
   // Fetch organization data for all selected datasets in parallel
-  const { data: organizationsData, isError: _isOrgErrorReal } = useRootOrganizations(selectedDatasetIds);
-  const isOrgError = true; // Forced for testing
+  const { data: organizationsData, isError: isOrgError } = useRootOrganizations(selectedDatasetIds);
 
   // Map organizations to years and check if all names are the same
   const organizationsByYear = useMemo(() => {
