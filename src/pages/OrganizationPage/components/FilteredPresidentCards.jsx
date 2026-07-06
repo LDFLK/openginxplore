@@ -244,6 +244,12 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       return;
     }
 
+    // Let the URL watcher handle ministry deep links — don't override with a default president/date
+    if (params.get("ministry") && params.get("selectedDate") && dateRangeMatchesUrl) {
+      prevDateRangeRef.current = dateRange;
+      return;
+    }
+
     if (filteredPresidents.length > 0) {
       const lastPresident = filteredPresidents[filteredPresidents.length - 1];
       selectPresidentAndDates(lastPresident);
@@ -258,12 +264,18 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     if (!selectedDate?.date) return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("view") === "department-flow") return;
-    const prevSelectedDate = params.get("selectedDate");
-    const url = new URL(window.location.href);
-    url.searchParams.set("selectedDate", selectedDate.date);
-    if (prevSelectedDate && prevSelectedDate !== selectedDate.date) {
-      url.searchParams.delete("ministry");
+
+    const urlSelectedDate = params.get("selectedDate");
+    const urlMinistry = params.get("ministry");
+    const reduxDate = selectedDate.date;
+
+    // Don't clobber a ministry deep link while Redux is still catching up to the URL
+    if (urlMinistry && urlSelectedDate && urlSelectedDate !== reduxDate) {
+      return;
     }
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("selectedDate", reduxDate);
     window.history.replaceState({}, "", url.toString());
   }, [selectedDate, location.search]);
 
