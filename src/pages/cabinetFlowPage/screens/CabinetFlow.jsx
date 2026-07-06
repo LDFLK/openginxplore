@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Calendar, BarChart2, Building2, ArrowRight } from "lucide-react";
 import DateRangePicker from "../components/DateRangePicker";
@@ -16,6 +17,7 @@ const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
 };
 
 const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClick }) => {
+    const location = useLocation();
     const { gazetteData } = useSelector((state) => state.gazettes);
     const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
     const presidentRelationDict = useSelector(
@@ -234,7 +236,13 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                                             className="flex items-center gap-2 text-xs text-foreground/90 dark:text-white/90 bg-background/60 border border-border rounded-sm px-2.5 py-1.5"
                                         >
                                             <Building2 size={14} className="text-gray-400 shrink-0" />
-                                            <span className="break-words">{departmentNames?.[id] ?? id}</span>
+                                            <Link
+                                                to={`/department-profile/${id}`}
+                                                state={{ mode: "back", from: location.pathname + location.search }}
+                                                className="break-words text-foreground/90 dark:text-white/90 hover:underline"
+                                            >
+                                                {departmentNames?.[id] ?? id}
+                                            </Link>
                                         </li>
                                     ))}
                                 </ul>
