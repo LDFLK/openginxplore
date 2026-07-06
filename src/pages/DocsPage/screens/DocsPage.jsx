@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Menu, X } from "lucide-react";
+import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "../components/CopyButton";
@@ -57,10 +58,9 @@ export default function DocsPage() {
     useEffect(() => {
         async function fetchDocFiles() {
             try {
-                const res = await fetch(
+                const { data } = await axios.get(
                     `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/docs?ref=${DOCS_BRANCH}&t=${Date.now()}`
                 );
-                const data = await res.json();
                 const mdFiles = Array.isArray(data)
                     ? data
                         .filter((f) => f.name.endsWith(".md"))
@@ -153,10 +153,10 @@ export default function DocsPage() {
 
         async function fetchMarkdown(fileName) {
             try {
-                const res = await fetch(
-                    `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${DOCS_BRANCH}/docs/${fileName}?t=${Date.now()}`
+                const { data: md } = await axios.get(
+                    `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${DOCS_BRANCH}/docs/${fileName}?t=${Date.now()}`,
+                    { responseType: "text" }
                 );
-                const md = await res.text();
                 if (cancelled) return;
                 setContent(md);
 

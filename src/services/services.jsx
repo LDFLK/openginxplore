@@ -6,6 +6,7 @@ const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : ""
 
 const GI_SERVICE_URL = "/v1/organisation";
 const GI_SERVICE_URL_PERSON = "/v1/person";
+const OPEN_GIN_REQUEST_CONFIG = { baseURL: "" };
 
 export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
   const { data } = await axios.post(
@@ -90,42 +91,27 @@ export const getPersonHistory = async ({ personId, signal }) => {
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
   try {
-    const response = await fetch(`${apiUrl}/v1/entities/search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const { data: result } = await axios.post(
+      `${apiUrl}/v1/entities/search`,
+      {
         kind: {
           major: "Document",
           minor: "extgztorg",
         },
-      }),
-    });
-
-    const responseForPerson = await fetch(`${apiUrl}/v1/entities/search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify({
+      OPEN_GIN_REQUEST_CONFIG
+    );
+
+    const { data: resultForPerson } = await axios.post(
+      `${apiUrl}/v1/entities/search`,
+      {
         kind: {
           major: "Document",
           minor: "extgztperson",
         },
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    if (!responseForPerson.ok) {
-      throw new Error(`API error: ${responseForPerson.statusText}`);
-    }
-
-    const result = await response.json();
-    const resultForPerson = await responseForPerson.json();
+      },
+      OPEN_GIN_REQUEST_CONFIG
+    );
 
     const datesList1 = result.body.map((item) => {
       return {
@@ -166,18 +152,13 @@ const fetchInitialGazetteData = async () => {
 
 const fetchPresidentsData = async (governmentNodeId = "gov_01") => {
   try {
-    const response = await fetch(
+    const { data: jsonResponse } = await axios.post(
       `${apiUrl}/v1/entities/${governmentNodeId}/relations`,
+      { name: "AS_PRESIDENT" },
       {
-        method: "POST",
-        body: JSON.stringify({ name: "AS_PRESIDENT" }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        ...OPEN_GIN_REQUEST_CONFIG,
       }
     );
-
-    const jsonResponse = await response.json();
 
     return jsonResponse;
   } catch (e) {
@@ -192,29 +173,20 @@ const fetchActiveMinistries = async (
   selectedPresident
 ) => {
   try {
-    const response = await fetch(
+    const { data: activeMinistryRelations } = await axios.post(
       `${apiUrl}/v1/entities/${selectedPresident.id}/relations`,
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          relatedEntityId: "",
-          startTime: "",
-          endTime: "",
-          id: "",
-          name: "AS_MINISTER",
-          activeAt: `${selectedDate.date}T00:00:00Z`,
-        }),
+        relatedEntityId: "",
+        startTime: "",
+        endTime: "",
+        id: "",
+        name: "AS_MINISTER",
+        activeAt: `${selectedDate.date}T00:00:00Z`,
+      },
+      {
+        ...OPEN_GIN_REQUEST_CONFIG,
       }
     );
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    const activeMinistryRelations = await response.json();
 
     // Extract relatedEntityId and startTime from each relation
     const activeMinistryInfo = activeMinistryRelations
@@ -265,30 +237,21 @@ const fetchActiveMinistries = async (
 
 const fetchAllPersons = async () => {
   try {
-    const response = await fetch(`${apiUrl}/v1/entities/search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const { data } = await axios.post(
+      `${apiUrl}/v1/entities/search`,
+      {
         kind: {
           major: "Person",
           minor: "citizen",
         },
-      }),
-    });
+      },
+      OPEN_GIN_REQUEST_CONFIG
+    );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    return response;
+    return data;
   } catch (error) {
     console.error("Error fetching person data from API:", error);
-    return {
-      dates: [],
-      allMinistryData: [],
-    };
+    return { body: [] };
   }
 };
 
@@ -298,29 +261,22 @@ const fetchActiveRelationsForMinistry = async (
   relationType
 ) => {
   try {
-    const response = await fetch(
+    const { data } = await axios.post(
       `${apiUrl}/v1/entities/${ministryId}/relations`,
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          relatedEntityId: "",
-          startTime: "",
-          endTime: "",
-          id: "",
-          name: relationType,
-          activeAt: `${selectedDate}T00:00:00Z`,
-        }),
+        relatedEntityId: "",
+        startTime: "",
+        endTime: "",
+        id: "",
+        name: relationType,
+        activeAt: `${selectedDate}T00:00:00Z`,
+      },
+      {
+        ...OPEN_GIN_REQUEST_CONFIG,
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    return response;
+    return data;
   } catch (error) {
     console.error("Error fetching active ministries:", error);
   }
@@ -328,68 +284,50 @@ const fetchActiveRelationsForMinistry = async (
 
 const fetchAllDepartments = async () => {
   // Fetch all department protobuf data
-  const response = await fetch(`${apiUrl}/v1/entities/search`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  const { data } = await axios.post(
+    `${apiUrl}/v1/entities/search`,
+    {
       kind: {
         major: "Organisation",
         minor: "department",
       },
-    }),
-  });
+    },
+    OPEN_GIN_REQUEST_CONFIG
+  );
 
-  if (!response.ok) {
-    throw new Error(`API error: ${response.statusText}`);
-  }
-
-  return response;
+  return data;
 };
 
 const fetchAllStateMinistries = async () => {
   // Fetch all state ministries protobuf data
-  const response = await fetch(`${apiUrl}/v1/entities/search`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  const { data } = await axios.post(
+    `${apiUrl}/v1/entities/search`,
+    {
       kind: {
         major: "Organisation",
         minor: "stateMinister",
       },
-    }),
-  });
+    },
+    OPEN_GIN_REQUEST_CONFIG
+  );
 
-  if (!response.ok) {
-    throw new Error(`API error: ${response.statusText}`);
-  }
-
-  return response;
+  return data;
 };
 
 const fetchAllCabinetMinistries = async () => {
   // Fetch all cabinet ministries protobuf data
-  const response = await fetch(`${apiUrl}/v1/entities/search`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  const { data } = await axios.post(
+    `${apiUrl}/v1/entities/search`,
+    {
       kind: {
         major: "Organisation",
         minor: "cabinetMinister",
       },
-    }),
-  });
+    },
+    OPEN_GIN_REQUEST_CONFIG
+  );
 
-  if (!response.ok) {
-    throw new Error(`API error: ${response.statusText}`);
-  }
-
-  return response;
+  return data;
 };
 
 const fetchAllRelationsForMinistry = async ({
@@ -402,29 +340,21 @@ const fetchAllRelationsForMinistry = async ({
   activeAt = "",
 }) => {
   try {
-    const response = await fetch(
+    const { data: json } = await axios.post(
       `${apiUrl}/v1/entities/${ministryId}/relations`,
       {
-        method: "POST",
-        body: JSON.stringify({
-          relatedEntityId: relatedEntityId,
-          startTime: startTime,
-          endTime: endTime,
-          id: id,
-          name: name,
-          activeAt: activeAt,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        relatedEntityId: relatedEntityId,
+        startTime: startTime,
+        endTime: endTime,
+        id: id,
+        name: name,
+        activeAt: activeAt,
+      },
+      {
+        ...OPEN_GIN_REQUEST_CONFIG,
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    const json = await response.json();
     return json;
   } catch (error) {
     console.error(
@@ -464,19 +394,12 @@ const createDepartmentHistoryDictionary = async (allMinistryData) => {
 const chatbotApiCall = async (question, session_id) => {
   try {
     console.log(`this is the question ${question}`);
-    const response = await fetch(`/chat`, {
-      method: "POST",
-      body: JSON.stringify({ question, session_id }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const { data: json } = await axios.post(
+      `/chat`,
+      { question, session_id },
+      OPEN_GIN_REQUEST_CONFIG
+    );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    const json = await response.json();
     return json;
   } catch (error) {
     console.error(`Chat Error`, error);
@@ -486,24 +409,17 @@ const chatbotApiCall = async (question, session_id) => {
 
 const getMinistriesByDepartment = async (departmentId) => {
   try {
-    const response = await fetch(
+    const { data } = await axios.post(
       `${apiUrl}/v1/entities/${departmentId}/relations`,
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: "AS_DEPARTMENT",
-        }),
+        name: "AS_DEPARTMENT",
+      },
+      {
+        ...OPEN_GIN_REQUEST_CONFIG,
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    return response;
+    return data;
   } catch (error) {
     console.error("Error fetching past ministries for department:", error);
   }
@@ -511,24 +427,17 @@ const getMinistriesByDepartment = async (departmentId) => {
 
 const getDepartmentRenamedInfo = async (departmentId) => {
   try {
-    const response = await fetch(
+    const { data } = await axios.post(
       `${apiUrl}/v1/entities/${departmentId}/relations`,
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: "RENAMED_TO",
-        }),
+        name: "RENAMED_TO",
+      },
+      {
+        ...OPEN_GIN_REQUEST_CONFIG,
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    return response;
+    return data;
   } catch (error) {
     console.error("Error fetching renamed department info:", error);
   }
@@ -536,24 +445,17 @@ const getDepartmentRenamedInfo = async (departmentId) => {
 
 const getMinistriesByPerson = async (personId) => {
   try {
-    const response = await fetch(
+    const { data } = await axios.post(
       `${apiUrl}/v1/entities/${personId}/relations`,
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: "AS_APPOINTED",
-        }),
+        name: "AS_APPOINTED",
+      },
+      {
+        ...OPEN_GIN_REQUEST_CONFIG,
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
-    return response;
+    return data;
   } catch (error) {
     console.error("Error fetching renamed department info:", error);
   }
