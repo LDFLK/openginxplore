@@ -81,7 +81,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                         callback: true,
                         callbackLink: location.state?.from,
                       }}
-                      className="text-accent font-medium hover:text-accent/80 transition-colors"
+                      className="text-primary hover:underline transition-colors"
                       style={{ fontSize: "1rem" }}
                     >
                       {entry.ministry_name}
@@ -97,7 +97,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                               callback: true,
                               callbackLink: location.state?.from,
                             }}
-                            className="text-accent text-normal font-medium hover:text-accent/80 transition-colors"
+                            className="text-accent text-normal font-medium hover:text-accent/80 hover:underline transition-colors"
                           >
                             {entry.minister_name}
                           </Link>
