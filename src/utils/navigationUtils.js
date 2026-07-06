@@ -12,15 +12,15 @@ import {
  * @returns {string} URL path with query params for `/organization`
  */
 export function buildCabinetStructureUrlFromHistoryEntry(entry, gazetteDates) {
-    const { startDate, endDate } = parseDepartmentHistoryPeriod(entry.period);
+    const { startDate, endDate } = parseDepartmentHistoryPeriod(entry?.period);
     const selectedDate = resolveGazetteDateOnOrAfter(startDate, gazetteDates);
 
     const params = new URLSearchParams();
     params.set("view", "cabinet-structure");
-    params.set("startDate", startDate);
-    params.set("endDate", endDate);
-    params.set("selectedDate", selectedDate);
-    params.set("ministry", entry.ministry_id);
+    if (startDate) params.set("startDate", startDate);
+    if (endDate) params.set("endDate", endDate);
+    if (selectedDate) params.set("selectedDate", selectedDate);
+    if (entry?.ministry_id) params.set("ministry", entry.ministry_id);
 
     return `/organization?${params.toString()}`;
 }
