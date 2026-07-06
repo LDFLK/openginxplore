@@ -44,16 +44,40 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'chromium-mobile',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 812 } },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'chromium-tablet',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 768, height: 1024 } },
     },
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: 'chromium-desktop',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
+    },
+    {
+      name: 'firefox-mobile',
+      use: { ...devices['Desktop Firefox'], viewport: { width: 375, height: 812 } },
+    },
+    {
+      name: 'firefox-tablet',
+      use: { ...devices['Desktop Firefox'], viewport: { width: 768, height: 1024 } },
+    },
+    {
+      name: 'firefox-desktop',
+      use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 800 } },
+    },
+    {
+      name: 'webkit-mobile',
+      use: { ...devices['Desktop Safari'], viewport: { width: 375, height: 812 } },
+    },
+    {
+      name: 'webkit-tablet',
+      use: { ...devices['Desktop Safari'], viewport: { width: 768, height: 1024 } },
+    },
+    {
+      name: 'webkit-desktop',
+      use: { ...devices['Desktop Safari'], viewport: { width: 1280, height: 800 } },
     },
   ],
 });

@@ -236,18 +236,13 @@ async function setupMocks(page) {
   });
 }
 
-// Viewport loop
+// Viewport per browser/viewport combination is configured via the project's
+// `use.viewport` in playwright.config.js (e.g. chromium-mobile, firefox-tablet, webkit-desktop)
+// rather than looping over sizes here, so each combination runs as its own Playwright project.
 
-const VIEWPORTS = [
-  { name: 'Mobile',  width: 375,  height: 812  },
-  { name: 'Tablet',  width: 768,  height: 1024 },
-  { name: 'Desktop', width: 1280, height: 800  },
-];
+test('Profile full flow', async ({ page, browserName }, testInfo) => {
+    const projectName = testInfo.project.name;
 
-for (const viewport of VIEWPORTS) {
-  test(`Profile full flow - ${viewport.name} (${viewport.width}px)`, async ({ page, browserName }) => {
-
-    await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await setupMocks(page);
 
     // Step 1: Go to org page
@@ -271,7 +266,7 @@ for (const viewport of VIEWPORTS) {
 
     // Step 4: URL check
     await expect(page).toHaveURL(new RegExp(`person-profile/${PERSON_ID}`), { timeout: 15000 });
-    await page.screenshot({ path: `test-results/profile-${viewport.name.toLowerCase()}-${browserName}.png` });
+    await page.screenshot({ path: `test-results/profile-${projectName}.png` });
 
     // Step 5: Profile data visible
     await expect(page.getByText('Test Person One')).toBeVisible({ timeout: 10000 });
@@ -313,7 +308,7 @@ for (const viewport of VIEWPORTS) {
     await expect(portfoliosTab).toBeVisible({ timeout: 10000 });
     await portfoliosTab.click();
     await expect(portfoliosTab).toHaveClass(/border-accent/, { timeout: 5000 });
-    await page.screenshot({ path: `test-results/portfolios-${viewport.name.toLowerCase()}-${browserName}.png` });
+    await page.screenshot({ path: `test-results/portfolios-${projectName}.png` });
 
     // Step 9: Qualifications tab
     const qualificationsTab = page.locator('button', { hasText: 'Qualifications' });
@@ -322,22 +317,21 @@ for (const viewport of VIEWPORTS) {
     // synthetic pointer click to this element (confirmed: app logic is correct — dispatching
     // a plain 'click' event works instantly, but Playwright's simulated mouse click does not
     // register at this viewport in Firefox). Fall back to dispatchEvent for that combination only.
-    if (browserName === 'firefox' && viewport.name === 'Mobile') {
+    if (projectName === 'firefox-mobile') {
       await qualificationsTab.dispatchEvent('click');
     } else {
       await qualificationsTab.click();
     }
     await expect(qualificationsTab).toHaveClass(/border-accent/, { timeout: 5000 });
-    await page.screenshot({ path: `test-results/qualifications-${viewport.name.toLowerCase()}-${browserName}.png` });
+    await page.screenshot({ path: `test-results/qualifications-${projectName}.png` });
 
     // Step 10: Back button
     const backButton = page.locator('button', { hasText: 'Back' });
     await expect(backButton).toBeVisible({ timeout: 10000 });
     await backButton.click();
     await expect(page).toHaveURL(/organization/, { timeout: 15000 });
-    await page.screenshot({ path: `test-results/back-${viewport.name.toLowerCase()}-${browserName}.png` });
-  });
-}
+    await page.screenshot({ path: `test-results/back-${projectName}.png` });
+});
 
 // Direct profile page navigation 
 // This path goes through DataLoadingAnimatedComponent with mode="person-profile",

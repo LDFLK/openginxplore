@@ -170,11 +170,12 @@ npm run dev
 npx playwright test
 ```
 
-### Run on a Single Browser
+### Run on a Single Browser/Viewport
+Each browser + viewport combination is its own project (see `playwright.config.js`):
 ```bash
-npx playwright test --project=chromium
-npx playwright test --project=firefox
-npx playwright test --project=webkit
+npx playwright test --project=chromium-mobile
+npx playwright test --project=firefox-tablet
+npx playwright test --project=webkit-desktop
 ```
 
 ### Run a Specific Test File
