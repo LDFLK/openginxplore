@@ -27,7 +27,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
 
     const handleLinkClick = useCallback((link) => {
         setSelectedNode(null);
-        setSelectedLink((prev) => 
+        setSelectedLink((prev) =>
             (prev?.source?.id === link.source?.id && prev?.target?.id === link.target?.id) ? null : link
         );
     }, []);
@@ -68,7 +68,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
                             <ul className="list-disc list-inside space-y-0.5 pl-1">
                                 <li>Each column represents a date when one or more changes may have occurred.</li>
                                 <li>Hover over a flow to view details about the departments involved.</li>
-                                <li>You can select up to 3 dates to compare.</li>
+                                <li>You can select up to 10 dates to compare.</li>
                             </ul>
                         </div>
                     </div>
@@ -109,7 +109,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
                         <div className="mt-4 mb-4 ms-0 me-0 rounded-lg border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
                             <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {selectedDates.length === 1 ? "Select at least 2 dates to compare" : "Select up to 3 dates to compare"}
+                                {selectedDates.length === 1 ? "Select at least 2 dates to compare" : "Select up to 10 dates to compare"}
                             </p>
                             <p className="text-xs text-gray-400 dark:text-gray-500 max-w-md">
                                 {selectedDates.length === 1

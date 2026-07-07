@@ -26,7 +26,7 @@ const Organization = ({ dateRange }) => {
 
   const handleMultiSelectChange = useCallback((date) => {
     setMultiSelectedDates((prev) =>
-      prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date].slice(-3) // Max 3 dates allowed
+      prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date].slice(-10) // Max 10 dates allowed
     );
   }, []);
 
