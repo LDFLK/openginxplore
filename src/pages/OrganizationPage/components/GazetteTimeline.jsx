@@ -137,7 +137,7 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
     >
       {gazetteData?.length > 0 && selectedPresident && (
         <div className="text-center text-[10px] md:text-xs text-primary/60 px-1 mt-2">
-          {utils.extractNameFromProtobuf(selectedPresident.name).split(" ").slice(0, 2).join(" ")}'s Gazettes published dates
+          {utils.extractNameFromProtobuf(selectedPresident.name).split(" ").slice(0, 2).join(" ")}'s Gazette Publication Dates
         </div>
       )}
 

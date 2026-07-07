@@ -348,7 +348,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     <div className="rounded-lg w-full">
       {dateRange && dateRange[0] && dateRange[1] && (
         <div className="text-center text-[10px] md:text-xs text-primary/60 mb-4 px-1">
-          Presidents During This Period: {new Date(dateRange[0]).toLocaleDateString("en-CA")} to {new Date(dateRange[1]).toLocaleDateString("en-CA")}
+          Presidents During The Period {new Date(dateRange[0]).toLocaleDateString("en-CA")} to {new Date(dateRange[1]).toLocaleDateString("en-CA")}
         </div>
       )}
       {filteredPresidents.length > 4 && (
@@ -408,7 +408,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                       to={`/person-profile/${president?.id}`}
                       onClick={(e) => e.stopPropagation()}
                       state={{ mode: "back", from: location.pathname + location.search }}
-                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
+                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex items-center"
                     >
                       <EyeIcon size={16} className="mr-1" />
                       <p>View Profile</p>
