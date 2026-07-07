@@ -281,7 +281,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     window.history.replaceState({}, "", url.toString());
   }, [selectedDate, location.search, initializedFromUrl]);
 
-  // Monitor URL parameter changes when already on /organization route
+  // Monitor URL parameter changes when already on /executive-branch route
   useEffect(() => {
     // Only run after initial URL initialization is complete
     if (!initializedFromUrl) return;

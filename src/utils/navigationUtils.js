@@ -86,7 +86,7 @@ export const handleResultNavigation = async (result, {
             params.set("filterByName", result.name);
 
             if (onComplete) onComplete();
-            navigate(`/organization?${params.toString()}`, {
+            navigate(`/executive-branch?${params.toString()}`, {
                 state: { searchResultName: result.name },
             });
             break;
