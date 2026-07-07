@@ -19,11 +19,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     const parseDate = d3.utcParse("%Y-%m-%d");
     const formatDate = d3.utcFormat("%b %d %Y");
 
-    const container = d3.select(containerRef.current);
-
-    // Clear any existing SVG content & tooltips
+    // Clear any existing SVG content
     d3.select(svgRef.current).selectAll("*").remove();
-    container.selectAll(".sankey-tooltip").remove();
 
     const svg = d3
       .select(svgRef.current)
@@ -150,101 +147,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("offset", "100%")
       .attr("stop-color", (d) => color(d.target.id));
 
-    // Tooltip — pinned next to the hovered/clicked link's nodes, not the cursor
-    const tooltip = container
-      .append("div")
-      .attr("class", "sankey-tooltip")
-      .style("position", "absolute")
-      .style("background", "rgba(0, 0, 0, 0.85)")
-      .style("color", "#fff")
-      .style("padding", "8px 10px")
-      .style("border-radius", "4px")
-      .style("font-size", "12px")
-      .style("pointer-events", "none")
-      .style("opacity", 0)
-      // FIX: constrain width so it never exceeds the container
-      .style("max-width", "min(260px, 80%)")
-      .style("word-wrap", "break-word")
-      .style("white-space", "normal")
-      .style("line-height", "1.5")
-      // Prevent the tooltip itself from causing the container to grow
-      .style("box-sizing", "border-box");
-
-    // Hovering the link or the tooltip itself keeps it open; leaving both hides it
-    let hideTimer = null;
-
-    // Repositions the tooltip relative to the current cursor position so it
-    // tracks the mouse while hovering a link.
-    const positionTooltipAtCursor = (event) => {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const tooltipNode = tooltip.node();
-      const tooltipWidth = tooltipNode.offsetWidth;
-      const tooltipHeight = tooltipNode.offsetHeight;
-      const MARGIN = 8;
-
-      // The chart container can be taller/wider than the actual browser
-      // viewport (e.g. a tall chart with many nodes), so clamp against
-      // both the container's own box AND the visible viewport — in
-      // container-local coordinates — and use whichever is tighter.
-      const minX = Math.max(0, -containerRect.left) + MARGIN;
-      const maxX = Math.min(containerRect.width, window.innerWidth - containerRect.left) - tooltipWidth - MARGIN;
-      const minY = Math.max(0, -containerRect.top) + MARGIN;
-      const maxY = Math.min(containerRect.height, window.innerHeight - containerRect.top) - tooltipHeight - MARGIN;
-
-      let x = event.clientX - containerRect.left + 12;
-      let y = event.clientY - containerRect.top + 12;
-
-      if (x > maxX) {
-        x = event.clientX - containerRect.left - tooltipWidth - 12;
-      }
-      x = Math.min(Math.max(x, minX), maxX);
-
-      if (y > maxY) {
-        y = event.clientY - containerRect.top - tooltipHeight - 12;
-      }
-      y = Math.min(Math.max(y, minY), maxY);
-
-      tooltip.style("left", `${x}px`).style("top", `${y}px`);
-    };
-
-    const showTooltip = (d, event) => {
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-      tooltip
-        .style("pointer-events", "auto")
-        .html(`
-          <div>
-            <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
-            ${d.value} department${d.value > 1 ? "s" : ""} moved
-          </div>
-        `);
-
-      positionTooltipAtCursor(event);
-
-      tooltip.transition().duration(200).style("opacity", 1);
-    };
-
-    const hideTooltipDelayed = () => {
-      hideTimer = setTimeout(() => {
-        tooltip
-          .transition()
-          .duration(200)
-          .style("opacity", 0)
-          .on("end", () => tooltip.style("pointer-events", "none"));
-      }, 150);
-    };
-
-    tooltip
-      .on("mouseenter", () => {
-        if (hideTimer) {
-          clearTimeout(hideTimer);
-          hideTimer = null;
-        }
-      })
-      .on("mouseleave", hideTooltipDelayed);
-
     // Links
     svg
       .append("g")
@@ -263,22 +165,20 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         if (!isHighlighted(d) && hasActiveSelection) {
           link.attr("stroke", greyColorHover);
         }
-        showTooltip(d, event);
-      })
-      .on("mousemove", (event) => {
-        positionTooltipAtCursor(event);
       })
       .on("mouseout", (event, d) => {
         const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", restingOpacity(d));
         if (!isHighlighted(d) && hasActiveSelection) {
           link.attr("stroke", greyColor);
         }
-        hideTooltipDelayed();
       })
       .on("click", (event, d) => {
         event.stopPropagation();
-        showTooltip(d, event);
-        onLinkClick?.(d);
+        if (isSelectedLink(d)) {
+          onClearSelection?.();
+        } else {
+          onLinkClick?.(d);
+        }
       });
 
     // Column date labels
@@ -377,11 +277,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .on("mouseleave", function () {
         d3.select(this).style("text-decoration", null);
       });
-
-    return () => {
-      if (hideTimer) clearTimeout(hideTimer);
-      tooltip.remove();
-    };
   }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onClearSelection, selectedLink, selectedNode]);
 
   return (
