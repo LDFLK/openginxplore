@@ -173,9 +173,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     // Hovering the link or the tooltip itself keeps it open; leaving both hides it
     let hideTimer = null;
 
-    // Pins the tooltip right where the cursor entered/clicked the link, once —
-    // it does NOT track mousemove afterwards, so it stays put under the cursor
-    // instead of requiring the user to travel to find it.
+    // Repositions the tooltip relative to the current cursor position so it
+    // tracks the mouse while hovering a link.
     const positionTooltipAtCursor = (event) => {
       const containerRect = containerRef.current.getBoundingClientRect();
       const tooltipNode = tooltip.node();
@@ -265,6 +264,9 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           link.attr("stroke", greyColorHover);
         }
         showTooltip(d, event);
+      })
+      .on("mousemove", (event) => {
+        positionTooltipAtCursor(event);
       })
       .on("mouseout", (event, d) => {
         const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", restingOpacity(d));
