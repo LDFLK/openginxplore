@@ -17,6 +17,7 @@ import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
+import Error404 from "../../ErrorBoundaries/screens/404Error";
 import { toast } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
@@ -28,6 +29,11 @@ export default function HomePage() {
   const [isExpanded, setIsExpanded] = useState(window.innerWidth >= 768);
   const navigate = useNavigate();
   const { tab } = useParams();
+
+  const validTabs = ["executive-branch", "data", "search"];
+  if (tab && !validTabs.includes(tab)) {
+    return <Error404 />;
+  }
 
   const selectedTab = tab || "executive-branch";
 

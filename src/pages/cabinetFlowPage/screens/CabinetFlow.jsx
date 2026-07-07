@@ -27,7 +27,9 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
 
     const handleLinkClick = useCallback((link) => {
         setSelectedNode(null);
-        setSelectedLink(link);
+        setSelectedLink((prev) => 
+            (prev?.source?.id === link.source?.id && prev?.target?.id === link.target?.id) ? null : link
+        );
     }, []);
     const handleNodeClick = useCallback((node) => {
         setSelectedLink(null);
