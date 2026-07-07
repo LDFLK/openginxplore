@@ -9,7 +9,7 @@ import StyledBadge from "../../../components/materialCustomAvatar";
 import { useThemeContext } from "../../../context/themeContext";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Divide, Files } from "lucide-react";
+import { Divide, Files, Calendar } from "lucide-react";
 
 export default function GazetteTimeline({ multiSelect = false, multiSelectedDates = [], onMultiSelectChange }) {
   const dispatch = useDispatch();
@@ -132,21 +132,14 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 2,
         width: "100%",
-        mb: { xs: "-20px", md: "auto" }
+        mb: { xs: -1, md: -3 }
       }}
     >
-      {gazetteData?.length > 0 && (
-        <Typography
-          sx={{
-            fontSize: { xs: "0.7rem", md: "0.95rem" },
-            color: `${colors.textPrimary}99`,
-            textAlign: "center",
-          }}
-        >
-          {selectedPresident && (`${utils.extractNameFromProtobuf(selectedPresident?.name).split(" ")[0]}'s Gazettes published dates`)}
-        </Typography>
+      {gazetteData?.length > 0 && selectedPresident && (
+        <div className="text-center text-[10px] md:text-xs text-primary/60 px-1 mt-2">
+          {utils.extractNameFromProtobuf(selectedPresident.name).split(" ").slice(0, 2).join(" ")}'s Gazettes published dates
+        </div>
       )}
 
       {selectedPresident && (
@@ -216,7 +209,7 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
             sx={{
               display: "flex",
               overflowX: "auto",
-              gap: 2,
+              gap: { xs: 4, sm: 3.25 },
               padding: { xs: 2, sm: 4 },
               paddingLeft: { xs: 22, sm: 28 },
               paddingRight: { xs: 8, sm: 14 },

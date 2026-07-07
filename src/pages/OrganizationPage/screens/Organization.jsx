@@ -147,34 +147,42 @@ const Organization = ({ dateRange }) => {
         </div>
       )}
 
-      {/* Card wrapper for Timeline and Content */}
-      <div className="bg-card rounded-lg border border-border p-2 md:p-4 mx-2 md:mx-4 mb-4">
-        {/* Gazette Timeline visible for both views */}
+      {/* Gazette Timeline (Moved outside the white box) */}
+      <div className="px-2 md:px-4">
         <GazetteTimeline
           multiSelect={activeView === "department-flow"}
           multiSelectedDates={multiSelectedDates}
           onMultiSelectChange={handleMultiSelectChange}
         />
+      </div>
 
-        {/* View Toggle Tabs (Moved below GazetteTimeline) */}
-        <div className="flex border-b border-border mt-2 mb-4 gap-1">
+      {/* Card wrapper for Content */}
+      <div className="bg-card rounded-lg border border-border p-2 md:p-4 mx-2 md:mx-4 mb-4">
+        {/* View Toggle Tabs */}
+        <div className="flex items-end border-b border-border mb-4 gap-2 px-2">
           <button
             onClick={() => toggleView("cabinet-structure")}
-            className={`px-4 py-2 text-sm font-medium transition-all duration-200 hover:cursor-pointer rounded-t-lg border-t border-l border-r ${activeView === "cabinet-structure"
-              ? "bg-card border-border text-foreground -mb-[1px] shadow-sm z-10"
-              : "bg-muted border-transparent text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "cabinet-structure"
+              ? "bg-card border-border text-primary"
+              : "bg-muted border-transparent text-primary/60 hover:bg-muted/80 hover:text-primary"
               }`}
           >
             Structure
+            {activeView === "cabinet-structure" && (
+              <div className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-card" />
+            )}
           </button>
           <button
             onClick={() => toggleView("department-flow")}
-            className={`px-4 py-2 text-sm font-medium transition-all duration-200 hover:cursor-pointer rounded-t-lg border-t border-l border-r ${activeView === "department-flow"
-              ? "bg-card border-border text-foreground -mb-[1px] shadow-sm z-10"
-              : "bg-muted border-transparent text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "department-flow"
+              ? "bg-card border-border text-primary"
+              : "bg-muted border-transparent text-primary/60 hover:bg-muted/80 hover:text-primary"
               }`}
           >
             Changes
+            {activeView === "department-flow" && (
+              <div className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-card" />
+            )}
           </button>
         </div>
 
