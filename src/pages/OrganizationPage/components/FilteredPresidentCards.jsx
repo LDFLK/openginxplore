@@ -363,8 +363,8 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                 onClick={() => selectPresidentAndDates(president)}
                 className={`min-w-[60vw] sm:min-w-[300px] md:min-w-0 flex-shrink-0 snap-center flex items-center p-1.5 md:p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
     ${isSelected
-                    ? "bg-accent/20 border-accent/35 shadow-md"
-                    : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
+                    ? "bg-accent/20 border-accent/35 shadow-md opacity-100"
+                    : "bg-card border-border shadow-sm opacity-80 hover:opacity-100 hover:bg-muted"
                   }`}
               >
                 <PersonAvatar

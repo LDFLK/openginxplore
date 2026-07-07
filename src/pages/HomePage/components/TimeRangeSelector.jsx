@@ -770,7 +770,7 @@ export default function TimeRangeSelector({
   };
 
   return (
-    <div className="bg-background border-b border-border p-2 md:p-4 w-full mx-auto">
+    <div className="bg-card border-b border-border p-2 md:p-4 w-full mx-auto">
       {/* Presets and calendar */}
       <div className="hidden md:block pb-2 md:pb-4 px-1 text-primary text-center md:text-left md:px-0 text-xs md:text-sm font-medium md:font-semibold">
         Select a date range
@@ -815,9 +815,9 @@ export default function TimeRangeSelector({
               setActivePreset(preset.label);
               setActivePresident("");
             }}
-            className={`px-3 py-1 rounded-md text-xs md:text-sm font-medium transition-colors border ${activePreset === preset.label
-                ? "bg-accent text-primary-foreground border-accent"
-                : "bg-background text-foreground border-border hover:bg-muted"
+            className={`px-2 py-1 cursor-pointer rounded-md text-xs md:text-sm font-medium transition-colors border ${activePreset === preset.label
+              ? "bg-accent text-primary-foreground border-accent"
+              : "bg-card text-foreground border-border hover:bg-muted"
               }`}
           >
             {preset.label}
@@ -828,9 +828,9 @@ export default function TimeRangeSelector({
         <div className="relative w-full md:w-56 text-xs">
           {/* Main button */}
           <button
-            className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center ${activePresident
+            className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center border border-border ${activePresident
               ? "bg-accent/20 text-primary"
-              : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
+              : "hover:bg-muted bg-card text-primary hover:cursor-pointer"
               }`}
             onClick={() => setIsDropdownOpen((o) => !o)}
           >
@@ -957,12 +957,10 @@ export default function TimeRangeSelector({
               setCalendarEnd(endDate);
               setCalendarOpen((o) => !o);
             }}
-            className={`flex items-center justify-center gap-2 w-full sm:w-auto px-2.5 py-1.5 text-xs rounded-md transition-colors cursor-pointer
-      ${calendarRange &&
-                startDate.toISOString() === calendarRange.start &&
-                endDate.toISOString() === calendarRange.end
-                ? "bg-accent text-white hover:bg-accent"
-                : "bg-foreground/10 text-primary font-medium hover:bg-border"
+            className={`flex items-center justify-center w-full sm:w-auto px-4 py-1.5 text-xs font-medium cursor-pointer rounded-md focus:outline-none border border-border ${
+              calendarRange && startDate.toISOString() === calendarRange.start && endDate.toISOString() === calendarRange.end
+                ? "bg-accent/20 text-primary"
+                : "hover:bg-muted bg-card text-primary"
               }`}
           >
             By Date
