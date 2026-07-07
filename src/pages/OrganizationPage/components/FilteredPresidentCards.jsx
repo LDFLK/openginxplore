@@ -7,7 +7,7 @@ import {
 } from "../../../store/presidencySlice";
 import { setGazetteData } from "../../../store/gazetteDate";
 import { Link, useLocation } from "react-router-dom";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, Calendar } from "lucide-react";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
 import PersonAvatar from "../../../components/PersonAvatar";
 
@@ -346,6 +346,11 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
   return (
     <div className="rounded-lg w-full">
+      {dateRange && dateRange[0] && dateRange[1] && (
+        <div className="text-center text-[10px] md:text-xs text-primary/60 mb-4 px-1">
+          Presidents During This Period: {new Date(dateRange[0]).toLocaleDateString("en-CA")} to {new Date(dateRange[1]).toLocaleDateString("en-CA")}
+        </div>
+      )}
       {filteredPresidents.length > 4 && (
         <input
           type="text"
@@ -378,7 +383,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                 className={`min-w-[60vw] sm:min-w-[300px] md:min-w-0 flex-shrink-0 snap-center flex items-center p-1.5 md:p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
     ${isSelected
                     ? "bg-accent/20 border-accent/35 shadow-md opacity-100"
-                    : "bg-card border-border shadow-sm opacity-80 hover:opacity-100 hover:bg-muted"
+                    : "bg-card border-border shadow-sm opacity-80 hover:opacity-100 hover:bg-accent/10 hover:border-accent/20"
                   }`}
               >
                 <PersonAvatar
