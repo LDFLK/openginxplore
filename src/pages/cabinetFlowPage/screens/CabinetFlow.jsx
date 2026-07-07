@@ -1,22 +1,12 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Calendar, BarChart2, Building2, ArrowRight } from "lucide-react";
-import DateRangePicker from "../components/DateRangePicker";
 import CabinetFlowPanel from "../components/CabinetFlowPanel";
 import RightSidePanel from "../../../components/RightSidePanel";
 import { useEntityNames } from "../../../hooks/useEntityNames";
 
-const formatEndDateForPicker = (finalEnd, hasPresidentEndTime) => {
-    if (!hasPresidentEndTime) {
-        return finalEnd.toISOString().split("T")[0];
-    }
-    const d = new Date(finalEnd);
-    d.setDate(d.getDate() - 1);
-    return d.toISOString().split("T")[0];
-};
-
-const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClick }) => {
+const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = [], onMinistryNodeClick }) => {
     const location = useLocation();
     const { gazetteData } = useSelector((state) => state.gazettes);
     const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
@@ -24,56 +14,6 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
         (s) => s.presidency.presidentRelationDict
     );
     const presidentRelation = presidentRelationDict[presidentId];
-
-    const [rangeStart, rangeEnd] = dateRange;
-
-    const { startDate, endDate } = useMemo(() => {
-        if (!presidentRelation?.startTime) {
-            return { startDate: null, endDate: null };
-        }
-
-        const presStart = new Date(presidentRelation.startTime.split("T")[0]);
-        const hasPresidentEndTime = !!presidentRelation.endTime;
-        const presEnd = hasPresidentEndTime
-            ? new Date(presidentRelation.endTime.split("T")[0])
-            : new Date();
-
-        const finalStart = rangeStart
-            ? new Date(Math.max(presStart.getTime(), rangeStart.getTime()))
-            : presStart;
-        const finalEnd = rangeEnd
-            ? new Date(Math.min(presEnd.getTime(), rangeEnd.getTime()))
-            : presEnd;
-
-        const start = finalStart.toISOString().split("T")[0];
-        let end = formatEndDateForPicker(finalEnd, hasPresidentEndTime);
-
-        if (start > end) {
-            end = start;
-        }
-
-        return { startDate: start, endDate: end };
-    }, [presidentRelation, rangeStart, rangeEnd]);
-
-    const [selectedDates, setSelectedDates] = useState([]);
-
-    useEffect(() => {
-        if (!startDate) {
-            setSelectedDates([]);
-            return;
-        }
-        const init = [startDate];
-        if (endDate && endDate !== startDate) {
-            init.push(endDate);
-        }
-        setSelectedDates(init);
-    }, [startDate, endDate, presidentId]);
-
-    const handleToggleDate = useCallback((date) => {
-        setSelectedDates((prev) =>
-            prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date]
-        );
-    }, []);
 
     const sortedDates = [...selectedDates].sort();
 
@@ -141,26 +81,10 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                                     >
                                         <Calendar size={11} />
                                         {d}
-                                        <button
-                                            onClick={() => handleToggleDate(d)}
-                                            className="ml-1 hover:text-red-400 transition-colors hover:cursor-pointer"
-                                        >
-                                            ×
-                                        </button>
                                     </span>
                                 ))}
                             </div>
                         )}
-                        <div className="flex justify-end gap-2">
-                            <DateRangePicker
-                                startDate={startDate}
-                                endDate={endDate}
-                                selectedDates={selectedDates}
-                                onToggle={handleToggleDate}
-                                maxDates={3}
-                                gazetteDates={gazetteDates}
-                            />
-                        </div>
                     </div>
                 </div>
             </div>

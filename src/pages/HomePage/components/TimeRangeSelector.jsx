@@ -815,9 +815,9 @@ export default function TimeRangeSelector({
               setActivePreset(preset.label);
               setActivePresident("");
             }}
-            className={`p-1 md:p-1.5 text-xs font-medium rounded-sm transition-colors hover:cursor-pointer ${activePreset === preset.label
-              ? "bg-accent/20 text-primary"
-              : "hover:bg-background/25 bg-foreground/10 text-primary hover:cursor-pointer"
+            className={`px-3 py-1 rounded-md text-xs md:text-sm font-medium transition-colors border ${activePreset === preset.label
+                ? "bg-accent text-primary-foreground border-accent"
+                : "bg-background text-foreground border-border hover:bg-muted"
               }`}
           >
             {preset.label}
