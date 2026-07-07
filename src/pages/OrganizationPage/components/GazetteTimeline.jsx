@@ -139,12 +139,12 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
       {gazetteData?.length > 0 && (
         <Typography
           sx={{
-            mb: "30px",
             fontSize: { xs: "0.7rem", md: "0.95rem" },
             color: `${colors.textPrimary}99`,
+            textAlign: "center",
           }}
         >
-          {selectedPresident ? `${utils.extractNameFromProtobuf(selectedPresident?.name).split(" ")[0]}'s` : "Gazettes"} published dates
+          {selectedPresident && (`${utils.extractNameFromProtobuf(selectedPresident?.name).split(" ")[0]}'s Gazettes published dates`)}
         </Typography>
       )}
 
@@ -234,8 +234,8 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
           >
             {gazetteData?.length > 0 ? (
               gazetteData.map((item) => {
-                const isDateSelected = multiSelect 
-                  ? multiSelectedDates.includes(item.date) 
+                const isDateSelected = multiSelect
+                  ? multiSelectedDates.includes(item.date)
                   : selectedDate?.date === item.date;
                 return (
                   <Box

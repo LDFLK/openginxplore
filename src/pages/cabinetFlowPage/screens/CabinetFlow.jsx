@@ -56,7 +56,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
     );
 
     return (
-        <div className="px-4 py-6 md:px-8 md:py-10 lg:px-12 xl:px-10 2xl:px-20 bg-background min-h-screen ms-4 me-4 mb-4 rounded-lg border border-border">
+        <div className="bg-background min-h-screen rounded-lg border border-border p-8">
             {/* ── Header ── */}
             <div className="w-full mb-6">
                 <div className="flex items-center justify-between gap-2">
@@ -104,7 +104,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
                             selectedNode={selectedNode}
                         />
                     ) : (
-                        <div className="mt-4 mb-4 ms-0 me-0 rounded-xl border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
+                        <div className="mt-4 mb-4 ms-0 me-0 rounded-lg border border-dashed border-border bg-gray-50 dark:bg-gray-900/50 flex flex-col items-center justify-center gap-2 py-20 px-6 text-center">
                             <BarChart2 size={28} className="text-gray-300 dark:text-gray-600" />
                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {selectedDates.length === 1 ? "Select at least 2 dates to compare" : "Select up to 3 dates to compare"}

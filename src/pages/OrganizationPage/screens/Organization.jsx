@@ -142,56 +142,59 @@ const Organization = ({ dateRange }) => {
     <div>
       {/* FilteredPresidentCards Component */}
       {dateRange[0] && dateRange[1] && (
-        <div className="mb-1 md:mb-6 px-2 md:px-4">
+        <div className="mb-4 px-2 md:px-4">
           <FilteredPresidentCards dateRange={dateRange} />
         </div>
       )}
 
-      {/* Gazette Timeline visible for both views */}
-      <GazetteTimeline
-        multiSelect={activeView === "department-flow"}
-        multiSelectedDates={multiSelectedDates}
-        onMultiSelectChange={handleMultiSelectChange}
-      />
+      {/* Card wrapper for Timeline and Content */}
+      <div className="bg-card rounded-lg border border-border p-2 md:p-4 mx-2 md:mx-4 mb-4">
+        {/* Gazette Timeline visible for both views */}
+        <GazetteTimeline
+          multiSelect={activeView === "department-flow"}
+          multiSelectedDates={multiSelectedDates}
+          onMultiSelectChange={handleMultiSelectChange}
+        />
 
-      {/* View Toggle Tabs (Moved below GazetteTimeline) */}
-      <div className="flex border-b border-border mt-2 mb-4 px-2 md:px-4 gap-1">
-        <button
-          onClick={() => toggleView("cabinet-structure")}
-          className={`px-4 py-2 text-sm font-medium transition-all duration-200 hover:cursor-pointer rounded-t-lg border-t border-l border-r ${activeView === "cabinet-structure"
-            ? "bg-background border-border text-foreground -mb-[1px] shadow-sm z-10"
-            : "bg-muted border-transparent text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-            }`}
-        >
-          Structure
-        </button>
-        <button
-          onClick={() => toggleView("department-flow")}
-          className={`px-4 py-2 text-sm font-medium transition-all duration-200 hover:cursor-pointer rounded-t-lg border-t border-l border-r ${activeView === "department-flow"
-            ? "bg-background border-border text-foreground -mb-[1px] shadow-sm z-10"
-            : "bg-muted border-transparent text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-            }`}
-        >
-          Changes
-        </button>
+        {/* View Toggle Tabs (Moved below GazetteTimeline) */}
+        <div className="flex border-b border-border mt-2 mb-4 gap-1">
+          <button
+            onClick={() => toggleView("cabinet-structure")}
+            className={`px-4 py-2 text-sm font-medium transition-all duration-200 hover:cursor-pointer rounded-t-lg border-t border-l border-r ${activeView === "cabinet-structure"
+              ? "bg-card border-border text-foreground -mb-[1px] shadow-sm z-10"
+              : "bg-muted border-transparent text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+              }`}
+          >
+            Structure
+          </button>
+          <button
+            onClick={() => toggleView("department-flow")}
+            className={`px-4 py-2 text-sm font-medium transition-all duration-200 hover:cursor-pointer rounded-t-lg border-t border-l border-r ${activeView === "department-flow"
+              ? "bg-card border-border text-foreground -mb-[1px] shadow-sm z-10"
+              : "bg-muted border-transparent text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+              }`}
+          >
+            Changes
+          </button>
+        </div>
+
+        {/* Conditional rendering based on active view */}
+        {activeView === "cabinet-structure" ? (
+          <>
+            {selectedPresident && <>{selectedDate != null && <MinistryCardGrid />}</>}
+          </>
+        ) : (
+          <LandscapeRequired onBack={() => toggleView("cabinet-structure")}>
+            <CabinetFlow
+              key={selectedPresident?.id}
+              presidentId={selectedPresident?.id}
+              dateRange={dateRange}
+              selectedDates={multiSelectedDates}
+              onMinistryNodeClick={handleMinistryNodeClick}
+            />
+          </LandscapeRequired>
+        )}
       </div>
-
-      {/* Conditional rendering based on active view */}
-      {activeView === "cabinet-structure" ? (
-        <>
-          {selectedPresident && <>{selectedDate != null && <MinistryCardGrid />}</>}
-        </>
-      ) : (
-        <LandscapeRequired onBack={() => toggleView("cabinet-structure")}>
-          <CabinetFlow
-            key={selectedPresident?.id}
-            presidentId={selectedPresident?.id}
-            dateRange={dateRange}
-            selectedDates={multiSelectedDates}
-            onMinistryNodeClick={handleMinistryNodeClick}
-          />
-        </LandscapeRequired>
-      )}
     </div>
   );
 };
