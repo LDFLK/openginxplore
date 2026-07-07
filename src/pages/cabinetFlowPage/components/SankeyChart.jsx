@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onClearSelection, selectedLink, selectedNode }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -150,7 +150,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("offset", "100%")
       .attr("stop-color", (d) => color(d.target.id));
 
-    // Tooltip — pinned next to the hovered link's nodes, not the cursor
+    // Tooltip — pinned next to the hovered/clicked link's nodes, not the cursor
     const tooltip = container
       .append("div")
       .attr("class", "sankey-tooltip")
@@ -172,10 +172,9 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
 
     // Hovering the link or the tooltip itself keeps it open; leaving both hides it
     let hideTimer = null;
-    let activeLinkData = null;
 
-    // Pins the tooltip right where the cursor entered the link, once — it
-    // does NOT track mousemove afterwards, so it stays put under the cursor
+    // Pins the tooltip right where the cursor entered/clicked the link, once —
+    // it does NOT track mousemove afterwards, so it stays put under the cursor
     // instead of requiring the user to travel to find it.
     const positionTooltipAtCursor = (event) => {
       const containerRect = containerRef.current.getBoundingClientRect();
@@ -214,7 +213,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         clearTimeout(hideTimer);
         hideTimer = null;
       }
-      activeLinkData = d;
       tooltip
         .style("pointer-events", "auto")
         .html(`
@@ -222,10 +220,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
             <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
             ${d.value} department${d.value > 1 ? "s" : ""} moved
           </div>
-          ${onLinkClick
-            ? `<button type="button" class="sankey-tooltip-link text-accent" style="margin-top:6px;display:inline-block;background:none;border:none;padding:0;font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;">View departments moved</button>`
-            : ""
-          }
         `);
 
       positionTooltipAtCursor(event);
@@ -250,13 +244,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           hideTimer = null;
         }
       })
-      .on("mouseleave", hideTooltipDelayed)
-      .on("click", (event) => {
-        event.stopPropagation();
-        if (event.target.closest(".sankey-tooltip-link") && activeLinkData) {
-          onLinkClick?.(activeLinkData);
-        }
-      });
+      .on("mouseleave", hideTooltipDelayed);
 
     // Links
     svg
@@ -270,7 +258,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("stroke", (d, i) => (isHighlighted(d) || !hasActiveSelection ? `url(#gradient-${i})` : greyColor))
       .attr("stroke-opacity", restingOpacity)
       .attr("stroke-width", (d) => Math.max(1, d.width))
-      .style("cursor", onLinkSingleClick ? "pointer" : "default")
+      .style("cursor", onLinkClick ? "pointer" : "default")
       .on("mouseover", (event, d) => {
         const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", 0.9);
         if (!isHighlighted(d) && hasActiveSelection) {
@@ -287,7 +275,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       })
       .on("click", (event, d) => {
         event.stopPropagation();
-        onLinkSingleClick?.(d.source);
+        showTooltip(d, event);
+        onLinkClick?.(d);
       });
 
     // Column date labels
@@ -391,7 +380,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       if (hideTimer) clearTimeout(hideTimer);
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode]);
+  }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onClearSelection, selectedLink, selectedNode]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>

@@ -174,7 +174,6 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], onMinistryNodeClic
                             onNodeClick={handleNodeClick}
                             onNodeNavigate={onMinistryNodeClick}
                             onLinkClick={handleLinkClick}
-                            onLinkSingleClick={handleNodeClick}
                             onClearSelection={handleClearSelection}
                             selectedLink={selectedLink}
                             selectedNode={selectedNode}
