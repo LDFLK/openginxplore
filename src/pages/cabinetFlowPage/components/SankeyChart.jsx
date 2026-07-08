@@ -41,17 +41,43 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       dateToLayer[normalizeDate(d.date)] = i;
     });
 
-    const { nodes, links } = sankey()
+    const totalLayers = chartDates.length;
+
+    // d3-sankey derives its internal column count from the graph's natural
+    // link depth (longest source-link chain), not from our custom nodeAlign
+    // mapping — any layer nodeAlign returns beyond that natural depth gets
+    // silently clamped into the last real column. If no single link-chain in
+    // the data spans every selected date, columns collapse into each other.
+    // Fix: pad the depth calc with an invisible zero-value node chain, one
+    // per date column, forcing d3-sankey to allocate the full column count.
+    const phantomNodes = Array.from({ length: totalLayers }, (_, i) => ({
+      id: `__phantom_${i}`,
+      __phantom: true,
+      __phantomLayer: i,
+    }));
+    const phantomLinks = phantomNodes.slice(1).map((target, i) => ({
+      source: phantomNodes[i],
+      target,
+      value: 0,
+      __phantom: true,
+    }));
+
+    const { nodes: layoutNodes, links: layoutLinks } = sankey()
       .nodeWidth(20)
       .nodePadding(15)
-      .nodeAlign((node) => dateToLayer[normalizeDate(node.time)] ?? 0)
+      .nodeAlign((node) =>
+        node.__phantom ? node.__phantomLayer : dateToLayer[normalizeDate(node.time)] ?? 0
+      )
       .extent([
         [1, topMargin],
         [width - 1, height - bottomMargin],
       ])({
-        nodes: data.nodes.map((d) => Object.assign({}, d)),
-        links: data.links.map((d) => Object.assign({}, d)),
+        nodes: [...data.nodes.map((d) => Object.assign({}, d)), ...phantomNodes],
+        links: [...data.links.map((d) => Object.assign({}, d)), ...phantomLinks],
       });
+
+    const nodes = layoutNodes.filter((n) => !n.__phantom);
+    const links = layoutLinks.filter((l) => !l.__phantom);
 
     // Responsive label truncation
     // Determine how much horizontal space is available for labels on each side.
@@ -70,8 +96,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         layerBounds[l].x1 = Math.max(layerBounds[l].x1, n.x1);
       }
     });
-
-    const totalLayers = chartDates.length;
 
     function labelCharLimit(node) {
       const layer = node.layer;
@@ -102,27 +126,26 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     // Color scale
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    // Identifies a link by its source/target node ids — links are rebuilt
-    // fresh on every render, so we can't compare object references.
-    const linkKey = (d) => `${d.source.id ?? d.source}->${d.target.id ?? d.target}`;
-    const selectedKey = selectedLink
-      ? `${selectedLink.source?.id ?? selectedLink.source}->${selectedLink.target?.id ?? selectedLink.target}`
-      : null;
+    const nodeKey = (n) => `${n?.id ?? n}::${normalizeDate(n?.time)}`;
+    const selectedNodeKey = selectedNode ? nodeKey(selectedNode) : null;
+
+    const linkKey = (d) => `${nodeKey(d.source)}->${nodeKey(d.target)}`;
+    const selectedKey = selectedLink ? linkKey(selectedLink) : null;
     const isSelectedLink = (d) => !!selectedKey && linkKey(d) === selectedKey;
     const isLinkedToSelectedNode = (d) =>
-      !!selectedNode && (d.source.id === selectedNode.id || d.target.id === selectedNode.id);
+      !!selectedNodeKey && (nodeKey(d.source) === selectedNodeKey || nodeKey(d.target) === selectedNodeKey);
     const isHighlighted = (d) => isSelectedLink(d) || isLinkedToSelectedNode(d);
-    const hasActiveSelection = !!selectedKey || !!selectedNode;
+    const hasActiveSelection = !!selectedKey || !!selectedNodeKey;
 
-    const relevantNodeIds = new Set();
-    if (selectedNode) relevantNodeIds.add(selectedNode.id);
+    const relevantNodeKeys = new Set();
+    if (selectedNodeKey) relevantNodeKeys.add(selectedNodeKey);
     links.forEach((d) => {
       if (isHighlighted(d)) {
-        relevantNodeIds.add(d.source.id);
-        relevantNodeIds.add(d.target.id);
+        relevantNodeKeys.add(nodeKey(d.source));
+        relevantNodeKeys.add(nodeKey(d.target));
       }
     });
-    const isRelevantNode = (d) => !hasActiveSelection || relevantNodeIds.has(d.id);
+    const isRelevantNode = (d) => !hasActiveSelection || relevantNodeKeys.has(nodeKey(d));
 
     const greyColor = isDarkMode ? "#4b5563" : "#64748b";
     const greyColorHover = isDarkMode ? "#6b7280" : "#c0c7d1";
@@ -343,8 +366,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("width", (d) => d.x1 - d.x0)
       .attr("fill", (d) => color(d.id))
       .attr("fill-opacity", (d) => (isRelevantNode(d) ? 1 : 0.25))
-      .attr("stroke", (d) => (selectedNode?.id === d.id ? (isDarkMode ? "#fff" : "#1f2933") : "none"))
-      .attr("stroke-width", (d) => (selectedNode?.id === d.id ? 0 : 0))
+      .attr("stroke", (d) => (nodeKey(d) === selectedNodeKey ? (isDarkMode ? "#fff" : "#1f2933") : "none"))
+      .attr("stroke-width", (d) => (nodeKey(d) === selectedNodeKey ? 0 : 0))
       .style("cursor", onNodeClick ? "pointer" : "default")
       .on("click", handleNodeClick)
       .append("title")
