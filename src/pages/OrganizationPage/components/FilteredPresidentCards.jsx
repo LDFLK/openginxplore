@@ -238,8 +238,8 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const dateRangeMatchesUrl =
       currStart && currEnd &&
       urlStartDate && urlEndDate &&
-      currStart.toLocaleDateString("en-CA") === urlStartDate &&
-      currEnd.toLocaleDateString("en-CA") === urlEndDate;
+      currStart.toISOString().split("T")[0] === urlStartDate &&
+      currEnd.toISOString().split("T")[0] === urlEndDate;
 
     // If date range doesn't match URL AND it's not a minister search navigation, 
     // this is a manual change - clear the processed URL
