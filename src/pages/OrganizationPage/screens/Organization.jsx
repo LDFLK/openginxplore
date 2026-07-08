@@ -43,14 +43,16 @@ const Organization = ({ dateRange }) => {
     });
   }, [setSearchParams]);
 
-  const lastResetPresidentId = useRef(null);
+  const lastResetState = useRef(null);
   const isFirstMount = useRef(true);
 
   useEffect(() => {
     if (!selectedPresident || !gazetteData || gazetteData.length === 0) return;
 
-    if (lastResetPresidentId.current !== selectedPresident.id) {
-      lastResetPresidentId.current = selectedPresident.id;
+    const currentStateKey = `${selectedPresident.id}-${activeView}`;
+
+    if (lastResetState.current !== currentStateKey) {
+      lastResetState.current = currentStateKey;
 
       if (activeView === "structure") {
         const lastGazette = gazetteData[gazetteData.length - 1];

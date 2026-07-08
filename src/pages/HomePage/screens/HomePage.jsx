@@ -31,9 +31,6 @@ export default function HomePage() {
   const { tab } = useParams();
 
   const validTabs = ["executive-branch", "data", "search"];
-  if (tab && !validTabs.includes(tab)) {
-    return <Error404 />;
-  }
 
   const selectedTab = tab || "executive-branch";
 
@@ -133,6 +130,10 @@ export default function HomePage() {
       search: params.toString() ? `?${params.toString()}` : "",
     });
   };
+
+  if (tab && !validTabs.includes(tab)) {
+    return <Error404 />;
+  }
 
   return (
     <div className="flex">
