@@ -3,7 +3,7 @@ import network, { OFFLINE_ERROR } from "../utils/network";
 
 const axiosInstance = axios.create({
   baseURL: window?.configs?.apiUrlData ? window.configs.apiUrlData : "",
-  timeout: 10000,
+  timeout: 100000,
   headers: {
     "Content-Type": "application/json",
   },

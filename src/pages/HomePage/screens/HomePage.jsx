@@ -17,6 +17,7 @@ import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
+import Error404 from "../../ErrorBoundaries/screens/404Error";
 import { toast } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
@@ -29,7 +30,9 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { tab } = useParams();
 
-  const selectedTab = tab || "organization";
+  const validTabs = ["executive-branch", "data", "search"];
+
+  const selectedTab = tab || "executive-branch";
 
   const gazetteDateClassic = useSelector(
     (state) => state.gazettes.gazetteDataClassic
@@ -113,7 +116,7 @@ export default function HomePage() {
     params.delete("ministry");
     params.delete("viewMode");
 
-    if (tabName === "organization") {
+    if (tabName === "executive-branch") {
       params.delete("categoryIds");
       params.delete("datasetId");
       params.delete("datasetName");
@@ -127,6 +130,10 @@ export default function HomePage() {
       search: params.toString() ? `?${params.toString()}` : "",
     });
   };
+
+  if (tab && !validTabs.includes(tab)) {
+    return <Error404 />;
+  }
 
   return (
     <div className="flex">
@@ -173,14 +180,14 @@ export default function HomePage() {
 
         <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 flex-1 mt-8">
           <button
-            className={`text-xs md:text-sm ${selectedTab === "organization"
+            className={`text-xs md:text-sm ${selectedTab === "executive-branch"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
               }  hover:cursor-pointer ${isExpanded ? "px-2 md:px-4" : "px-0"} py-2 md:py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
-            onClick={() => handleTabChange("organization")}
+            onClick={() => handleTabChange("executive-branch")}
           >
             <Binoculars className={`${isExpanded ? "mr-2 md:mr-3" : "mx-auto"}`} />
-            {isExpanded && "Organization"}
+            {isExpanded && "Executive Branch"}
           </button>
           <button
             className={`text-xs md:text-sm ${selectedTab === "data"
@@ -263,7 +270,7 @@ export default function HomePage() {
           {selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}
-              dates={selectedTab === "organization" ? dates : []}
+              dates={selectedTab === "executive-branch" ? dates : []}
               onDateChange={handleDateRangeChange}
               externalRange={externalDateRange}
               activePreset={activePreset}
@@ -273,7 +280,7 @@ export default function HomePage() {
             />
           )}
 
-          {selectedTab === "organization" ? (
+          {selectedTab === "executive-branch" ? (
             <Organization dateRange={userSelectedDateRange} />
           ) : selectedTab === "data" ? (
             <DataPage setExternalDateRange={setExternalDateRange} />

@@ -154,7 +154,15 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       }
     }
 
-    const validSelectedDate = urlSelectedDate;
+    let validSelectedDate = urlSelectedDate;
+
+    // If selectedDate is missing but we're in the changes view with compareDates, use the first date from compareDates
+    if (!validSelectedDate) {
+      const compareDates = params.get("compareDates");
+      if (compareDates) {
+        validSelectedDate = compareDates.split(",")[0];
+      }
+    }
 
     if (validSelectedDate) {
       const urlRange = [new Date(urlStartDate), new Date(urlEndDate)];
@@ -182,6 +190,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         selectPresidentAndDates(presidentForDate, urlRange, validSelectedDate);
         setInitializedFromUrl(true);
         setUrlInitComplete(true);
+        lastProcessedUrlRef.current = window.location.search;
         return;
       }
     }
@@ -239,7 +248,10 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     }
 
     // Don't auto-select if we just processed a URL change AND the date range matches that URL
-    if (lastProcessedUrlRef.current === currentUrlSearch && dateRangeMatchesUrl && currentUrlSearch.includes('selectedDate')) {
+    const isChangesView = params.get("view") === "changes";
+    const hasValidUrlState = currentUrlSearch.includes('selectedDate') || (isChangesView && currentUrlSearch.includes('compareDates'));
+
+    if (lastProcessedUrlRef.current === currentUrlSearch && dateRangeMatchesUrl && hasValidUrlState) {
       prevDateRangeRef.current = dateRange;
       return;
     }
@@ -257,7 +269,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   useEffect(() => {
     if (!selectedDate?.date) return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("view") === "department-flow") return;
+    if (params.get("view") === "changes") return;
     const prevSelectedDate = params.get("selectedDate");
     const url = new URL(window.location.href);
     url.searchParams.set("selectedDate", selectedDate.date);
@@ -267,7 +279,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     window.history.replaceState({}, "", url.toString());
   }, [selectedDate, location.search]);
 
-  // Monitor URL parameter changes when already on /organization route
+  // Monitor URL parameter changes when already on /executive-branch route
   useEffect(() => {
     // Only run after initial URL initialization is complete
     if (!initializedFromUrl) return;
@@ -332,6 +344,11 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
 
   return (
     <div className="rounded-lg w-full">
+      {dateRange && dateRange[0] && dateRange[1] && (
+        <div className="text-center text-[10px] md:text-xs text-primary/60 mb-4 px-1">
+          Presidents During The Period {new Date(dateRange[0]).toLocaleDateString("en-CA")} to {new Date(dateRange[1]).toLocaleDateString("en-CA")}
+        </div>
+      )}
       {filteredPresidents.length > 4 && (
         <input
           type="text"
@@ -363,8 +380,8 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                 onClick={() => selectPresidentAndDates(president)}
                 className={`min-w-[60vw] sm:min-w-[300px] md:min-w-0 flex-shrink-0 snap-center flex items-center p-1.5 md:p-2 rounded-lg border transition-all duration-200 hover:cursor-pointer
     ${isSelected
-                    ? "bg-accent/20 border-accent/35 shadow-md"
-                    : "bg-foreground/5 border-primary/15 hover:bg-foreground/15"
+                    ? "bg-accent/20 border-accent/35 shadow-md opacity-100"
+                    : "bg-card border-border shadow-sm opacity-80 hover:opacity-100 hover:bg-accent/10 hover:border-accent/20"
                   }`}
               >
                 <PersonAvatar
@@ -389,7 +406,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                       to={`/person-profile/${president?.id}`}
                       onClick={(e) => e.stopPropagation()}
                       state={{ mode: "back", from: location.pathname + location.search }}
-                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex"
+                      className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex items-center"
                     >
                       <EyeIcon size={16} className="mr-1" />
                       <p>View Profile</p>

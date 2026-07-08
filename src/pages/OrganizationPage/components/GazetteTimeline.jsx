@@ -1,17 +1,15 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Avatar, Typography, IconButton, Divider } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { Box, Typography, IconButton } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedDate } from "../../../store/presidencySlice";
 import utils from "../../../utils/utils";
-import StyledBadge from "../../../components/materialCustomAvatar";
 import { useThemeContext } from "../../../context/themeContext";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Divide, Files } from "lucide-react";
 
-export default function GazetteTimeline() {
+export default function GazetteTimeline({ multiSelect = false, multiSelectedDates = [], onMultiSelectChange }) {
   const dispatch = useDispatch();
 
   //redux state
@@ -24,14 +22,12 @@ export default function GazetteTimeline() {
 
   //ref
   const scrollRef = useRef(null);
-  const avatarRef = useRef(null);
   const dotRef = useRef(null);
 
   //states
   const [lineStyle, setLineStyle] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [latestPresidentId, setLatestPresidentId] = useState(null);
 
   const { colors } = useThemeContext();
 
@@ -67,23 +63,23 @@ export default function GazetteTimeline() {
   };
 
   const drawLine = () => {
-    if (!avatarRef.current || !dotRef.current || !scrollRef.current) {
+    if (!dotRef.current || !scrollRef.current) {
       setLineStyle(null);
       return;
     }
 
-    const avatarBox = avatarRef.current.getBoundingClientRect();
     const dotBox = dotRef.current.getBoundingClientRect();
     const containerBox =
       scrollRef.current.parentElement.getBoundingClientRect();
 
-    const startX = avatarBox.left + avatarBox.width;
+    // Start from the very left edge of the container
+    const startX = containerBox.left;
     const endX = dotBox.left + dotBox.width / 2;
     const containerHeight = containerBox.height;
     const top = containerHeight / 2 - 30;
 
     setLineStyle({
-      left: startX - containerBox.left,
+      left: 0,
       width: endX - startX,
       top,
     });
@@ -125,18 +121,23 @@ export default function GazetteTimeline() {
         });
       }, 100);
     }
-  }, [selectedDate, gazetteData]);
+  }, [selectedDate, gazetteData, multiSelect]);
 
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 2,
         width: "100%",
-        mb: { xs: "-20px", md: "auto" }
+        mb: { xs: -1, md: -3 }
       }}
     >
+      {gazetteData?.length > 0 && selectedPresident && (
+        <div className="text-center text-[10px] md:text-xs text-primary/60 px-1 mt-2">
+          {utils.extractNameFromProtobuf(selectedPresident.name).split(" ").slice(0, 2).join(" ")}'s Gazette Publication Dates
+        </div>
+      )}
+
       {selectedPresident && (
         <Box
           sx={{
@@ -181,7 +182,7 @@ export default function GazetteTimeline() {
             }}
           />
 
-          {lineStyle && selectedDate && (
+          {!multiSelect && lineStyle && selectedDate && (
             <Box
               sx={{
                 position: "absolute",
@@ -197,97 +198,14 @@ export default function GazetteTimeline() {
             />
           )}
 
-          {selectedPresident && (
-            <Box
-              sx={{
-                position: "absolute",
-                zIndex: 9,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                flexShrink: 0,
-                transition: "all 0.3s ease",
-                pointerEvents: "none",
-              }}
-            >
-              {selectedPresident.id === latestPresidentId ? (
-                <Box
-                  sx={{
-                    textAlign: "center",
-                    minWidth: { xs: 60, sm: 80 },
-                    background: `linear-gradient(to right, ${colors.backgroundPrimary} 65%, rgba(0,0,0,0) 50%)`,
-                  }}
-                >
-                  <StyledBadge
-                    ref={avatarRef}
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    variant="dot"
-                    sx={{
-                      border: `4px solid ${selectedPresident?.themeColorLight ||
-                        colors.timelineColor
-                        }`,
-                      backgroundColor: colors.backgroundPrimary,
-                      margin: "auto",
-                      borderRadius: 50,
-                    }}
-                  >
-                    <Avatar
-                      alt={selectedPresident.name}
-                      src={selectedPresident.imageUrl}
-                      sx={{
-                        width: { xs: 40, sm: 50 },
-                        height: { xs: 40, sm: 50 },
-                        border: `3px solid ${colors.backgroundPrimary}`,
-                        backgroundColor: colors.backgroundPrimary,
-                        margin: "auto",
-                      }}
-                    />
-                  </StyledBadge>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      mt: 1,
-                      color: colors.textPrimary,
-                      fontFamily: "poppins",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {utils.extractNameFromProtobuf(selectedPresident.name)}
-                  </Typography>
 
-                  <Typography
-                    variant="caption"
-                    sx={{ color: colors.textMuted, fontFamily: "poppins" }}
-                  >
-                    {selectedPresident.created.split("-")[0]} -{" "}
-                    {selectedPresident.endTime
-                      ? new Date(selectedPresident.endTime).getFullYear()
-                      : "Present"}
-                  </Typography>
-                </Box>
-              ) : (
-                <Box
-                  ref={avatarRef}
-                  sx={{
-                    display: "none",
-                    border: `3px solid ${colors.backgroundPrimary}`,
-                    backgroundColor: colors.backgroundPrimary,
-                    margin: "auto",
-                  }}
-                >
-                  <Box />
-                </Box>
-              )}
-            </Box>
-          )}
 
           <Box
             ref={scrollRef}
             sx={{
               display: "flex",
               overflowX: "auto",
-              gap: 2,
+              gap: { xs: 4, sm: 3.25 },
               padding: { xs: 2, sm: 4 },
               paddingLeft: { xs: 22, sm: 28 },
               paddingRight: { xs: 8, sm: 14 },
@@ -306,11 +224,19 @@ export default function GazetteTimeline() {
           >
             {gazetteData?.length > 0 ? (
               gazetteData.map((item) => {
-                const isDateSelected = selectedDate?.date === item.date;
+                const isDateSelected = multiSelect
+                  ? multiSelectedDates.includes(item.date)
+                  : selectedDate?.date === item.date;
                 return (
                   <Box
                     key={item.date}
-                    onClick={() => dispatch(setSelectedDate(item))}
+                    onClick={() => {
+                      if (multiSelect) {
+                        onMultiSelectChange(item.date);
+                      } else {
+                        dispatch(setSelectedDate(item));
+                      }
+                    }}
                     sx={{
                       display: "flex",
                       flexDirection: "column",
@@ -348,7 +274,7 @@ export default function GazetteTimeline() {
                       arrow
                     >
                       <Box
-                        ref={isDateSelected ? dotRef : null}
+                        ref={isDateSelected && !multiSelect ? dotRef : null}
                         sx={{
                           width: isDateSelected ? 20 : 15,
                           height: isDateSelected ? 20 : 15,
@@ -447,18 +373,6 @@ export default function GazetteTimeline() {
         </Box>
       )}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-        {gazetteData?.length > 0 && (
-          <Typography
-            sx={{
-              mt: "-50px",
-              mb: "30px",
-              fontSize: { xs: "0.7rem", md: "0.95rem" },
-              color: `${colors.textPrimary}99`,
-            }}
-          >
-            Gazettes published dates
-          </Typography>
-        )}
         {gazetteData?.length == 0 && selectedDate && (
           <Typography
             variant="caption"
