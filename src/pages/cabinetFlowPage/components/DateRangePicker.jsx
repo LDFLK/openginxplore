@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Calendar, ChevronLeft } from "lucide-react";
 
-const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates = 3, gazetteDates }) => {
+const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, gazetteDates }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const datePickerRef = useRef(null);
@@ -41,7 +41,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
 
     const isInRange = (d) => allDatesSet.has(d);
     const isSelected = (d) => selectedDates.includes(d);
-    const isDisabled = (d) => !isSelected(d) && selectedDates.length >= maxDates;
+    const isDisabled = () => false;
     const isEdge = (d) => d === startDate || d === endDate;
 
     const daysInMonth = new Date(viewMonth.year, viewMonth.month + 1, 0).getDate();
@@ -78,7 +78,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
 
     const triggerLabel =
         selectedDates.length === 0
-            ? "Select up to 3 dates"
+            ? "Select dates"
             : selectedDates.length === 1
                 ? selectedDates[0]
                 : `${selectedDates.length} dates selected`;
@@ -94,7 +94,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                 <span>{triggerLabel}</span>
                 {selectedDates.length > 0 && (
                     <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">
-                        {selectedDates.length}/{maxDates}
+                        {selectedDates.length}
                     </span>
                 )}
                 <ChevronLeft
@@ -181,7 +181,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                     {/* Footer */}
                     <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
                         <p className="text-xs text-gray-400">
-                            <span className="font-semibold text-accent">{selectedDates.length}</span>/{maxDates} selected
+                            <span className="font-semibold text-accent">{selectedDates.length}</span> selected
                         </p>
                         <div className="flex gap-2">
                             {selectedDates.length > 0 && (

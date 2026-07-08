@@ -81,18 +81,19 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         // 2 column layout: split the single gap 50/50 between both columns
         const gap = layerBounds[1].x0 - layerBounds[0].x1;
         availablePx = gap / 2 - LABEL_PADDING;
+      } else if (layer === 0) {
+        // first column: label renders to the right, full gap to the next column is free
+        const nextX0 = layerBounds[1]?.x0 ?? width;
+        availablePx = nextX0 - layerBounds[0].x1 - LABEL_PADDING;
+      } else if (layer === totalLayers - 1) {
+        // last column: label renders to the left, full gap to the previous column is free
+        const prevX1 = layerBounds[layer - 1]?.x1 ?? 0;
+        availablePx = layerBounds[layer].x0 - prevX1 - LABEL_PADDING;
       } else {
-        // 3 column layout:
-        // for col 1 -> full gaap to col 2
-        // for col 2 to col 3 -> split the gap by 50/50 and use for both col 2 and col 3
-        if (layer === 0) {
-          const nextX0 = layerBounds[1]?.x0 ?? width;
-          availablePx = nextX0 - layerBounds[0].x1 - LABEL_PADDING;
-        } else {
-          const prevX1 = layerBounds[layer - 1]?.x1 ?? 0;
-          const gap = layerBounds[layer].x0 - prevX1;
-          availablePx = gap / 2 - LABEL_PADDING;
-        }
+        // middle columns: split the gap to the previous column 50/50
+        const prevX1 = layerBounds[layer - 1]?.x1 ?? 0;
+        const gap = layerBounds[layer].x0 - prevX1;
+        availablePx = gap / 2 - LABEL_PADDING;
       }
 
       return Math.max(8, Math.floor(availablePx / CHAR_WIDTH_PX));
