@@ -28,10 +28,6 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
   const [lineStyle, setLineStyle] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-<<<<<<< HEAD
-  const [latestPresidentId, _setLatestPresidentId] = useState(null);
-=======
->>>>>>> 94c0c53 (minor fix)
 
   const { colors } = useThemeContext();
 
