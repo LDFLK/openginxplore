@@ -1,15 +1,13 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Avatar, Typography, IconButton, Divider } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { Box, Typography, IconButton } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedDate } from "../../../store/presidencySlice";
 import utils from "../../../utils/utils";
-import StyledBadge from "../../../components/materialCustomAvatar";
 import { useThemeContext } from "../../../context/themeContext";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Divide, Files, Calendar } from "lucide-react";
 
 export default function GazetteTimeline({ multiSelect = false, multiSelectedDates = [], onMultiSelectChange }) {
   const dispatch = useDispatch();
@@ -24,14 +22,12 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
 
   //ref
   const scrollRef = useRef(null);
-  const avatarRef = useRef(null);
   const dotRef = useRef(null);
 
   //states
   const [lineStyle, setLineStyle] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [latestPresidentId, setLatestPresidentId] = useState(null);
 
   const { colors } = useThemeContext();
 

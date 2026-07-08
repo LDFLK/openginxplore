@@ -1,22 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { Calendar, BarChart2, Building2, ArrowRight } from "lucide-react";
 import CabinetFlowPanel from "../components/CabinetFlowPanel";
 import RightSidePanel from "../../../components/RightSidePanel";
 import { useEntityNames } from "../../../hooks/useEntityNames";
 
-const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = [], onMinistryNodeClick }) => {
+const CabinetFlow = ({ presidentId, selectedDates = [], onMinistryNodeClick }) => {
     const location = useLocation();
-    const { gazetteData } = useSelector((state) => state.gazettes);
-    const gazetteDates = Array.isArray(gazetteData) ? gazetteData.map(item => item.date) : [];
-    const presidentRelationDict = useSelector(
-        (s) => s.presidency.presidentRelationDict
-    );
-    const presidentRelation = presidentRelationDict[presidentId];
-
     const sortedDates = [...selectedDates].sort();
-
     const [selectedLink, setSelectedLink] = useState(null);
     const [selectedNode, setSelectedNode] = useState(null);
 
@@ -27,9 +18,7 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
 
     const handleLinkClick = useCallback((link) => {
         setSelectedNode(null);
-        setSelectedLink((prev) =>
-            (prev?.source?.id === link.source?.id && prev?.target?.id === link.target?.id) ? null : link
-        );
+        setSelectedLink(link);
     }, []);
     const handleNodeClick = useCallback((node) => {
         setSelectedLink(null);
@@ -61,9 +50,9 @@ const CabinetFlow = ({ presidentId, dateRange = [null, null], selectedDates = []
         <div className="bg-background min-h-screen rounded-lg border border-border p-8">
             {/* ── Header ── */}
             <div className="w-full mb-6">
-                <div className="flex items-center justify-between gap-2">
-                    <div>
-                        <div className="space-y-1 text-xs md:text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="w-full md:w-auto lg:min-w-[40rem]">
+                        <div className="space-y-1 text-xs md:text-sm text-gray-500 dark:text-gray-400 w-full">
                             <p>This chart visualizes how ministries and departments evolved during the president's tenure.</p>
                             <ul className="list-disc list-inside space-y-0.5 pl-1">
                                 <li>Each column represents a date when one or more changes may have occurred.</li>
