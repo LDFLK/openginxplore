@@ -950,10 +950,9 @@ export default function TimeRangeSelector({
               setCalendarEnd(endDate);
               setCalendarOpen((o) => !o);
             }}
-            className={`flex items-center justify-center w-full sm:w-auto px-4 py-1.5 text-xs font-medium cursor-pointer rounded-md focus:outline-none border border-border ${
-              calendarRange && startDate.toISOString() === calendarRange.start && endDate.toISOString() === calendarRange.end
-                ? "bg-accent/20 text-primary"
-                : "hover:bg-muted bg-card text-primary"
+            className={`flex items-center justify-center w-full sm:w-auto px-4 py-1.5 text-xs font-medium cursor-pointer rounded-md focus:outline-none border border-border ${calendarRange && startDate.toISOString() === calendarRange.start && endDate.toISOString() === calendarRange.end
+              ? "bg-accent/20 text-primary"
+              : "hover:bg-muted bg-card text-primary"
               }`}
           >
             By Date
