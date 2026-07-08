@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Calendar, ChevronLeft } from "lucide-react";
 
+const MAX_DATES = 10;
+
 const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, gazetteDates }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -41,7 +43,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, gazetteD
 
     const isInRange = (d) => allDatesSet.has(d);
     const isSelected = (d) => selectedDates.includes(d);
-    const isDisabled = () => false;
+    const isDisabled = (d) => !isSelected(d) && selectedDates.length >= MAX_DATES;
     const isEdge = (d) => d === startDate || d === endDate;
 
     const daysInMonth = new Date(viewMonth.year, viewMonth.month + 1, 0).getDate();
@@ -78,7 +80,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, gazetteD
 
     const triggerLabel =
         selectedDates.length === 0
-            ? "Select dates"
+            ? `Select up to ${MAX_DATES} dates`
             : selectedDates.length === 1
                 ? selectedDates[0]
                 : `${selectedDates.length} dates selected`;
@@ -94,7 +96,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, gazetteD
                 <span>{triggerLabel}</span>
                 {selectedDates.length > 0 && (
                     <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">
-                        {selectedDates.length}
+                        {selectedDates.length}/{MAX_DATES}
                     </span>
                 )}
                 <ChevronLeft
@@ -181,7 +183,7 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, gazetteD
                     {/* Footer */}
                     <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
                         <p className="text-xs text-gray-400">
-                            <span className="font-semibold text-accent">{selectedDates.length}</span> selected
+                            <span className="font-semibold text-accent">{selectedDates.length}</span>/{MAX_DATES} selected
                         </p>
                         <div className="flex gap-2">
                             {selectedDates.length > 0 && (
