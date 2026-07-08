@@ -22,7 +22,12 @@ const CabinetFlow = ({ presidentId, selectedDates = [], onMinistryNodeClick }) =
     }, []);
     const handleNodeClick = useCallback((node) => {
         setSelectedLink(null);
-        setSelectedNode((prev) => (prev?.id === node.id ? null : node));
+        // Same id can appear as a separate node at multiple dates, so the
+        // toggle-off check needs id + date, not just id.
+        const normalizeDate = (d) => (typeof d === "string" ? d.split("T")[0] : d);
+        setSelectedNode((prev) =>
+            prev?.id === node.id && normalizeDate(prev?.time) === normalizeDate(node.time) ? null : node
+        );
     }, []);
     const handleClosePanel = useCallback(() => {
         setSelectedLink(null);
@@ -89,7 +94,6 @@ const CabinetFlow = ({ presidentId, selectedDates = [], onMinistryNodeClick }) =
                             onNodeClick={handleNodeClick}
                             onNodeNavigate={onMinistryNodeClick}
                             onLinkClick={handleLinkClick}
-                            onLinkSingleClick={handleNodeClick}
                             onClearSelection={handleClearSelection}
                             selectedLink={selectedLink}
                             selectedNode={selectedNode}
