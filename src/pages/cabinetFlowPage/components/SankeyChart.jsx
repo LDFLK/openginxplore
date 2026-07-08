@@ -277,8 +277,12 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       })
       .on("click", (event, d) => {
         event.stopPropagation();
-        showTooltip(d, event);
-        onLinkClick?.(d);
+        if (isSelectedLink(d)) {
+          onClearSelection?.();
+        } else {
+          showTooltip(d, event);
+          onLinkClick?.(d);
+        }
       });
 
     // Column date labels
