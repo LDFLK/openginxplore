@@ -7,7 +7,7 @@ import {
 } from "../../../store/presidencySlice";
 import { setGazetteData } from "../../../store/gazetteDate";
 import { Link, useLocation } from "react-router-dom";
-import { EyeIcon, Calendar } from "lucide-react";
+import { EyeIcon } from "lucide-react";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
 import PersonAvatar from "../../../components/PersonAvatar";
 
@@ -154,7 +154,15 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       }
     }
 
-    const validSelectedDate = urlSelectedDate;
+    let validSelectedDate = urlSelectedDate;
+    
+    // If selectedDate is missing but we're in the changes view with compareDates, use the first date from compareDates
+    if (!validSelectedDate) {
+      const compareDates = params.get("compareDates");
+      if (compareDates) {
+        validSelectedDate = compareDates.split(",")[0];
+      }
+    }
 
     if (validSelectedDate) {
       const urlRange = [new Date(urlStartDate), new Date(urlEndDate)];
@@ -182,6 +190,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         selectPresidentAndDates(presidentForDate, urlRange, validSelectedDate);
         setInitializedFromUrl(true);
         setUrlInitComplete(true);
+        lastProcessedUrlRef.current = window.location.search;
         return;
       }
     }
@@ -229,8 +238,8 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const dateRangeMatchesUrl =
       currStart && currEnd &&
       urlStartDate && urlEndDate &&
-      currStart.toISOString().split("T")[0] === urlStartDate &&
-      currEnd.toISOString().split("T")[0] === urlEndDate;
+      currStart.toLocaleDateString("en-CA") === urlStartDate &&
+      currEnd.toLocaleDateString("en-CA") === urlEndDate;
 
     // If date range doesn't match URL AND it's not a minister search navigation, 
     // this is a manual change - clear the processed URL
@@ -239,7 +248,10 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     }
 
     // Don't auto-select if we just processed a URL change AND the date range matches that URL
-    if (lastProcessedUrlRef.current === currentUrlSearch && dateRangeMatchesUrl && currentUrlSearch.includes('selectedDate')) {
+    const isChangesView = params.get("view") === "changes";
+    const hasValidUrlState = currentUrlSearch.includes('selectedDate') || (isChangesView && currentUrlSearch.includes('compareDates'));
+
+    if (lastProcessedUrlRef.current === currentUrlSearch && dateRangeMatchesUrl && hasValidUrlState) {
       prevDateRangeRef.current = dateRange;
       return;
     }
@@ -257,7 +269,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   useEffect(() => {
     if (!selectedDate?.date) return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("view") === "department-flow") return;
+    if (params.get("view") === "changes") return;
     const prevSelectedDate = params.get("selectedDate");
     const url = new URL(window.location.href);
     url.searchParams.set("selectedDate", selectedDate.date);

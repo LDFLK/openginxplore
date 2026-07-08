@@ -19,18 +19,32 @@ const Organization = ({ dateRange }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeView, setActiveView] = useState(searchParams.get('view') || 'cabinet-structure');
-  const [multiSelectedDates, setMultiSelectedDates] = useState([]);
-
-  const presidentRelationDict = useSelector((s) => s.presidency.presidentRelationDict);
+  const [activeView, setActiveView] = useState(searchParams.get('view') || 'structure');
+  const [multiSelectedDates, setMultiSelectedDates] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const datesParam = params.get('compareDates');
+    return datesParam ? datesParam.split(',') : [];
+  });
 
   const handleMultiSelectChange = useCallback((date) => {
-    setMultiSelectedDates((prev) =>
-      prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date].slice(-10) // Max 10 dates allowed
-    );
-  }, []);
+    setMultiSelectedDates((prev) => {
+      const newDates = prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date].slice(-10);
+
+      // Sync to URL
+      const params = new URLSearchParams(window.location.search);
+      if (newDates.length > 0) {
+        params.set("compareDates", newDates.join(","));
+      } else {
+        params.delete("compareDates");
+      }
+      setSearchParams(params, { replace: true });
+
+      return newDates;
+    });
+  }, [setSearchParams]);
 
   const lastResetPresidentId = useRef(null);
+  const isFirstMount = useRef(true);
 
   useEffect(() => {
     if (!selectedPresident || !gazetteData || gazetteData.length === 0) return;
@@ -38,28 +52,41 @@ const Organization = ({ dateRange }) => {
     if (lastResetPresidentId.current !== selectedPresident.id) {
       lastResetPresidentId.current = selectedPresident.id;
 
-      if (activeView === "cabinet-structure") {
+      if (activeView === "structure") {
         const lastGazette = gazetteData[gazetteData.length - 1];
         if (lastGazette) {
           dispatch(setSelectedDate(lastGazette));
         }
-      } else if (activeView === "department-flow") {
-        const firstGazette = gazetteData[0];
-        const lastGazette = gazetteData[gazetteData.length - 1];
+      } else if (activeView === "changes") {
+        const params = new URLSearchParams(window.location.search);
+        const datesFromUrl = params.get("compareDates");
 
-        const newDates = [];
-        if (firstGazette?.date) newDates.push(firstGazette.date);
-        if (lastGazette?.date && lastGazette.date !== firstGazette?.date) {
-          newDates.push(lastGazette.date);
+        if (isFirstMount.current && datesFromUrl) {
+          setMultiSelectedDates(datesFromUrl.split(","));
+        } else {
+          const firstGazette = gazetteData[0];
+          const lastGazette = gazetteData[gazetteData.length - 1];
+
+          const newDates = [];
+          if (firstGazette?.date) newDates.push(firstGazette.date);
+          if (lastGazette?.date && lastGazette.date !== firstGazette?.date) {
+            newDates.push(lastGazette.date);
+          }
+          setMultiSelectedDates(newDates);
+
+          if (newDates.length > 0) {
+            params.set("compareDates", newDates.join(","));
+            setSearchParams(params, { replace: true });
+          }
         }
-        setMultiSelectedDates(newDates);
       }
+      isFirstMount.current = false;
     }
-  }, [selectedPresident, gazetteData, activeView, dispatch]);
+  }, [selectedPresident, gazetteData, activeView, dispatch, setSearchParams]);
 
   // Aggressive fallback to ensure the timeline always has defaults on refresh or when cleared in Changes tab
   useEffect(() => {
-    if (activeView === "department-flow" && multiSelectedDates.length === 0 && gazetteData?.length > 0) {
+    if (activeView === "changes" && multiSelectedDates.length === 0 && gazetteData?.length > 0) {
       const firstGazette = gazetteData[0];
       const lastGazette = gazetteData[gazetteData.length - 1];
 
@@ -73,10 +100,10 @@ const Organization = ({ dateRange }) => {
   }, [activeView, gazetteData, multiSelectedDates.length]);
 
   useEffect(() => {
-    const view = searchParams.get("view") || "cabinet-structure";
+    const view = searchParams.get("view") || "structure";
     setActiveView(view);
 
-    if (view === "department-flow" && (searchParams.has("selectedDate") || searchParams.has("ministry"))) {
+    if (view === "changes" && (searchParams.has("selectedDate") || searchParams.has("ministry"))) {
       const params = new URLSearchParams(window.location.search);
       params.delete("selectedDate");
       params.delete("ministry");
@@ -88,18 +115,19 @@ const Organization = ({ dateRange }) => {
     const resolvedDate = resolveGazetteDate(node.time, gazetteData);
     dispatch(setSelectedDate({ date: resolvedDate }));
     const params = new URLSearchParams(window.location.search);
-    params.set("view", "cabinet-structure");
+    params.delete("compareDates");
+    params.set("view", "structure");
     params.set("selectedDate", resolvedDate);
     params.set("ministry", node.id);
     setSearchParams(params);
-    setActiveView("cabinet-structure");
+    setActiveView("structure");
   }, [dispatch, setSearchParams, gazetteData]);
 
   const toggleView = (viewName) => {
     setActiveView(viewName);
     const params = new URLSearchParams(window.location.search);
     params.set("view", viewName);
-    if (viewName === "department-flow") {
+    if (viewName === "changes") {
       params.delete("selectedDate");
       params.delete("ministry");
 
@@ -109,7 +137,14 @@ const Organization = ({ dateRange }) => {
       if (firstGazette?.date) newDates.push(firstGazette.date);
       if (selectedDate?.date && selectedDate.date !== firstGazette?.date) newDates.push(selectedDate.date);
       setMultiSelectedDates(newDates);
-    } else if (viewName === "cabinet-structure") {
+
+      if (newDates.length > 0) {
+        params.set("compareDates", newDates.join(","));
+      } else {
+        params.delete("compareDates");
+      }
+    } else if (viewName === "structure") {
+      params.delete("compareDates");
       if (multiSelectedDates.length > 0) {
         // Sort dates to get the latest
         const sorted = [...multiSelectedDates].sort();
@@ -150,7 +185,7 @@ const Organization = ({ dateRange }) => {
       {/* Gazette Timeline (Moved outside the white box) */}
       <div className="px-2 md:px-4">
         <GazetteTimeline
-          multiSelect={activeView === "department-flow"}
+          multiSelect={activeView === "changes"}
           multiSelectedDates={multiSelectedDates}
           onMultiSelectChange={handleMultiSelectChange}
         />
@@ -161,38 +196,38 @@ const Organization = ({ dateRange }) => {
         {/* View Toggle Tabs */}
         <div className="flex items-end border-b border-border mb-4 gap-2 px-2">
           <button
-            onClick={() => toggleView("cabinet-structure")}
-            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "cabinet-structure"
+            onClick={() => toggleView("structure")}
+            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "structure"
               ? "bg-card border-border text-primary"
               : "bg-muted border-transparent text-primary/60 hover:bg-muted/80 hover:text-primary"
               }`}
           >
             Structure
-            {activeView === "cabinet-structure" && (
+            {activeView === "structure" && (
               <div className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-card" />
             )}
           </button>
           <button
-            onClick={() => toggleView("department-flow")}
-            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "department-flow"
+            onClick={() => toggleView("changes")}
+            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "changes"
               ? "bg-card border-border text-primary"
               : "bg-muted border-transparent text-primary/60 hover:bg-muted/80 hover:text-primary"
               }`}
           >
             Changes
-            {activeView === "department-flow" && (
+            {activeView === "changes" && (
               <div className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-card" />
             )}
           </button>
         </div>
 
         {/* Conditional rendering based on active view */}
-        {activeView === "cabinet-structure" ? (
+        {activeView === "structure" ? (
           <>
             {selectedPresident && <>{selectedDate != null && <MinistryCardGrid />}</>}
           </>
         ) : (
-          <LandscapeRequired onBack={() => toggleView("cabinet-structure")}>
+          <LandscapeRequired onBack={() => toggleView("structure")}>
             <CabinetFlow
               key={selectedPresident?.id}
               presidentId={selectedPresident?.id}
