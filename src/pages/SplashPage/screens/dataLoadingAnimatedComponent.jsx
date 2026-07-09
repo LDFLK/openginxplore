@@ -190,7 +190,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
   return (
     <>
       {loading ? (
-        <SplashPage progress={progress} />
+        <SplashPage progress={progress} setProgress={setProgress} />
       ) : showServerError ? (
         <Error500 />
       ) : (

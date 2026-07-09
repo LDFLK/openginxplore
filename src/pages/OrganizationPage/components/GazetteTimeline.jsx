@@ -9,6 +9,7 @@ import StyledBadge from "../../../components/materialCustomAvatar";
 import { useThemeContext } from "../../../context/themeContext";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { Divide, Files } from "lucide-react";
 
 export default function GazetteTimeline() {
   const dispatch = useDispatch();
