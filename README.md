@@ -145,6 +145,58 @@ Update the `config.js` file in the `public` directory
 | `version` | `No` | Application Version | `rc-1.0.0` |
 | `dataSources` | `No` | Data Sources | `https://data.gov.lk/` |
 
+## How to Run Tests
+
+### Prerequisites
+Make sure dependencies are installed:
+```bash
+npm install
+npm install --save-dev monocart-reporter
+```
+
+Install Playwright browsers if not already done:
+```bash
+npx playwright install
+```
+
+### Start the Dev Server
+The dev server must be running before executing tests:
+```bash
+npm run dev
+```
+
+### Run All Tests (all browsers + all viewports)
+```bash
+npx playwright test
+```
+
+### Run on a Single Browser
+```bash
+npx playwright test --project=chromium
+npx playwright test --project=firefox
+npx playwright test --project=webkit
+```
+
+### Run a Specific Test File
+```bash
+npx playwright test tests/view-profile.spec.ts
+```
+
+### View HTML Test Report
+```bash
+npx playwright show-report
+```
+
+### View Coverage Report
+After running tests, open the coverage report:
+```bash
+# macOS
+open coverage/index.html
+
+# Linux
+xdg-open coverage/index.html
+```
+
 ## Contributing
 
 Please see our [Contributing Guidelines](CONTRIBUTING.md).
