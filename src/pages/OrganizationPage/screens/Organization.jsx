@@ -23,8 +23,6 @@ const Organization = ({ dateRange }) => {
   const [multiSelectedDates, setMultiSelectedDates] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const datesParam = params.get('compareDates');
-    console.log('dates param in init')
-    console.log(datesParam)
     return datesParam ? datesParam.split(',') : [];
   });
 
@@ -59,9 +57,18 @@ const Organization = ({ dateRange }) => {
 
       if (activeView === "structure") {
         if (!isFirstMount.current) {
-          const lastGazette = gazetteData[gazetteData.length - 1];
-          if (lastGazette) {
-            dispatch(setSelectedDate(lastGazette));
+          const params = new URLSearchParams(window.location.search);
+          const urlSelectedDate = params.get("selectedDate");
+
+          // Prefer the URL's selectedDate over the default lastGazette.
+          // This prevents an intermediate president-switch from wiping the shared date.
+          const gazetteItem = urlSelectedDate
+            ? gazetteData.find((g) => g.date === urlSelectedDate)
+            : null;
+
+          const dateToSet = gazetteItem ?? gazetteData[gazetteData.length - 1];
+          if (dateToSet) {
+            dispatch(setSelectedDate(dateToSet));
           }
         }
       } else if (activeView === "changes") {
@@ -119,14 +126,8 @@ const Organization = ({ dateRange }) => {
   useEffect(() => {
     const view = searchParams.get("view") || "structure";
     setActiveView(view);
+  }, [searchParams]);
 
-    if (view === "changes" && (searchParams.has("selectedDate") || searchParams.has("ministry"))) {
-      const params = new URLSearchParams(window.location.search);
-      // params.delete("selectedDate");
-      // params.delete("ministry");
-      setSearchParams(params, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
 
   const handleMinistryNodeClick = useCallback((node) => {
     const resolvedDate = resolveGazetteDateOnOrBefore(node.time, gazetteData);
@@ -152,9 +153,7 @@ const Organization = ({ dateRange }) => {
 
       const newDates = [];
       if (firstGazette?.date) newDates.push(firstGazette.date);
-      if (selectedDate && selectedDate?.date !== firstGazette?.date) newDates.push(selectedDate.date);
-      console.log('new dates')
-      console.log(newDates)
+      if (selectedDate?.date && selectedDate.date !== firstGazette.date) newDates.push(selectedDate.date);
       setMultiSelectedDates(newDates);
 
       if (newDates.length > 0) {
