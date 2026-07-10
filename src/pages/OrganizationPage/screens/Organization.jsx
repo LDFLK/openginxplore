@@ -23,6 +23,8 @@ const Organization = ({ dateRange }) => {
   const [multiSelectedDates, setMultiSelectedDates] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const datesParam = params.get('compareDates');
+    console.log('dates param in init')
+    console.log(datesParam)
     return datesParam ? datesParam.split(',') : [];
   });
 
@@ -49,15 +51,18 @@ const Organization = ({ dateRange }) => {
   useEffect(() => {
     if (!selectedPresident || !gazetteData || gazetteData.length === 0) return;
 
-    const currentStateKey = `${selectedPresident.id}-${activeView}`;
+    // Track ONLY president.id so it doesn't clobber your toggleView state when switching tabs
+    const currentStateKey = `${selectedPresident.id}`;
 
     if (lastResetState.current !== currentStateKey) {
       lastResetState.current = currentStateKey;
 
       if (activeView === "structure") {
-        const lastGazette = gazetteData[gazetteData.length - 1];
-        if (lastGazette) {
-          dispatch(setSelectedDate(lastGazette));
+        if (!isFirstMount.current) {
+          const lastGazette = gazetteData[gazetteData.length - 1];
+          if (lastGazette) {
+            dispatch(setSelectedDate(lastGazette));
+          }
         }
       } else if (activeView === "changes") {
         const params = new URLSearchParams(window.location.search);
@@ -65,14 +70,39 @@ const Organization = ({ dateRange }) => {
 
         if (isFirstMount.current && datesFromUrl) {
           setMultiSelectedDates(datesFromUrl.split(","));
+        } else if (datesFromUrl) {
+          // President changed and URL has compareDates.
+          // Validate them against the NEW president's gazette data to distinguish:
+          //   - URL share: dates are valid for this president → preserve
+          //   - Manual president click: old dates don't belong here → reset to defaults
+          const urlDates = datesFromUrl.split(",");
+          const gazetteDataDates = new Set(gazetteData.map((g) => g.date));
+          const allValid = urlDates.every((d) => gazetteDataDates.has(d));
+
+          if (allValid) {
+            setMultiSelectedDates(urlDates);
+          } else {
+            // Manual president switch: reset to first + last gazette of the new president
+            const firstGazette = gazetteData[0];
+            const lastGazette = gazetteData[gazetteData.length - 1];
+            const newDates = [];
+            if (firstGazette?.date) newDates.push(firstGazette.date);
+            if (lastGazette?.date && lastGazette.date !== firstGazette?.date) newDates.push(lastGazette.date);
+            setMultiSelectedDates(newDates);
+            params.set("compareDates", newDates.join(","));
+            setSearchParams(params, { replace: true });
+          }
         } else {
           const firstGazette = gazetteData[0];
           const lastGazette = gazetteData[gazetteData.length - 1];
 
+          // Use selectedDate if available instead of forcing the lastGazette
+          const targetDate = selectedDate?.date ? selectedDate.date : lastGazette?.date;
+
           const newDates = [];
           if (firstGazette?.date) newDates.push(firstGazette.date);
-          if (lastGazette?.date && lastGazette.date !== firstGazette?.date) {
-            newDates.push(lastGazette.date);
+          if (targetDate && targetDate !== firstGazette?.date) {
+            newDates.push(targetDate);
           }
           setMultiSelectedDates(newDates);
 
@@ -84,22 +114,7 @@ const Organization = ({ dateRange }) => {
       }
       isFirstMount.current = false;
     }
-  }, [selectedPresident, gazetteData, activeView, dispatch, setSearchParams]);
-
-  // Aggressive fallback to ensure the timeline always has defaults on refresh or when cleared in Changes tab
-  useEffect(() => {
-    if (activeView === "changes" && multiSelectedDates.length === 0 && gazetteData?.length > 0) {
-      const firstGazette = gazetteData[0];
-      const lastGazette = gazetteData[gazetteData.length - 1];
-
-      const newDates = [];
-      if (firstGazette?.date) newDates.push(firstGazette.date);
-      if (lastGazette?.date && lastGazette.date !== firstGazette?.date) {
-        newDates.push(lastGazette.date);
-      }
-      setMultiSelectedDates(newDates);
-    }
-  }, [activeView, gazetteData, multiSelectedDates.length]);
+  }, [selectedPresident, gazetteData, activeView, dispatch, setSearchParams, selectedDate]);
 
   useEffect(() => {
     const view = searchParams.get("view") || "structure";
@@ -107,8 +122,8 @@ const Organization = ({ dateRange }) => {
 
     if (view === "changes" && (searchParams.has("selectedDate") || searchParams.has("ministry"))) {
       const params = new URLSearchParams(window.location.search);
-      params.delete("selectedDate");
-      params.delete("ministry");
+      // params.delete("selectedDate");
+      // params.delete("ministry");
       setSearchParams(params, { replace: true });
     }
   }, [searchParams, setSearchParams]);
@@ -137,7 +152,9 @@ const Organization = ({ dateRange }) => {
 
       const newDates = [];
       if (firstGazette?.date) newDates.push(firstGazette.date);
-      if (selectedDate?.date && selectedDate.date !== firstGazette?.date) newDates.push(selectedDate.date);
+      if (selectedDate && selectedDate?.date !== firstGazette?.date) newDates.push(selectedDate.date);
+      console.log('new dates')
+      console.log(newDates)
       setMultiSelectedDates(newDates);
 
       if (newDates.length > 0) {

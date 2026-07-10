@@ -136,8 +136,18 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     let urlStartDate = params.get("startDate");
     let urlEndDate = params.get("endDate");
 
-    if (urlSelectedDate) {
-      const targetDate = new Date(urlSelectedDate);
+    let validSelectedDate = urlSelectedDate;
+
+    // If selectedDate is missing but we're in the changes view with compareDates, use the first date from compareDates
+    if (!validSelectedDate) {
+      const compareDates = params.get("compareDates");
+      if (compareDates) {
+        validSelectedDate = compareDates.split(",")[0];
+      }
+    }
+
+    if (validSelectedDate) {
+      const targetDate = new Date(validSelectedDate);
       let start = urlStartDate ? new Date(urlStartDate) : null;
       let end = urlEndDate ? new Date(urlEndDate) : null;
 
@@ -150,17 +160,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         url.searchParams.set("startDate", urlStartDate);
         url.searchParams.set("endDate", urlEndDate);
         window.history.replaceState({}, "", url.toString());
-
-      }
-    }
-
-    let validSelectedDate = urlSelectedDate;
-
-    // If selectedDate is missing but we're in the changes view with compareDates, use the first date from compareDates
-    if (!validSelectedDate) {
-      const compareDates = params.get("compareDates");
-      if (compareDates) {
-        validSelectedDate = compareDates.split(",")[0];
       }
     }
 
@@ -229,17 +228,24 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     }
 
     // Check if this date range change matches the URL we just processed
-    const currentUrlSearch = location.search;
+    const currentUrlSearch = window.location.search;
     const params = new URLSearchParams(currentUrlSearch);
     const urlStartDate = params.get("startDate");
     const urlEndDate = params.get("endDate");
     const hasFilterByName = params.get("filterByName");
 
+    const formatLocalDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     const dateRangeMatchesUrl =
       currStart && currEnd &&
       urlStartDate && urlEndDate &&
-      currStart.toISOString().split("T")[0] === urlStartDate &&
-      currEnd.toISOString().split("T")[0] === urlEndDate;
+      formatLocalDate(currStart) === urlStartDate &&
+      formatLocalDate(currEnd) === urlEndDate;
 
     // If date range doesn't match URL AND it's not a minister search navigation, 
     // this is a manual change - clear the processed URL
