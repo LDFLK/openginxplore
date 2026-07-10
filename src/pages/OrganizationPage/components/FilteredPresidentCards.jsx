@@ -27,6 +27,9 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const [urlInitComplete, setUrlInitComplete] = useState(false);
   const prevDateRangeRef = useRef([null, null]);
   const lastProcessedUrlRef = useRef("");
+  // Tracks if this session was initialized from a valid URL with a specific selectedDate or compareDates.
+  // When true, the dateRange (slider) effect skips auto-switching presidents.
+  const urlWasInitializedRef = useRef(false);
 
   const location = useLocation()
 
@@ -136,8 +139,18 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     let urlStartDate = params.get("startDate");
     let urlEndDate = params.get("endDate");
 
-    if (urlSelectedDate) {
-      const targetDate = new Date(urlSelectedDate);
+    let validSelectedDate = urlSelectedDate;
+
+    // If selectedDate is missing but we're in the changes view with compareDates, use the first date from compareDates
+    if (!validSelectedDate) {
+      const compareDates = params.get("compareDates");
+      if (compareDates) {
+        validSelectedDate = compareDates.split(",")[0];
+      }
+    }
+
+    if (validSelectedDate) {
+      const targetDate = new Date(validSelectedDate);
       let start = urlStartDate ? new Date(urlStartDate) : null;
       let end = urlEndDate ? new Date(urlEndDate) : null;
 
@@ -150,17 +163,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         url.searchParams.set("startDate", urlStartDate);
         url.searchParams.set("endDate", urlEndDate);
         window.history.replaceState({}, "", url.toString());
-
-      }
-    }
-
-    let validSelectedDate = urlSelectedDate;
-
-    // If selectedDate is missing but we're in the changes view with compareDates, use the first date from compareDates
-    if (!validSelectedDate) {
-      const compareDates = params.get("compareDates");
-      if (compareDates) {
-        validSelectedDate = compareDates.split(",")[0];
       }
     }
 
@@ -190,6 +192,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         selectPresidentAndDates(presidentForDate, urlRange, validSelectedDate);
         setInitializedFromUrl(true);
         setUrlInitComplete(true);
+        urlWasInitializedRef.current = true;
         lastProcessedUrlRef.current = window.location.search;
         return;
       }
@@ -229,17 +232,24 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     }
 
     // Check if this date range change matches the URL we just processed
-    const currentUrlSearch = location.search;
+    const currentUrlSearch = window.location.search;
     const params = new URLSearchParams(currentUrlSearch);
     const urlStartDate = params.get("startDate");
     const urlEndDate = params.get("endDate");
     const hasFilterByName = params.get("filterByName");
 
+    const formatLocalDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     const dateRangeMatchesUrl =
       currStart && currEnd &&
       urlStartDate && urlEndDate &&
-      currStart.toISOString().split("T")[0] === urlStartDate &&
-      currEnd.toISOString().split("T")[0] === urlEndDate;
+      formatLocalDate(currStart) === urlStartDate &&
+      formatLocalDate(currEnd) === urlEndDate;
 
     // If date range doesn't match URL AND it's not a minister search navigation, 
     // this is a manual change - clear the processed URL
@@ -252,6 +262,22 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const hasValidUrlState = currentUrlSearch.includes('selectedDate') || (isChangesView && currentUrlSearch.includes('compareDates'));
 
     if (lastProcessedUrlRef.current === currentUrlSearch && dateRangeMatchesUrl && hasValidUrlState) {
+      prevDateRangeRef.current = dateRange;
+      return;
+    }
+
+    // If this session was initialized from a valid URL (selectedDate or compareDates),
+    // trust the URL state and don't auto-switch presidents based on the slider range.
+    // The URL monitor handles any needed corrections when location.search changes.
+    if (urlWasInitializedRef.current && selectedPresident) {
+      prevDateRangeRef.current = dateRange;
+      return;
+    }
+
+    // Don't reset if the current president is still valid in the filtered list.
+    const currentPresidentIsValid =
+      selectedPresident && filteredPresidents.some((p) => p.id === selectedPresident.id);
+    if (currentPresidentIsValid) {
       prevDateRangeRef.current = dateRange;
       return;
     }
