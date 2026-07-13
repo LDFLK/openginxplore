@@ -15,7 +15,7 @@ import SpriteText from "three-spritetext";
 import WebGLChecker, { isWebGLAvailable } from "../../../components/webgl_checker";
 import LoadingComponent from "../../../components/loading_component";
 import { useThemeContext } from "../../../context/themeContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { departmentsByPortfolioQueryOptions } from "../../../hooks/useDepartmentsByPortfolio";
@@ -86,6 +86,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const focusRef = useRef();
   const cameraAnimTimeoutRef = useRef();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const selectedDate = useSelector((state) => state.presidency.selectedDate);
   const selectedPresident = useSelector(
@@ -352,7 +353,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         }
       };
     }
-  }, [focusRef.current]);
+  }, [loading]);
 
   // Memoized graph data
   const graphData = useMemo(() => {
@@ -493,7 +494,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         await buildGraph(node);
       }
     },
-    [buildGraph]
+    [buildGraph, graphParent, navigate, location]
   );
 
   // Configure forces

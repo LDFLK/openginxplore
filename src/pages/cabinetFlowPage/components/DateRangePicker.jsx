@@ -42,7 +42,6 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
     const isInRange = (d) => allDatesSet.has(d);
     const isSelected = (d) => selectedDates.includes(d);
     const isDisabled = (d) => !isSelected(d) && selectedDates.length >= maxDates;
-    const isEdge = (d) => d === startDate || d === endDate;
 
     const daysInMonth = new Date(viewMonth.year, viewMonth.month + 1, 0).getDate();
     const firstDayOfWeek = new Date(viewMonth.year, viewMonth.month, 1).getDay();
@@ -142,7 +141,6 @@ const DateRangePicker = ({ startDate, endDate, selectedDates, onToggle, maxDates
                             const inRange = isInRange(dateStr);
                             const selected = isSelected(dateStr);
                             const disabled = !inRange || isDisabled(dateStr);
-                            const edge = isEdge(dateStr);
                             const hasGazette = gazetteDates.includes(dateStr);
 
                             return (

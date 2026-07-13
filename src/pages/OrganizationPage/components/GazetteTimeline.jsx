@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Box, Avatar, Typography, IconButton, Divider } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -9,7 +9,6 @@ import StyledBadge from "../../../components/materialCustomAvatar";
 import { useThemeContext } from "../../../context/themeContext";
 import { Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Divide, Files } from "lucide-react";
 
 export default function GazetteTimeline() {
   const dispatch = useDispatch();
@@ -31,7 +30,7 @@ export default function GazetteTimeline() {
   const [lineStyle, setLineStyle] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [latestPresidentId, setLatestPresidentId] = useState(null);
+  const [latestPresidentId, _setLatestPresidentId] = useState(null);
 
   const { colors } = useThemeContext();
 

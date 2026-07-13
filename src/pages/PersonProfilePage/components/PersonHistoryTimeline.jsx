@@ -55,7 +55,7 @@ const PersonHistoryTimeline = ({
         layout="2-columns"
         lineColor={isDark ? "#364153" : "#dbdbdb"}
       >
-        {ministryHistory.map((entry, idx, arr) => {
+        {ministryHistory.map((entry, idx) => {
           return (
             <VerticalTimelineElement
               key={idx}

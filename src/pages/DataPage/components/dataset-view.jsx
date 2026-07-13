@@ -35,8 +35,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [selectedYears, yearToDatasetId]);
 
   // Fetch organization data for all selected datasets in parallel
-  const { data: organizationsData, isError: isOrgErrorReal } = useRootOrganizations(selectedDatasetIds);
-  const isOrgError = true; // Forced for testing
+  const { data: organizationsData, isError: isOrgError } = useRootOrganizations(selectedDatasetIds);
 
   // Map organizations to years and check if all names are the same
   const organizationsByYear = useMemo(() => {
@@ -55,7 +54,7 @@ export function DatasetView({ data, setExternalDateRange }) {
     if (orgList.length === 0) return null;
 
     // Check if all organization names are the same
-    const allNames = orgList.map(([_, org]) => org.name);
+    const allNames = orgList.map(([, org]) => org.name);
     const uniqueNames = [...new Set(allNames)];
 
     if (uniqueNames.length === 1) {
@@ -75,7 +74,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   useEffect(() => {
     if (allAvailableYears.length === 0) return;
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const startDate = params.get("startDate");
     const endDate = params.get("endDate");
 
@@ -98,7 +97,7 @@ export function DatasetView({ data, setExternalDateRange }) {
     if (yearsInRange.length === 0) {
       setSelectedYears([]);
     }
-  }, [allAvailableYears, window.location.search]);
+  }, [allAvailableYears, location.search]);
 
   const multiYearMode = filteredYears.length > 1;
 
@@ -112,7 +111,7 @@ export function DatasetView({ data, setExternalDateRange }) {
   }, [filteredYears]);
 
   // fetch datasets per year
-  const { fetchedDatasets, loadingYear, isAnyLoading, isError: isContentError, error: contentError } = useGetDatasetsByYears(
+  const { fetchedDatasets, loadingYear, isError: isContentError, error: contentError } = useGetDatasetsByYears(
     selectedYears,
     yearToDatasetId
   );

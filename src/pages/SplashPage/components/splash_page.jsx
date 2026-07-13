@@ -3,7 +3,7 @@ import BackgroundGradientEffect from "./backgroundGradientEffect";
 import AnimatedDots from "./animatedDots";
 import { Link } from "react-router-dom";
 
-const SplashPage = ({ progress, setProgress }) => {
+const SplashPage = ({ progress }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [

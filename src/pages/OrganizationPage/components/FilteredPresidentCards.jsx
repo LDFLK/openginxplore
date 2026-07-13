@@ -252,7 +252,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     }
 
     prevDateRangeRef.current = dateRange;
-  }, [dateRange, filteredPresidents, initializedFromUrl, urlInitComplete]);
+  }, [dateRange, filteredPresidents, initializedFromUrl, urlInitComplete, location.search]);
 
   useEffect(() => {
     if (!selectedDate?.date) return;

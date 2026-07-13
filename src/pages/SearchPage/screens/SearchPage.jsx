@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { Search, Loader2, AlertCircle } from "lucide-react";
 import { useSearch } from "../../../hooks/useSearch";
-import { getDatasetCategories } from "../../../services/searchServices";
 import { ENTITY_CONFIG } from "../../../constants/entityConfig";
 import { handleResultNavigation } from "../../../utils/navigationUtils";
 

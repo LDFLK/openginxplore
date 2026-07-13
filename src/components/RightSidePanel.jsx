@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-import { useThemeContext } from "../context/themeContext";
 
 /**
  * Generic right-side sliding panel. Pure presentation - the caller owns
@@ -17,7 +16,6 @@ export default function RightSidePanel({
   onClose,
   title,
   children,
-  footer,
   width = "w-full md:w-1/2 lg:w-1/3",
 }) {
 
