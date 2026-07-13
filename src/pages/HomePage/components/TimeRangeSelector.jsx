@@ -17,11 +17,7 @@ export default function TimeRangeSelector({
   activePresident,
   setActivePresident
 }) {
-  const [defaultStartDate] = useState(() => {
-    const date = new Date();
-    date.setFullYear(date.getFullYear() - 5);
-    return date;
-  });
+  const [defaultStartDate] = useState(() => new Date(Date.UTC(startYear, 0, 1)));
   const presidentsArray = useSelector(
     (state) => state.presidency.presidentDict
   );

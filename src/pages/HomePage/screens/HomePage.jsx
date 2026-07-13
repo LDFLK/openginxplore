@@ -44,7 +44,7 @@ export default function HomePage() {
     null,
   ]);
   const [externalDateRange, setExternalDateRange] = useState([null, null]);
-  const [activePreset, setActivePreset] = useState(null);
+  const [activePreset, setActivePreset] = useState("All");
   const [activePresident, setActivePresident] = useState("");
 
   const handleDateRangeChange = useCallback((dateRange) => {
