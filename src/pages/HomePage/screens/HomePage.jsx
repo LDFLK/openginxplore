@@ -18,7 +18,6 @@ import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
 import Error404 from "../../ErrorBoundaries/screens/404Error";
-import { toast } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
@@ -44,7 +43,25 @@ export default function HomePage() {
     null,
   ]);
   const [externalDateRange, setExternalDateRange] = useState([null, null]);
-  const [activePreset, setActivePreset] = useState(null);
+  const [activePreset, setActivePreset] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const startDateParam = params.get("startDate");
+    if (!startDateParam) return "All"; // no URL startDate → default to "All"
+
+    const today = new Date();
+    const urlStart = new Date(startDateParam);
+    const diffYears = (today - urlStart) / (365.25 * 24 * 60 * 60 * 1000);
+
+    if (Math.abs(diffYears - 1) < 0.1) return "1Y";
+    if (Math.abs(diffYears - 2) < 0.1) return "2Y";
+    if (Math.abs(diffYears - 3) < 0.1) return "3Y";
+    if (Math.abs(diffYears - 5) < 0.1) return "5Y";
+
+    // startDate matches the earliest possible year (i.e. "All" was selected)
+    if (urlStart.getFullYear() <= 2019) return "All";
+
+    return null; // custom range — no preset highlighted
+  });
   const [activePresident, setActivePresident] = useState("");
 
   const handleDateRangeChange = useCallback((dateRange) => {
@@ -137,22 +154,6 @@ export default function HomePage() {
 
   return (
     <div className="flex">
-      {/* <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        toastClassName={() =>
-          "bg-background text-foreground border border-border shadow-lg rounded-md p-4 w-full"
-        }
-        bodyClassName={() => "text-sm"}
-        progressClassName="bg-primary"
-      /> */}
-
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 z-20 h-[100dvh] ${isExpanded ? "w-48 md:w-64" : "w-12 md:w-16"

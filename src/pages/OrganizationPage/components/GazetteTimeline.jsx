@@ -129,14 +129,18 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        mb: { xs: -1, md: -3 }
       }}
     >
-      {gazetteData?.length > 0 && selectedPresident && (
-        <div className="text-center text-[10px] md:text-xs text-primary/60 px-1 mt-2">
-          {utils.extractNameFromProtobuf(selectedPresident.name).split(" ").slice(0, 2).join(" ")}'s Gazette Publication Dates
-        </div>
-      )}
+
+      {
+        multiSelect ?
+          <div className="text-center text-xs text-primary/60 px-1 mt-2">
+            Select gazettes to compare structure
+          </div> :
+          <div className="text-center text-xs text-primary/60 px-1 mt-2">
+            Select a gazette
+          </div>
+      }
 
       {selectedPresident && (
         <Box
@@ -198,8 +202,6 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
             />
           )}
 
-
-
           <Box
             ref={scrollRef}
             sx={{
@@ -256,7 +258,7 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
                               item.gazetteId.map((id, index) => (
                                 <li key={id}>
                                   <a
-                                    href={`https://archives.opendata.lk/?search=id%3A${id}`}
+                                    href={`${window?.configs?.gazetteSources}${item.date.split("-")[0]}/${(item.date.split("-")[1].startsWith(0) ? item.date.split("-")[1].slice(1) : item.date.split("-")[1])}/${id}_E.pdf`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="hover:text-accent text-md"

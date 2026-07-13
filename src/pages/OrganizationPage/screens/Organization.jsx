@@ -200,15 +200,6 @@ const Organization = ({ dateRange }) => {
         </div>
       )}
 
-      {/* Gazette Timeline (Moved outside the white box) */}
-      <div className="px-2 md:px-4">
-        <GazetteTimeline
-          multiSelect={activeView === "changes"}
-          multiSelectedDates={multiSelectedDates}
-          onMultiSelectChange={handleMultiSelectChange}
-        />
-      </div>
-
       {/* Card wrapper for Content */}
       <div className="bg-card rounded-lg border border-border p-2 md:p-4 mx-2 md:mx-4 mb-4">
         {/* View Toggle Tabs */}
@@ -238,6 +229,15 @@ const Organization = ({ dateRange }) => {
             )}
           </button>
         </div>
+
+
+        {/* Gazette Timeline (Moved outside the white box) */}
+        <GazetteTimeline
+          multiSelect={activeView === "changes"}
+          multiSelectedDates={multiSelectedDates}
+          onMultiSelectChange={handleMultiSelectChange}
+        />
+
 
         {/* Conditional rendering based on active view */}
         {activeView === "structure" ? (
