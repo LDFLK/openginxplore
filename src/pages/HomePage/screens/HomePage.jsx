@@ -18,7 +18,6 @@ import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
 import Error404 from "../../ErrorBoundaries/screens/404Error";
-import { toast } from "react-toastify";
 import SlFlag from "/sl_flag.png";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
@@ -155,22 +154,6 @@ export default function HomePage() {
 
   return (
     <div className="flex">
-      {/* <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        toastClassName={() =>
-          "bg-background text-foreground border border-border shadow-lg rounded-md p-4 w-full"
-        }
-        bodyClassName={() => "text-sm"}
-        progressClassName="bg-primary"
-      /> */}
-
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 z-20 h-[100dvh] ${isExpanded ? "w-48 md:w-64" : "w-12 md:w-16"
