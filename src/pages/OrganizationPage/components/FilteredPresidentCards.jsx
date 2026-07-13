@@ -29,7 +29,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const lastProcessedUrlRef = useRef("");
   // Tracks if this session was initialized from a valid URL with a specific selectedDate or compareDates.
   // When true, the dateRange (slider) effect skips auto-switching presidents.
-  const urlWasInitializedRef = useRef(false);
+
 
   const location = useLocation()
 
@@ -192,7 +192,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         selectPresidentAndDates(presidentForDate, urlRange, validSelectedDate);
         setInitializedFromUrl(true);
         setUrlInitComplete(true);
-        urlWasInitializedRef.current = true;
+
         lastProcessedUrlRef.current = window.location.search;
         return;
       }
@@ -266,13 +266,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       return;
     }
 
-    // If this session was initialized from a valid URL (selectedDate or compareDates),
-    // trust the URL state and don't auto-switch presidents based on the slider range.
-    // The URL monitor handles any needed corrections when location.search changes.
-    if (urlWasInitializedRef.current && selectedPresident) {
-      prevDateRangeRef.current = dateRange;
-      return;
-    }
 
     // Don't reset if the current president is still valid in the filtered list.
     const currentPresidentIsValid =
