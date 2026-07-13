@@ -18,6 +18,7 @@ window.configs = {
     feedbackFormUrl: "",
     version: "ALPHA",
     dataSources: "https://data.gov.lk/",
+    gazetteSources: "https://documents.gov.lk/view/egz/",
     imageStorageBaseUrl: "", // add the base url of the image storage location ex: "https://raw.githubusercontent.com/<org_name>/<repo_name>/<branch>/"
     gaMeasurementId: ""
 };
