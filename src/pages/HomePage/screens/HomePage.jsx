@@ -44,7 +44,25 @@ export default function HomePage() {
     null,
   ]);
   const [externalDateRange, setExternalDateRange] = useState([null, null]);
-  const [activePreset, setActivePreset] = useState("All");
+  const [activePreset, setActivePreset] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const startDateParam = params.get("startDate");
+    if (!startDateParam) return "All"; // no URL startDate → default to "All"
+
+    const today = new Date();
+    const urlStart = new Date(startDateParam);
+    const diffYears = (today - urlStart) / (365.25 * 24 * 60 * 60 * 1000);
+
+    if (Math.abs(diffYears - 1) < 0.1) return "1Y";
+    if (Math.abs(diffYears - 2) < 0.1) return "2Y";
+    if (Math.abs(diffYears - 3) < 0.1) return "3Y";
+    if (Math.abs(diffYears - 5) < 0.1) return "5Y";
+
+    // startDate matches the earliest possible year (i.e. "All" was selected)
+    if (urlStart.getFullYear() <= 2019) return "All";
+
+    return null; // custom range — no preset highlighted
+  });
   const [activePresident, setActivePresident] = useState("");
 
   const handleDateRangeChange = useCallback((dateRange) => {
