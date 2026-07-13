@@ -258,7 +258,7 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
                               item.gazetteId.map((id, index) => (
                                 <li key={id}>
                                   <a
-                                    href={`${window?.configs?.gazetteSources}${item.date.split("-")[0]}/${(item.date.split("-")[1].startsWith(0) ? item.date.split("-")[1].slice(1) : item.date.split("-")[1])}/${id}_E.pdf`}
+                                    href={`${window?.configs?.gazetteSources}${item.date.split("-")[0]}/${parseInt(item.date.split("-")[1], 10)}/${id}_E.pdf`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="hover:text-accent text-md"

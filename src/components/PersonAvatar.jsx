@@ -1,9 +1,13 @@
 import { User2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function PersonAvatar({ isOnline, imageUrl, image, name, className = "" }) {
   const [imgError, setImgError] = useState(false);
   const src = imageUrl || image;
+
+  useEffect(() => {
+    setImgError(false);
+  }, [src]);
 
   return isOnline && src && !imgError ? (
     <img
