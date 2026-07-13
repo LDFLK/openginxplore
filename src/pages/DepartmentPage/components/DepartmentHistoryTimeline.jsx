@@ -1,16 +1,19 @@
 import { useThemeContext } from "../../../context/themeContext";
 import { ClipLoader } from "react-spinners";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   VerticalTimeline,
   VerticalTimelineElement,
 } from "react-vertical-timeline-component";
 import { Landmark } from "lucide-react";
 import { useDepartmentHistory } from "../../../hooks/useDepartmentHistory";
+import { buildCabinetStructureUrlFromHistoryEntry } from "../../../utils/navigationUtils";
 
 const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
   const { colors, isDark } = useThemeContext();
   const location = useLocation();
+  const gazetteDataClassic = useSelector((s) => s.gazettes.gazetteDataClassic);
 
   const {
     data: departmentHistory,
@@ -56,9 +59,6 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                     border: `1px solid ${isDark ? "#364153" : "#dbdbdb"}`,
                     boxShadow: "none",
                     padding: "10px",
-                    paddingTop: "0px",
-                    marginBottom: "25px",
-                    marginTop: "15px",
                   }}
                   contentArrowStyle={{
                     borderRight: `7px solid ${isDark ? "#364153" : "#dbdbdb"}`,
@@ -67,9 +67,22 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                   dateClassName={"text-primary/65"}
                 >
                   <div>
-                    <p className="text-primary" style={{ fontSize: "1rem" }}>
+                    <Link
+                      to={buildCabinetStructureUrlFromHistoryEntry(
+                        entry,
+                        gazetteDataClassic
+                      )}
+                      state={{
+                        mode: "back",
+                        from: location.pathname + location.search,
+                        callback: true,
+                        callbackLink: location.state?.from,
+                      }}
+                      className="text-primary hover:underline transition-colors"
+                      style={{ fontSize: "1rem" }}
+                    >
                       {entry.ministry_name}
-                    </p>
+                    </Link>
                     <div className="flex items-center mt-1 space-x-3">
                       <div className="flex items-center justify-between">
                         {entry.minister_name ? (
@@ -81,7 +94,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                               callback: true,
                               callbackLink: location.state?.from,
                             }}
-                            className="text-accent text-normal font-medium hover:text-accent/80 transition-colors"
+                            className="text-accent text-normal font-medium hover:text-accent/80 hover:underline transition-colors"
                           >
                             {entry.minister_name}
                           </Link>

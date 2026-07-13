@@ -7,7 +7,7 @@ import FilteredPresidentCards from "../components/FilteredPresidentCards";
 import CabinetFlow from "../../cabinetFlowPage/screens/CabinetFlow"
 import LandscapeRequired from "../../../components/landscapeRequired";
 import { setSelectedDate } from "../../../store/presidencySlice";
-import { resolveGazetteDate } from "../../../utils/gazetteDateUtils";
+import { resolveGazetteDateOnOrBefore } from "../../../utils/gazetteDateUtils";
 
 const Organization = ({ dateRange }) => {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ const Organization = ({ dateRange }) => {
   }, [searchParams, setSearchParams]);
 
   const handleMinistryNodeClick = useCallback((node) => {
-    const resolvedDate = resolveGazetteDate(node.time, gazetteData);
+    const resolvedDate = resolveGazetteDateOnOrBefore(node.time, gazetteData);
     dispatch(setSelectedDate({ date: resolvedDate }));
     const params = new URLSearchParams(window.location.search);
     params.set("view", "cabinet-structure");

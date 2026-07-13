@@ -72,9 +72,13 @@ const MinistryCardGrid = () => {
     const params = new URLSearchParams(window.location.search);
     const ministryId = params.get("ministry");
 
-    if (!ministryId || activeMinistryList.length === 0) {
+    if (!ministryId) {
       setSelectedCard(null);
       setActiveStep(0);
+      return;
+    }
+
+    if (activeMinistryList.length === 0) {
       return;
     }
 
@@ -197,14 +201,20 @@ const MinistryCardGrid = () => {
 
     if (selectedDate?.date && prevDateRef.current && selectedDate.date !== prevDateRef.current) {
       const params = new URLSearchParams(window.location.search);
+      const isDeepLinkSync =
+        params.get("ministry") &&
+        params.get("selectedDate") === selectedDate.date;
 
-      if (params.has("ministry")) {
-        params.delete("ministry");
-        navigate(`${window.location.pathname}?${params.toString()}`);
-      } 
+      if (!isDeepLinkSync) {
+        if (params.has("ministry")) {
+          params.delete("ministry");
+          params.set("selectedDate", selectedDate.date);
+          navigate(`${window.location.pathname}?${params.toString()}`);
+        }
 
-      setActiveStep(0);
-      setSelectedCard(null);
+        setActiveStep(0);
+        setSelectedCard(null);
+      }
     }
 
     prevDateRef.current = selectedDate?.date;
