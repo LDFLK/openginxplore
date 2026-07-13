@@ -58,7 +58,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                     color: isDark ? "#f8f8f8" : "#0b0b0b",
                     border: `1px solid ${isDark ? "#364153" : "#dbdbdb"}`,
                     boxShadow: "none",
-                    padding: "10px",
+                    padding: "12px",
                     paddingTop: "0px",
                     marginBottom: "25px",
                     marginTop: "15px",
