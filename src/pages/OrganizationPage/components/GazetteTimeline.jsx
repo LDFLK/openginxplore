@@ -343,7 +343,7 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
                   }}
                 >
                   <InfoOutlinedIcon
-                    sx={{ fontSize: 15, color: colors.textMuted }}
+                    sx={{ fontSize: 15, color: colors.textMuted, marginRight: 1 }}
                   />
                   <Typography variant="caption">
                     No new gazette publications
@@ -383,6 +383,7 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
               fontWeight: 500,
               textAlign: "center",
               fontSize: 14,
+              marginBottom: 2
             }}
           >
             Information corresponds to the last date of selected range:{" "}

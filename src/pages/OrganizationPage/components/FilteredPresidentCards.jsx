@@ -275,6 +275,10 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const currentPresidentIsValid =
       selectedPresident && filteredPresidents.some((p) => p.id === selectedPresident.id);
     if (currentPresidentIsValid) {
+      // Re-run the selection to update gazette bounds for the new date range.
+      // We don't pass selectedDate so it auto-selects the last available gazette date 
+      // within the new bounds, matching the user's expectations during slider drag.
+      selectPresidentAndDates(selectedPresident);
       prevDateRangeRef.current = dateRange;
       return;
     }
@@ -287,7 +291,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     }
 
     prevDateRangeRef.current = dateRange;
-  }, [dateRange, filteredPresidents, initializedFromUrl, urlInitComplete, location.search]);
+  }, [dateRange, filteredPresidents, initializedFromUrl, urlInitComplete, location.search, selectedDate?.date]);
 
   useEffect(() => {
     if (!selectedDate?.date) return;
