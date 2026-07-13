@@ -265,6 +265,8 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const params = new URLSearchParams(window.location.search);
     if (params.get("view") === "department-flow") return;
 
+    if (!initializedFromUrl) return;
+
     const urlSelectedDate = params.get("selectedDate");
     const urlMinistry = params.get("ministry");
     const reduxDate = selectedDate.date;
@@ -277,7 +279,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
     const url = new URL(window.location.href);
     url.searchParams.set("selectedDate", reduxDate);
     window.history.replaceState({}, "", url.toString());
-  }, [selectedDate, location.search]);
+  }, [selectedDate, location.search, initializedFromUrl]);
 
   // Monitor URL parameter changes when already on /organization route
   useEffect(() => {
