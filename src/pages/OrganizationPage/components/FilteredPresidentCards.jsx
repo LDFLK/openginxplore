@@ -154,15 +154,19 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       let start = urlStartDate ? new Date(urlStartDate) : null;
       let end = urlEndDate ? new Date(urlEndDate) : null;
 
-      if (!start || !end || targetDate < start || targetDate > end) {
-        const year = targetDate.getFullYear();
-        urlStartDate = `${year}-01-01`;
-        urlEndDate = `${year}-12-31`;
+      // Only auto-compute range from selectedDate when no explicit dates were given.
+      // If startDate/endDate are already in the URL, trust them as-is.
+      if (!urlStartDate || !urlEndDate) {
+        if (!start || !end || targetDate < start || targetDate > end) {
+          const year = targetDate.getFullYear();
+          urlStartDate = `${year}-01-01`;
+          urlEndDate = `${year}-12-31`;
 
-        const url = new URL(window.location.href);
-        url.searchParams.set("startDate", urlStartDate);
-        url.searchParams.set("endDate", urlEndDate);
-        window.history.replaceState({}, "", url.toString());
+          const url = new URL(window.location.href);
+          url.searchParams.set("startDate", urlStartDate);
+          url.searchParams.set("endDate", urlEndDate);
+          window.history.replaceState({}, "", url.toString());
+        }
       }
     }
 

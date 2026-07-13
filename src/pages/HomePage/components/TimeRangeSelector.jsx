@@ -56,12 +56,16 @@ export default function TimeRangeSelector({
     if (selectedDateParam) {
       const targetDate = new Date(selectedDateParam);
       if (!(targetDate >= urlStart && targetDate <= urlEnd)) {
-        if (targetDate >= minDate && targetDate <= maxDate) {
-          urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
-          urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
-        } else {
-          urlStart = minDate;
-          urlEnd = maxDate;
+        // Only auto-compute range from selectedDate when no explicit dates were given.
+        // If startDate/endDate are already in the URL, trust them as-is.
+        if (!startDateParam || !endDateParam) {
+          if (targetDate >= minDate && targetDate <= maxDate) {
+            urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
+            urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
+          } else {
+            urlStart = minDate;
+            urlEnd = maxDate;
+          }
         }
       }
     } else {
@@ -181,15 +185,19 @@ export default function TimeRangeSelector({
 
       // If outside calculated range, update it
       if (!(targetDate >= urlStart && targetDate <= urlEnd)) {
-        // SelectedDate year is outside URL range but within available range → override range to full year
-        if (targetDate >= minDate && targetDate <= maxDate) {
-          urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
-          urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
-        }
-        // SelectedDate outside available range → default
-        else {
-          urlStart = minDate;
-          urlEnd = maxDate;
+        // Only auto-compute range from selectedDate when no explicit dates were given.
+        // If startDate/endDate are already in the URL, trust them as-is.
+        if (!startDateParam || !endDateParam) {
+          // SelectedDate year is outside URL range but within available range → override range to full year
+          if (targetDate >= minDate && targetDate <= maxDate) {
+            urlStart = new Date(`${targetDate.getFullYear()}-01-01`);
+            urlEnd = new Date(`${targetDate.getFullYear()}-12-31`);
+          }
+          // SelectedDate outside available range → default
+          else {
+            urlStart = minDate;
+            urlEnd = maxDate;
+          }
         }
       }
     } else {
