@@ -55,6 +55,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       __phantom: true,
       __phantomLayer: i,
     }));
+
     const phantomLinks = phantomNodes.slice(1).map((target, i) => ({
       source: phantomNodes[i],
       target,
@@ -346,7 +347,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("transform", `translate(0, ${topMargin - 24})`)
       .style("font", "12px sans-serif")
       .style("font-weight", "600")
-      .style("fill", !isDarkMode ? "#1f2933" : "#fff") 
+      .style("fill", !isDarkMode ? "#1f2933" : "#fff")
       .attr("text-anchor", "middle")
       .selectAll("text")
       .data(columnData)

@@ -76,13 +76,13 @@ const Organization = ({ dateRange }) => {
         const datesFromUrl = params.get("compareDates");
 
         if (isFirstMount.current && datesFromUrl) {
-          setMultiSelectedDates(datesFromUrl.split(","));
+          setMultiSelectedDates(datesFromUrl.split(",").slice(-10));
         } else if (datesFromUrl) {
           // President changed and URL has compareDates.
           // Validate them against the NEW president's gazette data to distinguish:
           //   - URL share: dates are valid for this president → preserve
           //   - Manual president click: old dates don't belong here → reset to defaults
-          const urlDates = datesFromUrl.split(",");
+          const urlDates = datesFromUrl.split(",").slice(-10);
           const gazetteDataDates = new Set(gazetteData.map((g) => g.date));
           const allValid = urlDates.every((d) => gazetteDataDates.has(d));
 

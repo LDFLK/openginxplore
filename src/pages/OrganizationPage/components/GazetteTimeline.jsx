@@ -271,7 +271,6 @@ export default function GazetteTimeline({ multiSelect = false, multiSelectedDate
                           </ul>
                         </Box>
                       }
-                      children={"hellow hello"}
                       placement="top"
                       arrow
                     >
