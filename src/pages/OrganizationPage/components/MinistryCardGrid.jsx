@@ -232,13 +232,7 @@ const MinistryCardGrid = () => {
   };
 
   return (
-    <Box
-      sx={{
-        px: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 },
-        mt: -2,
-        my: 2,
-      }}
-    >
+    <Box>
       <Box
         sx={{
           display: "grid",

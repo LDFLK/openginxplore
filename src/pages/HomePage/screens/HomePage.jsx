@@ -17,7 +17,7 @@ import ThemeToggle from "../../../components/theme-toggle";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
-import { toast } from "react-toastify";
+import Error404 from "../../ErrorBoundaries/screens/404Error";
 import SlFlag from "/sl_flag.png";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
@@ -29,7 +29,9 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { tab } = useParams();
 
-  const selectedTab = tab || "organization";
+  const validTabs = ["executive-branch", "data", "search"];
+
+  const selectedTab = tab || "executive-branch";
 
   const gazetteDateClassic = useSelector(
     (state) => state.gazettes.gazetteDataClassic
@@ -41,7 +43,25 @@ export default function HomePage() {
     null,
   ]);
   const [externalDateRange, setExternalDateRange] = useState([null, null]);
-  const [activePreset, setActivePreset] = useState(null);
+  const [activePreset, setActivePreset] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const startDateParam = params.get("startDate");
+    if (!startDateParam) return "All"; // no URL startDate → default to "All"
+
+    const today = new Date();
+    const urlStart = new Date(startDateParam);
+    const diffYears = (today - urlStart) / (365.25 * 24 * 60 * 60 * 1000);
+
+    if (Math.abs(diffYears - 1) < 0.1) return "1Y";
+    if (Math.abs(diffYears - 2) < 0.1) return "2Y";
+    if (Math.abs(diffYears - 3) < 0.1) return "3Y";
+    if (Math.abs(diffYears - 5) < 0.1) return "5Y";
+
+    // startDate matches the earliest possible year (i.e. "All" was selected)
+    if (urlStart.getFullYear() <= 2019) return "All";
+
+    return null; // custom range — no preset highlighted
+  });
   const [activePresident, setActivePresident] = useState("");
 
   const handleDateRangeChange = useCallback((dateRange) => {
@@ -113,7 +133,7 @@ export default function HomePage() {
     params.delete("ministry");
     params.delete("viewMode");
 
-    if (tabName === "organization") {
+    if (tabName === "executive-branch") {
       params.delete("categoryIds");
       params.delete("datasetId");
       params.delete("datasetName");
@@ -128,24 +148,12 @@ export default function HomePage() {
     });
   };
 
+  if (tab && !validTabs.includes(tab)) {
+    return <Error404 />;
+  }
+
   return (
     <div className="flex">
-      {/* <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        toastClassName={() =>
-          "bg-background text-foreground border border-border shadow-lg rounded-md p-4 w-full"
-        }
-        bodyClassName={() => "text-sm"}
-        progressClassName="bg-primary"
-      /> */}
-
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 z-20 h-[100dvh] ${isExpanded ? "w-48 md:w-64" : "w-12 md:w-16"
@@ -173,14 +181,14 @@ export default function HomePage() {
 
         <nav className="flex flex-col text-foreground w-full gap-1 relative top-0 flex-1 mt-8">
           <button
-            className={`text-xs md:text-sm ${selectedTab === "organization"
+            className={`text-xs md:text-sm ${selectedTab === "executive-branch"
               ? "bg-accent text-primary-foreground font-semibold"
               : "hover:bg-background-dark/85"
               }  hover:cursor-pointer ${isExpanded ? "px-2 md:px-4" : "px-0"} py-2 md:py-3 rounded-md transition-all ease-in-out text-left flex items-center`}
-            onClick={() => handleTabChange("organization")}
+            onClick={() => handleTabChange("executive-branch")}
           >
             <Binoculars className={`${isExpanded ? "mr-2 md:mr-3" : "mx-auto"}`} />
-            {isExpanded && "Organization"}
+            {isExpanded && "Executive Branch"}
           </button>
           <button
             className={`text-xs md:text-sm ${selectedTab === "data"
@@ -263,7 +271,7 @@ export default function HomePage() {
           {selectedTab !== "search" && (
             <TimeRangeSelector
               startYear={2019}
-              dates={selectedTab === "organization" ? dates : []}
+              dates={selectedTab === "executive-branch" ? dates : []}
               onDateChange={handleDateRangeChange}
               externalRange={externalDateRange}
               activePreset={activePreset}
@@ -273,7 +281,7 @@ export default function HomePage() {
             />
           )}
 
-          {selectedTab === "organization" ? (
+          {selectedTab === "executive-branch" ? (
             <Organization dateRange={userSelectedDateRange} />
           ) : selectedTab === "data" ? (
             <DataPage setExternalDateRange={setExternalDateRange} />

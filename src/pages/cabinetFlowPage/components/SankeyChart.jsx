@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal } from "d3-sankey";
 import { useEffect, useRef } from "react";
 
-export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode }) {
+export default function SankeyChart({ data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onClearSelection, selectedLink, selectedNode }) {
   const containerRef = useRef();
   const svgRef = useRef();
 
@@ -41,17 +41,44 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       dateToLayer[normalizeDate(d.date)] = i;
     });
 
-    const { nodes, links } = sankey()
+    const totalLayers = chartDates.length;
+
+    // d3-sankey derives its internal column count from the graph's natural
+    // link depth (longest source-link chain), not from our custom nodeAlign
+    // mapping — any layer nodeAlign returns beyond that natural depth gets
+    // silently clamped into the last real column. If no single link-chain in
+    // the data spans every selected date, columns collapse into each other.
+    // Fix: pad the depth calc with an invisible zero-value node chain, one
+    // per date column, forcing d3-sankey to allocate the full column count.
+    const phantomNodes = Array.from({ length: totalLayers }, (_, i) => ({
+      id: `__phantom_${i}`,
+      __phantom: true,
+      __phantomLayer: i,
+    }));
+
+    const phantomLinks = phantomNodes.slice(1).map((target, i) => ({
+      source: phantomNodes[i],
+      target,
+      value: 0,
+      __phantom: true,
+    }));
+
+    const { nodes: layoutNodes, links: layoutLinks } = sankey()
       .nodeWidth(20)
       .nodePadding(15)
-      .nodeAlign((node) => dateToLayer[normalizeDate(node.time)] ?? 0)
+      .nodeAlign((node) =>
+        node.__phantom ? node.__phantomLayer : dateToLayer[normalizeDate(node.time)] ?? 0
+      )
       .extent([
         [1, topMargin],
         [width - 1, height - bottomMargin],
       ])({
-        nodes: data.nodes.map((d) => Object.assign({}, d)),
-        links: data.links.map((d) => Object.assign({}, d)),
+        nodes: [...data.nodes.map((d) => Object.assign({}, d)), ...phantomNodes],
+        links: [...data.links.map((d) => Object.assign({}, d)), ...phantomLinks],
       });
+
+    const nodes = layoutNodes.filter((n) => !n.__phantom);
+    const links = layoutLinks.filter((l) => !l.__phantom);
 
     // Responsive label truncation
     // Determine how much horizontal space is available for labels on each side.
@@ -71,8 +98,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       }
     });
 
-    const totalLayers = chartDates.length;
-
     function labelCharLimit(node) {
       const layer = node.layer;
       let availablePx;
@@ -81,18 +106,19 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         // 2 column layout: split the single gap 50/50 between both columns
         const gap = layerBounds[1].x0 - layerBounds[0].x1;
         availablePx = gap / 2 - LABEL_PADDING;
+      } else if (layer === 0) {
+        // first column: label renders to the right, full gap to the next column is free
+        const nextX0 = layerBounds[1]?.x0 ?? width;
+        availablePx = nextX0 - layerBounds[0].x1 - LABEL_PADDING;
+      } else if (layer === totalLayers - 1) {
+        // last column: label renders to the left, full gap to the previous column is free
+        const prevX1 = layerBounds[layer - 1]?.x1 ?? 0;
+        availablePx = layerBounds[layer].x0 - prevX1 - LABEL_PADDING;
       } else {
-        // 3 column layout:
-        // for col 1 -> full gaap to col 2
-        // for col 2 to col 3 -> split the gap by 50/50 and use for both col 2 and col 3
-        if (layer === 0) {
-          const nextX0 = layerBounds[1]?.x0 ?? width;
-          availablePx = nextX0 - layerBounds[0].x1 - LABEL_PADDING;
-        } else {
-          const prevX1 = layerBounds[layer - 1]?.x1 ?? 0;
-          const gap = layerBounds[layer].x0 - prevX1;
-          availablePx = gap / 2 - LABEL_PADDING;
-        }
+        // middle columns: split the gap to the previous column 50/50
+        const prevX1 = layerBounds[layer - 1]?.x1 ?? 0;
+        const gap = layerBounds[layer].x0 - prevX1;
+        availablePx = gap / 2 - LABEL_PADDING;
       }
 
       return Math.max(8, Math.floor(availablePx / CHAR_WIDTH_PX));
@@ -101,27 +127,26 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
     // Color scale
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    // Identifies a link by its source/target node ids — links are rebuilt
-    // fresh on every render, so we can't compare object references.
-    const linkKey = (d) => `${d.source.id ?? d.source}->${d.target.id ?? d.target}`;
-    const selectedKey = selectedLink
-      ? `${selectedLink.source?.id ?? selectedLink.source}->${selectedLink.target?.id ?? selectedLink.target}`
-      : null;
+    const nodeKey = (n) => `${n?.id ?? n}::${normalizeDate(n?.time)}`;
+    const selectedNodeKey = selectedNode ? nodeKey(selectedNode) : null;
+
+    const linkKey = (d) => `${nodeKey(d.source)}->${nodeKey(d.target)}`;
+    const selectedKey = selectedLink ? linkKey(selectedLink) : null;
     const isSelectedLink = (d) => !!selectedKey && linkKey(d) === selectedKey;
     const isLinkedToSelectedNode = (d) =>
-      !!selectedNode && (d.source.id === selectedNode.id || d.target.id === selectedNode.id);
+      !!selectedNodeKey && (nodeKey(d.source) === selectedNodeKey || nodeKey(d.target) === selectedNodeKey);
     const isHighlighted = (d) => isSelectedLink(d) || isLinkedToSelectedNode(d);
-    const hasActiveSelection = !!selectedKey || !!selectedNode;
+    const hasActiveSelection = !!selectedKey || !!selectedNodeKey;
 
-    const relevantNodeIds = new Set();
-    if (selectedNode) relevantNodeIds.add(selectedNode.id);
+    const relevantNodeKeys = new Set();
+    if (selectedNodeKey) relevantNodeKeys.add(selectedNodeKey);
     links.forEach((d) => {
       if (isHighlighted(d)) {
-        relevantNodeIds.add(d.source.id);
-        relevantNodeIds.add(d.target.id);
+        relevantNodeKeys.add(nodeKey(d.source));
+        relevantNodeKeys.add(nodeKey(d.target));
       }
     });
-    const isRelevantNode = (d) => !hasActiveSelection || relevantNodeIds.has(d.id);
+    const isRelevantNode = (d) => !hasActiveSelection || relevantNodeKeys.has(nodeKey(d));
 
     const greyColor = isDarkMode ? "#4b5563" : "#64748b";
     const greyColorHover = isDarkMode ? "#6b7280" : "#c0c7d1";
@@ -150,7 +175,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("offset", "100%")
       .attr("stop-color", (d) => color(d.target.id));
 
-    // Tooltip — pinned next to the hovered link's nodes, not the cursor
+    // Tooltip — pinned next to the hovered/clicked link's nodes, not the cursor
     const tooltip = container
       .append("div")
       .attr("class", "sankey-tooltip")
@@ -172,11 +197,9 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
 
     // Hovering the link or the tooltip itself keeps it open; leaving both hides it
     let hideTimer = null;
-    let activeLinkData = null;
 
-    // Pins the tooltip right where the cursor entered the link, once — it
-    // does NOT track mousemove afterwards, so it stays put under the cursor
-    // instead of requiring the user to travel to find it.
+    // Repositions the tooltip relative to the current cursor position so it
+    // tracks the mouse while hovering a link.
     const positionTooltipAtCursor = (event) => {
       const containerRect = containerRef.current.getBoundingClientRect();
       const tooltipNode = tooltip.node();
@@ -214,7 +237,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
         clearTimeout(hideTimer);
         hideTimer = null;
       }
-      activeLinkData = d;
       tooltip
         .style("pointer-events", "auto")
         .html(`
@@ -222,10 +244,6 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
             <strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br/>
             ${d.value} department${d.value > 1 ? "s" : ""} moved
           </div>
-          ${onLinkClick
-            ? `<button type="button" class="sankey-tooltip-link text-accent" style="margin-top:6px;display:inline-block;background:none;border:none;padding:0;font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;">View departments moved</button>`
-            : ""
-          }
         `);
 
       positionTooltipAtCursor(event);
@@ -250,13 +268,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
           hideTimer = null;
         }
       })
-      .on("mouseleave", hideTooltipDelayed)
-      .on("click", (event) => {
-        event.stopPropagation();
-        if (event.target.closest(".sankey-tooltip-link") && activeLinkData) {
-          onLinkClick?.(activeLinkData);
-        }
-      });
+      .on("mouseleave", hideTooltipDelayed);
 
     // Links
     svg
@@ -270,13 +282,16 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("stroke", (d, i) => (isHighlighted(d) || !hasActiveSelection ? `url(#gradient-${i})` : greyColor))
       .attr("stroke-opacity", restingOpacity)
       .attr("stroke-width", (d) => Math.max(1, d.width))
-      .style("cursor", onLinkSingleClick ? "pointer" : "default")
+      .style("cursor", onLinkClick ? "pointer" : "default")
       .on("mouseover", (event, d) => {
         const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", 0.9);
         if (!isHighlighted(d) && hasActiveSelection) {
           link.attr("stroke", greyColorHover);
         }
         showTooltip(d, event);
+      })
+      .on("mousemove", (event) => {
+        positionTooltipAtCursor(event);
       })
       .on("mouseout", (event, d) => {
         const link = d3.select(event.target).transition().duration(200).attr("stroke-opacity", restingOpacity(d));
@@ -287,7 +302,12 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       })
       .on("click", (event, d) => {
         event.stopPropagation();
-        onLinkSingleClick?.(d.source);
+        if (isSelectedLink(d)) {
+          onClearSelection?.();
+        } else {
+          showTooltip(d, event);
+          onLinkClick?.(d);
+        }
       });
 
     // Column date labels
@@ -327,7 +347,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("transform", `translate(0, ${topMargin - 24})`)
       .style("font", "12px sans-serif")
       .style("font-weight", "600")
-      .style("fill", !isDarkMode ? "#1f2933" : "#fff") 
+      .style("fill", !isDarkMode ? "#1f2933" : "#fff")
       .attr("text-anchor", "middle")
       .selectAll("text")
       .data(columnData)
@@ -347,8 +367,8 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       .attr("width", (d) => d.x1 - d.x0)
       .attr("fill", (d) => color(d.id))
       .attr("fill-opacity", (d) => (isRelevantNode(d) ? 1 : 0.25))
-      .attr("stroke", (d) => (selectedNode?.id === d.id ? (isDarkMode ? "#fff" : "#1f2933") : "none"))
-      .attr("stroke-width", (d) => (selectedNode?.id === d.id ? 0 : 0))
+      .attr("stroke", (d) => (nodeKey(d) === selectedNodeKey ? (isDarkMode ? "#fff" : "#1f2933") : "none"))
+      .attr("stroke-width", (d) => (nodeKey(d) === selectedNodeKey ? 0 : 0))
       .style("cursor", onNodeClick ? "pointer" : "default")
       .on("click", handleNodeClick)
       .append("title")
@@ -391,7 +411,7 @@ export default function SankeyChart({ data, width, height, isDarkMode, onNodeCli
       if (hideTimer) clearTimeout(hideTimer);
       tooltip.remove();
     };
-  }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode]);
+  }, [data, width, height, isDarkMode, onNodeClick, onNodeNavigate, onLinkClick, onClearSelection, selectedLink, selectedNode]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", overflow: "hidden" }}>

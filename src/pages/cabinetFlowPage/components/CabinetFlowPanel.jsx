@@ -4,7 +4,7 @@ import SankeyChart from "./SankeyChart";
 import { BarChart2 } from "lucide-react";
 import { useThemeContext } from "../../../context/themeContext";
 
-const CabinetFlowPanel = ({ presidentId, dates, onNodeClick, onNodeNavigate, onLinkClick, onLinkSingleClick, onClearSelection, selectedLink, selectedNode }) => {
+const CabinetFlowPanel = ({ presidentId, dates, onNodeClick, onNodeNavigate, onLinkClick, onClearSelection, selectedLink, selectedNode }) => {
     const { isDark } = useThemeContext();
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -31,7 +31,7 @@ const CabinetFlowPanel = ({ presidentId, dates, onNodeClick, onNodeNavigate, onL
         return (
             <div className="w-full flex flex-col items-center justify-center py-20 gap-4">
                 <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">Loading cabinet flow…</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Loading changes</p>
             </div>
         );
     }
@@ -41,7 +41,7 @@ const CabinetFlowPanel = ({ presidentId, dates, onNodeClick, onNodeNavigate, onL
             <div className="w-full rounded-xl border border-dashed border-border flex flex-col items-center justify-center py-20 gap-3">
                 <BarChart2 size={36} className="text-gray-300 dark:text-gray-600" />
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Could not load cabinet flow
+                    Could not load changes
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 max-w-xs text-center">
                     Something went wrong fetching the data. Try different dates or reload the page.
@@ -57,15 +57,14 @@ const CabinetFlowPanel = ({ presidentId, dates, onNodeClick, onNodeNavigate, onL
     return (
         <div ref={containerRef} className="w-full mt-2">
             {noDataDates.length > 0 && (
-                <div className="mt-4 mb-4 ms-0 me-0 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+                <div className="mt-2 mb-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
                     <p className="text-sm font-medium">
-                        Some selected dates don’t have active departments data.
+                        {noDataDates.length > 1
+                            ? "Some selected dates don't have active departments."
+                            : "One of the selected dates doesn't have active departments."}
                     </p>
                     <p className="mt-0.5 text-xs opacity-80">
-                        Please deselect the following date(s):{" "}
-                        <span className="font-semibold">
-                            {noDataDates.map((d) => d.date).join(", ")}
-                        </span>
+                        {noDataDates.map((d) => d.date).join(", ")}
                     </p>
                 </div>
             )}
@@ -78,7 +77,6 @@ const CabinetFlowPanel = ({ presidentId, dates, onNodeClick, onNodeNavigate, onL
                     onNodeClick={onNodeClick}
                     onNodeNavigate={onNodeNavigate}
                     onLinkClick={onLinkClick}
-                    onLinkSingleClick={onLinkSingleClick}
                     onClearSelection={onClearSelection}
                     selectedLink={selectedLink}
                     selectedNode={selectedNode}
