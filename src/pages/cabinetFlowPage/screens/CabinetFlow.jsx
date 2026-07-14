@@ -63,6 +63,7 @@ const CabinetFlow = ({ presidentId, selectedDates = [], onMinistryNodeClick }) =
                                 <li>Each column represents a date when one or more changes may have occurred.</li>
                                 <li>Hover over a flow to view details about the departments involved.</li>
                                 <li>You can select up to 10 dates to compare.</li>
+                                <li>Click on a flow to view the departments that moved. Click on a ministry's node to highlight the department changes for that ministry.</li>
                             </ul>
                         </div>
                     </div>
