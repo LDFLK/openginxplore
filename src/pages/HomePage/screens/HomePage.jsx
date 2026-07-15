@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Binoculars,
   BookOpenText,
@@ -72,54 +72,6 @@ export default function HomePage() {
 
   const dates =
     gazetteDateClassic && gazetteDateClassic.map((d) => `${d.date}T00:00:00Z`);
-
-  useEffect(() => {
-    const isVisited = localStorage.getItem("OpenGINXploreVisit");
-
-    if (!isVisited) {
-      setTimeout(() => {
-        const toastContent = (
-          <div className="w-full">
-            <div className="text-primary max-w-prose">
-              <p className="font-semibold">📢 Welcome to OpenGIN Xplore!</p>
-              <p>
-                This project is{" "}
-                <Link to="https://github.com/LDFLK" target="_blank" rel="noopener noreferrer" className="text-accent">
-                  Open Source
-                </Link>{" "}
-                and evolving fast. Your feedback helps us make it better for everyone.
-              </p>
-            </div>
-            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
-              <Link
-                to={feedbackFormUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="cursor-pointer bg-accent text-primary-foreground border-none p-2 rounded-md">
-                  <p>Share feedback</p>
-                </div>
-              </Link>
-              <button
-                onClick={() => toast.dismiss()}
-                className="cursor-pointer bg-primary/25 border-none p-2 rounded-md text-primary"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        );
-
-        toast(toastContent, {
-          autoClose: false,
-          closeOnClick: false,
-          draggable: false,
-        });
-
-        localStorage.setItem("OpenGINXploreVisit", true);
-      }, 5000);
-    }
-  }, []);
 
   const handleTabChange = (tabName) => {
     const params = new URLSearchParams(window.location.search);
