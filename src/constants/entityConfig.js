@@ -13,7 +13,7 @@ export const ENTITY_CONFIG = {
     },
     department: {
         icon: Building2,
-        label: "Department",
+        label: "Departments, Statutory Institutions and Public Corporations",
         bgColor: "bg-blue-500/10",
         textColor: "text-blue-600",
         borderColor: "border-blue-500/20",

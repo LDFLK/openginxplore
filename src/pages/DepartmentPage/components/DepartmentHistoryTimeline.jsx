@@ -31,7 +31,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
         <div className="flex flex-col items-center justify-center bg-transparent px-6 py-20">
           <div className="text-center max-w-md">
             <p className="text-sm text-gray-500 dark:text-gray-400 border-none mb-6">
-              Something went wrong. Couldn't load department history.
+              Something went wrong. Couldn't load departments, statutory institutions and public corporations history.
             </p>
           </div>
         </div>

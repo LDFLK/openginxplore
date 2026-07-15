@@ -120,7 +120,7 @@ export default function Drawer({
                       </div>
                     ) : selectedNode.type == "department" ? (
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
-                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Department</span>
+                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Departments, Statutory Institutions and Public Corporations</span>
                       </div>
                     ) : selectedNode.type == "persons" ? (
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">

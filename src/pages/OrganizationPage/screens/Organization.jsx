@@ -206,7 +206,7 @@ const Organization = ({ dateRange }) => {
         <div className="flex items-end border-b border-border mb-4 gap-2 px-2">
           <button
             onClick={() => toggleView("structure")}
-            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "structure"
+            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-xs md:text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "structure"
               ? "bg-card border-border text-primary"
               : "bg-muted border-transparent text-primary/60 hover:bg-muted/80 hover:text-primary"
               }`}
@@ -218,7 +218,7 @@ const Organization = ({ dateRange }) => {
           </button>
           <button
             onClick={() => toggleView("changes")}
-            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "changes"
+            className={`min-w-[140px] md:min-w-[160px] px-6 py-2.5 text-xs md:text-sm font-semibold transition-all duration-200 hover:cursor-pointer rounded-t-xl border-t border-l border-r relative ${activeView === "changes"
               ? "bg-card border-border text-primary"
               : "bg-muted border-transparent text-primary/60 hover:bg-muted/80 hover:text-primary"
               }`}
