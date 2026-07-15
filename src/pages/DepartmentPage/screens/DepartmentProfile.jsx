@@ -56,7 +56,7 @@ export default function DepartmentProfile() {
       </div>
       <div className="flex justify-center">
         <p className="border border-border text-xs text-accent font-semibold px-4 py-3 bg-background mt-2 md:mt-4 rounded-full">
-          Departments, Statutory Institutions and Public Corporations History Timeline{" "}
+          History Timeline{" "}
           <InfoTooltip
             message="Ministers the Departments, Statutory Institutions and Public Corporations was under throughout history"
             iconColor={colors.textPrimary}

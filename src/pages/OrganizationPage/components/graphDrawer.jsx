@@ -120,7 +120,7 @@ export default function Drawer({
                       </div>
                     ) : selectedNode.type == "department" ? (
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
-                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Departments, Statutory Institutions and Public Corporations</span>
+                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Department, Statutory Institution or Public Corporation</span>
                       </div>
                     ) : selectedNode.type == "persons" ? (
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
@@ -210,7 +210,7 @@ export default function Drawer({
                     parentNode &&
                       (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") &&
                       selectedTab === "departments"
-                      ? <h2 className="text-sm md:text-md font-normal text-primary mt-2 md:mt-4 mb-2 shrink-0"> {Object.keys(drawerContentList).length} Departments</h2>
+                      ? <h2 className="text-sm md:text-md font-normal text-primary mt-2 md:mt-4 mb-2 shrink-0"> {Object.keys(drawerContentList).length} Departments, Statutory Institutions and Public Corporations</h2>
                       : parentNode &&
                         (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") &&
                         selectedTab === "persons"

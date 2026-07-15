@@ -925,15 +925,16 @@ const MinistryCardGrid = () => {
                             onClick={
                               (activeStep != 0 &&
                                 step.label == "Ministries" &&
-                                selectedCard) ||
-                                (activeStep == 1 &&
-                                  step.label == "Departments, Statutory Institutions and Public Corporations & People")
+                                selectedCard)
                                 ? handleBack
                                 : null
                             }
                             sx={{
                               fontWeight: 700,
                               cursor: "pointer",
+                              ...(step.label !== "Ministries" && {
+                                display: "none",
+                              }),
                               "&:hover .MuiTypography-root": {
                                 textDecoration: "underline",
                               },
@@ -1013,7 +1014,7 @@ const MinistryCardGrid = () => {
                                   </Box>
                                 )}
                               </Box>
-                            ) : (
+                            ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
                               <Typography
                                 component="span"
                                 sx={{
@@ -1138,7 +1139,7 @@ const MinistryCardGrid = () => {
                                     p: { xs: 0, sm: 0, md: 4 },
                                     borderRadius: { xs: 0, sm: 0, md: "14px" },
                                     mr: 1,
-                                    mt: 2,
+                                    mt: 0,
                                     display: "flex",
                                     flexDirection: "column",
                                     overflowY: "auto",

@@ -130,9 +130,9 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                           gap: 0.5
                         }}
                       >
-                        Total Departments{" "}
+                        Total count{" "}
                         <InfoTooltip
-                          message="Total of departments under the minister on this date"
+                          message="Total number of departments, statutory institutions and public corporations under the minister on this date"
                           iconColor={colors.textPrimary}
                           iconSize={13}
                           placement="right"
@@ -186,9 +186,9 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                           gap: 0.5
                         }}
                       >
-                        New Departments{" "}
+                        Newly added{" "}
                         <InfoTooltip
-                          message="Total of newly added departments to this minister on this date"
+                          message="Total number of newly added departments, statutory institutions and public corporations under this minister on this date"
                           iconColor={colors.textPrimary}
                           iconSize={13}
                           placement="right"
@@ -231,13 +231,13 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                   mb: { xs: "6px", sm: "6px", md: 0 }
                 }}
               >
-                Departments
+                Departments, Statutory Institutions and Public Corporations
               </Typography>
 
               <Box>
                 <TextField
                   size="small"
-                  label="Search departments"
+                  label="Search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   InputProps={{
