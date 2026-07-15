@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import utils from "../../../utils/utils";
 import { useLocation } from "react-router-dom";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import useClickOutside from "../../../hooks/useClickOutside";
 
 export default function TimeRangeSelector({
   startYear,
@@ -27,6 +28,11 @@ export default function TimeRangeSelector({
   const containerRef = useRef(null);
   const dragStartRef = useRef(null);
   const scrollWrapperRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const calendarRef = useRef(null);
+
+  useClickOutside(dropdownRef, () => setIsDropdownOpen(false))
+  useClickOutside(calendarRef, () => setCalendarOpen(false))
 
   // Helper: safely parse YYYY-MM-DD → Date
   const parseDate = (dateStr, fallback) => {
@@ -105,6 +111,7 @@ export default function TimeRangeSelector({
     initialStart.getUTCFullYear(),
     initialEnd.getUTCFullYear(),
   ]);
+
   useEffect(() => {
     if (!externalRange) return;
 
@@ -427,6 +434,7 @@ export default function TimeRangeSelector({
     () => getPreciseOverlayMetrics(),
     [startDate, endDate, tempEndDate, tempStartDate, selectedRange]
   );
+
   const handlePositions = React.useMemo(
     () => getHandlePositions(),
     [startDate, endDate, tempEndDate, tempStartDate, selectedRange]
@@ -620,6 +628,7 @@ export default function TimeRangeSelector({
     setIsDragging(null);
     setIsMovingWindow(false);
   };
+
   useEffect(() => {
     if (onDateChange && startDate && endDate) {
       onDateChange([startDate, endDate]);
@@ -822,7 +831,7 @@ export default function TimeRangeSelector({
         ))}
 
         {/* Presidents dropdown */}
-        <div className="relative w-full md:w-56 text-xs">
+        <div ref={dropdownRef} className="relative w-full md:w-56 text-xs">
           {/* Main button */}
           <button
             className={`w-full px-3 py-1.5 text-left font-medium cursor-pointer rounded-md focus:outline-none flex justify-between items-center border border-border ${activePresident
@@ -947,7 +956,7 @@ export default function TimeRangeSelector({
         </div>
 
         {/* Calendar button */}
-        <div className="relative w-full md:w-auto">
+        <div ref={calendarRef} className="relative w-full md:w-auto">
           <button
             onClick={() => {
               setCalendarStart(startDate);
@@ -1253,7 +1262,7 @@ export default function TimeRangeSelector({
                       });
                     }
                   }}
-                  className="px-3 py-1.5 bg-accent text-primary cursor-pointer rounded-md hover:bg-accent text-xs"
+                  className="px-3 py-1.5 bg-accent text-white cursor-pointer rounded-md hover:bg-accent text-xs"
                 >
                   Apply
                 </button>
