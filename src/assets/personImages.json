@@ -1,8 +1,38 @@
 [
-  { "personName": "Ranil Wickremesinghe", "type": "president", "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/ranil-wickremesinghe.jpg", "themeColorLight": "#4A9243" },
-  { "personName": "Anura Kumara Dissanayake", "type": "president", "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/anura-kumara-dissanayake.jpg", "themeColorLight": "#B33F67" },
-  { "personName": "Gotabaya Rajapaksa", "type": "president", "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/gotabaya-rajapaksa.jpg", "themeColorLight": "#C23D48" },
-  { "personName": "Dinesh Chandra Rupasingha Gunawardena", "type": "prime-minister", "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/dinesh-gunawardena.jpg", "themeColorLight": "#C23D48" },
-  { "personName": "Harini Amarasuriya", "type": "prime-minister", "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/harini-amarasuriya.jpg", "themeColorLight": "#C23D48" },
-  { "personName": "Mahinda Rajapaksa", "type": "prime-minister", "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/mahinda-rajapaksa.jpg", "themeColorLight": "#C23D48" }
+  {
+    "personName": "Ranil Wickremesinghe",
+    "type": "president",
+    "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/ranil-wickremesinghe.jpg",
+    "themeColorLight": "#299fb9"
+  },
+  {
+    "personName": "Anura Kumara Dissanayake",
+    "type": "president",
+    "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/anura-kumara-dissanayake.jpg",
+    "themeColorLight": "#749427"
+  },
+  {
+    "personName": "Gotabaya Rajapaksa",
+    "type": "president",
+    "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/gotabaya-rajapaksa.jpg",
+    "themeColorLight": "#af8841"
+  },
+  {
+    "personName": "Dinesh Chandra Rupasingha Gunawardena",
+    "type": "prime-minister",
+    "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/dinesh-gunawardena.jpg",
+    "themeColorLight": "#C23D48"
+  },
+  {
+    "personName": "Harini Amarasuriya",
+    "type": "prime-minister",
+    "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/harini-amarasuriya.jpg",
+    "themeColorLight": "#C23D48"
+  },
+  {
+    "personName": "Mahinda Rajapaksa",
+    "type": "prime-minister",
+    "imageUrl": "https://raw.githubusercontent.com/LDFLK/datasets/main/data/people/images/mahinda-rajapaksa.jpg",
+    "themeColorLight": "#C23D48"
+  }
 ]

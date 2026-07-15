@@ -139,7 +139,7 @@ const MinistryCardGrid = () => {
       description: `All active ministries on this date`,
     },
     {
-      label: "Departments & People",
+      label: "Departments, Statutory Institutions and Public Corporations & People",
       description: "All departments under this ministry",
     },
   ];
@@ -148,7 +148,7 @@ const MinistryCardGrid = () => {
     let IconComponent = null;
 
     if (label === "Ministries") IconComponent = ApartmentIcon;
-    if (label === "Departments & People") IconComponent = PeopleIcon;
+    if (label === "Departments, Statutory Institutions and Public Corporations & People") IconComponent = PeopleIcon;
 
     if (!IconComponent) return null;
 
@@ -748,7 +748,7 @@ const MinistryCardGrid = () => {
               justifyContent: "flex-end",
             }}
           >
-            {steps[activeStep]?.label !== "Departments & People" && !new URLSearchParams(location.search).has("ministry") && (
+            {steps[activeStep]?.label !== "Departments, Statutory Institutions and Public Corporations & People" && !new URLSearchParams(location.search).has("ministry") && (
               <>
                 {/* Search Bar */}
                 <Box
@@ -908,9 +908,9 @@ const MinistryCardGrid = () => {
                     orientation="vertical"
                   >
                     {steps.map((step) => {
-                      // Hide "Departments & People" step if it's not clickable
+                      // Hide "Departments, Statutory Institutions and Public Corporations & People" step if it's not clickable
                       if (
-                        step.label == "Departments & People" &&
+                        step.label == "Departments, Statutory Institutions and Public Corporations & People" &&
                         activeStep != 1
                       ) {
                         return null;
@@ -925,15 +925,16 @@ const MinistryCardGrid = () => {
                             onClick={
                               (activeStep != 0 &&
                                 step.label == "Ministries" &&
-                                selectedCard) ||
-                                (activeStep == 1 &&
-                                  step.label == "Departments & People")
+                                selectedCard)
                                 ? handleBack
                                 : null
                             }
                             sx={{
                               fontWeight: 700,
                               cursor: "pointer",
+                              ...(step.label !== "Ministries" && {
+                                display: "none",
+                              }),
                               "&:hover .MuiTypography-root": {
                                 textDecoration: "underline",
                               },
@@ -1013,7 +1014,7 @@ const MinistryCardGrid = () => {
                                   </Box>
                                 )}
                               </Box>
-                            ) : (
+                            ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
                               <Typography
                                 component="span"
                                 sx={{
@@ -1132,13 +1133,13 @@ const MinistryCardGrid = () => {
                               )} */}
                               </>
                             ) : (
-                              step.label == "Departments & People" && (
+                              step.label == "Departments, Statutory Institutions and Public Corporations & People" && (
                                 <DialogContent
                                   sx={{
                                     p: { xs: 0, sm: 0, md: 4 },
                                     borderRadius: { xs: 0, sm: 0, md: "14px" },
                                     mr: 1,
-                                    mt: 2,
+                                    mt: 0,
                                     display: "flex",
                                     flexDirection: "column",
                                     overflowY: "auto",

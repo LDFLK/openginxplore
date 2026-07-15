@@ -296,7 +296,6 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   useEffect(() => {
     if (!selectedDate?.date) return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("view") === "department-flow") return;
     if (params.get("view") === "changes") return;
 
     if (!initializedFromUrl) return;
