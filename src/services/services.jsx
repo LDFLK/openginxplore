@@ -16,7 +16,7 @@ export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
     }
   );
 
-  // temp fix: remove state minister if president is the state minister
+  // TODO: Remove this temporary fix when the backend is updated to no longer assign the president as a state minister.
   const formattedData = (data?.portfolioList || []).map((item) => {
     return {
       ...item,
