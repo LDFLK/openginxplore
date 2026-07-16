@@ -19,7 +19,7 @@ import InfoTooltip from "../../../components/InfoToolTip";
 import { useDepartmentsByPortfolio } from "../../../hooks/useDepartmentsByPortfolio";
 
 
-const DepartmentTab = ({ selectedDate, ministryId }) => {
+const DepartmentTab = ({ selectedDate, ministryId, onDepartmentClick }) => {
   const { colors } = useThemeContext();
   const { selectedPresident } = useSelector((state) => state.presidency);
   const [searchQuery, setSearchQuery] = useState("");
@@ -279,9 +279,15 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                 return (
                   <div
                     key={dep.id}
+                    role="button"
+                    tabIndex={0}
                     onMouseEnter={() => setHoveredDeptId(dep.id)}
                     onMouseLeave={() => setHoveredDeptId(null)}
-                    className={`flex flex-col rounded-lg  cursor-pointer transition-shadow border 
+                    onClick={() => onDepartmentClick?.(dep)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") onDepartmentClick?.(dep);
+                    }}
+                    className={`flex flex-col rounded-lg  cursor-pointer transition-shadow border
                       ${hoveredDeptId === dep.id ? "shadow-md" : "shadow-sm"}`}
                     style={{ borderColor: selectedPresident.themeColorLight + "99" }}
                   >
@@ -324,6 +330,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                         state={{ mode: "back", from: location.pathname + location.search }}
                         className="text-xs md:text-sm font-small hover:underline"
                         style={{ color: selectedPresident.themeColorLight }}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         History
                       </Link>
@@ -346,6 +353,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                             to={`/data?${outerParams.toString()}`}
                             className="text-xs md:text-sm font-normal hover:underline"
                             style={{ color: selectedPresident.themeColorLight }}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             Data
                           </Link>
