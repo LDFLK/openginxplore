@@ -133,35 +133,31 @@ const BodyTab = ({ departmentId }) => {
           )}
 
           {bodyList.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4">
               {bodyList.map((body) => (
                 <div
                   key={body.id}
                   onMouseEnter={() => setHoveredBodyId(body.id)}
                   onMouseLeave={() => setHoveredBodyId(null)}
-                  className={`flex flex-col rounded-lg overflow-hidden cursor-pointer transition-shadow border
-                    ${hoveredBodyId === body.id ? "shadow-md" : "shadow-sm"}`}
-                  style={{ borderColor: selectedPresident.themeColorLight + "99" }}
+                  className="flex items-center gap-3 rounded-lg border px-4 py-3 transition-all"
+                  style={{
+                    backgroundColor: colors.backgroundWhite,
+                    borderColor:
+                      hoveredBodyId === body.id
+                        ? selectedPresident.themeColorLight
+                        : colors.border,
+                    boxShadow:
+                      hoveredBodyId === body.id
+                        ? "0 2px 8px rgba(0,0,0,0.08)"
+                        : "none",
+                  }}
                 >
-                  {/* Header */}
-                  <div
-                    className="flex items-center gap-2 px-4 py-2"
-                    style={{
-                      backgroundColor:
-                        hoveredBodyId === body.id
-                          ? selectedPresident.themeColorLight
-                          : selectedPresident.themeColorLight + "99",
-                      minHeight: "70px",
-                      maxHeight: "70px",
-                    }}
+                  <span
+                    className="font-normal text-xs md:text-sm leading-[1.4] font-poppins overflow-hidden text-ellipsis line-clamp-2"
+                    style={{ color: colors.textPrimary }}
                   >
-                    <div className="flex flex-col justify-center flex-1 overflow-hidden">
-                      <span
-                        className=" text-white  font-normal  text-xs md:text-sm leading-[1.4] font-poppins overflow-hidden text-ellipsis line-clamp-3">
-                        {body.name}
-                      </span>
-                    </div>
-                  </div>
+                    {body.name}
+                  </span>
                 </div>
               ))}
             </div>
