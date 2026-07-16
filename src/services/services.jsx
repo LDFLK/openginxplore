@@ -2,7 +2,6 @@ import utils from "../utils/utils";
 import axios from "@/lib/axios";
 
 const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : ""
-// const apiUrl = "";
 
 const GI_SERVICE_URL = "/v1/organisation";
 const GI_SERVICE_URL_PERSON = "/v1/person";
@@ -17,7 +16,15 @@ export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
     }
   );
 
-  return data;
+  // temp fix: remove state minister if president is the state minister
+  const formattedData = (data?.portfolioList || []).map((item) => {
+    return {
+      ...item,
+      ministers: (item?.type === "stateMinister" && item?.ministers?.[0]?.isPresident) ? [] : (item?.ministers || [])
+    }
+  })
+
+  return { ...data, portfolioList: formattedData };
 };
 
 export const getPersonProfile = async ({ personId, signal }) => {
