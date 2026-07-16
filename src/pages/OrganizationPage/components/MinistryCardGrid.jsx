@@ -995,23 +995,25 @@ const MinistryCardGrid = () => {
                                     </Box>
                                   </Link>
                                 ) : (
-                                  selectedCard.ministers?.length === 0 ?? (<Box
-                                    sx={{
-                                      backgroundColor: `${selectedPresident.themeColorLight}66`,
-                                      color: "#fff",
-                                      fontSize: { xs: "0.6rem", md: "0.9rem" },
-                                      borderRadius: "12px",
-                                      px: 1.5,
-                                      py: 0.7,
-                                      fontFamily: "poppins",
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      lineHeight: 1,
-                                      mt: 0.2,
-                                    }}
-                                  >
-                                    {selectedCard.ministers?.[0]?.name}
-                                  </Box>)
+                                  selectedCard.ministers?.length === 0 ? null : (
+                                    <Box
+                                      sx={{
+                                        backgroundColor: `${selectedPresident.themeColorLight}66`,
+                                        color: "#fff",
+                                        fontSize: { xs: "0.6rem", md: "0.9rem" },
+                                        borderRadius: "12px",
+                                        px: 1.5,
+                                        py: 0.7,
+                                        fontFamily: "poppins",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        lineHeight: 1,
+                                        mt: 0.2,
+                                      }}
+                                    >
+                                      {selectedCard.ministers?.[0]?.name}
+                                    </Box>
+                                  )
                                 )}
                               </Box>
                             ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
