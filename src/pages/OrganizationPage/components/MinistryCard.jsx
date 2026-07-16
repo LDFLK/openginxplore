@@ -183,7 +183,7 @@ const MinistryCard = ({ card, onClick }) => {
                   } : {},
                 }}
               >
-                {card.ministers?.length === 0 ? "Not assigned" : card.ministers?.[0]?.name}
+                {card.ministers?.length === 0 ? "" : card.ministers?.[0]?.name}
               </Typography>
 
               {card.ministers?.[0]?.isNew && showPersonBadge && (
