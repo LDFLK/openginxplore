@@ -995,7 +995,7 @@ const MinistryCardGrid = () => {
                                     </Box>
                                   </Link>
                                 ) : (
-                                  <Box
+                                  selectedCard.ministers?.length === 0 ?? (<Box
                                     sx={{
                                       backgroundColor: `${selectedPresident.themeColorLight}66`,
                                       color: "#fff",
@@ -1011,7 +1011,7 @@ const MinistryCardGrid = () => {
                                     }}
                                   >
                                     {selectedCard.ministers?.[0]?.name}
-                                  </Box>
+                                  </Box>)
                                 )}
                               </Box>
                             ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (

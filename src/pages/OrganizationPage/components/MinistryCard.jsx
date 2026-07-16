@@ -128,7 +128,8 @@ const MinistryCard = ({ card, onClick }) => {
         <Stack
           spacing={0.5}
           sx={{
-            p: 1,
+            px: 1.5,
+            py: 1,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between", // push name to bottom
@@ -182,7 +183,7 @@ const MinistryCard = ({ card, onClick }) => {
                   } : {},
                 }}
               >
-                {card.ministers?.[0]?.name}
+                {card.ministers?.length === 0 ? "" : card.ministers?.[0]?.name}
               </Typography>
 
               {card.ministers?.[0]?.isNew && showPersonBadge && (
