@@ -56,6 +56,12 @@ const PersonHistoryTimeline = ({
         lineColor={isDark ? "#364153" : "#dbdbdb"}
       >
         {ministryHistory.map((entry, idx) => {
+
+          const lowerMinistry = entry?.name?.toLowerCase()
+          const showCard = !((lowerMinistry?.startsWith("state") || lowerMinistry?.startsWith("non cabinet")) && entry?.is_president)
+
+          if (!showCard) return null
+
           return (
             <VerticalTimelineElement
               key={idx}

@@ -21,6 +21,19 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
     error
   } = useDepartmentHistory(selectedDepartment?.id);
 
+  // TODO: temp solution. Remove presidents' names from state and non cabinet ministries
+  const PRESIDENTS_LIST = ["gotabaya rajapaksa", "ranil wickremesinghe", "anura kumara dissanayake"];
+
+  const getMinisterName = (ministryName, ministerName) => {
+    const lowerMinistry = (ministryName || "").toLowerCase();
+    const lowerMinister = (ministerName || "").toLowerCase();
+
+    if (!((lowerMinistry.startsWith("state") || lowerMinistry.startsWith("non cabinet")) && PRESIDENTS_LIST.includes(lowerMinister))) {
+      return ministerName
+    }
+    return ""
+  }
+
   return (
     <>
       {isLoading ? (
@@ -96,7 +109,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                             }}
                             className="text-accent text-normal font-medium hover:text-accent/80 hover:underline transition-colors"
                           >
-                            {entry.minister_name}
+                            {getMinisterName(entry.ministry_name, entry.minister_name)}
                           </Link>
                         ) : (
                           <span className="text-primary/25 italic">

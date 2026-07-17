@@ -1191,7 +1191,7 @@ const MinistryCardGrid = () => {
                                         },
                                       }}
                                     >
-                                      {["departments", "people"].map((tab) => {
+                                      {["departments", "people"].filter(tab => !(tab === "people" && selectedCard?.type === "stateMinister")).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);
@@ -1252,7 +1252,7 @@ const MinistryCardGrid = () => {
                                         gap: 2,
                                       }}
                                     >
-                                      {["departments", "people"].map((tab) => {
+                                      {["departments", "people"].filter(tab => !(tab === "people" && selectedCard?.type === "stateMinister")).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);
@@ -1302,7 +1302,7 @@ const MinistryCardGrid = () => {
                                             ministryId={selectedCard?.id}
                                           />
                                         )}
-                                      {selectedCard && activeTab === "people" && (
+                                      {selectedCard && activeTab === "people" && selectedCard.type !== "stateMinister" && (
                                         <PersonsTab
                                           selectedDate={
                                             selectedDate?.date || selectedDate
