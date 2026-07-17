@@ -995,7 +995,7 @@ const MinistryCardGrid = () => {
                                     </Box>
                                   </Link>
                                 ) : (
-                                  selectedCard.ministers?.length === 0 ? null : (
+                                  selectedCard.ministers?.[0]?.name ? (
                                     <Box
                                       sx={{
                                         backgroundColor: `${selectedPresident.themeColorLight}66`,
@@ -1011,9 +1011,9 @@ const MinistryCardGrid = () => {
                                         mt: 0.2,
                                       }}
                                     >
-                                      {selectedCard.ministers?.[0]?.name}
+                                      {selectedCard.ministers[0].name}
                                     </Box>
-                                  )
+                                  ) : null
                                 )}
                               </Box>
                             ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
@@ -1191,7 +1191,7 @@ const MinistryCardGrid = () => {
                                         },
                                       }}
                                     >
-                                      {["departments", "people"].filter(tab => !(tab === "people" && selectedCard?.type === "stateMinister")).map((tab) => {
+                                      {(selectedCard?.type === "stateMinister" ? ["departments"] : ["departments", "people"]).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);
@@ -1252,7 +1252,7 @@ const MinistryCardGrid = () => {
                                         gap: 2,
                                       }}
                                     >
-                                      {["departments", "people"].filter(tab => !(tab === "people" && selectedCard?.type === "stateMinister")).map((tab) => {
+                                      {(selectedCard?.type === "stateMinister" ? ["departments"] : ["departments", "people"]).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);

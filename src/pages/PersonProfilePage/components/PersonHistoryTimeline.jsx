@@ -55,12 +55,10 @@ const PersonHistoryTimeline = ({
         layout="2-columns"
         lineColor={isDark ? "#364153" : "#dbdbdb"}
       >
-        {ministryHistory.map((entry, idx) => {
-
-          const lowerMinistry = entry?.name?.toLowerCase()
-          const showCard = !((lowerMinistry?.startsWith("state") || lowerMinistry?.startsWith("non cabinet")) && entry?.is_president)
-
-          if (!showCard) return null
+        {ministryHistory.filter((entry) => {
+          const lowerMinistry = entry?.name?.toLowerCase();
+          return !((lowerMinistry?.startsWith("state") || lowerMinistry?.startsWith("non cabinet")) && entry?.is_president);
+        }).map((entry, idx) => {
 
           return (
             <VerticalTimelineElement

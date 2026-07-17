@@ -10,6 +10,19 @@ import { Landmark } from "lucide-react";
 import { useDepartmentHistory } from "../../../hooks/useDepartmentHistory";
 import { buildCabinetStructureUrlFromHistoryEntry } from "../../../utils/navigationUtils";
 
+// TODO: temp solution. Remove presidents' names from state and non cabinet ministries
+const PRESIDENTS_LIST = ["gotabaya rajapaksa", "ranil wickremesinghe", "anura kumara dissanayake"];
+
+const getMinisterName = (ministryName, ministerNameArg) => {
+  const lowerMinistry = (ministryName || "").toLowerCase();
+  const lowerMinister = (ministerNameArg || "").toLowerCase();
+
+  if (!((lowerMinistry.startsWith("state") || lowerMinistry.startsWith("non cabinet")) && PRESIDENTS_LIST.includes(lowerMinister))) {
+    return ministerNameArg
+  }
+  return ""
+}
+
 const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
   const { colors, isDark } = useThemeContext();
   const location = useLocation();
@@ -21,18 +34,6 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
     error
   } = useDepartmentHistory(selectedDepartment?.id);
 
-  // TODO: temp solution. Remove presidents' names from state and non cabinet ministries
-  const PRESIDENTS_LIST = ["gotabaya rajapaksa", "ranil wickremesinghe", "anura kumara dissanayake"];
-
-  const getMinisterName = (ministryName, ministerName) => {
-    const lowerMinistry = (ministryName || "").toLowerCase();
-    const lowerMinister = (ministerName || "").toLowerCase();
-
-    if (!((lowerMinistry.startsWith("state") || lowerMinistry.startsWith("non cabinet")) && PRESIDENTS_LIST.includes(lowerMinister))) {
-      return ministerName
-    }
-    return ""
-  }
 
   return (
     <>
@@ -56,6 +57,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
             lineColor={isDark ? "#364153" : "#dbdbdb"}
           >
             {departmentHistory.map((entry, idx) => {
+              const ministerName = getMinisterName(entry.ministry_name, entry.minister_name);
               return (
                 <VerticalTimelineElement
                   key={idx}
@@ -98,7 +100,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                     </Link>
                     <div className="flex items-center mt-1 space-x-3">
                       <div className="flex items-center justify-between">
-                        {entry.minister_name ? (
+                        {ministerName ? (
                           <Link
                             to={`/person-profile/${entry.minister_id}`}
                             state={{
@@ -109,11 +111,11 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                             }}
                             className="text-accent text-normal font-medium hover:text-accent/80 hover:underline transition-colors"
                           >
-                            {getMinisterName(entry.ministry_name, entry.minister_name)}
+                            {ministerName}
                           </Link>
                         ) : (
                           <span className="text-primary/25 italic">
-                            No Minister Assigned
+                            No Person Assigned
                           </span>
                         )}
                       </div>
