@@ -88,6 +88,7 @@ const MinistryCardGrid = () => {
 
     if (matchedCard) {
       setSelectedCard(matchedCard);
+      setActiveTab("departments");
       setActiveStep(1);
     }
   }, [location.search, activeMinistryList, viewMode]);
@@ -224,6 +225,7 @@ const MinistryCardGrid = () => {
     // dispatch(setSelectedMinistry(card.id));
     handleNext();
     setSelectedCard(card);
+    setActiveTab("departments");
 
     const params = new URLSearchParams(window.location.search);
     params.set("ministry", card.id);
