@@ -88,6 +88,7 @@ const MinistryCardGrid = () => {
 
     if (matchedCard) {
       setSelectedCard(matchedCard);
+      setActiveTab("departments");
       setActiveStep(1);
     }
   }, [location.search, activeMinistryList, viewMode]);
@@ -224,6 +225,7 @@ const MinistryCardGrid = () => {
     // dispatch(setSelectedMinistry(card.id));
     handleNext();
     setSelectedCard(card);
+    setActiveTab("departments");
 
     const params = new URLSearchParams(window.location.search);
     params.set("ministry", card.id);
@@ -995,7 +997,7 @@ const MinistryCardGrid = () => {
                                     </Box>
                                   </Link>
                                 ) : (
-                                  selectedCard.ministers?.length === 0 ? null : (
+                                  selectedCard.ministers?.[0]?.name ? (
                                     <Box
                                       sx={{
                                         backgroundColor: `${selectedPresident.themeColorLight}66`,
@@ -1011,9 +1013,9 @@ const MinistryCardGrid = () => {
                                         mt: 0.2,
                                       }}
                                     >
-                                      {selectedCard.ministers?.[0]?.name}
+                                      {selectedCard.ministers[0].name}
                                     </Box>
-                                  )
+                                  ) : null
                                 )}
                               </Box>
                             ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
@@ -1191,7 +1193,7 @@ const MinistryCardGrid = () => {
                                         },
                                       }}
                                     >
-                                      {["departments", "people"].map((tab) => {
+                                      {(selectedCard?.type === "stateMinister" ? ["departments"] : ["departments", "people"]).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);
@@ -1252,7 +1254,7 @@ const MinistryCardGrid = () => {
                                         gap: 2,
                                       }}
                                     >
-                                      {["departments", "people"].map((tab) => {
+                                      {(selectedCard?.type === "stateMinister" ? ["departments"] : ["departments", "people"]).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);
@@ -1302,7 +1304,7 @@ const MinistryCardGrid = () => {
                                             ministryId={selectedCard?.id}
                                           />
                                         )}
-                                      {selectedCard && activeTab === "people" && (
+                                      {selectedCard && activeTab === "people" && selectedCard.type !== "stateMinister" && (
                                         <PersonsTab
                                           selectedDate={
                                             selectedDate?.date || selectedDate
