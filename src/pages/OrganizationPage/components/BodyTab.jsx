@@ -142,10 +142,10 @@ const BodyTab = ({ departmentId }) => {
                   className="flex items-center gap-3 rounded-lg border px-4 py-3 transition-all"
                   style={{
                     backgroundColor: colors.backgroundWhite,
-                    borderColor:
-                      hoveredBodyId === body.id
-                        ? selectedPresident.themeColorLight
-                        : colors.border,
+                    minHeight: "64px",
+                    borderColor: colors.border,
+                    borderLeftWidth: "4px",
+                    borderLeftColor: selectedPresident.themeColorLight,
                     boxShadow:
                       hoveredBodyId === body.id
                         ? "0 2px 8px rgba(0,0,0,0.08)"
