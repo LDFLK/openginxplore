@@ -59,14 +59,26 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) 
 
 export const getBodiesByDepartment = async ({ departmentId, signal }) => {
   return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      return reject(new DOMException("Aborted", "AbortError"));
+    }
+
     const timeoutId = setTimeout(() => {
+      cleanup();
       resolve({ bodyList: getMockBodiesByDepartment(departmentId) });
     }, 300);
 
-    signal?.addEventListener("abort", () => {
+    const onAbort = () => {
       clearTimeout(timeoutId);
+      cleanup();
       reject(new DOMException("Aborted", "AbortError"));
-    });
+    };
+
+    const cleanup = () => {
+      signal?.removeEventListener("abort", onAbort);
+    };
+
+    signal?.addEventListener("abort", onAbort);
   });
 };
 

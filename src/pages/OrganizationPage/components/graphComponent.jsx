@@ -443,10 +443,12 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     previousClickedNodeRef.current = null;
     setSelectedNode(null);
     const params = new URLSearchParams(location.search);
-    params.delete("ministry");
+    if (!previousParent) {
+      params.delete("ministry");
+    }
     const newUrl = `${location.pathname}?${params.toString()}`;
     navigate(newUrl);
-  }, [buildGraph, navigate, parentStack]);
+  }, [buildGraph, navigate, parentStack, location.search, location.pathname]);
   // store previous clicked node id
   const previousClickedNodeRef = useRef(null);
 

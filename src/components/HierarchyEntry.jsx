@@ -28,6 +28,7 @@ const HierarchyEntry = ({
         {title}
       </Typography>
 
+<<<<<<< HEAD
       {badges.length > 0 && (
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
           {badges.map((b, idx) =>
@@ -81,6 +82,55 @@ const HierarchyEntry = ({
             )
           )}
         </Box>
+=======
+      {badge && (
+        badge.to ? (
+          <Link
+            to={badge.to}
+            state={badge.state}
+            style={{ textDecoration: "none" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Box
+              sx={{
+                backgroundColor: badge.color,
+                color: "#fff",
+                fontSize: { xs: "0.6rem", md: "0.9rem" },
+                borderRadius: "12px",
+                px: 1.5,
+                py: 0.7,
+                fontFamily: "Poppins",
+                display: "inline-flex",
+                alignItems: "center",
+                lineHeight: 1,
+                mt: 0.2,
+                cursor: "pointer",
+                "&:hover": { opacity: 0.9 },
+              }}
+            >
+              {badge.label}
+            </Box>
+          </Link>
+        ) : (
+          <Box
+            sx={{
+              backgroundColor: badge.mutedColor || badge.color,
+              color: "#fff",
+              fontSize: { xs: "0.6rem", md: "0.9rem" },
+              borderRadius: "12px",
+              px: 1.5,
+              py: 0.7,
+              fontFamily: "Poppins",
+              display: "inline-flex",
+              alignItems: "center",
+              lineHeight: 1,
+              mt: 0.2,
+            }}
+          >
+            {badge.label}
+          </Box>
+        )
+>>>>>>> ac31b7e (fix: fiexed bot commits)
       )}
     </Box>
   );

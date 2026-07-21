@@ -1267,7 +1267,7 @@ const MinistryCardGrid = () => {
                                             py: 0.8,
                                             backgroundColor: isActive
                                               ? selectedPresident.themeColorLight
-                                              : "none",
+                                              : "transparent",
                                             borderColor: selectedPresident.themeColorLight,
                                             color: isActive
                                               ? colors.white
