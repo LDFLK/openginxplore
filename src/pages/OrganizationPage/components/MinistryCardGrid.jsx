@@ -964,59 +964,63 @@ const MinistryCardGrid = () => {
                                 >
                                   {selectedCard.name}
                                 </Typography>
-                                {selectedCard.ministers?.[0]?.id ? (
-                                  <Link
-                                    to={`/person-profile/${selectedCard.ministers?.[0]?.id}`}
-                                    state={{
-                                      mode: "back",
-                                      from: location.pathname + location.search,
-                                    }}
-                                    style={{ textDecoration: "none" }}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <Box
-                                      sx={{
-                                        backgroundColor: selectedPresident.themeColorLight,
-                                        color: "#fff",
-                                        fontSize: { xs: "0.6rem", md: "0.9rem" },
-                                        borderRadius: "12px",
-                                        px: 1.5,
-                                        py: 0.7,
-                                        fontFamily: "poppins",
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        lineHeight: 1,
-                                        mt: 0.2,
-                                        cursor: "pointer",
-                                        "&:hover": {
-                                          opacity: 0.9,
-                                        },
-                                      }}
-                                    >
-                                      {selectedCard.ministers?.[0]?.name}
-                                    </Box>
-                                  </Link>
-                                ) : (
-                                  selectedCard.ministers?.[0]?.name ? (
-                                    <Box
-                                      sx={{
-                                        backgroundColor: `${selectedPresident.themeColorLight}66`,
-                                        color: "#fff",
-                                        fontSize: { xs: "0.6rem", md: "0.9rem" },
-                                        borderRadius: "12px",
-                                        px: 1.5,
-                                        py: 0.7,
-                                        fontFamily: "poppins",
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        lineHeight: 1,
-                                        mt: 0.2,
-                                      }}
-                                    >
-                                      {selectedCard.ministers[0].name}
-                                    </Box>
-                                  ) : null
-                                )}
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                  {(selectedCard.ministers ?? []).map((minister, idx) =>
+                                    minister.id ? (
+                                      <Link
+                                        key={minister.id ?? `${selectedCard.id}-minister-${idx}`}
+                                        to={`/person-profile/${minister.id}`}
+                                        state={{
+                                          mode: "back",
+                                          from: location.pathname + location.search,
+                                        }}
+                                        style={{ textDecoration: "none" }}
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <Box
+                                          sx={{
+                                            backgroundColor: selectedPresident.themeColorLight,
+                                            color: "#fff",
+                                            fontSize: { xs: "0.6rem", md: "0.9rem" },
+                                            borderRadius: "12px",
+                                            px: 1.5,
+                                            py: 0.7,
+                                            fontFamily: "poppins",
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            lineHeight: 1,
+                                            mt: 0.2,
+                                            cursor: "pointer",
+                                            "&:hover": {
+                                              opacity: 0.9,
+                                            },
+                                          }}
+                                        >
+                                          {minister.name}
+                                        </Box>
+                                      </Link>
+                                    ) : minister.name ? (
+                                      <Box
+                                        key={`${selectedCard.id}-minister-${idx}`}
+                                        sx={{
+                                          backgroundColor: `${selectedPresident.themeColorLight}66`,
+                                          color: "#fff",
+                                          fontSize: { xs: "0.6rem", md: "0.9rem" },
+                                          borderRadius: "12px",
+                                          px: 1.5,
+                                          py: 0.7,
+                                          fontFamily: "poppins",
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                          lineHeight: 1,
+                                          mt: 0.2,
+                                        }}
+                                      >
+                                        {minister.name}
+                                      </Box>
+                                    ) : null
+                                  )}
+                                </Box>
                               </Box>
                             ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
                               <Typography
