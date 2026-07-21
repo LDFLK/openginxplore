@@ -320,17 +320,19 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   };
 
   useEffect(() => {
-    setParentStack([]);
-
     const params = new URLSearchParams(location.search);
     const selectedMinistry = params.get("ministry");
+    const selectedDepartment = params.get("department");
 
     if (selectedMinistry) {
       const portfolioItem = activeMinistries?.find(
         (m) => m.id === selectedMinistry
       );
 
-      if (!portfolioItem) return;
+      if (!portfolioItem) {
+        setParentStack([]);
+        return;
+      }
 
       const ministryParent = {
         id: portfolioItem.id,
@@ -339,8 +341,45 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         color: "#D3AF37",
         type: portfolioItem.type,
       };
-      buildGraph(ministryParent);
+
+      if (selectedDepartment) {
+        (async () => {
+          try {
+            const responseDepartment = await queryClient.fetchQuery(
+              departmentsByPortfolioQueryOptions(ministryParent.id, selectedDate?.date)
+            );
+            const departmentList = responseDepartment?.departmentList || [];
+            const departmentItem = departmentList.find(
+              (dep) => dep.id === selectedDepartment
+            );
+
+            if (!departmentItem) {
+              setParentStack([]);
+              await buildGraph(ministryParent);
+              return;
+            }
+
+            const departmentParent = {
+              id: departmentItem.id,
+              name: departmentItem.name,
+              group: 3,
+              type: "department",
+            };
+
+            setParentStack([null, ministryParent]);
+            await buildGraph(departmentParent);
+          } catch (e) {
+            console.error("Error building graph for department:", e.message);
+            setParentStack([]);
+            buildGraph(ministryParent);
+          }
+        })();
+      } else {
+        setParentStack([]);
+        buildGraph(ministryParent);
+      }
     } else if (selectedDate && selectedPresident) {
+      setParentStack([]);
       buildGraph();
     }
   }, [
@@ -349,6 +388,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     activeMinistries,
     filterType,
     location.search,
+    queryClient,
   ]);
 
   // Handle WebGL context loss and restoration
@@ -443,6 +483,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     previousClickedNodeRef.current = null;
     setSelectedNode(null);
     const params = new URLSearchParams(location.search);
+    params.delete("department");
     if (!previousParent) {
       params.delete("ministry");
     }
