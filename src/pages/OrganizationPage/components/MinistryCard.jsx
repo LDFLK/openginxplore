@@ -32,6 +32,7 @@ const MinistryCard = ({ card, onClick }) => {
         borderRadius: "10px",
         position: "relative",
         width: "100%",
+        height: "100%",
       }}
       onMouseOver={() => setMouseHover(card)}
       onMouseOut={() => setMouseHover(null)}

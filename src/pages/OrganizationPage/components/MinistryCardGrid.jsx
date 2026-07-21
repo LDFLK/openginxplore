@@ -968,7 +968,7 @@ const MinistryCardGrid = () => {
                                   {(selectedCard.ministers ?? []).map((minister, idx) =>
                                     minister.id ? (
                                       <Link
-                                        key={minister.id ?? `${selectedCard.id}-minister-${idx}`}
+                                        key={minister.id}
                                         to={`/person-profile/${minister.id}`}
                                         state={{
                                           mode: "back",
