@@ -32,7 +32,6 @@ const MinistryCard = ({ card, onClick }) => {
         borderRadius: "10px",
         position: "relative",
         width: "100%",
-        height: "100%",
       }}
       onMouseOver={() => setMouseHover(card)}
       onMouseOut={() => setMouseHover(null)}
@@ -141,7 +140,7 @@ const MinistryCard = ({ card, onClick }) => {
           </Stack>
 
           {/* Name & Badge Section */}
-          <Stack direction="column" spacing={0.75}>
+          <Stack direction="column" spacing={1}>
             {(() => {
               const hasMultipleMinisters = (card.ministers?.length ?? 0) > 1;
               return (card.ministers ?? []).map((minister, idx) => (
