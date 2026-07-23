@@ -142,7 +142,9 @@ const MinistryCard = ({ card, onClick }) => {
 
           {/* Name & Badge Section */}
           <Stack direction="column" spacing={0.75}>
-            {(card.ministers ?? []).map((minister, idx) => (
+            {(() => {
+              const hasMultipleMinisters = (card.ministers?.length ?? 0) > 1;
+              return (card.ministers ?? []).map((minister, idx) => (
               <Stack key={minister.id ?? `${card.id}-minister-${idx}`} direction="column" spacing={0}>
                 {/* President Label */}
                 {minister.isPresident ? (
@@ -184,6 +186,7 @@ const MinistryCard = ({ card, onClick }) => {
                       } : {},
                     }}
                   >
+                    {hasMultipleMinisters && "• "}
                     {minister.name}
                   </Typography>
 
@@ -205,7 +208,8 @@ const MinistryCard = ({ card, onClick }) => {
                   )}
                 </Stack>
               </Stack>
-            ))}
+              ));
+            })()}
           </Stack>
         </Stack>
       </Stack>
