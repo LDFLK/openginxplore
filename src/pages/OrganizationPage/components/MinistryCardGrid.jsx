@@ -1193,7 +1193,7 @@ const MinistryCardGrid = () => {
                                         },
                                       }}
                                     >
-                                      {(selectedCard?.type === "stateMinister" ? ["departments"] : ["departments", "people"]).map((tab) => {
+                                      {(selectedCard?.type === "stateMinister" && !selectedCard?.ministers?.[0]?.id ? ["departments"] : ["departments", "people"]).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);
@@ -1254,7 +1254,7 @@ const MinistryCardGrid = () => {
                                         gap: 2,
                                       }}
                                     >
-                                      {(selectedCard?.type === "stateMinister" ? ["departments"] : ["departments", "people"]).map((tab) => {
+                                      {(selectedCard?.type === "stateMinister" && !selectedCard?.ministers?.[0]?.id ? ["departments"] : ["departments", "people"]).map((tab) => {
                                         const label =
                                           tab.charAt(0).toUpperCase() +
                                           tab.slice(1);
@@ -1304,7 +1304,7 @@ const MinistryCardGrid = () => {
                                             ministryId={selectedCard?.id}
                                           />
                                         )}
-                                      {selectedCard && activeTab === "people" && selectedCard.type !== "stateMinister" && (
+                                      {selectedCard && activeTab === "people" && (selectedCard.type !== "stateMinister" || selectedCard?.ministers?.[0]?.id) && (
                                         <PersonsTab
                                           selectedDate={
                                             selectedDate?.date || selectedDate
