@@ -140,69 +140,75 @@ const MinistryCard = ({ card, onClick }) => {
           </Stack>
 
           {/* Name & Badge Section */}
-          <Stack direction="column" spacing={0}>
-            {/* President Label */}
-            {card.ministers?.[0]?.isPresident ? (
-              <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: colors.white,
-                    fontFamily: "poppins",
-                    py: "2px",
-                    px: "6px",
-                    fontSize: { xs: "0.6rem", md: "10px" },
-                    backgroundColor: selectedPresident?.themeColorLight,
-                    borderRadius: "3px",
-                    mb: "2px",
-                  }}
-                >
-                  President
-                </Typography>
-              </Box>
-            ) : null}
+          <Stack direction="column" spacing={1}>
+            {(() => {
+              const hasMultipleMinisters = (card.ministers?.length ?? 0) > 1;
+              return (card.ministers ?? []).map((minister, idx) => (
+              <Stack key={minister.id ?? `${card.id}-minister-${idx}`} direction="column" spacing={0}>
+                {/* President Label */}
+                {minister.isPresident ? (
+                  <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        color: colors.white,
+                        fontFamily: "poppins",
+                        py: "2px",
+                        px: "6px",
+                        fontSize: { xs: "0.6rem", md: "10px" },
+                        backgroundColor: selectedPresident?.themeColorLight,
+                        borderRadius: "3px",
+                        mb: "2px",
+                      }}
+                    >
+                      President
+                    </Typography>
+                  </Box>
+                ) : null}
 
-            {/* Name + NEW badge */}
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography
-                variant="subtitle2"
-                onClick={(e) =>
-                  handleOpenProfile(e, card.ministers?.[0]?.id)
-                }
-                sx={{
-                  fontWeight: 400,
-                  fontSize: { xs: "0.7rem", md: "13px" },
-                  color: colors.textPrimary,
-                  fontFamily: "poppins",
-                  textDecorationThickness: "1px",
-                  textUnderlineOffset: "3px",
-                  cursor: card.ministers?.[0]?.id ? "pointer" : "default",
-                  "&:hover": card.ministers?.[0]?.id ? {
-                    textDecoration: "underline",
-                    opacity: 0.9,
-                  } : {},
-                }}
-              >
-                {card.ministers?.length === 0 ? "" : card.ministers?.[0]?.name}
-              </Typography>
+                {/* Name + NEW badge */}
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography
+                    variant="subtitle2"
+                    onClick={(e) => handleOpenProfile(e, minister.id)}
+                    sx={{
+                      fontWeight: 400,
+                      fontSize: { xs: "0.7rem", md: "13px" },
+                      color: colors.textPrimary,
+                      fontFamily: "poppins",
+                      textDecorationThickness: "1px",
+                      textUnderlineOffset: "3px",
+                      cursor: minister.id ? "pointer" : "default",
+                      "&:hover": minister.id ? {
+                        textDecoration: "underline",
+                        opacity: 0.9,
+                      } : {},
+                    }}
+                  >
+                    {hasMultipleMinisters && "• "}
+                    {minister.name}
+                  </Typography>
 
-              {card.ministers?.[0]?.isNew && showPersonBadge && (
-                <Box
-                  sx={{
-                    border: `1px solid ${colors.green}`,
-                    color: colors.green,
-                    fontSize: "0.65rem",
-                    fontWeight: "semibold",
-                    borderRadius: "4px",
-                    px: 1,
-                    py: "1px",
-                    fontFamily: "poppins",
-                  }}
-                >
-                  NEW
-                </Box>
-              )}
-            </Stack>
+                  {minister.isNew && showPersonBadge && (
+                    <Box
+                      sx={{
+                        border: `1px solid ${colors.green}`,
+                        color: colors.green,
+                        fontSize: "0.65rem",
+                        fontWeight: "semibold",
+                        borderRadius: "4px",
+                        px: 1,
+                        py: "1px",
+                        fontFamily: "poppins",
+                      }}
+                    >
+                      NEW
+                    </Box>
+                  )}
+                </Stack>
+              </Stack>
+              ));
+            })()}
           </Stack>
         </Stack>
       </Stack>
