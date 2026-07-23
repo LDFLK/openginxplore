@@ -5,12 +5,14 @@ import {
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useThemeContext } from "../../../context/themeContext";
 import useUrlParamState from "../../../hooks/singleSharingURL";
 import { useActivePortfolioList } from "../../../hooks/useActivePortfolioList";
 import { usePrimeMinister } from "../../../hooks/usePrimeMinister";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
+import { departmentsByPortfolioQueryOptions } from "../../../hooks/useDepartmentsByPortfolio";
 
 import MinistryCard from "./MinistryCard";
 import MinistryViewModeToggleButton from "../../../components/ministryViewModeToggleButton";
@@ -58,6 +60,7 @@ const MinistryCardGrid = () => {
   const { colors } = useThemeContext();
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useActivePortfolioList(
     selectedPresident?.id,
@@ -97,12 +100,32 @@ const MinistryCardGrid = () => {
       setActiveTab("departments");
       const departmentId = params.get("department");
       setActiveStep(departmentId ? 2 : 1);
+
       if (!departmentId) {
-         setSelectedDepartment(null);
+        setSelectedDepartment(null);
+        return;
+      }
+
+      if (selectedDepartment?.id !== departmentId) {
+        (async () => {
+          try {
+            const response = await queryClient.fetchQuery(
+              departmentsByPortfolioQueryOptions(matchedCard.id, selectedDate?.date)
+            );
+            const departmentList = response?.departmentList || [];
+            const matchedDepartment = departmentList.find(
+              (dep) => String(dep.id) === String(departmentId)
+            );
+            setSelectedDepartment(matchedDepartment || null);
+          } catch (e) {
+            console.error("Error resolving department from URL:", e.message);
+            setSelectedDepartment(null);
+          }
+        })();
       }
     }
 
-  }, [location.search, activeMinistryList, viewMode]);
+  }, [location.search, activeMinistryList, viewMode, queryClient, selectedDate]);
 
   const {
     data: primeMinisterData,

@@ -305,6 +305,8 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           focusRef.current.stopAnimation?.();
         }
 
+        setDepartmentDictionary({});
+        setPersonDictionary({});
         setBodyDictionary(bodyDic);
 
         setAllNodes([parentNode, ...Object.values(bodyDic)]);
@@ -574,6 +576,10 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         setParentStack((prev) => [...prev, graphParent]);
         await buildGraph(node);
       } else if (node.type === "department") {
+        const params = new URLSearchParams(location.search);
+        params.set("department", node.id);
+        const newUrl = `${location.pathname}?${params.toString()}`;
+        navigate(newUrl);
         setParentStack((prev) => [...prev, graphParent]);
         await buildGraph(node);
       }
