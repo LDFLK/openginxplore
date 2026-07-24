@@ -95,10 +95,18 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       : presStart;
     const finalEnd = rangeEnd ? new Date(Math.min(presEnd, rangeEnd)) : presEnd;
 
+    // Find if any other president starts on the same day this president ends.
+    const allRels = Object.values(presidentRelationDict);
+    const nextPresidentStartsOnSameDay = allRels.some((r) => {
+      if (!r.startTime) return false;
+      const rStart = new Date(r.startTime.split("T")[0]);
+      return rStart.getTime() === presEnd.getTime() && r !== rel;
+    });
+
     const filteredDates = gazetteDateClassic
       .filter((d) => {
         const dd = new Date(d.date);
-        return dd >= finalStart && dd < finalEnd;
+        return dd >= finalStart && (nextPresidentStartsOnSameDay ? dd < finalEnd : dd <= finalEnd);
       })
       .map((date) => (date));
 
