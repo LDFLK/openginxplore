@@ -5,20 +5,25 @@ import {
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useThemeContext } from "../../../context/themeContext";
 import useUrlParamState from "../../../hooks/singleSharingURL";
 import { useActivePortfolioList } from "../../../hooks/useActivePortfolioList";
 import { usePrimeMinister } from "../../../hooks/usePrimeMinister";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
+import { departmentsByPortfolioQueryOptions } from "../../../hooks/useDepartmentsByPortfolio";
 
 import MinistryCard from "./MinistryCard";
 import MinistryViewModeToggleButton from "../../../components/ministryViewModeToggleButton";
 import GraphComponent from "./graphComponent";
 import PersonsTab from "./PersonsTab";
 import DepartmentTab from "./DepartmentTab";
+import BodyTab from "./BodyTab";
 import InfoTooltip from "../../../components/InfoToolTip";
 import LandscapeRequired from "../../../components/landscapeRequired";
+import HierarchyEntry from "../../../components/HierarchyEntry";
+import HierarchyConnector from "../../../components/HierarchyConnector";
 
 import { ClipLoader } from "react-spinners";
 
@@ -50,9 +55,12 @@ const MinistryCardGrid = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [activeTab, setActiveTab] = useState("departments");
   const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [bodyDetailTab, setBodyDetailTab] = useState("bodies");
   const { colors } = useThemeContext();
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useActivePortfolioList(
     selectedPresident?.id,
@@ -74,6 +82,7 @@ const MinistryCardGrid = () => {
 
     if (!ministryId) {
       setSelectedCard(null);
+      setSelectedDepartment(null);
       setActiveStep(0);
       return;
     }
@@ -89,9 +98,34 @@ const MinistryCardGrid = () => {
     if (matchedCard) {
       setSelectedCard(matchedCard);
       setActiveTab("departments");
-      setActiveStep(1);
+      const departmentId = params.get("department");
+      setActiveStep(departmentId ? 2 : 1);
+
+      if (!departmentId) {
+        setSelectedDepartment(null);
+        return;
+      }
+
+      if (selectedDepartment?.id !== departmentId) {
+        (async () => {
+          try {
+            const response = await queryClient.fetchQuery(
+              departmentsByPortfolioQueryOptions(matchedCard.id, selectedDate?.date)
+            );
+            const departmentList = response?.departmentList || [];
+            const matchedDepartment = departmentList.find(
+              (dep) => String(dep.id) === String(departmentId)
+            );
+            setSelectedDepartment(matchedDepartment || null);
+          } catch (e) {
+            console.error("Error resolving department from URL:", e.message);
+            setSelectedDepartment(null);
+          }
+        })();
+      }
     }
-  }, [location.search, activeMinistryList, viewMode]);
+
+  }, [location.search, activeMinistryList, viewMode, queryClient, selectedDate]);
 
   const {
     data: primeMinisterData,
@@ -143,6 +177,10 @@ const MinistryCardGrid = () => {
       label: "Departments, Statutory Institutions and Public Corporations & People",
       description: "All departments under this ministry",
     },
+    {
+      label: "Bodies",
+      description: "All bodies under this department",
+    },
   ];
   // Custom icon component
   const StepIcon = ({ label }) => {
@@ -150,6 +188,8 @@ const MinistryCardGrid = () => {
 
     if (label === "Ministries") IconComponent = ApartmentIcon;
     if (label === "Departments, Statutory Institutions and Public Corporations & People") IconComponent = PeopleIcon;
+    if (label === "Bodies") IconComponent = ApartmentIcon;
+
 
     if (!IconComponent) return null;
 
@@ -174,20 +214,36 @@ const MinistryCardGrid = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => {
-      const newStep = prevActiveStep - 1;
+  // Clicking the ministry name always returns to the ministries list,
+  // regardless of how many levels deep (department/bodies) we currently are.
+  const goToMinistriesList = () => {
+    setActiveStep(0);
+    setSelectedDepartment(null);
 
-      if (newStep === 0) {
-        const params = new URLSearchParams(window.location.search);
-        params.delete("ministry");
+    const params = new URLSearchParams(window.location.search);
+    params.delete("ministry");
+    params.delete("department");
+    navigate(`${window.location.pathname}?${params.toString()}`);
+  };
 
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-        navigate(newUrl);
-      }
+  // Clicking the department name always returns to that ministry's department list.
+  const goToDepartmentsList = () => {
+    setActiveStep(1);
+    setSelectedDepartment(null);
 
-      return newStep;
-    });
+    const params = new URLSearchParams(window.location.search);
+    params.delete("department");
+    navigate(`${window.location.pathname}?${params.toString()}`);
+  };
+
+  const handleDepartmentClick = (dep) => {
+    setSelectedDepartment(dep);
+    setBodyDetailTab("bodies");
+    setActiveStep(2);
+
+    const params = new URLSearchParams(window.location.search);
+    params.set("department", dep.id);
+    navigate(`${window.location.pathname}?${params.toString()}`);
   };
 
   const prevDateRef = useRef(selectedDate?.date);
@@ -750,7 +806,7 @@ const MinistryCardGrid = () => {
               justifyContent: "flex-end",
             }}
           >
-            {steps[activeStep]?.label !== "Departments, Statutory Institutions and Public Corporations & People" && !new URLSearchParams(location.search).has("ministry") && (
+            {activeStep === 0 && !new URLSearchParams(location.search).has("ministry") && (
               <>
                 {/* Search Bar */}
                 <Box
@@ -901,11 +957,9 @@ const MinistryCardGrid = () => {
                 {viewMode == "Grid" ? (
                   <Stepper
                     activeStep={activeStep}
+                    connector={null}
                     sx={{
                       width: "100%",
-                      "& .MuiStepConnector-line": {
-                        borderColor: colors.textMuted,
-                      }
                     }}
                     orientation="vertical"
                   >
@@ -918,42 +972,78 @@ const MinistryCardGrid = () => {
                         return null;
                       }
 
+                      // Hide "Bodies" step if it's not the active level
+                      if (step.label == "Bodies" && activeStep != 2) {
+                        return null;
+                      }
+
+                      const isStepActive =
+                        (step.label === "Ministries" && activeStep === 0) ||
+                        (step.label === "Departments, Statutory Institutions and Public Corporations & People" && activeStep === 1) ||
+                        (step.label === "Bodies" && activeStep === 2);
+
+                      const isStepCompleted =
+                        (step.label === "Ministries" && activeStep > 0) ||
+                        (step.label === "Departments, Statutory Institutions and Public Corporations & People" && activeStep > 1);
+
                       return (
-                        <Step key={step.label}>
-                          <StepLabel
-                            StepIconComponent={() => (
-                              <StepIcon sx={{ fontSize: { xs: "1rem", md: "1.1rem" } }} label={step.label} />
-                            )}
-                            onClick={
-                              (activeStep != 0 &&
-                                step.label == "Ministries" &&
-                                selectedCard)
-                                ? handleBack
-                                : null
-                            }
-                            sx={{
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              ...(step.label !== "Ministries" && {
-                                display: "none",
-                              }),
-                              "&:hover .MuiTypography-root": {
-                                textDecoration: "underline",
-                              },
-                              "& .MuiStepIcon-root": {
-                                fontSize: "2rem", // Increase icon size
-                                color: selectedPresident.themeColorLight,
-                                "&.Mui-active": {
-                                  color: selectedPresident.themeColorLight,
+                        <Step key={step.label} active={isStepActive} completed={isStepCompleted}>
+                          {step.label === "Bodies" && (
+                            <HierarchyConnector color={colors.textMuted} />
+                          )}
+                          {step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
+                            <StepLabel
+                              StepIconComponent={() => (
+                                <StepIcon sx={{ fontSize: { xs: "1rem", md: "1.1rem" } }} label={step.label} />
+                              )}
+                              onClick={
+                                step.label === "Ministries" && activeStep !== 0 && selectedCard
+                                  ? goToMinistriesList
+                                  : step.label === "Bodies" && activeStep === 2
+                                    ? goToDepartmentsList
+                                    : null
+                              }
+                              sx={{
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                "&:hover .MuiTypography-root": {
+                                  textDecoration: "underline",
                                 },
-                                "&.Mui-completed": {
+                                "& .MuiStepIcon-root": {
+                                  fontSize: "2rem", // Increase icon size
                                   color: selectedPresident.themeColorLight,
+                                  "&.Mui-active": {
+                                    color: selectedPresident.themeColorLight,
+                                  },
+                                  "&.Mui-completed": {
+                                    color: selectedPresident.themeColorLight,
+                                  },
                                 },
-                              },
-                            }}
-                          >
-                            {selectedCard && step.label === "Ministries" && activeStep !== 0 ? (
-                              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 0.5 }}>
+                              }}
+                            >
+                              {selectedCard && step.label === "Ministries" && activeStep !== 0 ? (
+                                <HierarchyEntry
+                                  title={selectedCard.name}
+                                  titleColor={colors.textPrimary}
+                                  badge={(selectedCard.ministers ?? []).map((minister) => ({
+                                    label: minister.name,
+                                    to: minister.id
+                                      ? `/person-profile/${minister.id}`
+                                      : undefined,
+                                    state: {
+                                      mode: "back",
+                                      from: location.pathname + location.search,
+                                    },
+                                    color: selectedPresident.themeColorLight,
+                                    mutedColor: `${selectedPresident.themeColorLight}66`,
+                                  }))}
+                                />
+                              ) : step.label === "Bodies" ? (
+                                <HierarchyEntry
+                                  title={selectedDepartment?.name}
+                                  titleColor={colors.textPrimary}
+                                />
+                              ) : (
                                 <Typography
                                   component="span"
                                   sx={{
@@ -962,79 +1052,11 @@ const MinistryCardGrid = () => {
                                     transition: "text-decoration 0.2s ease-in-out",
                                   }}
                                 >
-                                  {selectedCard.name}
+                                  {step.label}
                                 </Typography>
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                  {(selectedCard.ministers ?? []).map((minister, idx) =>
-                                    minister.id ? (
-                                      <Link
-                                        key={minister.id}
-                                        to={`/person-profile/${minister.id}`}
-                                        state={{
-                                          mode: "back",
-                                          from: location.pathname + location.search,
-                                        }}
-                                        style={{ textDecoration: "none" }}
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        <Box
-                                          sx={{
-                                            backgroundColor: selectedPresident.themeColorLight,
-                                            color: "#fff",
-                                            fontSize: { xs: "0.6rem", md: "0.9rem" },
-                                            borderRadius: "12px",
-                                            px: 1.5,
-                                            py: 0.7,
-                                            fontFamily: "poppins",
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            lineHeight: 1,
-                                            mt: 0.2,
-                                            cursor: "pointer",
-                                            "&:hover": {
-                                              opacity: 0.9,
-                                            },
-                                          }}
-                                        >
-                                          {minister.name}
-                                        </Box>
-                                      </Link>
-                                    ) : minister.name ? (
-                                      <Box
-                                        key={`${selectedCard.id}-minister-${idx}`}
-                                        sx={{
-                                          backgroundColor: `${selectedPresident.themeColorLight}66`,
-                                          color: "#fff",
-                                          fontSize: { xs: "0.6rem", md: "0.9rem" },
-                                          borderRadius: "12px",
-                                          px: 1.5,
-                                          py: 0.7,
-                                          fontFamily: "poppins",
-                                          display: "inline-flex",
-                                          alignItems: "center",
-                                          lineHeight: 1,
-                                          mt: 0.2,
-                                        }}
-                                      >
-                                        {minister.name}
-                                      </Box>
-                                    ) : null
-                                  )}
-                                </Box>
-                              </Box>
-                            ) : step.label !== "Departments, Statutory Institutions and Public Corporations & People" && (
-                              <Typography
-                                component="span"
-                                sx={{
-                                  color: colors.textPrimary,
-                                  fontSize: { xs: "0.8rem", md: "1.1rem" },
-                                  transition: "text-decoration 0.2s ease-in-out",
-                                }}
-                              >
-                                {step.label}
-                              </Typography>
-                            )}
-                          </StepLabel>
+                              )}
+                            </StepLabel>
+                          )}
                           <StepContent>
                             {step.label == "Ministries" ? (
                               <>
@@ -1140,6 +1162,176 @@ const MinistryCardGrid = () => {
                                 </Box>
                               )} */}
                               </>
+                            ) : step.label == "Bodies" ? (
+                              <DialogContent
+                                sx={{
+                                  p: { xs: 0, sm: 0, md: 4 },
+                                  borderRadius: { xs: 0, sm: 0, md: "14px" },
+                                  mr: 1,
+                                  mt: 0,
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  overflowY: "auto",
+                                  scrollbarWidth: "none",
+                                  backgroundColor: { xs: colors.backgroundWhite, sm: colors.backgroundWhite, md: colors.backgroundDark },
+                                  "&::-webkit-scrollbar": { display: "none" },
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    gap: 2,
+                                    mb: 4,
+                                    alignItems: "center",
+                                    justifyContent: {
+                                      xs: "center",
+                                      sm: "space-between",
+                                    },
+                                    flexWrap: "wrap",
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      gap: 2,
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    {/* Toggle for xs and sm screens */}
+                                    <ToggleButtonGroup
+                                      value={bodyDetailTab}
+                                    exclusive
+                                    onChange={(e, newValue) => {
+                                      if (newValue !== null) {
+                                        setBodyDetailTab(newValue);
+                                      }
+                                    }}
+                                    sx={{
+                                      display: { xs: "flex", sm: "flex", md: "none" },
+                                      gap: 0,
+                                      "& .MuiToggleButtonGroup-grouped": {
+                                        border: `1px solid ${selectedPresident.themeColorLight}`,
+                                        borderRadius: "50px",
+                                        "&:not(:first-of-type)": {
+                                          borderLeft: `1px solid ${selectedPresident.themeColorLight}`,
+                                          marginLeft: "-1px",
+                                        },
+                                        "&:first-of-type": {
+                                          borderTopRightRadius: 0,
+                                          borderBottomRightRadius: 0,
+                                        },
+                                        "&:last-of-type": {
+                                          borderTopLeftRadius: 0,
+                                          borderBottomLeftRadius: 0,
+                                        },
+                                      },
+                                    }}
+                                  >
+                                    {["bodies", "people"].map((tab) => {
+                                      const label =
+                                        tab.charAt(0).toUpperCase() + tab.slice(1);
+                                      const isActive = bodyDetailTab === tab;
+                                      const IconComponent = tab === "bodies" ? ApartmentIcon : PeopleIcon;
+                                      return (
+                                        <ToggleButton
+                                          key={tab}
+                                          value={tab}
+                                          sx={{
+                                            textTransform: "none",
+                                            px: 2,
+                                            py: 0.8,
+                                            width: isActive ? "130px" : "70px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            backgroundColor: isActive
+                                              ? selectedPresident.themeColorLight
+                                              : "transparent",
+                                            color: isActive
+                                              ? colors.white
+                                              : selectedPresident.themeColorLight,
+                                            fontFamily: "poppins",
+                                            fontSize: "0.8rem",
+                                            "&.Mui-selected": {
+                                              backgroundColor: selectedPresident.themeColorLight,
+                                              color: colors.white,
+                                              "&:hover": {
+                                                backgroundColor: selectedPresident.themeColorLight,
+                                              },
+                                            },
+                                          }}
+                                        >
+                                          {isActive ? label : <IconComponent sx={{ fontSize: 18 }} />}
+                                        </ToggleButton>
+                                      );
+                                    })}
+                                  </ToggleButtonGroup>
+
+                                  {/* Buttons for md and larger screens */}
+                                  <Box
+                                    sx={{
+                                      display: { xs: "none", sm: "none", md: "flex" },
+                                      gap: 2,
+                                    }}
+                                  >
+                                    {["bodies", "people"].map((tab) => {
+                                      const label =
+                                        tab.charAt(0).toUpperCase() + tab.slice(1);
+                                      const isActive = bodyDetailTab === tab;
+                                      return (
+                                        <Button
+                                          key={tab}
+                                          variant={isActive ? "contained" : "outlined"}
+                                          onClick={() => setBodyDetailTab(tab)}
+                                          sx={{
+                                            textTransform: "none",
+                                            borderRadius: "50px",
+                                            px: 3,
+                                            py: 0.8,
+                                            backgroundColor: isActive
+                                              ? selectedPresident.themeColorLight
+                                              : "transparent",
+                                            borderColor: selectedPresident.themeColorLight,
+                                            color: isActive
+                                              ? colors.white
+                                              : selectedPresident.themeColorLight,
+                                            fontFamily: "poppins",
+                                            fontSize: "1rem",
+                                          }}
+                                        >
+                                          {label}
+                                        </Button>
+                                      );
+                                    })}
+                                  </Box>
+                                  </Box>
+
+                                  {selectedDepartment && (
+                                    <Link
+                                      to={`/department-profile/${selectedDepartment.id}`}
+                                      state={{ mode: "back", from: location.pathname + location.search }}
+                                      className="text-xs md:text-sm font-small hover:underline"
+                                      style={{ color: selectedPresident.themeColorLight }}
+                                    >
+                                      History
+                                    </Link>
+                                  )}
+                                </Box>
+                                <Box sx={{ flexGrow: 1, width: "100%" }}>
+                                  {selectedDepartment && bodyDetailTab === "bodies" && (
+                                    <BodyTab departmentId={selectedDepartment.id} />
+                                  )}
+                                  {selectedDepartment && bodyDetailTab === "people" && (
+                                    <Box sx={{ width: "100%", mt: 4, display: "flex", justifyContent: "center" }}>
+                                      <Alert severity="info" sx={{ backgroundColor: "transparent", width: "100%", maxWidth: 600 }}>
+                                        <AlertTitle sx={{ fontFamily: "poppins", color: colors.textPrimary }}>
+                                          Info: No people found.
+                                        </AlertTitle>
+                                      </Alert>
+                                    </Box>
+                                  )}
+                                </Box>
+                              </DialogContent>
                             ) : (
                               step.label == "Departments, Statutory Institutions and Public Corporations & People" && (
                                 <DialogContent
@@ -1306,6 +1498,7 @@ const MinistryCardGrid = () => {
                                               selectedDate?.date || selectedDate
                                             }
                                             ministryId={selectedCard?.id}
+                                            onDepartmentClick={handleDepartmentClick}
                                           />
                                         )}
                                       {selectedCard && activeTab === "people" && (selectedCard.type !== "stateMinister" || selectedCard?.ministers?.[0]?.id) && (

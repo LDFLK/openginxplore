@@ -15,6 +15,7 @@ export default function Drawer({
   personDic,
   ministryDic,
   departmentDic,
+  bodyDic,
   loading,
   activeMinistries,
 }) {
@@ -67,12 +68,12 @@ export default function Drawer({
         setDrawerContentList(personDic || {});
       }
     } else if (parentNode.type === "department") {
-      setDrawerContentList(personDic || {});
+      setDrawerContentList(bodyDic || {});
     } else {
       setDrawerContentList({});
     }
     setVisibleCount(BATCH_SIZE);
-  }, [parentNode, selectedTab, ministryDic, departmentDic, personDic]);
+  }, [parentNode, selectedTab, ministryDic, departmentDic, personDic, bodyDic]);
 
   return (
     <div
@@ -122,9 +123,13 @@ export default function Drawer({
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
                         <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Department, Statutory Institution or Public Corporation</span>
                       </div>
-                    ) : selectedNode.type == "persons" ? (
+                    ) : selectedNode.type == "person" ? (
                       <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
                         <User className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Person</span>
+                      </div>
+                    ) : selectedNode.type == "body" ? (
+                      <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
+                        <Building2 className="w-4 h-4 md:w-5 md:h-5" /> <span className="text-xs md:text-sm">Body</span>
                       </div>
                     ) : null}
                     <p className="text-base md:text-md font-semibold tracking-tight text-gray-900 dark:text-gray-300">
@@ -170,7 +175,7 @@ export default function Drawer({
                   </p>
                 </div>
               )}
-              {!(selectedNode && (selectedNode.type === "department" || selectedNode.type === "person")) && (
+              {!(selectedNode && (selectedNode.type === "person" || selectedNode.type === "body")) && (
                 <>
                   {/* Tabs for ministers */}
                   {parentNode && (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") && (
@@ -215,7 +220,9 @@ export default function Drawer({
                         (parentNode.type === "cabinetMinister" || parentNode.type === "stateMinister") &&
                         selectedTab === "persons"
                         ? <h2 className="text-sm md:text-md font-normal text-primary mt-2 md:mt-4 mb-2 shrink-0">{Object.keys(drawerContentList).length} People</h2>
-                        : ""
+                        : parentNode && parentNode.type === "department"
+                          ? <h2 className="text-sm md:text-md font-normal text-primary mt-2 md:mt-4 mb-2 shrink-0">{Object.keys(drawerContentList).length} Bodies</h2>
+                          : ""
                   )}
 
                   {/* Scrollable content */}

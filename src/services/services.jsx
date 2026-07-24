@@ -1,5 +1,6 @@
 import utils from "../utils/utils";
 import axios from "@/lib/axios";
+import { getMockBodiesByDepartment } from "../assets/mockBodiesData";
 
 const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : ""
 
@@ -54,6 +55,31 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) 
   );
 
   return data;
+};
+
+export const getBodiesByDepartment = async ({ departmentId, signal }) => {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      return reject(new DOMException("Aborted", "AbortError"));
+    }
+
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      resolve({ bodyList: getMockBodiesByDepartment(departmentId) });
+    }, 300);
+
+    const onAbort = () => {
+      clearTimeout(timeoutId);
+      cleanup();
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+
+    const cleanup = () => {
+      signal?.removeEventListener("abort", onAbort);
+    };
+
+    signal?.addEventListener("abort", onAbort);
+  });
 };
 
 export const getPrimeMinister = async ({ date, signal }) => {

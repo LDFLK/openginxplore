@@ -19,6 +19,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { departmentsByPortfolioQueryOptions } from "../../../hooks/useDepartmentsByPortfolio";
+import { bodiesByDepartmentQueryOptions } from "../../../hooks/useBodiesByDepartment";
 
 export default function GraphComponent({ activeMinistries, filterType }) {
   const [loading, setLoading] = useState(true);
@@ -32,8 +33,10 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   const [ministryDictionary, setMinistryDictionary] = useState({});
   const [departmentDictionary, setDepartmentDictionary] = useState({});
   const [personDictionary, setPersonDictionary] = useState({});
+  const [bodyDictionary, setBodyDictionary] = useState({});
   const [graphParent, setGraphParent] = useState(null);
   const [nodeLoading, setNodeLoading] = useState(false);
+  const [parentStack, setParentStack] = useState([]);
 
   const { colors, isDark } = useThemeContext();
 
@@ -203,6 +206,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         setMinistryDictionary(ministryDic);
         setPersonDictionary(personDic);
         setDepartmentDictionary({});
+        setBodyDictionary({});
 
         setAllNodes([
           govNode,
@@ -272,6 +276,41 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           ...Object.values(personDic),
         ]);
         setRelations([...departmentLinks, ...personLinks]);
+      } else if (parentNode.type === "department") {
+        const responseBody = await queryClient.fetchQuery(
+          bodiesByDepartmentQueryOptions(parentNode.id)
+        );
+
+        const bodyList = responseBody?.bodyList || [];
+
+        const bodyLinks = bodyList.map((body) => ({
+          source: parentNode.id,
+          target: body.id,
+          value: 3,
+          type: "level3",
+        }));
+
+        const bodyDic = bodyList.reduce((acc, body) => {
+          acc[body.id] = {
+            id: body.id,
+            name: body.name,
+            group: 4,
+            color: "#9b59b6",
+            type: "body",
+          };
+          return acc;
+        }, {});
+
+        if (focusRef.current) {
+          focusRef.current.stopAnimation?.();
+        }
+
+        setDepartmentDictionary({});
+        setPersonDictionary({});
+        setBodyDictionary(bodyDic);
+
+        setAllNodes([parentNode, ...Object.values(bodyDic)]);
+        setRelations([...bodyLinks]);
       }
     } catch (e) {
       console.error("Error building graph:", e.message);
@@ -285,13 +324,17 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const selectedMinistry = params.get("ministry");
+    const selectedDepartment = params.get("department");
 
     if (selectedMinistry) {
       const portfolioItem = activeMinistries?.find(
         (m) => m.id === selectedMinistry
       );
 
-      if (!portfolioItem) return;
+      if (!portfolioItem) {
+        setParentStack([]);
+        return;
+      }
 
       const ministryParent = {
         id: portfolioItem.id,
@@ -300,8 +343,45 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         color: "#D3AF37",
         type: portfolioItem.type,
       };
-      buildGraph(ministryParent);
+
+      if (selectedDepartment) {
+        (async () => {
+          try {
+            const responseDepartment = await queryClient.fetchQuery(
+              departmentsByPortfolioQueryOptions(ministryParent.id, selectedDate?.date)
+            );
+            const departmentList = responseDepartment?.departmentList || [];
+            const departmentItem = departmentList.find(
+              (dep) => dep.id === selectedDepartment
+            );
+
+            if (!departmentItem) {
+              setParentStack([]);
+              await buildGraph(ministryParent);
+              return;
+            }
+
+            const departmentParent = {
+              id: departmentItem.id,
+              name: departmentItem.name,
+              group: 3,
+              type: "department",
+            };
+
+            setParentStack([null, ministryParent]);
+            await buildGraph(departmentParent);
+          } catch (e) {
+            console.error("Error building graph for department:", e.message);
+            setParentStack([]);
+            buildGraph(ministryParent);
+          }
+        })();
+      } else {
+        setParentStack([]);
+        buildGraph(ministryParent);
+      }
     } else if (selectedDate && selectedPresident) {
+      setParentStack([]);
       buildGraph();
     }
   }, [
@@ -310,6 +390,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
     activeMinistries,
     filterType,
     location.search,
+    queryClient,
   ]);
 
   // Handle WebGL context loss and restoration
@@ -397,43 +478,44 @@ export default function GraphComponent({ activeMinistries, filterType }) {
   );
 
   const handleBackClick = useCallback(async () => {
-    await buildGraph();
+    const stack = [...parentStack];
+    const previousParent = stack.pop() ?? null;
+    setParentStack(stack);
+    await buildGraph(previousParent);
     previousClickedNodeRef.current = null;
     setSelectedNode(null);
     const params = new URLSearchParams(location.search);
-    params.delete("ministry");
+    params.delete("department");
+    if (!previousParent) {
+      params.delete("ministry");
+    }
     const newUrl = `${location.pathname}?${params.toString()}`;
     navigate(newUrl);
-  }, [buildGraph]);
+  }, [buildGraph, navigate, parentStack, location.search, location.pathname]);
   // store previous clicked node id
   const previousClickedNodeRef = useRef(null);
 
   // Refactored handleNodeClick to use buildGraph for expansion
   const handleNodeClick = useCallback(
     async (node) => {
+      const isExpandable = (n) =>
+        n?.type === "cabinetMinister" ||
+        n?.type === "stateMinister" ||
+        n?.type === "department";
+
       setSelectedNode(node);
       if (node?.type === "cabinetMinister" || node?.type === "stateMinister") {
         setNodeLoading(true);
       }
 
-      if (
-        (node?.type === "cabinetMinister" || node?.type === "stateMinister") &&
-        graphParent &&
-        graphParent.id === node.id
-      ) {
-        await buildGraph();
-        previousClickedNodeRef.current = null;
-        setSelectedNode(null);
-        const params = new URLSearchParams(location.search);
-        params.delete("ministry");
-        const newUrl = `${location.pathname}?${params.toString()}`;
-        navigate(newUrl);
+      if (isExpandable(node) && graphParent && graphParent.id === node.id) {
+        await handleBackClick();
         return;
       }
 
       if (previousClickedNodeRef.current === node?.id) {
-        if (node.type === "cabinetMinister" || node?.type === "stateMinister") {
-          await buildGraph();
+        if (isExpandable(node)) {
+          await handleBackClick();
         }
         previousClickedNodeRef.current = null;
         setSelectedNode(null);
@@ -491,10 +573,18 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         params.set("ministry", node.id);
         const newUrl = `${location.pathname}?${params.toString()}`;
         navigate(newUrl);
+        setParentStack((prev) => [...prev, graphParent]);
+        await buildGraph(node);
+      } else if (node.type === "department") {
+        const params = new URLSearchParams(location.search);
+        params.set("department", node.id);
+        const newUrl = `${location.pathname}?${params.toString()}`;
+        navigate(newUrl);
+        setParentStack((prev) => [...prev, graphParent]);
         await buildGraph(node);
       }
     },
-    [buildGraph, graphParent, navigate, location]
+    [buildGraph, handleBackClick, graphParent, navigate, location]
   );
 
   // Configure forces
@@ -696,6 +786,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
           personDic={personDictionary}
           ministryDic={ministryDictionary}
           departmentDic={departmentDictionary}
+          bodyDic={bodyDictionary}
           loading={nodeLoading}
           activeMinistries={activeMinistries}
         />
