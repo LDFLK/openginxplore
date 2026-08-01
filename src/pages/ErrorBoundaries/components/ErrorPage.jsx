@@ -9,7 +9,7 @@ export default function ErrorPage({ statusCode, title, description, icon: Icon }
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      navigate("/");
+      navigate("/", { replace: true });
     }, REDIRECT_DELAY);
 
     return () => window.clearTimeout(timer);
