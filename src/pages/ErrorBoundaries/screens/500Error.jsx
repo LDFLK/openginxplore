@@ -1,4 +1,3 @@
-import { ServerCrash } from "lucide-react";
 import ErrorPage from "../components/ErrorPage";
 
 export default function Error500() {
@@ -7,7 +6,6 @@ export default function Error500() {
       statusCode="500"
       title="Something went wrong"
       description="We couldn't complete your request because of an internal server error. Please try again shortly."
-      icon={ServerCrash}
     />
   );
 }

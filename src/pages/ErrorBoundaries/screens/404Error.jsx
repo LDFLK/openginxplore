@@ -1,4 +1,3 @@
-import { SearchX } from "lucide-react";
 import ErrorPage from "../components/ErrorPage";
 
 export default function Error404() {
@@ -7,7 +6,6 @@ export default function Error404() {
       statusCode="404"
       title="Page not found"
       description="The page you're looking for doesn't exist, may have moved, or is no longer available."
-      icon={SearchX}
     />
   );
 }
