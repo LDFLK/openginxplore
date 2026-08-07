@@ -5,6 +5,8 @@ import DataLoadingAnimatedComponent from "./pages/SplashPage/screens/dataLoading
 import DocsPage from "./pages/DocsPage/screens/DocsPage";
 import OfflineBanner from "./components/OfflineBanner";
 import { usePageTracking } from "./hooks/usePageTracking";
+import { ErrorBoundary } from "react-error-boundary";
+import Error500 from "./pages/ErrorBoundaries/screens/500Error";
 
 const AppRoutes = () => {
   usePageTracking();
@@ -27,9 +29,11 @@ const App = () => {
   return (
     <div className={isDark ? "dark" : ""}>
       <OfflineBanner />
-      <Router>
-        <AppRoutes />
-      </Router>
+      <ErrorBoundary FallbackComponent={Error500}>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </ErrorBoundary>
     </div>
   );
 }
