@@ -12,14 +12,14 @@ export default function ErrorPage({ statusCode, title, description }) {
           {statusCode}
         </p>
 
-        <div className="mt-9 flex flex-col items-center sm:mt-10">
+        <div className="mt-9 flex flex-col items-center">
           <h1
             id="error-title"
             className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl"
           >
             {title}
           </h1>
-          <p className="mt-5 max-w-[520px] text-base leading-7 text-primary/55 sm:text-xl sm:leading-8">
+          <p className="mt-3 max-w-[520px] text-base leading-7 text-primary/55 sm:text-xl ">
             {description}
           </p>
         </div>
