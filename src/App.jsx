@@ -29,11 +29,11 @@ const App = () => {
   return (
     <div className={isDark ? "dark" : ""}>
       <OfflineBanner />
-      <ErrorBoundary FallbackComponent={Error500}>
         <Router>
+          <ErrorBoundary FallbackComponent={Error500}>
           <AppRoutes />
+          </ErrorBoundary>
         </Router>
-      </ErrorBoundary>
     </div>
   );
 }
