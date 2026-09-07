@@ -33,4 +33,13 @@ export default [
       ],
     },
   },
+
+  {
+    files: ['playwright.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ]
