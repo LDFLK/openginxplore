@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Typography,
@@ -16,7 +15,6 @@ import { useBodiesByDepartment } from "../../../hooks/useBodiesByDepartment";
 const BodyTab = ({ departmentId }) => {
   const { colors } = useThemeContext();
   const { selectedPresident } = useSelector((state) => state.presidency);
-  const [hoveredBodyId, setHoveredBodyId] = useState(null);
 
   const { data, isLoading, isError } = useBodiesByDepartment(departmentId);
 
