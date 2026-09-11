@@ -120,6 +120,23 @@ export const getPersonHistory = async ({ personId, signal }) => {
   return data;
 };
 
+export const getPersonsByPortfolio = async ({ portfolioId, date, signal }) => {
+
+  try {
+    const { data } = await axios.post(
+      `${GI_SERVICE_URL}/portfolio/${portfolioId}/person`,
+      { date },
+      { signal }
+    );
+    return data; // { totalCount, newCount, personList }
+  } catch (error) {
+    if (axios.isCancel(error)) throw error;
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch persons for this portfolio."
+    );
+  }
+};
+
 // Fetch initial gazette dates and all ministry protobuf data
 const fetchInitialGazetteData = async () => {
   try {
@@ -610,5 +627,6 @@ export default {
   getPersonProfile,
   getDepartmentsByPortfolio,
   getPrimeMinister,
-  getEntityNames
+  getEntityNames,
+  getPersonsByPortfolio
 };
