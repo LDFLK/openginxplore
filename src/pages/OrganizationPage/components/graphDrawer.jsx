@@ -163,15 +163,17 @@ export default function Drawer({
                 </div>
               )}
 
-              {/* Case 2: Show ministry from URL when no selected node */}
-              {!selectedNode && urlMinistry && (
+              {/* Case 2: Show the current level's node (ministry or department) when no selected node */}
+              {!selectedNode && (parentNode || urlMinistry) && (
                 <div className="w-full mb-2 p-3 md:p-4 bg-background/90 border border-border rounded-md">
                   <div className="flex items-center gap-1.5 md:gap-2 mb-1 text-primary/50">
                     <Building2 className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="text-xs md:text-sm">Ministry</span>
+                    <span className="text-xs md:text-sm">
+                      {parentNode?.type === "department" ? "Department, Statutory Institution or Public Corporation" : "Ministry"}
+                    </span>
                   </div>
                   <p className="text-base md:text-lg font-normal tracking-tight text-primary">
-                    {urlMinistry.name}
+                    {parentNode ? parentNode.name : urlMinistry.name}
                   </p>
                 </div>
               )}
