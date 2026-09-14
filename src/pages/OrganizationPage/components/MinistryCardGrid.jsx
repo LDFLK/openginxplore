@@ -98,7 +98,11 @@ const MinistryCardGrid = () => {
     );
   }, [urlMinistryId, activeMinistryList]);
 
-  const { data: departmentsData } = useDepartmentsByPortfolio(
+  // Expose isLoading so the Bodies-level UI can tell "still fetching" apart
+  // from "fetched, but this department id doesn't exist" (stale/hand-edited
+  // ?department= param) — both previously collapsed into the same
+  // `selectedDepartment === null` state, showing a silent blank panel.
+  const { data: departmentsData, isLoading: isDepartmentsLoading } = useDepartmentsByPortfolio(
     selectedMinistry?.id || urlMinistryId,
     selectedDate?.date
   );
@@ -276,7 +280,29 @@ const MinistryCardGrid = () => {
       );
     }
 
-    if (index === 1 && selectedDepartment) {
+    if (index === 1) {
+      // Distinguish "still fetching the department list" from "fetched,
+      // but this department id isn't in it" so the breadcrumb never just
+      // silently disappears for a stale/hand-edited ?department= param.
+      if (isDepartmentsLoading) {
+        return null;
+      }
+
+      if (!selectedDepartment) {
+        return (
+          <Typography
+            component="span"
+            sx={{
+              color: colors.textMuted,
+              fontStyle: "italic",
+              fontSize: { xs: "0.8rem", md: "1.1rem" },
+            }}
+          >
+            Department not found
+          </Typography>
+        );
+      }
+
       return (
         <HierarchyEntry
           title={selectedDepartment.name}
@@ -530,6 +556,54 @@ const MinistryCardGrid = () => {
     }
 
     if (index === 2) {
+      // 1) Still fetching the department list -> show a spinner, same
+      //    pattern used for the top-level `isLoading` state elsewhere in
+      //    this file, instead of a blank panel.
+      if (isDepartmentsLoading) {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "20vh",
+            }}
+          >
+            <ClipLoader
+              color={selectedPresident.themeColorLight}
+              loading
+              size={25}
+            />
+          </Box>
+        );
+      }
+
+      // 2) Fetch finished, but this department id isn't in the list
+      //    (stale bookmark / hand-edited ?department= param) -> show an
+      //    explicit not-found message instead of silently rendering
+      //    nothing.
+      if (!selectedDepartment) {
+        return (
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "15px",
+            }}
+          >
+            <Alert severity="info" sx={{ backgroundColor: "transparent" }}>
+              <AlertTitle
+                sx={{ fontFamily: "poppins", color: colors.textPrimary }}
+              >
+                Department not found.
+              </AlertTitle>
+            </Alert>
+          </Box>
+        );
+      }
+
+      // 3) Valid, resolved department -> render the normal Bodies panel.
       return (
         <DialogContent
           sx={{
@@ -559,19 +633,17 @@ const MinistryCardGrid = () => {
               flexWrap: "wrap",
             }}
           >
-            {selectedDepartment && (
-              <Link
-                to={`/department-profile/${selectedDepartment.id}`}
-                state={{ mode: "back", from: location.pathname + location.search }}
-                className="text-xs md:text-sm font-small hover:underline"
-                style={{ color: selectedPresident.themeColorLight }}
-              >
-                History
-              </Link>
-            )}
+            <Link
+              to={`/department-profile/${selectedDepartment.id}`}
+              state={{ mode: "back", from: location.pathname + location.search }}
+              className="text-xs md:text-sm font-small hover:underline"
+              style={{ color: selectedPresident.themeColorLight }}
+            >
+              History
+            </Link>
           </Box>
           <Box sx={{ flexGrow: 1, width: "100%" }}>
-            {selectedDepartment && <BodyTab departmentId={selectedDepartment.id} />}
+            <BodyTab departmentId={selectedDepartment.id} />
           </Box>
         </DialogContent>
       );

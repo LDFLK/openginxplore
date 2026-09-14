@@ -334,9 +334,13 @@ export default function GraphComponent({ activeMinistries, filterType }) {
 
       if (!portfolioItem) {
         setParentStack([]);
+        const cleanParams = new URLSearchParams(location.search);
+        cleanParams.delete("ministry");
+        cleanParams.delete("department");
+        navigate(`${location.pathname}?${cleanParams.toString()}`, { replace: true });
+        buildGraph(); 
         return;
       }
-
       const ministryParent = {
         id: portfolioItem.id,
         name: portfolioItem.name,

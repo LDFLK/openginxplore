@@ -285,10 +285,12 @@ const DepartmentTab = ({ selectedDate, ministryId, onDepartmentClick }) => {
                     onMouseLeave={() => setHoveredDeptId(null)}
                     onClick={() => onDepartmentClick?.(dep)}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                      if (e.target !== e.currentTarget) return;
+
+                      if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         onDepartmentClick?.(dep);
-                    }                    
+                      }
                     }}
                     className={`flex flex-col rounded-lg  cursor-pointer transition-shadow border
                       ${hoveredDeptId === dep.id ? "shadow-md" : "shadow-sm"}`}
@@ -334,6 +336,7 @@ const DepartmentTab = ({ selectedDate, ministryId, onDepartmentClick }) => {
                         className="text-xs md:text-sm font-small hover:underline"
                         style={{ color: selectedPresident.themeColorLight }}
                         onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
                       >
                         History
                       </Link>
@@ -357,6 +360,7 @@ const DepartmentTab = ({ selectedDate, ministryId, onDepartmentClick }) => {
                             className="text-xs md:text-sm font-normal hover:underline"
                             style={{ color: selectedPresident.themeColorLight }}
                             onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
                           >
                             Data
                           </Link>
