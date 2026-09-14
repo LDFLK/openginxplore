@@ -9,7 +9,7 @@ import { setGazetteData } from "../../../store/gazetteDate";
 import { Link, useLocation } from "react-router-dom";
 import { EyeIcon } from "lucide-react";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
-import PersonAvatar from "../../../components/PersonAvatar";
+import PersonAvatar from "../../../components/PersonAvatar/PersonAvatar";
 
 export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const dispatch = useDispatch();
