@@ -26,4 +26,3 @@ window.configs = {
 // get the data to the relevant component using,
 // example
 // const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "";
-
