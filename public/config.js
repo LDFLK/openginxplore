@@ -13,7 +13,7 @@
 
 // for development
 window.configs = {
-    apiUrl: "https://aaf8ece1-3077-4a52-ab05-183a424f6d93-prod.e1-us-east-azure.choreoapis.dev/data-platform/read-api/v1.2", // keep empty for local development, otherwise this redirects to the OpenGIN service
+    apiUrl: "", // keep empty for local development, otherwise this redirects to the OpenGIN service
     apiUrlData: "/api", // keep '/api' for local development, otherwise this redirects to the BFF service
     feedbackFormUrl: "",
     version: "ALPHA",
@@ -27,5 +27,3 @@ window.configs = {
 // example
 // const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : "";
 
-// https://aaf8ece1-3077-4a52-ab05-183a424f6d93-prod.e1-us-east-azure.choreoapis.dev/data-platform/read-api/v1.2/v1/v1/entities/search
-// https://aaf8ece1-3077-4a52-ab05-183a424f6d93-prod.e1-us-east-azure.choreoapis.dev/data-platform/read-api/v1.2/v1/entities/search
