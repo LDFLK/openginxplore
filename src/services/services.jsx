@@ -56,6 +56,22 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) 
   return data;
 };
 
+export const getBodiesByDepartment = async ({ departmentId, date, signal }) => {
+  try {
+    const { data } = await axios.post(
+      `${GI_SERVICE_URL}/department/${departmentId}/bodies`,
+      { date },
+      { signal }
+    );
+    return data; // { totalBodies, newBodies, bodyList }
+  } catch (error) {
+    if (axios.isCancel(error)) throw error;
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch bodies for this department."
+    );
+  }
+};
+
 export const getPrimeMinister = async ({ date, signal }) => {
   const { data } = await axios.post(
     `${GI_SERVICE_URL}/prime-minister`,
@@ -602,5 +618,6 @@ export default {
   getDepartmentsByPortfolio,
   getPrimeMinister,
   getEntityNames,
-  getPersonsByPortfolio
+  getPersonsByPortfolio,
+  getBodiesByDepartment
 };
