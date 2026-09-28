@@ -278,7 +278,7 @@ export default function GraphComponent({ activeMinistries, filterType }) {
         setRelations([...departmentLinks, ...personLinks]);
       } else if (parentNode.type === "department") {
         const responseBody = await queryClient.fetchQuery(
-          bodiesByDepartmentQueryOptions(parentNode.id)
+          bodiesByDepartmentQueryOptions(parentNode.id, selectedDate?.date)
         );
 
         const bodyList = responseBody?.bodyList || [];

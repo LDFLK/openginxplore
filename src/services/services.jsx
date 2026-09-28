@@ -1,6 +1,5 @@
 import utils from "../utils/utils";
 import axios from "@/lib/axios";
-import { getMockBodiesByDepartment } from "../assets/mockBodiesData";
 
 const apiUrl = window?.configs?.apiUrl ? window.configs.apiUrl : ""
 
@@ -57,29 +56,20 @@ export const getDepartmentsByPortfolio = async ({ portfolioId, date, signal, }) 
   return data;
 };
 
-export const getBodiesByDepartment = async ({ departmentId, signal }) => {
-  return new Promise((resolve, reject) => {
-    if (signal?.aborted) {
-      return reject(new DOMException("Aborted", "AbortError"));
-    }
-
-    const timeoutId = setTimeout(() => {
-      cleanup();
-      resolve({ bodyList: getMockBodiesByDepartment(departmentId) });
-    }, 300);
-
-    const onAbort = () => {
-      clearTimeout(timeoutId);
-      cleanup();
-      reject(new DOMException("Aborted", "AbortError"));
-    };
-
-    const cleanup = () => {
-      signal?.removeEventListener("abort", onAbort);
-    };
-
-    signal?.addEventListener("abort", onAbort);
-  });
+export const getBodiesByDepartment = async ({ departmentId, date, signal }) => {
+  try {
+    const { data } = await axios.post(
+      `${GI_SERVICE_URL}/department/${departmentId}/bodies`,
+      { date },
+      { signal }
+    );
+    return data; // { totalBodies, newBodies, bodyList }
+  } catch (error) {
+    if (axios.isCancel(error)) throw error;
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch bodies for this department."
+    );
+  }
 };
 
 export const getPrimeMinister = async ({ date, signal }) => {
@@ -628,5 +618,6 @@ export default {
   getDepartmentsByPortfolio,
   getPrimeMinister,
   getEntityNames,
-  getPersonsByPortfolio
+  getPersonsByPortfolio,
+  getBodiesByDepartment
 };

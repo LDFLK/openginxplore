@@ -643,7 +643,10 @@ const MinistryCardGrid = () => {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1, width: "100%" }}>
-            <BodyTab departmentId={selectedDepartment.id} />
+            <BodyTab
+              departmentId={selectedDepartment.id}
+              selectedDate={selectedDate?.date || selectedDate}
+            />
           </Box>
         </DialogContent>
       );

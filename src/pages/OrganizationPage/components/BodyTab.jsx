@@ -6,19 +6,25 @@ import {
 } from "@mui/material";
 
 import ApartmentIcon from "@mui/icons-material/Apartment";
+import DomainAddIcon from "@mui/icons-material/DomainAdd";
 import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import { useThemeContext } from "../../../context/themeContext";
 import InfoTooltip from "../../../components/InfoToolTip";
 import { useBodiesByDepartment } from "../../../hooks/useBodiesByDepartment";
 
-const BodyTab = ({ departmentId }) => {
+const BodyTab = ({ departmentId, selectedDate }) => {
   const { colors } = useThemeContext();
   const { selectedPresident } = useSelector((state) => state.presidency);
 
-  const { data, isLoading, isError } = useBodiesByDepartment(departmentId);
+  const { data, isLoading, isError } = useBodiesByDepartment(
+    departmentId,
+    selectedDate
+  );
 
   const bodyList = data?.bodyList || [];
+  const totalBodies = data?.totalBodies ?? bodyList.length;
+  const newBodies = data?.newBodies || 0;
 
   return (
     <Box sx={{ mt: -2 }}>
@@ -125,10 +131,68 @@ const BodyTab = ({ departmentId }) => {
                         color: colors.textPrimary,
                       }}
                     >
-                      {bodyList.length}
+                      {totalBodies}
                     </Typography>
                   </Box>
                 </Box>
+
+                {/* New Bodies */}
+                {newBodies > 0 && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      width: "100%",
+                    }}
+                  >
+                    <DomainAddIcon
+                      sx={{
+                        color: colors.textMuted,
+                        fontSize: { xs: "1rem", md: "1.2rem" },
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: { xs: "row", sm: "row" },
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontFamily: "Poppins",
+                          fontWeight: 500,
+                          color: colors.textMuted,
+                          fontSize: { xs: "0.8rem", md: "1rem" },
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                        }}
+                      >
+                        Newly added{" "}
+                        <InfoTooltip
+                          message="Total of newly added bodies under this department on this date"
+                          iconColor={colors.textPrimary}
+                          iconSize={13}
+                          placement="right"
+                        />
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "Poppins",
+                          fontSize: { xs: "0.8rem", md: "1rem" },
+                          fontWeight: 500,
+                          color: colors.textPrimary,
+                        }}
+                      >
+                        {newBodies}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
               </Box>
             </Box>
           )}
@@ -185,6 +249,24 @@ const BodyTab = ({ departmentId }) => {
                   >
                     {body.name}
                   </Typography>
+
+                  {body.isNew && (
+                    <Box
+                      sx={{
+                        ml: "auto",
+                        px: 1,
+                        py: "2px",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        borderRadius: "4px",
+                        backgroundColor: colors.green,
+                        color: "#fff",
+                        flexShrink: 0,
+                      }}
+                    >
+                      NEW
+                    </Box>
+                  )}
                 </Box>
               ))}
             </Box>
