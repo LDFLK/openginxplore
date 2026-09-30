@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useSelector } from "react-redux";
-import utils from "../../../utils/utils";
 import { useLocation } from "react-router-dom";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import useClickOutside from "../../../hooks/useClickOutside";
+import usePresidents from "../../../hooks/usePresidents";
+
+// Stable fallbacks: fresh literals would change identity every render and
+// retrigger the memos/effects below while the query is still loading.
+const EMPTY_LIST = [];
+const EMPTY_DICT = {};
 
 export default function TimeRangeSelector({
   startYear,
@@ -18,12 +22,10 @@ export default function TimeRangeSelector({
   setActivePresident
 }) {
   const [defaultStartDate] = useState(() => new Date(Date.UTC(startYear, 0, 1)));
-  const presidentsArray = useSelector(
-    (state) => state.presidency.presidentDict
-  );
-  const presidentRelationDict = useSelector(
-    (state) => state.presidency.presidentRelationDict
-  );
+  const { data: presidentData } = usePresidents();
+  const presidentsArray = presidentData?.presidentList ?? EMPTY_LIST;
+  const presidentRelationDict =
+    presidentData?.presidentRelationDict ?? EMPTY_DICT;
   const location = useLocation();
   const containerRef = useRef(null);
   const dragStartRef = useRef(null);
@@ -254,10 +256,8 @@ export default function TimeRangeSelector({
       const relation = presidentRelationDict[president.id];
       if (!relation) return;
 
-      const displayName = utils.extractNameFromProtobuf(president.name);
-
       obj[president.id] = {
-        name: displayName,
+        name: president.name,
         terms: [
           {
             start: relation.startTime,

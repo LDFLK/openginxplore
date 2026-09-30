@@ -27,6 +27,12 @@ export const getActivePortfolioList = async ({ presidentId, date, signal }) => {
   return { ...data, portfolioList: formattedData };
 };
 
+export const getPresidents = async ({ signal } = {}) => {
+  const { data } = await axios.get(`${GI_SERVICE_URL}/presidents`, { signal });
+
+  return data;
+};
+
 export const getPersonProfile = async ({ personId, signal }) => {
   const { data } = await axios.get(
     `${GI_SERVICE_URL_PERSON}/person-profile/${personId}`,
