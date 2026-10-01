@@ -6,11 +6,6 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import useClickOutside from "../../../hooks/useClickOutside";
 import usePresidents from "../../../hooks/usePresidents";
 
-// Stable fallbacks: fresh literals would change identity every render and
-// retrigger the memos/effects below while the query is still loading.
-const EMPTY_LIST = [];
-const EMPTY_DICT = {};
-
 export default function TimeRangeSelector({
   startYear,
   dates,
@@ -23,9 +18,14 @@ export default function TimeRangeSelector({
 }) {
   const [defaultStartDate] = useState(() => new Date(Date.UTC(startYear, 0, 1)));
   const { data: presidentData } = usePresidents();
-  const presidentsArray = presidentData?.presidentList ?? EMPTY_LIST;
-  const presidentRelationDict =
-    presidentData?.presidentRelationDict ?? EMPTY_DICT;
+  const presidentsArray = useMemo(
+    () => presidentData?.presidentList ?? [],
+    [presidentData]
+  );
+  const presidentRelationDict = useMemo(
+    () => presidentData?.presidentRelationDict ?? {},
+    [presidentData]
+  );
   const location = useLocation();
   const containerRef = useRef(null);
   const dragStartRef = useRef(null);
