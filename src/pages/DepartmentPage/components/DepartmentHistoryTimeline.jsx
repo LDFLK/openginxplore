@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useThemeContext } from "../../../context/themeContext";
 import { ClipLoader } from "react-spinners";
 import { Link, useLocation } from "react-router-dom";
@@ -9,9 +10,6 @@ import { Landmark } from "lucide-react";
 import { useDepartmentHistory } from "../../../hooks/useDepartmentHistory";
 import { buildCabinetStructureUrlFromHistoryEntry } from "../../../utils/navigationUtils";
 import usePresidents from "../../../hooks/usePresidents";
-
-// Stable fallback: a fresh literal would change identity every render.
-const EMPTY_LIST = [];
 
 // TODO: temp solution. Remove presidents' names from state and non cabinet ministries
 const PRESIDENTS_LIST = ["gotabaya rajapaksa", "ranil wickremesinghe", "anura kumara dissanayake"];
@@ -30,7 +28,10 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
   const { colors, isDark } = useThemeContext();
   const location = useLocation();
   const { data: presidentData } = usePresidents();
-  const gazetteDataClassic = presidentData?.gazetteDataClassic ?? EMPTY_LIST;
+  const gazetteDataClassic = useMemo(
+    () => presidentData?.gazetteDataClassic ?? [],
+    [presidentData]
+  );
 
   const {
     data: departmentHistory,
