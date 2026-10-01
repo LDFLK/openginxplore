@@ -11,20 +11,22 @@ import useNetworkStatus from "../../../hooks/useNetworkStatus";
 import usePresidents from "../../../hooks/usePresidents";
 import PersonAvatar from "../../../components/PersonAvatar";
 
-// Stable fallbacks: fresh literals would change identity every render and
-// retrigger the effects below while the query is still loading.
-const EMPTY_LIST = [];
-const EMPTY_DICT = {};
-
 export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const dispatch = useDispatch();
 
-  // President/gazette data comes straight from /v1/presidents, not Redux.
   const { data: presidentData } = usePresidents();
-  const presidents = presidentData?.presidentList ?? EMPTY_LIST;
-  const presidentRelationDict =
-    presidentData?.presidentRelationDict ?? EMPTY_DICT;
-  const gazetteDateClassic = presidentData?.gazetteDataClassic ?? EMPTY_LIST;
+  const presidents = useMemo(
+    () => presidentData?.presidentList ?? [],
+    [presidentData]
+  );
+  const presidentRelationDict = useMemo(
+    () => presidentData?.presidentRelationDict ?? {},
+    [presidentData]
+  );
+  const gazetteDateClassic = useMemo(
+    () => presidentData?.gazetteDataClassic ?? [],
+    [presidentData]
+  );
 
   const selectedPresident = useSelector((s) => s.presidency.selectedPresident);
   const selectedDate = useSelector((s) => s.presidency.selectedDate);

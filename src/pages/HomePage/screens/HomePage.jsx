@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import {
   Binoculars,
   BookOpenText,
@@ -20,9 +20,6 @@ import Error404 from "../../ErrorBoundaries/screens/404Error";
 import SlFlag from "/sl_flag.png";
 import usePresidents from "../../../hooks/usePresidents";
 
-// Stable fallback: a fresh literal would change identity every render.
-const EMPTY_LIST = [];
-
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
   ? window.configs.feedbackFormUrl
   : "/";
@@ -37,7 +34,10 @@ export default function HomePage() {
   const selectedTab = tab || "executive-branch";
 
   const { data: presidentData } = usePresidents();
-  const gazetteDateClassic = presidentData?.gazetteDataClassic ?? EMPTY_LIST;
+  const gazetteDateClassic = useMemo(
+    () => presidentData?.gazetteDataClassic ?? [],
+    [presidentData]
+  );
 
 
   const [userSelectedDateRange, setUserSelectedDateRange] = useState([
