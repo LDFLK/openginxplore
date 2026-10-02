@@ -31,7 +31,8 @@ export default function DataLoadingAnimatedComponent({ mode }) {
   } = usePresidents();
 
   const presidentList = presidentData?.presidentList;
-  const presidentsReady = !!presidentList?.length;
+  // presidentData defined (even as []) means the query succeeded — treat as ready.
+  const presidentsReady = presidentData !== undefined;
 
   const totalSteps = 2;
   const completedSteps = (presidentsPending ? 0 : 1) + (departmentsLoaded ? 1 : 0);

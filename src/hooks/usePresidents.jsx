@@ -39,6 +39,7 @@ export const usePresidents = () => {
       const presidentRelationDict = {};
       body.forEach((president) => {
         const tenureList = president.tenureList ?? [];
+        if (tenureList.length === 0) return;
         const first = tenureList[0];
         const last = tenureList[tenureList.length - 1];
 
