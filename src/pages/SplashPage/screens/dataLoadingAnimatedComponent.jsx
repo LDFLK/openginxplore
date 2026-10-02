@@ -12,12 +12,6 @@ import DepartmentProfile from "../../DepartmentPage/screens/DepartmentProfile";
 import SplashPage from "../components/splash_page";
 import HomePage from "../../HomePage/screens/HomePage";
 
-const listToDict = (list) =>
-  list.reduce((acc, item) => {
-    acc[item.id] = item;
-    return acc;
-  }, {});
-
 export default function DataLoadingAnimatedComponent({ mode }) {
   const [showServerError, setShowServerError] = useState(false);
   const [departmentsLoaded, setDepartmentsLoaded] = useState(false);
@@ -54,7 +48,7 @@ export default function DataLoadingAnimatedComponent({ mode }) {
         const response = await api.fetchAllDepartments();
         const departmentList = await response.json();
         if (cancelled) return;
-        dispatch(setAllDepartmentData(listToDict(departmentList.body)));
+        dispatch(setAllDepartmentData(Object.fromEntries(departmentList.body.map((item) => [item.id, item]))));
         setDepartmentsLoaded(true);
       } catch (e) {
         if (cancelled) return;
