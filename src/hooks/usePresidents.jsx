@@ -5,6 +5,10 @@ import personImages from "../assets/personImages.json";
 
 const toIsoTime = (date) => (date ? `${date}T00:00:00Z` : null);
 
+const personImageMap = Object.fromEntries(
+  personImages.map((img) => [img.personName.trim(), img])
+);
+
 export const usePresidents = () => {
   return useQuery({
     queryKey: ["presidents"],
@@ -22,15 +26,12 @@ export const usePresidents = () => {
 
       // Cards: president identity plus the image/theme from the local asset.
       const presidentList = body.map((president) => {
-        const filtered_person = personImages.find(
-          (img) => img.personName.trim() === president.name?.trim()
-        );
-
+        const imgData = personImageMap[president.name?.trim()];
         return {
           id: president.id,
           name: president.name,
-          imageUrl: filtered_person?.imageUrl ?? null,
-          themeColorLight: filtered_person?.themeColorLight ?? null,
+          imageUrl: imgData?.imageUrl ?? null,
+          themeColorLight: imgData?.themeColorLight ?? null,
         };
       });
 
