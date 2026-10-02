@@ -1,19 +1,11 @@
 import { useState, useEffect } from "react";
 import api from "../../../services/services";
-import utils from "../../../utils/utils";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
-import { setAllMinistryData } from "../../../store/allMinistryData";
+import usePresidents from "../../../hooks/usePresidents";
 import { setAllDepartmentData } from "../../../store/allDepartmentData";
-import presidentDetails from "../../../assets/personImages.json";
-import { setAllPerson } from "../../../store/allPersonData";
-import {
-  setPresidentRelationDict,
-  setPresidentDict,
-  setSelectedPresident,
-} from "../../../store/presidencySlice";
+import { setSelectedPresident } from "../../../store/presidencySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { OFFLINE_ERROR } from "../../../utils/network";
-import { setGazetteDataClassic } from "../../../store/gazetteDate";
 import PersonProfile from "../../PersonProfilePage/screens/PersonProfile";
 import Error500 from "../../ErrorBoundaries/screens/500Error";
 import DepartmentProfile from "../../DepartmentPage/screens/DepartmentProfile";
@@ -21,171 +13,82 @@ import SplashPage from "../components/splash_page";
 import HomePage from "../../HomePage/screens/HomePage";
 
 export default function DataLoadingAnimatedComponent({ mode }) {
-  const [loading, setLoading] = useState(false);
   const [showServerError, setShowServerError] = useState(false);
-  const { presidentDict, selectedPresident } = useSelector(
-    (state) => state.presidency
-  );
+  const [departmentsLoaded, setDepartmentsLoaded] = useState(false);
+  const [splashDelayDone, setSplashDelayDone] = useState(false);
+
   const dispatch = useDispatch();
   const isOnline = useNetworkStatus();
 
-  const totalSteps = 4;
-  const [completedSteps, setCompletedSteps] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const selectedPresident = useSelector((s) => s.presidency.selectedPresident);
 
-  useEffect(() => {
-    setProgress(Math.round((completedSteps / totalSteps) * 100));
-  }, [completedSteps, totalSteps]);
+  // Presidents and gazette dates now come from React Query; it is the same
+  // cached query the rest of the app reads, so nothing is fetched twice.
+  const {
+    data: presidentData,
+    isPending: presidentsPending,
+    isError: presidentsError,
+  } = usePresidents();
 
+  const presidentList = presidentData?.presidentList;
+  // presidentData defined (even as []) means the query succeeded — treat as ready.
+  const presidentsReady = presidentData !== undefined;
+
+  const totalSteps = 2;
+  const completedSteps = (presidentsPending ? 0 : 1) + (departmentsLoaded ? 1 : 0);
+  const progress = Math.round((completedSteps / totalSteps) * 100);
+
+  // Departments are still Redux-backed (read by DepartmentProfile), so they
+  // stay an imperative fetch until that slice gets its own hook.
   useEffect(() => {
-    const initialFetchData = async () => {
-      if (Object.keys(presidentDict).length !== 0) return;
-      if (!isOnline) {
-        setShowServerError(false);
-        return;
+    if (departmentsLoaded || !isOnline) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await api.fetchAllDepartments();
+        const departmentList = await response.json();
+        if (cancelled) return;
+        dispatch(setAllDepartmentData(Object.fromEntries(departmentList.body.map((item) => [item.id, item]))));
+        setDepartmentsLoaded(true);
+      } catch (e) {
+        if (cancelled) return;
+        if (e.message !== OFFLINE_ERROR) setShowServerError(true);
+        console.log(`Error fetching department data : ${e.message}`);
       }
+    })();
 
-      setLoading(true);
-      setShowServerError(false);
-      setCompletedSteps(0);
-
-      const track = async (promise) => {
-        try {
-          await promise;
-        } finally {
-          setCompletedSteps((prev) => prev + 1);
-        }
-      };
-
-      await Promise.allSettled([
-        track(fetchPersonData()),
-        track(fetchAllMinistryData()),
-        track(fetchAllDepartmentData()),
-        track(fetchAllGazetteDate()),
-      ]);
-
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+    return () => {
+      cancelled = true;
     };
+  }, [departmentsLoaded, isOnline, dispatch]);
 
-    initialFetchData();
-  }, [presidentDict, isOnline]);
-
-  const listToDict = (list) => {
-    return list.reduce((acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    }, {});
-  };
-
-  const fetchPersonData = async () => {
-    try {
-      const personResponse = await api.fetchAllPersons();
-      const personList = await personResponse.json();
-      //dispatch(setAllPerson(personList.body));
-      const personDict = listToDict(personList.body);
-      dispatch(setAllPerson(personDict));
-
-      const presidentResponseRaw = await api.fetchPresidentsData();
-
-      // Sort by startTime
-      const presidentResponse = presidentResponseRaw.sort(
-        (a, b) => new Date(a.startTime) - new Date(b.startTime)
-      );
-
-      // Convert to dictionary keyed by id
-      const presidentRelationDict = listToDict(
-        presidentResponse.map((item) => ({
-          ...item,
-          id: item.relatedEntityId,
-        }))
-      );
-      dispatch(setPresidentRelationDict(presidentRelationDict));
-
-      // Map relatedEntityId → person using existing personDict
-      const presidentDictInDetail = presidentResponse
-        .map((p) => personDict[p.relatedEntityId])
-        .filter(Boolean);
-
-      // Enrich presidents
-      const enrichedPresidents = presidentDictInDetail.map((president) => {
-        const matchedDetail = presidentDetails.find((detail) =>
-          detail.personName
-            .toLowerCase()
-            .includes(
-              utils.extractNameFromProtobuf(president.name).toLowerCase()
-            )
-        );
-
-        return {
-          ...president,
-          imageUrl: matchedDetail?.imageUrl || null,
-          themeColorLight: matchedDetail?.themeColorLight || null,
-        };
-      });
-
-      dispatch(setPresidentDict(enrichedPresidents));
-
-      // Only select the last president if no president is currently selected
-      if (!selectedPresident) {
-        const selectedPre = enrichedPresidents[enrichedPresidents.length - 1];
-        dispatch(setSelectedPresident(selectedPre));
-      }
-    } catch (e) {
-      if (e.message !== OFFLINE_ERROR) {
-        setShowServerError(true);
-      }
-      console.log(`Error fetching person data : ${e.message}`);
+  // Going offline is not a server error, and the query will fail while offline.
+  useEffect(() => {
+    if (!isOnline) {
+      setShowServerError(false);
+      return;
     }
-  };
+    if (presidentsError) setShowServerError(true);
+  }, [presidentsError, isOnline]);
 
-  const fetchAllDepartmentData = async () => {
-    try {
-      const response = await api.fetchAllDepartments();
-      const departmentList = await response.json();
-      const departmentDict = listToDict(departmentList.body);
-      dispatch(setAllDepartmentData(departmentDict));
-    } catch (e) {
-      setShowServerError(true);
-      console.log(`Error fetching department data : ${e.message}`);
-    }
-  };
+  // Default to the sitting president, unless a selection already exists.
+  useEffect(() => {
+    if (selectedPresident || !presidentsReady) return;
+    dispatch(setSelectedPresident(presidentList[presidentList.length - 1]));
+  }, [selectedPresident, presidentsReady, presidentList, dispatch]);
 
-  const fetchAllMinistryData = async () => {
-    try {
-      const [stateRes, cabinetRes] = await Promise.all([
-        api.fetchAllStateMinistries(),
-        api.fetchAllCabinetMinistries(),
-      ]);
+  const dataReady = presidentsReady && departmentsLoaded;
 
-      const stateData = await stateRes.json();
-      const cabinetData = await cabinetRes.json();
+  // Hold the splash for a beat after the data lands, as before.
+  useEffect(() => {
+    if (!dataReady) return;
+    const timer = setTimeout(() => setSplashDelayDone(true), 1000);
+    return () => clearTimeout(timer);
+  }, [dataReady]);
 
-      const stateDict = listToDict(stateData.body);
-      const cabinetDict = listToDict(cabinetData.body);
-
-      const combined = {
-        ...stateDict,
-        ...cabinetDict,
-      };
-
-      dispatch(setAllMinistryData(combined));
-    } catch (e) {
-      setShowServerError(true);
-      console.log(`Error fetching ministry data : ${e.message}`);
-    }
-  };
-
-  const fetchAllGazetteDate = async () => {
-    try {
-      const response = await api.fetchInitialGazetteData();
-      dispatch(setGazetteDataClassic(response));
-    } catch (e) {
-      setShowServerError(true);
-      console.log(`Error fetching gazette dates : ${e.message}`);
-    }
-  };
+  const loading =
+    isOnline && !showServerError && !(dataReady && splashDelayDone);
 
   return (
     <>
@@ -195,14 +98,14 @@ export default function DataLoadingAnimatedComponent({ mode }) {
         <Error500 />
       ) : (
         <>
-          {Object.keys(presidentDict).length > 0 && mode === "orgchart" ? (
+          {presidentsReady && mode === "orgchart" ? (
             <HomePage />
-          ) : Object.keys(presidentDict).length > 0 &&
-            mode === "person-profile" ? (
+          ) : presidentsReady && mode === "person-profile" ? (
             <PersonProfile />
           ) : (
-            Object.keys(presidentDict).length > 0 &&
-            mode === "department-profile" && <DepartmentProfile />
+            presidentsReady && mode === "department-profile" && (
+              <DepartmentProfile />
+            )
           )}
         </>
       )}

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import {
   Binoculars,
   BookOpenText,
@@ -10,7 +10,6 @@ import {
 import DataPage from "../../DataPage/screens/DataPage";
 import TimeRangeSelector from "../components/TimeRangeSelector";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
 import TextLogo from "../components/textLogo";
 import Organization from "../../OrganizationPage/screens/Organization";
 import ThemeToggle from "../../../components/theme-toggle";
@@ -19,6 +18,7 @@ import SearchBar from "../../../components/SearchBar";
 import SearchPage from "../../SearchPage/screens/SearchPage";
 import Error404 from "../../ErrorBoundaries/screens/404Error";
 import SlFlag from "/sl_flag.png";
+import usePresidents from "../../../hooks/usePresidents";
 
 const feedbackFormUrl = window?.configs?.feedbackFormUrl
   ? window.configs.feedbackFormUrl
@@ -33,8 +33,10 @@ export default function HomePage() {
 
   const selectedTab = tab || "executive-branch";
 
-  const gazetteDateClassic = useSelector(
-    (state) => state.gazettes.gazetteDataClassic
+  const { data: presidentData } = usePresidents();
+  const gazetteDateClassic = useMemo(
+    () => presidentData?.gazetteDataClassic ?? [],
+    [presidentData]
   );
 
 

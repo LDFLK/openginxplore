@@ -1,7 +1,7 @@
+import { useMemo } from "react";
 import { useThemeContext } from "../../../context/themeContext";
 import { ClipLoader } from "react-spinners";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import {
   VerticalTimeline,
   VerticalTimelineElement,
@@ -9,6 +9,7 @@ import {
 import { Landmark } from "lucide-react";
 import { useDepartmentHistory } from "../../../hooks/useDepartmentHistory";
 import { buildCabinetStructureUrlFromHistoryEntry } from "../../../utils/navigationUtils";
+import usePresidents from "../../../hooks/usePresidents";
 
 // TODO: temp solution. Remove presidents' names from state and non cabinet ministries
 const PRESIDENTS_LIST = ["gotabaya rajapaksa", "ranil wickremesinghe", "anura kumara dissanayake"];
@@ -26,7 +27,11 @@ const getMinisterName = (ministryName, ministerNameArg) => {
 const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
   const { colors, isDark } = useThemeContext();
   const location = useLocation();
-  const gazetteDataClassic = useSelector((s) => s.gazettes.gazetteDataClassic);
+  const { data: presidentData } = usePresidents();
+  const gazetteDataClassic = useMemo(
+    () => presidentData?.gazetteDataClassic ?? [],
+    [presidentData]
+  );
 
   const {
     data: departmentHistory,

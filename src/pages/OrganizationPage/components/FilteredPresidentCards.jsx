@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useMemo, useEffect, useRef } from "react";
-import utils from "../../../utils/utils";
 import {
   setSelectedPresident,
   setSelectedDate,
@@ -9,15 +8,26 @@ import { setGazetteData } from "../../../store/gazetteDate";
 import { Link, useLocation } from "react-router-dom";
 import { EyeIcon } from "lucide-react";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
+import usePresidents from "../../../hooks/usePresidents";
 import PersonAvatar from "../../../components/PersonAvatar";
 
 export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const dispatch = useDispatch();
-  const presidents = useSelector((s) => s.presidency.presidentDict);
-  const presidentRelationDict = useSelector(
-    (s) => s.presidency.presidentRelationDict
+
+  const { data: presidentData } = usePresidents();
+  const presidents = useMemo(
+    () => presidentData?.presidentList ?? [],
+    [presidentData]
   );
-  const gazetteDateClassic = useSelector((s) => s.gazettes.gazetteDataClassic);
+  const presidentRelationDict = useMemo(
+    () => presidentData?.presidentRelationDict ?? {},
+    [presidentData]
+  );
+  const gazetteDateClassic = useMemo(
+    () => presidentData?.gazetteDataClassic ?? [],
+    [presidentData]
+  );
+
   const selectedPresident = useSelector((s) => s.presidency.selectedPresident);
   const selectedDate = useSelector((s) => s.presidency.selectedDate);
   const isOnline = useNetworkStatus();
@@ -53,7 +63,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
       })
       .filter((p) => {
         if (!searchTerm) return true;
-        const nameText = utils.extractNameFromProtobuf(p.name);
+        const nameText = p.name ?? "";
         const rel = presidentRelationDict[p.id];
         const startYear = rel?.startTime ? rel.startTime.split("-")[0] : "";
         const endYear = rel?.endTime
@@ -413,7 +423,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
         <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 pb-2 md:pb-0 no-scrollbar">
           {filteredPresidents.map((president) => {
             const isSelected = selectedPresident?.id === president.id;
-            const nameText = utils.extractNameFromProtobuf(president.name);
+            const nameText = president.name ?? "";
             const rel = presidentRelationDict[president.id];
             const startYear = rel?.startTime ? rel.startTime.split("-")[0] : "";
             const endYear = rel?.endTime
