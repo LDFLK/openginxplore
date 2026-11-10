@@ -9,6 +9,7 @@ import { useAvailableYearsForDataset } from "../../../hooks/useAvailableYearsFor
 import { useGetDatasetsByYears } from "../../../hooks/useGetDatasetsByYears";
 import { useRootOrganizations } from "../../../hooks/useRootOrganizations";
 import LandscapeRequired from "../../../components/landscapeRequired";
+import { departmentProfilePath } from "../../../utils/navigationUtils";
 
 export function DatasetView({ data, setExternalDateRange }) {
   const location = useLocation();
@@ -336,7 +337,7 @@ export function DatasetView({ data, setExternalDateRange }) {
                   {displayOrganizations && displayOrganizations.type === 'single' && (
                     displayOrganizations.data.type === "department" ? (
                       <Link
-                        to={`/department-profile/${displayOrganizations.data.id}`}
+                        to={departmentProfilePath(displayOrganizations.data.id)}
                         state={{
                           mode: "back",
                           from: location.pathname + location.search,
@@ -358,7 +359,7 @@ export function DatasetView({ data, setExternalDateRange }) {
                         <span className="font-medium min-w-[40px]">{org.year}:</span>
                         {org.type === "department" ? (
                           <Link
-                            to={`/department-profile/${org.id}`}
+                            to={departmentProfilePath(org.id)}
                             state={{
                               mode: "back",
                               from: location.pathname + location.search,
