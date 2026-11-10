@@ -5,6 +5,10 @@ import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import { Building, History, UserRound, Building2, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import {
+  departmentProfilePath,
+  personProfilePath,
+} from "../../../utils/navigationUtils";
 
 export default function Drawer({
   expandDrawer,
@@ -135,7 +139,7 @@ export default function Drawer({
                   {/* Profile buttons */}
                   {selectedNode && selectedNode.type == "department" ? (
                     <Link
-                      to={`/department-profile/${selectedNode.id}`}
+                      to={departmentProfilePath(selectedNode.id)}
                       state={{ mode: "back", from: location.pathname + location.search }}
                       className="mt-2 inline-flex items-center px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium text-center text-background bg-accent rounded-sm hover:bg-accent/90"
                     >
@@ -146,7 +150,7 @@ export default function Drawer({
                     selectedNode &&
                     selectedNode.type == "person" && (
                       <Link
-                        to={`/person-profile/${selectedNode.id}`}
+                        to={personProfilePath(selectedNode.id)}
                         state={{ mode: "back", from: location.pathname + location.search }}
                         className="mt-2 inline-flex items-center px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium text-center text-background bg-accent rounded-sm hover:bg-accent/90"
                       >

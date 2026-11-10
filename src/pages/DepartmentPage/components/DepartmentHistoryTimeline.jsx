@@ -8,7 +8,10 @@ import {
 } from "react-vertical-timeline-component";
 import { Landmark } from "lucide-react";
 import { useDepartmentHistory } from "../../../hooks/useDepartmentHistory";
-import { buildCabinetStructureUrlFromHistoryEntry } from "../../../utils/navigationUtils";
+import {
+  buildCabinetStructureUrlFromHistoryEntry,
+  personProfilePath,
+} from "../../../utils/navigationUtils";
 
 // TODO: temp solution. Remove presidents' names from state and non cabinet ministries
 const PRESIDENTS_LIST = ["gotabaya rajapaksa", "ranil wickremesinghe", "anura kumara dissanayake"];
@@ -102,7 +105,7 @@ const DepartmentHistoryTimeline = ({ selectedDepartment }) => {
                       <div className="flex items-center justify-between">
                         {ministerName ? (
                           <Link
-                            to={`/person-profile/${entry.minister_id}`}
+                            to={personProfilePath(entry.minister_id)}
                             state={{
                               mode: "back",
                               from: location.pathname + location.search,

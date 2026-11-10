@@ -4,6 +4,7 @@ import { Calendar, BarChart2, Building2, ArrowRight } from "lucide-react";
 import CabinetFlowPanel from "../components/CabinetFlowPanel";
 import RightSidePanel from "../../../components/RightSidePanel";
 import { useEntityNames } from "../../../hooks/useEntityNames";
+import { departmentProfilePath } from "../../../utils/navigationUtils";
 
 const CabinetFlow = ({ presidentId, selectedDates = [], onMinistryNodeClick }) => {
     const location = useLocation();
@@ -157,7 +158,7 @@ const CabinetFlow = ({ presidentId, selectedDates = [], onMinistryNodeClick }) =
                                         >
                                             <Building2 size={14} className="text-gray-400 shrink-0" />
                                             <Link
-                                                to={`/department-profile/${id}`}
+                                                to={departmentProfilePath(id)}
                                                 state={{ mode: "back", from: location.pathname + location.search }}
                                                 className="break-words text-foreground/90 dark:text-white/90 hover:underline"
                                             >

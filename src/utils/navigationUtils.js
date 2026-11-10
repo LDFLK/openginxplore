@@ -1,4 +1,10 @@
 import { getDatasetCategories } from "../services/searchServices";
+
+export const personProfilePath = (id) =>
+    `/person-profile/${encodeURIComponent(id)}`;
+
+export const departmentProfilePath = (id) =>
+    `/department-profile/${encodeURIComponent(id)}`;
 import {
     parseDepartmentHistoryPeriod,
     resolveGazetteDateOnOrAfter,
@@ -49,14 +55,14 @@ export const handleResultNavigation = async (result, {
     switch (result.type) {
         case "person":
             if (onComplete) onComplete();
-            navigate(`/person-profile/${result.id}`, {
+            navigate(personProfilePath(result.id), {
                 state: { from: returnPath, searchResultName: result.name },
             });
             break;
 
         case "department":
             if (onComplete) onComplete();
-            navigate(`/department-profile/${result.id}`, {
+            navigate(departmentProfilePath(result.id), {
                 state: { from: returnPath, searchResultName: result.name },
             });
             break;

@@ -10,6 +10,7 @@ import { Link, useLocation } from "react-router-dom";
 import { EyeIcon } from "lucide-react";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
 import PersonAvatar from "../../../components/PersonAvatar";
+import { personProfilePath } from "../../../utils/navigationUtils";
 
 export default function FilteredPresidentCards({ dateRange = [null, null] }) {
   const dispatch = useDispatch();
@@ -449,7 +450,7 @@ export default function FilteredPresidentCards({ dateRange = [null, null] }) {
                   </p>
                   <div className="flex flex-nowrap gap-3 mt-1">
                     <Link
-                      to={`/person-profile/${president?.id}`}
+                      to={personProfilePath(president?.id)}
                       onClick={(e) => e.stopPropagation()}
                       state={{ mode: "back", from: location.pathname + location.search }}
                       className="text-primary/75 text-xs md:text-sm hover:text-accent transition-all animation duration-200 mt-1 flex items-center"

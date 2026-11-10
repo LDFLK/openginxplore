@@ -17,6 +17,7 @@ import DomainAddIcon from "@mui/icons-material/DomainAdd";
 import { useThemeContext } from "../../../context/themeContext";
 import InfoTooltip from "../../../components/InfoToolTip";
 import { useDepartmentsByPortfolio } from "../../../hooks/useDepartmentsByPortfolio";
+import { departmentProfilePath } from "../../../utils/navigationUtils";
 
 
 const DepartmentTab = ({ selectedDate, ministryId }) => {
@@ -320,7 +321,7 @@ const DepartmentTab = ({ selectedDate, ministryId }) => {
                     {/* Footer Links */}
                     <div className="flex items-center justify-between px-4 py-2 mt-auto">
                       <Link
-                        to={`/department-profile/${dep.id}`}
+                        to={departmentProfilePath(dep.id)}
                         state={{ mode: "back", from: location.pathname + location.search }}
                         className="text-xs md:text-sm font-small hover:underline"
                         style={{ color: selectedPresident.themeColorLight }}

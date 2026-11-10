@@ -4,6 +4,7 @@ import { useThemeContext } from "../../../context/themeContext";
 import { useBadgeContext } from "../../../context/badgeContext";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { personProfilePath } from "../../../utils/navigationUtils";
 
 const MinistryCard = ({ card, onClick }) => {
   const { selectedPresident } = useSelector((state) => state.presidency);
@@ -16,7 +17,7 @@ const MinistryCard = ({ card, onClick }) => {
   const handleOpenProfile = (e, id) => {
     e.stopPropagation();
     if (!id) return;
-    navigate(`/person-profile/${id}`, {
+    navigate(personProfilePath(id), {
       state: { mode: "back", from: location.pathname + location.search }
     })
   }

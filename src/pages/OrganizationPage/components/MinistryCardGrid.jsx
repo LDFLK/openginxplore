@@ -27,6 +27,7 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import StepContent from "@mui/material/StepContent";
+import { personProfilePath } from "../../../utils/navigationUtils";
 
 import {
   Search as SearchIcon,
@@ -357,7 +358,7 @@ const MinistryCardGrid = () => {
                   </Typography>
                   <Button
                     component={Link}
-                    to={`/person-profile/${primeMinister?.id}`}
+                    to={personProfilePath(primeMinister?.id)}
                     state={{
                       mode: "back",
                       from: location.pathname + location.search,
@@ -969,7 +970,7 @@ const MinistryCardGrid = () => {
                                     minister.id ? (
                                       <Link
                                         key={minister.id}
-                                        to={`/person-profile/${minister.id}`}
+                                        to={personProfilePath(minister.id)}
                                         state={{
                                           mode: "back",
                                           from: location.pathname + location.search,

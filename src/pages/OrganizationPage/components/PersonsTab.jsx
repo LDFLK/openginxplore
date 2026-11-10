@@ -7,6 +7,7 @@ import InfoTooltip from "../../../components/InfoToolTip";
 import { Link, useLocation } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { usePersonsByPortfolio } from "../../../hooks/usePersonsByPortfolio";
+import { personProfilePath } from "../../../utils/navigationUtils";
 
 const PersonsTab = ({ selectedDate, ministryId }) => {
   const { colors } = useThemeContext();
@@ -303,7 +304,7 @@ const PersonsTab = ({ selectedDate, ministryId }) => {
                   </Box>
 
                   <Link
-                    to={`/person-profile/${person.id}`}
+                    to={personProfilePath(person.id)}
                     state={{ mode: "back", from: location.pathname + location.search }}
                     style={{ textDecoration: "none" }}
                   >
