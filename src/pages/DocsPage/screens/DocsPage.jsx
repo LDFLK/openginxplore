@@ -4,14 +4,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "../components/CopyButton";
 import { TextWithCitations } from "../components/TextWithCitation";
+import { useDocsFiles, useDocMarkdown } from "../../../hooks/useDocs";
 
-const GITHUB_USERNAME = "ldflk";
-const REPO_NAME = "openginxplore";
-const DOCS_BRANCH = "main";
+const EMPTY_FILES = [];
 
 export default function DocsPage() {
-    const [files, setFiles] = useState([]);
+    const { data: files = EMPTY_FILES } = useDocsFiles();
     const [activeFile, setActiveFile] = useState(null);
+    const { data: markdown } = useDocMarkdown(activeFile?.file);
     const [content, setContent] = useState("");
     const [headings, setHeadings] = useState([]);
     const [currentHash, setCurrentHash] = useState(
@@ -53,42 +53,21 @@ export default function DocsPage() {
         return () => window.removeEventListener("hashchange", handleHashChange);
     }, []);
 
-    // fetch docs list
+    // select the initial doc file once the list is available
     useEffect(() => {
-        async function fetchDocFiles() {
-            try {
-                const res = await fetch(
-                    `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/docs?ref=${DOCS_BRANCH}&t=${Date.now()}`
-                );
-                const data = await res.json();
-                const mdFiles = Array.isArray(data)
-                    ? data
-                        .filter((f) => f.name.endsWith(".md"))
-                        .map((f) => ({
-                            name: f.name.replace(/-/g, " ").replace(".md", ""),
-                            file: f.name,
-                            slug: f.name.replace(".md", ""),
-                        }))
-                    : [];
+        if (!files.length) return;
 
-                setFiles(mdFiles);
-
-                if (pendingFileRef.current) {
-                    const matched = mdFiles.find((m) => m.slug === pendingFileRef.current);
-                    if (matched) {
-                        setActiveFile(matched);
-                        return;
-                    }
-                }
-
-                if (!activeFile && mdFiles.length) setActiveFile(mdFiles[0]);
-            } catch (err) {
-                console.error("Failed to fetch doc files", err);
+        if (pendingFileRef.current) {
+            const matched = files.find((m) => m.slug === pendingFileRef.current);
+            if (matched) {
+                setActiveFile(matched);
+                return;
             }
         }
-        fetchDocFiles();
+
+        if (!activeFile) setActiveFile(files[0]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [files]);
 
 
 
@@ -146,60 +125,43 @@ export default function DocsPage() {
         return extracted;
     }
 
-    // fetch markdown whenever activeFile changes
+    // apply the markdown whenever the active file's content arrives
     useEffect(() => {
-        if (!activeFile) return;
-        let cancelled = false;
+        if (!markdown || !activeFile) return;
 
-        async function fetchMarkdown(fileName) {
-            try {
-                const res = await fetch(
-                    `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${DOCS_BRANCH}/docs/${fileName}?t=${Date.now()}`
-                );
-                const md = await res.text();
-                if (cancelled) return;
-                setContent(md);
+        setContent(markdown);
 
-                const fileSlug = activeFile.slug || activeFile.file.replace(".md", "");
-                const newHeadings = generateHeadingIds(md, fileSlug);
-                setHeadings(newHeadings);
+        const fileSlug = activeFile.slug || activeFile.file.replace(".md", "");
+        const newHeadings = generateHeadingIds(markdown, fileSlug);
+        setHeadings(newHeadings);
 
-                if (contentRef.current)
-                    contentRef.current.scrollTo({ top: 0 });
+        if (contentRef.current)
+            contentRef.current.scrollTo({ top: 0 });
 
-                const pendingHash = pendingHashRef.current;
-                const pendingFile = pendingFileRef.current;
+        const pendingHash = pendingHashRef.current;
+        const pendingFile = pendingFileRef.current;
 
-                // Update URL with hash if pending, otherwise just file
-                const newUrl = (pendingHash && pendingFile === fileSlug)
-                    ? `?file=${fileSlug}#${pendingHash}`
-                    : `?file=${fileSlug}`;
-                window.history.replaceState(null, "", newUrl);
+        // Update URL with hash if pending, otherwise just file
+        const newUrl = (pendingHash && pendingFile === fileSlug)
+            ? `?file=${fileSlug}#${pendingHash}`
+            : `?file=${fileSlug}`;
+        window.history.replaceState(null, "", newUrl);
 
-                if (pendingHash && pendingFile === fileSlug) {
-                    const targetDomId = `${fileSlug}-${pendingHash}`;
-                    setTimeout(() => {
-                        const el = document.getElementById(targetDomId);
-                        if (el && contentRef.current) {
-                            el.scrollIntoView({ behavior: "smooth", block: "start" });
-                            setCurrentHash(pendingHash);
-                        }
-                        pendingHashRef.current = null;
-                        pendingFileRef.current = null;
-                    }, 300);
+        if (pendingHash && pendingFile === fileSlug) {
+            const targetDomId = `${fileSlug}-${pendingHash}`;
+            setTimeout(() => {
+                const el = document.getElementById(targetDomId);
+                if (el && contentRef.current) {
+                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    setCurrentHash(pendingHash);
                 }
-            } catch (err) {
-                console.error("Failed to fetch markdown", err);
-            }
+                pendingHashRef.current = null;
+                pendingFileRef.current = null;
+            }, 300);
         }
-
-        fetchMarkdown(activeFile.file);
-
-        return () => {
-            cancelled = true;
-        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeFile]);
+    }, [markdown, activeFile]);
+
 
 
     const getHeadingId = (text, level) => {
