@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import api from "../../../services/services";
+import { useState, useEffect, useRef } from "react";
 import utils from "../../../utils/utils";
 import useNetworkStatus from "../../../hooks/useNetworkStatus";
+import { useBootstrapData } from "../../../hooks/useBootstrapData";
 import { setAllMinistryData } from "../../../store/allMinistryData";
 import { setAllDepartmentData } from "../../../store/allDepartmentData";
 import presidentDetails from "../../../assets/personImages.json";
@@ -20,170 +20,137 @@ import DepartmentProfile from "../../DepartmentPage/screens/DepartmentProfile";
 import SplashPage from "../components/splash_page";
 import HomePage from "../../HomePage/screens/HomePage";
 
+const TOTAL_STEPS = 4;
+const MIN_SPLASH_MS = 1000;
+
+const listToDict = (list = []) => {
+  return list.reduce((acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  }, {});
+};
+
 export default function DataLoadingAnimatedComponent({ mode }) {
-  const [loading, setLoading] = useState(false);
   const [showServerError, setShowServerError] = useState(false);
+  const [minDelayElapsed, setMinDelayElapsed] = useState(false);
   const { presidentDict, selectedPresident } = useSelector(
     (state) => state.presidency
   );
   const dispatch = useDispatch();
   const isOnline = useNetworkStatus();
 
-  const totalSteps = 4;
-  const [completedSteps, setCompletedSteps] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const hasPresidentData = Object.keys(presidentDict).length !== 0;
+  const {
+    persons,
+    ministries,
+    departments,
+    gazetteDates,
+    isSettled,
+    isError,
+    error,
+  } = useBootstrapData({ enabled: isOnline && !hasPresidentData });
+
+  const appliedPersonsRef = useRef(null);
+  const appliedMinistriesRef = useRef(null);
+  const appliedDepartmentsRef = useRef(null);
+  const appliedGazetteRef = useRef(null);
 
   useEffect(() => {
-    setProgress(Math.round((completedSteps / totalSteps) * 100));
-  }, [completedSteps, totalSteps]);
+    const timeout = setTimeout(() => setMinDelayElapsed(true), MIN_SPLASH_MS);
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
-    const initialFetchData = async () => {
-      if (Object.keys(presidentDict).length !== 0) return;
-      if (!isOnline) {
-        setShowServerError(false);
-        return;
-      }
+    if (!isError) return;
+    if (error?.message !== OFFLINE_ERROR) setShowServerError(true);
+  }, [isError, error]);
 
-      setLoading(true);
-      setShowServerError(false);
-      setCompletedSteps(0);
+  useEffect(() => {
+    if (!persons.data || appliedPersonsRef.current === persons.data) return;
+    appliedPersonsRef.current = persons.data;
 
-      const track = async (promise) => {
-        try {
-          await promise;
-        } finally {
-          setCompletedSteps((prev) => prev + 1);
-        }
-      };
+    const { persons: personList, presidents } = persons.data;
+    const personDict = listToDict(personList);
+    dispatch(setAllPerson(personDict));
 
-      await Promise.allSettled([
-        track(fetchPersonData()),
-        track(fetchAllMinistryData()),
-        track(fetchAllDepartmentData()),
-        track(fetchAllGazetteDate()),
-      ]);
+    const presidentResponse = [...presidents].sort(
+      (a, b) => new Date(a.startTime) - new Date(b.startTime)
+    );
 
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    };
+    const presidentRelationDict = listToDict(
+      presidentResponse.map((item) => ({
+        ...item,
+        id: item.relatedEntityId,
+      }))
+    );
+    dispatch(setPresidentRelationDict(presidentRelationDict));
 
-    initialFetchData();
-  }, [presidentDict, isOnline]);
+    const presidentDictInDetail = presidentResponse
+      .map((p) => personDict[p.relatedEntityId])
+      .filter(Boolean);
 
-  const listToDict = (list) => {
-    return list.reduce((acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    }, {});
-  };
-
-  const fetchPersonData = async () => {
-    try {
-      const personList = await api.fetchAllPersons();
-      //dispatch(setAllPerson(personList.body));
-      const personDict = listToDict(personList.body);
-      dispatch(setAllPerson(personDict));
-
-      const presidentResponseRaw = await api.fetchPresidentsData();
-
-      // Sort by startTime
-      const presidentResponse = presidentResponseRaw.sort(
-        (a, b) => new Date(a.startTime) - new Date(b.startTime)
+    const enrichedPresidents = presidentDictInDetail.map((president) => {
+      const matchedDetail = presidentDetails.find((detail) =>
+        detail.personName
+          .toLowerCase()
+          .includes(utils.extractNameFromProtobuf(president.name).toLowerCase())
       );
 
-      // Convert to dictionary keyed by id
-      const presidentRelationDict = listToDict(
-        presidentResponse.map((item) => ({
-          ...item,
-          id: item.relatedEntityId,
-        }))
-      );
-      dispatch(setPresidentRelationDict(presidentRelationDict));
-
-      // Map relatedEntityId → person using existing personDict
-      const presidentDictInDetail = presidentResponse
-        .map((p) => personDict[p.relatedEntityId])
-        .filter(Boolean);
-
-      // Enrich presidents
-      const enrichedPresidents = presidentDictInDetail.map((president) => {
-        const matchedDetail = presidentDetails.find((detail) =>
-          detail.personName
-            .toLowerCase()
-            .includes(
-              utils.extractNameFromProtobuf(president.name).toLowerCase()
-            )
-        );
-
-        return {
-          ...president,
-          imageUrl: matchedDetail?.imageUrl || null,
-          themeColorLight: matchedDetail?.themeColorLight || null,
-        };
-      });
-
-      dispatch(setPresidentDict(enrichedPresidents));
-
-      // Only select the last president if no president is currently selected
-      if (!selectedPresident) {
-        const selectedPre = enrichedPresidents[enrichedPresidents.length - 1];
-        dispatch(setSelectedPresident(selectedPre));
-      }
-    } catch (e) {
-      if (e.message !== OFFLINE_ERROR) {
-        setShowServerError(true);
-      }
-      console.log(`Error fetching person data : ${e.message}`);
-    }
-  };
-
-  const fetchAllDepartmentData = async () => {
-    try {
-      const departmentList = await api.fetchAllDepartments();
-      const departmentDict = listToDict(departmentList.body);
-      dispatch(setAllDepartmentData(departmentDict));
-    } catch (e) {
-      setShowServerError(true);
-      console.log(`Error fetching department data : ${e.message}`);
-    }
-  };
-
-  const fetchAllMinistryData = async () => {
-    try {
-      const [stateRes, cabinetRes] = await Promise.all([
-        api.fetchAllStateMinistries(),
-        api.fetchAllCabinetMinistries(),
-      ]);
-
-      const stateData = stateRes;
-      const cabinetData = cabinetRes;
-
-      const stateDict = listToDict(stateData.body);
-      const cabinetDict = listToDict(cabinetData.body);
-
-      const combined = {
-        ...stateDict,
-        ...cabinetDict,
+      return {
+        ...president,
+        imageUrl: matchedDetail?.imageUrl || null,
+        themeColorLight: matchedDetail?.themeColorLight || null,
       };
+    });
 
-      dispatch(setAllMinistryData(combined));
-    } catch (e) {
-      setShowServerError(true);
-      console.log(`Error fetching ministry data : ${e.message}`);
-    }
-  };
+    dispatch(setPresidentDict(enrichedPresidents));
 
-  const fetchAllGazetteDate = async () => {
-    try {
-      const response = await api.fetchInitialGazetteData();
-      dispatch(setGazetteDataClassic(response));
-    } catch (e) {
-      setShowServerError(true);
-      console.log(`Error fetching gazette dates : ${e.message}`);
+    if (!selectedPresident) {
+      const selectedPre = enrichedPresidents[enrichedPresidents.length - 1];
+      dispatch(setSelectedPresident(selectedPre));
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persons.data]);
+
+  useEffect(() => {
+    if (!ministries.data || appliedMinistriesRef.current === ministries.data) {
+      return;
+    }
+    appliedMinistriesRef.current = ministries.data;
+
+    const stateDict = listToDict(ministries.data.state?.body);
+    const cabinetDict = listToDict(ministries.data.cabinet?.body);
+
+    dispatch(setAllMinistryData({ ...stateDict, ...cabinetDict }));
+  }, [ministries.data, dispatch]);
+
+  useEffect(() => {
+    if (!departments.data || appliedDepartmentsRef.current === departments.data) {
+      return;
+    }
+    appliedDepartmentsRef.current = departments.data;
+
+    dispatch(setAllDepartmentData(listToDict(departments.data.body)));
+  }, [departments.data, dispatch]);
+
+  useEffect(() => {
+    if (!gazetteDates.data || appliedGazetteRef.current === gazetteDates.data) {
+      return;
+    }
+    appliedGazetteRef.current = gazetteDates.data;
+
+    dispatch(setGazetteDataClassic(gazetteDates.data));
+  }, [gazetteDates.data, dispatch]);
+
+  const settledCount = [persons, ministries, departments, gazetteDates].filter(
+    (query) => query.isSuccess || query.isError
+  ).length;
+  const progress = Math.round((settledCount / TOTAL_STEPS) * 100);
+  const loading =
+    isOnline &&
+    !showServerError &&
+    !hasPresidentData &&
+    (!isSettled || !minDelayElapsed);
 
   return (
     <>

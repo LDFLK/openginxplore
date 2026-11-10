@@ -113,7 +113,7 @@ export const getPersonsByPortfolio = async ({ portfolioId, date, signal }) => {
 };
 
 // Fetch initial gazette dates and all ministry protobuf data
-const fetchInitialGazetteData = async () => {
+export const fetchInitialGazetteData = async ({ signal } = {}) => {
   try {
     const { data: result } = await axios.post(
       `${apiUrl}/v1/entities/search`,
@@ -123,7 +123,7 @@ const fetchInitialGazetteData = async () => {
           minor: "extgztorg",
         },
       },
-      OPEN_GIN_REQUEST_CONFIG
+      { ...OPEN_GIN_REQUEST_CONFIG, signal }
     );
 
     const { data: resultForPerson } = await axios.post(
@@ -134,7 +134,7 @@ const fetchInitialGazetteData = async () => {
           minor: "extgztperson",
         },
       },
-      OPEN_GIN_REQUEST_CONFIG
+      { ...OPEN_GIN_REQUEST_CONFIG, signal }
     );
 
     const datesList1 = result.body.map((item) => {
@@ -174,13 +174,17 @@ const fetchInitialGazetteData = async () => {
   }
 };
 
-const fetchPresidentsData = async (governmentNodeId = "gov_01") => {
+export const fetchPresidentsData = async (
+  governmentNodeId = "gov_01",
+  { signal } = {}
+) => {
   try {
     const { data: jsonResponse } = await axios.post(
       `${apiUrl}/v1/entities/${governmentNodeId}/relations`,
       { name: "AS_PRESIDENT" },
       {
         ...OPEN_GIN_REQUEST_CONFIG,
+        signal,
       }
     );
 
@@ -259,24 +263,19 @@ const fetchActiveMinistries = async (
   }
 };
 
-const fetchAllPersons = async () => {
-  try {
-    const { data } = await axios.post(
-      `${apiUrl}/v1/entities/search`,
-      {
-        kind: {
-          major: "Person",
-          minor: "citizen",
-        },
+export const fetchAllPersons = async ({ signal } = {}) => {
+  const { data } = await axios.post(
+    `${apiUrl}/v1/entities/search`,
+    {
+      kind: {
+        major: "Person",
+        minor: "citizen",
       },
-      OPEN_GIN_REQUEST_CONFIG
-    );
+    },
+    { ...OPEN_GIN_REQUEST_CONFIG, signal }
+  );
 
-    return data;
-  } catch (error) {
-    console.error("Error fetching person data from API:", error);
-    return { body: [] };
-  }
+  return data;
 };
 
 const fetchActiveRelationsForMinistry = async (
@@ -306,7 +305,7 @@ const fetchActiveRelationsForMinistry = async (
   }
 };
 
-const fetchAllDepartments = async () => {
+export const fetchAllDepartments = async ({ signal } = {}) => {
   // Fetch all department protobuf data
   const { data } = await axios.post(
     `${apiUrl}/v1/entities/search`,
@@ -316,13 +315,13 @@ const fetchAllDepartments = async () => {
         minor: "department",
       },
     },
-    OPEN_GIN_REQUEST_CONFIG
+    { ...OPEN_GIN_REQUEST_CONFIG, signal }
   );
 
   return data;
 };
 
-const fetchAllStateMinistries = async () => {
+export const fetchAllStateMinistries = async ({ signal } = {}) => {
   // Fetch all state ministries protobuf data
   const { data } = await axios.post(
     `${apiUrl}/v1/entities/search`,
@@ -332,13 +331,13 @@ const fetchAllStateMinistries = async () => {
         minor: "stateMinister",
       },
     },
-    OPEN_GIN_REQUEST_CONFIG
+    { ...OPEN_GIN_REQUEST_CONFIG, signal }
   );
 
   return data;
 };
 
-const fetchAllCabinetMinistries = async () => {
+export const fetchAllCabinetMinistries = async ({ signal } = {}) => {
   // Fetch all cabinet ministries protobuf data
   const { data } = await axios.post(
     `${apiUrl}/v1/entities/search`,
@@ -348,7 +347,7 @@ const fetchAllCabinetMinistries = async () => {
         minor: "cabinetMinister",
       },
     },
-    OPEN_GIN_REQUEST_CONFIG
+    { ...OPEN_GIN_REQUEST_CONFIG, signal }
   );
 
   return data;
